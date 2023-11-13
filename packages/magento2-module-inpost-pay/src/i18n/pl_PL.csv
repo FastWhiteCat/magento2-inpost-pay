@@ -1,0 +1,32 @@
+"Invalid InPost Pay configuration.","Nieprawidłowa konfiguracja InPost Pay.",module,InPost_InPostPay
+"Invalid InPost Pay configuration. Details: %1","Nieprawidłowa konfiguracja InPost Pay. Szczegóły: %1",module,InPost_InPostPay
+"InPost Courier not mapped","Kurier InPost nie został zmapowany",module,InPost_InPostPay
+"InPost Paczkomat 24/7 not mapped","Metoda dostawy InPost Paczkomat 24/7 nie został zmapowany",module,InPost_InPostPay
+"Empty Client ID","Wartość Client ID jest pusta",module,InPost_InPostPay
+"Empty Client Secret","Wartość Client Secret jest pusta",module,InPost_InPostPay
+"Empty Auth Token URL","Adres URL Autoryzacji Tokena jest pusty",module,InPost_InPostPay
+"Empty IZI API URL","Adres URL IZI API jest pusty",module,InPost_InPostPay
+"Authorization Settings","Ustawienia Autoryzacji",module,InPost_InPostPay
+"General Settings","Ogólne Ustawienia",module,InPost_InPostPay
+"Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
+"Title","Tytuł",module,InPost_InPostPay
+"New Order Status","Status Nowego Zamówienia",module,InPost_InPostPay
+"Payment from Applicable Countries","Akceptacja Płatności z Krajów",module,InPost_InPostPay
+"Payment from Specific Countries","Akceptacja Płatności z Wymienionych Krajów",module,InPost_InPostPay
+"Minimum Order Total","Minimalna Wartość Zamówienia",module,InPost_InPostPay
+"Maximum Order Total","Maksymalna Wartość Zamówienia",module,InPost_InPostPay
+"Enable InPost Pay Sandbox","Przełącz InPost Pay w Tryb Sandbox",module,InPost_InPostPay
+"Mapping for InPost Courier delivery method","Mapowanie Kuriera InPost do metody dostawy",module,InPost_InPostPay
+"Mapping for InPost Paczkomat 24/7 delivery method","Mapowanie metody dostawy InPost Paczkomat 24/7",module,InPost_InPostPay
+"Could not obtain public key.","Nie udało się uzyskać klucza publicznego.",module,InPost_InPostPay
+"Empty IZI API URL","Wartość IZI API URL jest pusta",module,InPost_InPostPay
+"InPost API endpoint ""%1"" responded with an error: %2","Procesowane zapytania API InPost ""%1"" zwróciło błąd: %2",module,InPost_InPostPay
+"InPost API endpoint ""%1"" responded with %1 code.","Procesowane zapytania API InPost ""%1"" zwróciło kod: %2",module,InPost_InPostPay
+"There was a problem with public key generation request. Details: %1","Wystąpił błąd podczas procesowania zapytania generującego klucz publiczny. Szczegóły: %1",module,InPost_InPostPay
+"Could not generate token due to invalid configuration. Details: %1","Nie można wygenerować token autoryzacyjnego ze względu na błędną konfigurację systemu. Szczegóły: %1",module,InPost_InPostPay
+"There was a problem with processing token generation request. Details: %1","Wystąpił błąd podczas generacji tokena. Szczegóły: %1",module,InPost_InPostPay
+"Incorrect public key hash","Niepoprawny hash klucza publicznego",module,InPost_InPostPay
+"Invalid signature","Niepoprawna sygnatura",module,InPost_InPostPay
+"There has been an error during signature validation: ""%1""","Wystąpił błąd podczas weryfikacji sygnatury: ""%1""",module,InPost_InPostPay
+"Signature validation failed for unknown reasons","Weryfikacja sygnatury nie powiodła się z nieznanego powodu",module,InPost_InPostPay
+"Signature is no longer valid","Sygnatura utraciła ważność",module,InPost_InPostPay

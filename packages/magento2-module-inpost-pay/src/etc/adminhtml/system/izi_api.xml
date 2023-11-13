@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_terms_and_conditions" translate="label" type="text" sortOrder="40"
+           showInDefault="1" showInWebsite="1">
+        <label>IZI API Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="izi_api_url" translate="label" type="text" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>IZI API URL</label>
+            <config_path>payment/inpost_pay/izi_api_url</config_path>
+        </field>
+    </group>
+</include>

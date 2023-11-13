@@ -1,0 +1,91 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Provider\Config;
+
+use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
+class AuthConfigProvider
+{
+    private const XML_PATH_CLIENT_ID = 'payment/inpost_pay/%sclient_id';
+    private const XML_PATH_CLIENT_SECRET = 'payment/inpost_pay/%sclient_secret';
+    private const XML_PATH_AUTH_TOKEN_URL = 'payment/inpost_pay/%sauth_token_url';
+
+    /**
+     * @param ScopeConfigInterface $scopeConfig
+     * @param SandboxConfigProvider $sandboxConfigProvider
+     */
+    public function __construct(
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly SandboxConfigProvider $sandboxConfigProvider
+    ) {
+    }
+
+    /**
+     * Returns production or sandbox Client ID
+     *
+     * @return string
+     * @throws InPostPayInvalidConfigurationException
+     */
+    public function getClientId(): string
+    {
+        $clientId = (string)$this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_CLIENT_ID,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            )
+        );
+
+        if (empty($clientId)) {
+            throw new InPostPayInvalidConfigurationException(__('Empty Client ID'));
+        }
+
+        return $clientId;
+    }
+
+    /**
+     * Returns production or sandbox Client Secret
+     *
+     * @return string
+     * @throws InPostPayInvalidConfigurationException
+     */
+    public function getClientSecret(): string
+    {
+        $clientSecret = (string)$this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_CLIENT_SECRET,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            )
+        );
+
+        if (empty($clientSecret)) {
+            throw new InPostPayInvalidConfigurationException(__('Empty Client Secret'));
+        }
+
+        return $clientSecret;
+    }
+
+    /**
+     * Returns production or sandbox Token providing API URL
+     *
+     * @return string
+     * @throws InPostPayInvalidConfigurationException
+     */
+    public function getAuthTokenUrl(): string
+    {
+        $authTokenUrl = (string)$this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_AUTH_TOKEN_URL,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            )
+        );
+
+        if (empty($authTokenUrl)) {
+            throw new InPostPayInvalidConfigurationException(__('Empty Auth Token URL'));
+        }
+
+        return $authTokenUrl;
+    }
+}

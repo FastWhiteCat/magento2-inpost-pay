@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <inpost_pay>
+                <enabled>0</enabled>
+                <model>InPostPayPaymentFacade</model>
+                <title>InPost Pay</title>
+                <order_status>pending</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>5</sort_order>
+                <min_order_total>0</min_order_total>
+                <max_order_total>99999</max_order_total>
+                <client_id></client_id>
+                <client_secret></client_secret>
+                <auth_token_url>https://login.inpost.pl/</auth_token_url>
+                <izi_api_url>https://api.inpost.pl/</izi_api_url>
+                <sandbox_enabled>0</sandbox_enabled>
+                <sandbox_client_id></sandbox_client_id>
+                <sandbox_client_secret></sandbox_client_secret>
+                <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
+                <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
+                <min_log_level>100</min_log_level>
+            </inpost_pay>
+        </payment>
+    </default>
+</config>
