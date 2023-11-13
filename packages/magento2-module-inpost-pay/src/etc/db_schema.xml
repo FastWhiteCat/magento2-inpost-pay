@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="checkout_agreement_version" resource="default" engine="innodb" comment="PayEye quote">
+        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false"
+                comment="Agreement ID"/>
+        <column xsi:type="int" name="version" unsigned="true" nullable="false" identity="false"
+                comment="Version"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="agreement_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CHKT_AGRT_VER_AGRT_ID_CHKT_AGRT_AGRT_ID" table="checkout_agreement_version"
+                    column="agreement_id" referenceTable="checkout_agreement" referenceColumn="agreement_id"
+                    onDelete="CASCADE"/>
+    </table>
+</schema>

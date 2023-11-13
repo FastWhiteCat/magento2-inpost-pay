@@ -30,3 +30,11 @@
 "There has been an error during signature validation: ""%1""","Wystąpił błąd podczas weryfikacji sygnatury: ""%1""",module,InPost_InPostPay
 "Signature validation failed for unknown reasons","Weryfikacja sygnatury nie powiodła się z nieznanego powodu",module,InPost_InPostPay
 "Signature is no longer valid","Sygnatura utraciła ważność",module,InPost_InPostPay
+"Terms and Conditions Mapping", "Mapowanie zgód",module,InPost_InPostPay
+"Terms and Conditions Mapping Settings","Ustawienia mapowania zgód",module,InPost_InPostPay
+"Magento Terms and Conditions","Zgody Magento",module,InPost_InPostPay
+"Requirement","Wymagalność",module,InPost_InPostPay
+"Agreement url","Link do zgody",module,InPost_InPostPay
+"always","zawsze",module,InPost_InPostPay
+"only in new version","tylko gdy nowa wersja",module,InPost_InPostPay
+"optional","niewymagana",module,InPost_InPostPay
