@@ -5,6 +5,8 @@
                 type="InPost\InPostPay\Validator\SignatureValidator"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\ConnectorInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
+    <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
+                type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
