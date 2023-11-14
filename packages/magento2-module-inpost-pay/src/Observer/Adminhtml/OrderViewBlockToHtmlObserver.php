@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Observer\Adminhtml;
 
+use InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -21,10 +22,9 @@ class OrderViewBlockToHtmlObserver implements ObserverInterface
             && $transportObject instanceof DataObject
         ) {
             $html = $transportObject->getData('html');
-            $html .= 'XXXXXXXXXXXXXXXXXX';
-//            $block->getLayout()->createBlock()
-            //TODO::Create and render block with Selected Locker Info IF Smartmage Module does not exist
-            $transportObject->setData('html', $html);
+            $infoBlock = $block->getLayout()->createBlock(OrderViewDeliveryInfo::class);
+            $additionalInfoHtml = $infoBlock->toHtml();
+            $transportObject->setData('html', $html . $additionalInfoHtml);
         }
     }
 }

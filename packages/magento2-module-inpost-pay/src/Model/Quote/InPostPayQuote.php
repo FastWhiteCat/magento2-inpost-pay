@@ -23,6 +23,7 @@ class InPostPayQuote implements InPostPayQuoteInterface
     {
         try {
             $cart->setData(InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD, $lockerId);
+            $cart->setData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD, $lockerId);
             $this->cartRepository->save($cart);
             $this->logger->info(
                 sprintf('Successfully saved Locker %s for Cart ID %s.', $lockerId, (int)$cart->getId())

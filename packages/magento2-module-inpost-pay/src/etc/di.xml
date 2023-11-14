@@ -85,4 +85,15 @@
             <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo">
+        <arguments>
+            <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Adminhtml\Order\View\RegisterCurrentOrderPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>
