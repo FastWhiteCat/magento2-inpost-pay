@@ -22,8 +22,9 @@ class RegisterCurrentOrderPlugin
 
     public function beforeExecute(View $subject): void
     {
-        $orderId = (int)$subject->getRequest()->getParam('order_id');
+        $orderId = $subject->getRequest()->getParam('order_id');
         try {
+            $orderId = (is_scalar($orderId)) ? (int)$orderId : 0;
             $order = $this->orderRepository->get($orderId);
             if ($order instanceof Order) {
                 $this->currentOrderRegistry->setOrder($order);

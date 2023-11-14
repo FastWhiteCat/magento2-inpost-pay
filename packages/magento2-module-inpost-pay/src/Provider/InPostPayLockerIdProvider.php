@@ -97,6 +97,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
      */
     private function getFromOrder(OrderInterface $order): string
     {
+        // @phpstan-ignore-next-line
         if (!$this->isInPostPickupDeliveryMethod((string)$order->getShippingMethod())) {
             throw new LocalizedException(
                 __(
