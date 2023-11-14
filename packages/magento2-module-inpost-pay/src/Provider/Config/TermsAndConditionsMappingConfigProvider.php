@@ -25,7 +25,10 @@ class TermsAndConditionsMappingConfigProvider
     public function getTermsAndConditionsMapping(): array
     {
         return  $this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING)
-            ? json_decode($this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING), true)
+            ? json_decode(
+                (string)$this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING),
+                true
+            )
             : [];
     }
 }

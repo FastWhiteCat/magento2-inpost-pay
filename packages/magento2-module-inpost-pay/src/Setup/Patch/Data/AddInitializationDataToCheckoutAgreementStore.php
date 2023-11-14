@@ -22,7 +22,8 @@ class AddInitializationDataToCheckoutAgreementStore implements DataPatchInterfac
         private readonly ModuleDataSetupInterface $moduleDataSetup,
         private readonly CheckoutAgreementsListInterface $checkoutAgreementsList,
         private readonly SearchCriteriaInterface $searchCriteria
-    ) {}
+    ) {
+    }
 
     /**
      * {@inheritdoc}

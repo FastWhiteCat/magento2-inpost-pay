@@ -11,21 +11,15 @@ class TermsAndConditionsRequirements implements OptionSourceInterface
     public const ONLY_IN_NEW_VERSION = 'REQUIRED_ONCE';
     public const OPTIONAL = 'OPTIONAL';
 
-    public const LABELS = [
-        self::ALWAYES => 'always',
-        self::ONLY_IN_NEW_VERSION => 'only in new version',
-        self::OPTIONAL => 'optional'
-    ];
-
     /**
      * @return array
      */
     public function toOptionArray(): array
     {
         return [
-            ['label' => self::ALWAYES, 'value' => __(self::LABELS[self::ALWAYES])],
-            ['label' => self::ONLY_IN_NEW_VERSION, 'value' => __(self::LABELS[self::ONLY_IN_NEW_VERSION])],
-            ['label' => self::OPTIONAL, 'value' => __(self::LABELS[self::OPTIONAL])]
+            ['label' => self::ALWAYES, 'value' => __('always')],
+            ['label' => self::ONLY_IN_NEW_VERSION, 'value' => __('only in new version')],
+            ['label' => self::OPTIONAL, 'value' => __('optional')]
         ];
     }
 }

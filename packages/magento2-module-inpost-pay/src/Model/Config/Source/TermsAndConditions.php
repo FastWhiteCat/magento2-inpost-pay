@@ -23,7 +23,7 @@ class TermsAndConditions implements OptionSourceInterface
     {
         $result = [];
         $agreementCollection = $this->agreementCollectionFactory->create();
-        $agreementCollection->addFieldToFilter('is_active', 1);
+        $agreementCollection->addFieldToFilter('is_active', ['eq' => 1]);
 
         /** @var Agreement $agreement */
         foreach ($agreementCollection as $agreement) {
