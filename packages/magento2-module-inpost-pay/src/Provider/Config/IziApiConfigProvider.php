@@ -36,7 +36,7 @@ class IziApiConfigProvider
             )
         );
 
-        if (empty($iziApiUrl) | !is_scalar($iziApiUrl)) {
+        if (empty($iziApiUrl) || !is_scalar($iziApiUrl)) {
             throw new InPostPayInvalidConfigurationException(__('Empty IZI API URL'));
         }
 
