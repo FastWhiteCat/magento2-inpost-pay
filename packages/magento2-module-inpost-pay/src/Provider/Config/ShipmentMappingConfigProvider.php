@@ -28,13 +28,13 @@ class ShipmentMappingConfigProvider
      */
     public function getCarrierMethodCodeForInPostCourier(): string
     {
-        $carrier = (string)$this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER);
+        $carrier = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER);
 
-        if (empty($carrier)) {
+        if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInvalidConfigurationException(__('InPost Courier not mapped'));
         }
 
-        return $carrier;
+        return (string)$carrier;
     }
 
     /**
@@ -45,12 +45,12 @@ class ShipmentMappingConfigProvider
      */
     public function getCarrierMethodCodeForInPostPickup(): string
     {
-        $carrier = (string)$this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP);
+        $carrier = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP);
 
-        if (empty($carrier)) {
+        if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInvalidConfigurationException(__('InPost Paczkomat 24/7 not mapped'));
         }
 
-        return $carrier;
+        return (string)$carrier;
     }
 }
