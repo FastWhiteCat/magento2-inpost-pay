@@ -1,0 +1,12 @@
+{
+    "quote": {
+        "column": {
+            "inpost_pay_locker_id": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "inpost_pay_locker_id": true
+        }
+    }
+}
