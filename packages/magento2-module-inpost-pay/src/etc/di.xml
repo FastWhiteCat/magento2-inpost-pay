@@ -7,6 +7,8 @@
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
+    <preference for="InPost\InPostPay\Api\InPostPayQuoteInterface"
+                type="InPost\InPostPay\Model\Quote\InPostPayQuote" />
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
@@ -70,6 +72,17 @@
     <type name="InPost\InPostPay\Validator\SignatureValidator">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Provider\InPostPayLockerIdProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CopyInPostPayLockerIdFromQuoteToOrderObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+            <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
         </arguments>
     </type>
 </config>

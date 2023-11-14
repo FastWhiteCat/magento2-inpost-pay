@@ -10,6 +10,7 @@ use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -28,38 +29,28 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
 
     public function getFromQuoteById(int $quoteId): string
     {
-        try {
-            $quote = $this->cartRepository->get($quoteId);
-            // @phpstan-ignore-next-line
-            if (!$this->isInPostPickupDeliveryMethod((string)$quote->getShippingAddress()->getShippingMethod())) {
-                throw new LocalizedException(
-                    __('Delivery method selected for this quote is not InPost Paczkomat 24/7')
-                );
-            }
+        $quote = $this->getQuoteById($quoteId);
+        // @phpstan-ignore-next-line
+        if (!$this->isInPostPickupDeliveryMethod((string)$quote->getShippingAddress()->getShippingMethod())) {
+            $errorPhrase = __('Delivery method selected for this quote is not InPost Paczkomat 24/7');
+            $this->logger->error($errorPhrase->render());
 
-            $inPostLockerId = '';
-            if ($quote->hasData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD)) {
-                $inPostLockerId = (string)$quote->getData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD);
-            } elseif ($quote->hasData(InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD)) {
-                $inPostLockerId = (string)$quote->getData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD);
-            }
-
-            if (empty($inPostLockerId)) {
-                throw new LocalizedException(__('InPost Locker ID not set for quote %1.', (string)$quote->getId()));
-            }
-
-            return $inPostLockerId;
-        } catch (NoSuchEntityException $e) {
-            $this->logger->error(
-                __('InPost Locker ID cannot be obtained because quote does not exist: %1', $e->getMessage())
-            );
-
-            throw $e;
-        } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage());
-
-            throw $e;
+            throw new LocalizedException($errorPhrase);
         }
+
+        $inPostLockerId = (string)$quote->getData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD);
+        $inPostPayLockerId = (string)$quote->getData(
+            InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD
+        );
+        if ($inPostLockerId) {
+            $lockerId = $inPostLockerId;
+        } elseif ($inPostPayLockerId) {
+            $lockerId = $inPostPayLockerId;
+        } else {
+            throw new LocalizedException(__('InPost Locker not set for Quote ID %1.', (string)$quote->getId()));
+        }
+
+        return $lockerId;
     }
 
     public function getFromOrderById(int $orderId): string
@@ -109,18 +100,17 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
             );
         }
 
-        $inPostLockerId = '';
-        if ($order->hasData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD)) {
-            $inPostLockerId = (string)$order->getData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD);
-        } elseif ($order->hasData(InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD)) {
-            $inPostLockerId = (string)$order->getData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD);
+        $inPostLockerId = (string)$order->getData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD);
+        $inPostPayLockerId = (string)$order->getData(InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD);
+        if ($inPostLockerId) {
+            $lockerId = $inPostLockerId;
+        } elseif ($inPostPayLockerId) {
+            $lockerId = $inPostPayLockerId;
+        } else {
+            throw new LocalizedException(__('InPost Locker ID not set for order #%1.', (string)$order->getIncrementId()));
         }
 
-        if (empty($inPostLockerId)) {
-            throw new LocalizedException(__('InPost Locker ID not set for order %1.', (string)$order->getId()));
-        }
-
-        return $inPostLockerId;
+        return $lockerId;
     }
 
     /**
@@ -142,10 +132,28 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
         }
 
         if (!isset($order)) {
-            throw new NoSuchEntityException(__('Order with Increment ID "%1" not found.'));
+            throw new NoSuchEntityException(__('Order  #%1 not found.'));
         }
 
         return $order;
+    }
+
+    /**
+     * @param int $quoteId
+     * @return CartInterface
+     * @throws NoSuchEntityException
+     */
+    private function getQuoteById(int $quoteId): CartInterface
+    {
+        try {
+            return $this->cartRepository->get($quoteId);
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error(
+                __('InPost Locker cannot be obtained because quote does not exist: %1', $e->getMessage())
+            );
+
+            throw $e;
+        }
     }
 
     /**

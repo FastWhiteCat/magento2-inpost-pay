@@ -10,11 +10,16 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
+use Magento\Payment\Model\Method\Adapter as InPostPayAdapter;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Psr\Log\LoggerInterface;
 
 class CopyInPostPayLockerIdFromQuoteToOrderObserver implements ObserverInterface
 {
     public function __construct(
-        private readonly InPostPayLockerIdProviderInterface $inPostPayLockerIdProvider
+        private readonly InPostPayLockerIdProviderInterface $inPostPayLockerIdProvider,
+        private readonly InPostPayAdapter $inPostPayAdapter,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -31,9 +36,26 @@ class CopyInPostPayLockerIdFromQuoteToOrderObserver implements ObserverInterface
     public function execute(Observer $observer): void
     {
         $order = $observer->getEvent()->getData('order');
-        if ($order instanceof Order) {
+        if ($order instanceof Order && $this->isOrderApplicable($order)) {
             $quoteInPostLockerId = $this->inPostPayLockerIdProvider->getFromQuoteById((int)$order->getQuoteId());
             $order->setData(InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD, $quoteInPostLockerId);
+            $this->logger->info(
+                sprintf(
+                    'Successfully copied Locker %s from Quote to Order #%s.',
+                    $quoteInPostLockerId,
+                    (string)$order->getIncrementId()
+                )
+            );
         }
+    }
+
+    private function isOrderApplicable(Order $order): bool
+    {
+        $payment = $order->getPayment();
+        if ($payment instanceof OrderPaymentInterface) {
+            $orderPaymentCode = $payment->getMethodInstance()->getCode();
+        }
+
+        return isset($orderPaymentCode) && $orderPaymentCode === $this->inPostPayAdapter->getCode();
     }
 }
