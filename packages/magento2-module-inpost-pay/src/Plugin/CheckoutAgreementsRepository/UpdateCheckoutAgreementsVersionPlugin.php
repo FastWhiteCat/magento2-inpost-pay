@@ -38,14 +38,10 @@ class UpdateCheckoutAgreementsVersionPlugin
     }
 
     /**
-     * @param CheckoutAgreementsRepositoryInterface $checkoutAgreementsRepository
-     * @param $result
      * @param AgreementInterface $agreement
      * @return void
      */
     public function afterSave(
-        CheckoutAgreementsRepositoryInterface $checkoutAgreementsRepository,
-        $result,
         AgreementInterface $agreement
     ):void {
         if ($agreement->getData('changed_version')) {

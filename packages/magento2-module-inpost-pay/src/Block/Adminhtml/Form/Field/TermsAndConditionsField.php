@@ -10,9 +10,9 @@ use Magento\Framework\View\Element\BlockInterface;
 
 class TermsAndConditionsField extends AbstractFieldArray
 {
-    /** @var BlockInterface */
+    /** @var BlockInterface|null */
     private $agreementRenderer;
-    /** @var BlockInterface */
+    /** @var BlockInterface|null */
     private $requirementsRenderer;
 
     /**
@@ -51,12 +51,14 @@ class TermsAndConditionsField extends AbstractFieldArray
         $options = [];
         $agreementId = $row->getMagentoAgreementId();
         if ($agreementId !== null) {
+            // @phpstan-ignore-next-line
             $options['option_' . $this->getAgreementRenderer()->calcOptionHash($agreementId)]
                 = 'selected="selected"';
         }
 
         $requirement = $row->getRequirement();
         if ($requirement !== null) {
+            // @phpstan-ignore-next-line
             $options['option_' . $this->getRequirementsRenderer()->calcOptionHash($requirement)]
                 = 'selected="selected"';
         }

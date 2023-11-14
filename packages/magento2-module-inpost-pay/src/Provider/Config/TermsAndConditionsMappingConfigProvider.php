@@ -20,9 +20,9 @@ class TermsAndConditionsMappingConfigProvider
     /**
      * Returns mapped terms and conditions
      *
-     * @return array
+     * @return mixed
      */
-    public function getTermsAndConditionsMapping(): array
+    public function getTermsAndConditionsMapping(): mixed
     {
         return  $this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING)
             ? json_decode(
