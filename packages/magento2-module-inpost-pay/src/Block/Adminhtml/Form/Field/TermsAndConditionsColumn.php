@@ -39,7 +39,7 @@ class TermsAndConditionsColumn extends Select
      * Set "name" for <select> element
      *
      * @param string $value
-     * @return $this
+     * @return TermsAndConditionsColumn
      */
     public function setInputName(string $value): TermsAndConditionsColumn
     {

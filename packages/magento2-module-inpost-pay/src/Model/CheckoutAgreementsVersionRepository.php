@@ -12,7 +12,8 @@ class CheckoutAgreementsVersionRepository implements CheckoutAgreementsVersionRe
      * @param ResourceConnection $resourceConnection
      */
     public function __construct(private readonly ResourceConnection $resourceConnection)
-    {}
+    {
+    }
 
     /**
      * @inheritdoc
@@ -24,9 +25,7 @@ class CheckoutAgreementsVersionRepository implements CheckoutAgreementsVersionRe
         $select = $connection->select()->from(
             'checkout_agreement_version',
             'version'
-        )->where(
-            'agreement_id = ?', $agreementId
-        );
+        )->where('agreement_id = ?', $agreementId);
 
         return (int)$connection->fetchOne($select);
     }

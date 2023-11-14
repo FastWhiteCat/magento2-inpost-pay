@@ -6,14 +6,13 @@ namespace InPost\InPostPay\Block\Adminhtml\Form\Field;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\BlockInterface;
 
 class TermsAndConditionsField extends AbstractFieldArray
 {
-    /** @var AbstractBlock */
+    /** @var BlockInterface */
     private $agreementRenderer;
-    /** @var AbstractBlock */
+    /** @var BlockInterface */
     private $requirementsRenderer;
 
     /**
@@ -65,7 +64,7 @@ class TermsAndConditionsField extends AbstractFieldArray
         $row->setData('option_extra_attrs', $options);
     }
 
-    private function getAgreementRenderer(): AbstractBlock
+    private function getAgreementRenderer(): BlockInterface
     {
         if (!$this->agreementRenderer) {
             $this->agreementRenderer = $this->getRenderer(TermsAndConditionsColumn::class);
@@ -74,7 +73,7 @@ class TermsAndConditionsField extends AbstractFieldArray
         return $this->agreementRenderer;
     }
 
-    private function getRequirementsRenderer(): AbstractBlock
+    private function getRequirementsRenderer(): BlockInterface
     {
         if (!$this->requirementsRenderer) {
             $this->requirementsRenderer = $this->getRenderer(TermsAndConditionsRequirementsColumn::class);
@@ -85,10 +84,10 @@ class TermsAndConditionsField extends AbstractFieldArray
 
     /**
      * @param string $className
-     * @return BlockInterface|string
+     * @return BlockInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function getRenderer(string $className): BlockInterface|string
+    private function getRenderer(string $className): BlockInterface
     {
         return $this->getLayout()->createBlock(
             $className,

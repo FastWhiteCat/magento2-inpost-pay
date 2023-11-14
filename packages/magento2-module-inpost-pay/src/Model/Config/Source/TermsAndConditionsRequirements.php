@@ -7,11 +7,11 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class TermsAndConditionsRequirements implements OptionSourceInterface
 {
-    const ALWAYES = 'REQUIRED_ALWAYS';
-    const ONLY_IN_NEW_VERSION = 'REQUIRED_ONCE';
-    const OPTIONAL = 'OPTIONAL';
+    public const ALWAYES = 'REQUIRED_ALWAYS';
+    public const ONLY_IN_NEW_VERSION = 'REQUIRED_ONCE';
+    public const OPTIONAL = 'OPTIONAL';
 
-    const LABELS = [
+    public const LABELS = [
         self::ALWAYES => 'always',
         self::ONLY_IN_NEW_VERSION => 'only in new version',
         self::OPTIONAL => 'optional'

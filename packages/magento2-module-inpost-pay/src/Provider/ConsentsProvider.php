@@ -16,11 +16,11 @@ class ConsentsProvider
     public const MAGENTO_AGREEMENT_ID_FIELD = 'magento_agreement_id';
 
     /**
-     * @param \InPost\InPostPay\Provider\Config\TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider
-     * @param \Magento\CheckoutAgreements\Api\CheckoutAgreementsListInterface $checkoutAgreementsList
-     * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
+     * @param TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider
+     * @param CheckoutAgreementsListInterface $checkoutAgreementsList
+     * @param FilterBuilder $filterBuilder
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
      */
     public function __construct(
         private readonly TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider,
@@ -28,8 +28,8 @@ class ConsentsProvider
         private readonly FilterBuilder $filterBuilder,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
-    ) {}
-
+    ) {
+    }
 
     /**
      * @return array
@@ -52,7 +52,11 @@ class ConsentsProvider
             $consents[] = [
                 'consent_id' => $item[self::MAGENTO_AGREEMENT_ID_FIELD],
                 'consent_link' => $item['agreement_url'],
-                'consent_description' => substr($checkoutAgreementsArray[$item[self::MAGENTO_AGREEMENT_ID_FIELD]]['name'], 0, self::CONSENT_DESCRIPTION_MAX_LENGTH),
+                'consent_description' => substr(
+                    $checkoutAgreementsArray[$item[self::MAGENTO_AGREEMENT_ID_FIELD]]['name'],
+                    0,
+                    self::CONSENT_DESCRIPTION_MAX_LENGTH
+                ),
                 'consent_version' => $checkoutAgreementsVersion[$item[self::MAGENTO_AGREEMENT_ID_FIELD]],
                 'requirement_type' => $item['requirement']
             ];

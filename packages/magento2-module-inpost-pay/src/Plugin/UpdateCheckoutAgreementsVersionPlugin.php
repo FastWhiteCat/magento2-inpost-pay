@@ -15,7 +15,8 @@ class UpdateCheckoutAgreementsVersionPlugin
     public function __construct(
         private readonly CheckoutAgreementsRepositoryInterface $checkoutAgreementsRepository,
         private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
-    ) {}
+    ) {
+    }
 
     /**
      * @param AgreementInterface $agreement
@@ -38,15 +39,14 @@ class UpdateCheckoutAgreementsVersionPlugin
 
     /**
      * @param AgreementInterface $agreement
-     * @param $result
      * @return void
      */
     public function afterSave(
-        AgreementInterface $agreement,
-        $result
+        AgreementInterface $agreement
     ):void {
         if ($agreement->getData('changed_version')) {
-            $checkoutAgreementVersion = $this->checkoutAgreementsVersionRepository->getCheckoutAgreementVersion((int)$agreement->getAgreementId());
+            $checkoutAgreementVersion = $this->checkoutAgreementsVersionRepository
+                ->getCheckoutAgreementVersion((int)$agreement->getAgreementId());
             $data['agreement_id'] = $agreement->getAgreementId();
             $data['version'] = 1;
             if ($checkoutAgreementVersion) {
