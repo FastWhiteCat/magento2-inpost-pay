@@ -38,7 +38,6 @@ class TermsAndConditionsField extends AbstractFieldArray
         ]);
 
         $this->_addAfter = false;
-        $this->_addButtonLabel = __('Add');
     }
 
     /**
