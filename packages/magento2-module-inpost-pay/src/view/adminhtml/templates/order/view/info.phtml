@@ -7,7 +7,7 @@ use InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo;
  */
 ?>
 <div class="admin__page-section-item order-shipping-method inpost-pay">
-    <?php if ($block->canShowLockerInfo() && $block->getLockerId()): ?>
+    <?php if (isset($block) && $block->canShowLockerInfo() && $block->getLockerId()): ?>
         <div class="admin__page-section-item-content inpost-pay-selected-locker">
             <br/>
             <?= $block->getEscaper()->escapeHtml(

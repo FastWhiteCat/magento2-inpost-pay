@@ -32,7 +32,10 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
         $quote = $this->getQuoteById($quoteId);
         // @phpstan-ignore-next-line
         if (!$this->isInPostPickupDeliveryMethod((string)$quote->getShippingAddress()->getShippingMethod())) {
-            $errorPhrase = __('Delivery method selected for this quote is not InPost Paczkomat 24/7');
+            $errorPhrase = __(
+                'Delivery method selected for this quote (ID: %1) is not InPost Paczkomat 24/7',
+                (string)$quoteId
+            );
             $this->logger->error($errorPhrase->render());
 
             throw new LocalizedException($errorPhrase);
@@ -59,7 +62,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
             return $this->getFromOrder($this->orderRepository->get($orderId));
         } catch (NoSuchEntityException $e) {
             $this->logger->error(
-                __('InPost Locker ID cannot be obtained because order does not exist: %1', $e->getMessage())
+                __('InPost Locker ID cannot be obtained because order does not exist: %1', $e->getMessage())->render()
             );
 
             throw $e;
@@ -76,7 +79,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
             return $this->getFromOrder($this->getOrderByIncrementId($orderIncrementId));
         } catch (NoSuchEntityException $e) {
             $this->logger->error(
-                __('InPost Locker ID cannot be obtained because order does not exist: %1', $e->getMessage())
+                __('InPost Locker ID cannot be obtained because order does not exist: %1', $e->getMessage())->render()
             );
 
             throw $e;
@@ -96,7 +99,10 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     {
         if (!$this->isInPostPickupDeliveryMethod((string)$order->getShippingMethod())) {
             throw new LocalizedException(
-                __('Delivery method selected for this order is not InPost Paczkomat 24/7')
+                __(
+                    'Delivery method selected for this order #%1 is not InPost Paczkomat 24/7',
+                    (string)$order->getIncrementId()
+                )
             );
         }
 
@@ -107,7 +113,9 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
         } elseif ($inPostPayLockerId) {
             $lockerId = $inPostPayLockerId;
         } else {
-            throw new LocalizedException(__('InPost Locker ID not set for order #%1.', (string)$order->getIncrementId()));
+            throw new LocalizedException(
+                __('InPost Locker ID not set for order #%1.', (string)$order->getIncrementId())
+            );
         }
 
         return $lockerId;
@@ -132,7 +140,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
         }
 
         if (!isset($order)) {
-            throw new NoSuchEntityException(__('Order  #%1 not found.'));
+            throw new NoSuchEntityException(__('Order #%1 not found.'));
         }
 
         return $order;
@@ -149,7 +157,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
             return $this->cartRepository->get($quoteId);
         } catch (NoSuchEntityException $e) {
             $this->logger->error(
-                __('InPost Locker cannot be obtained because quote does not exist: %1', $e->getMessage())
+                __('InPost Locker cannot be obtained because quote does not exist: %1', $e->getMessage())->render()
             );
 
             throw $e;

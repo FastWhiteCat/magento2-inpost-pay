@@ -37,14 +37,14 @@ class OrderViewDeliveryInfo extends Template
     public function getLockerId(): ?string
     {
         try {
-            $lockerId = (string)$this->getCurrentOrder()->getData(
+            $lockerId = $this->getCurrentOrder()->getData(
                 InPostPayLockerIdProviderInterface::INPOST_PAY_LOCKER_ID_FIELD
             );
         } catch (LocalizedException $e) {
             $lockerId = null;
         }
 
-        return (!empty($lockerId)) ? $lockerId : null;
+        return (!empty($lockerId) && is_scalar($lockerId)) ? (string)$lockerId : null;
     }
 
     public function canShowLockerInfo(): bool
@@ -55,10 +55,9 @@ class OrderViewDeliveryInfo extends Template
     public function canShowInPostPayInfo(): bool
     {
         try {
-            return $this->getCurrentOrder()
-                && !$this->getCurrentOrder()->getIsVirtual()
-                && $this->isInPostPayOrder()
-                && !$this->isInPostDeliveryModuleEnabled();
+            $order = $this->getCurrentOrder();
+
+            return !$order->getIsVirtual() && $this->isInPostPayOrder() && !$this->isInPostDeliveryModuleEnabled();
         } catch (LocalizedException $e) {
             return false;
         }
@@ -78,6 +77,7 @@ class OrderViewDeliveryInfo extends Template
         }
 
         if ($payment instanceof OrderPaymentInterface) {
+            // @phpstan-ignore-next-line
             $orderPaymentCode = $payment->getMethodInstance()->getCode();
         }
 

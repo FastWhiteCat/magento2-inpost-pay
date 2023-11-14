@@ -30,7 +30,11 @@ class RegisterCurrentOrderPlugin
             }
         } catch (Exception $e) {
             $this->logger->error(
-                __('Could not register currently viewed order (ID:%1). Reason: %2', $orderId, $e->getMessage())
+                __(
+                    'Could not register currently viewed order (ID:%1). Reason: %2',
+                    $orderId,
+                    $e->getMessage()
+                )->render()
             );
         }
     }

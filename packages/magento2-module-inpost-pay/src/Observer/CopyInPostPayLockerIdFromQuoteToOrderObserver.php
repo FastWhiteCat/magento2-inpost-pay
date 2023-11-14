@@ -53,6 +53,7 @@ class CopyInPostPayLockerIdFromQuoteToOrderObserver implements ObserverInterface
     {
         $payment = $order->getPayment();
         if ($payment instanceof OrderPaymentInterface) {
+            // @phpstan-ignore-next-line
             $orderPaymentCode = $payment->getMethodInstance()->getCode();
         }
 

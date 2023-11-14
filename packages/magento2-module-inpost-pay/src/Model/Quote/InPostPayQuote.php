@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Model\Quote;
 use Exception;
 use InPost\InPostPay\Api\InPostPayLockerIdProviderInterface;
 use InPost\InPostPay\Api\InPostPayQuoteInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,12 @@ class InPostPayQuote implements InPostPayQuoteInterface
     ) {
     }
 
+    /**
+     * @param CartInterface $cart
+     * @param string $lockerId
+     * @return void
+     * @throws LocalizedException
+     */
     public function setLockerIdForCart(CartInterface $cart, string $lockerId): void
     {
         try {
@@ -29,14 +36,15 @@ class InPostPayQuote implements InPostPayQuoteInterface
                 sprintf('Successfully saved Locker %s for Cart ID %s.', $lockerId, (int)$cart->getId())
             );
         } catch (Exception $e) {
-            $this->logger->error(
-                __(
-                    'Could not save Locker "%1" on Cart ID %2. Reason: %3',
-                    $lockerId,
-                    (int)$cart->getId(),
-                    $e->getMessage()
-                )
+            $errorPhrase = __(
+                'Could not save Locker "%1" on Cart ID %2. Reason: %3',
+                $lockerId,
+                (int)$cart->getId(),
+                $e->getMessage()
             );
+            $this->logger->error($errorPhrase->render());
+
+            throw new LocalizedException($errorPhrase);
         }
     }
 }
