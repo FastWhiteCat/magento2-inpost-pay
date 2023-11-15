@@ -83,12 +83,6 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Observer\CopyInPostPayLockerIdFromQuoteToOrderObserver">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-            <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
-        </arguments>
-    </type>
     <type name="InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo">
         <arguments>
             <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
