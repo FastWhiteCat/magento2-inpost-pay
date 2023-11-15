@@ -27,8 +27,13 @@ class TermsAndConditionsMappingConfigProvider
      */
     public function getTermsAndConditionsMapping(): array
     {
-        $value =  (string)$this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING);
+        $value = $this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING);
 
-        return $value ? (array)$this->serializer->unserialize($value) : [];
+        $termsAndConditions = null;
+        if (is_scalar($value)) {
+            $termsAndConditions = $this->serializer->unserialize((string)$value);
+        }
+
+        return is_array($termsAndConditions) ? $termsAndConditions : [];
     }
 }
