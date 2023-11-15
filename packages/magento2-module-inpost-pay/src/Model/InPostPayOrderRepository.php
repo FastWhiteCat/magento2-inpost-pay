@@ -79,6 +79,7 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
             $items[] = $model;
         }
 
+        // @phpstan-ignore-next-line
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
 

@@ -77,7 +77,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
             );
         }
 
-        $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId((int)$order->getId());
+        $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId((int)$order->getEntityId());
         $lockerId = $inPostPayOrder->getLockerId();
 
         if (empty($lockerId)) {

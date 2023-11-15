@@ -38,12 +38,15 @@ class OrderViewDeliveryInfo extends Template
     public function getLockerId(): ?string
     {
         try {
-            return $this->inPostPayLockerIdProvider->getFromOrderById((int)$this->getCurrentOrder()->getId());
+            $orderId = $this->getCurrentOrder()->getId();
+            if ($orderId && is_scalar($orderId)) {
+                return $this->inPostPayLockerIdProvider->getFromOrderById((int) $orderId);
+            }
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
-
-            return null;
         }
+
+        return null;
     }
 
     public function canShowLockerInfo(): bool

@@ -25,7 +25,8 @@ class OrderLockerService implements OrderLockerServiceInterface
     public function setLockerIdForOrder(Order $order, string $lockerId): void
     {
         try {
-            $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId((int)$order->getId());
+            $orderId = is_scalar($order->getId()) ? (int)$order->getId() : 0;
+            $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
             $this->setLockerIdOnInPostOrder($inPostPayOrder, $lockerId);
             $this->setLockerIdOnMagentoOrder($order, $lockerId);
         } catch (LocalizedException $e) {
@@ -53,7 +54,11 @@ class OrderLockerService implements OrderLockerServiceInterface
         $order->setData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD, $lockerId);
         $this->orderRepository->save($order);
         $this->logger->debug(
-            sprintf('Locker ID %s was saved in Magento Order ID %s ', $lockerId, (string)$order->getId())
+            sprintf(
+                'Locker ID %s was saved in Magento Order ID %s ',
+                $lockerId,
+                is_scalar($order->getId()) ? (int)$order->getId() : ''
+            )
         );
     }
 
