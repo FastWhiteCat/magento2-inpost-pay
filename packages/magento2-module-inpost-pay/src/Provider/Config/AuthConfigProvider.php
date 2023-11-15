@@ -31,18 +31,18 @@ class AuthConfigProvider
      */
     public function getClientId(): string
     {
-        $clientId = (string)$this->scopeConfig->getValue(
+        $clientId = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_CLIENT_ID,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             )
         );
 
-        if (empty($clientId)) {
+        if (empty($clientId) || !is_scalar($clientId)) {
             throw new InPostPayInvalidConfigurationException(__('Empty Client ID'));
         }
 
-        return $clientId;
+        return (string)$clientId;
     }
 
     /**
@@ -53,18 +53,18 @@ class AuthConfigProvider
      */
     public function getClientSecret(): string
     {
-        $clientSecret = (string)$this->scopeConfig->getValue(
+        $clientSecret = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_CLIENT_SECRET,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             )
         );
 
-        if (empty($clientSecret)) {
+        if (empty($clientSecret) || !is_scalar($clientSecret)) {
             throw new InPostPayInvalidConfigurationException(__('Empty Client Secret'));
         }
 
-        return $clientSecret;
+        return (string)$clientSecret;
     }
 
     /**
@@ -75,17 +75,17 @@ class AuthConfigProvider
      */
     public function getAuthTokenUrl(): string
     {
-        $authTokenUrl = (string)$this->scopeConfig->getValue(
+        $authTokenUrl = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_AUTH_TOKEN_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             )
         );
 
-        if (empty($authTokenUrl)) {
+        if (empty($authTokenUrl) || !is_scalar($authTokenUrl)) {
             throw new InPostPayInvalidConfigurationException(__('Empty Auth Token URL'));
         }
 
-        return $authTokenUrl;
+        return (string)$authTokenUrl;
     }
 }
