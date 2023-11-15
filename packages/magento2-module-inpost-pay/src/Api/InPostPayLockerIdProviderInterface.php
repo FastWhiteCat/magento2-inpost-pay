@@ -10,16 +10,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 interface InPostPayLockerIdProviderInterface
 {
     public const INPOST_LOCKER_ID_FIELD = 'inpost_locker_id';
-    public const INPOST_PAY_LOCKER_ID_FIELD = 'inpost_pay_locker_id';
     public const INPOST_PICKUP_CARRIER_CODE = 'inpostlocker';
-
-    /**
-     * @param int $quoteId
-     * @return string
-     * @throws NoSuchEntityException
-     * @throws LocalizedException
-     */
-    public function getFromQuoteById(int $quoteId): string;
 
     /**
      * @param int $orderId)

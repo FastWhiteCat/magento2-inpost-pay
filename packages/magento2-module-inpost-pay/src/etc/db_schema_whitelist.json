@@ -1,12 +1,16 @@
 {
-    "quote": {
+    "inpost_pay_order": {
         "column": {
-            "inpost_pay_locker_id": true
-        }
-    },
-    "sales_order": {
-        "column": {
-            "inpost_pay_locker_id": true
+            "inpost_pay_order_id": true,
+            "order_id": true,
+            "locker_id": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_ORDER_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "INPOST_PAY_ORDER_ORDER_ID": true
         }
     }
 }
