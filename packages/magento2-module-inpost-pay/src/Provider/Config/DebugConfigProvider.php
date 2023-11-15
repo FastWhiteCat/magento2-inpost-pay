@@ -24,6 +24,8 @@ class DebugConfigProvider
      */
     public function getMinLogLevel(): int
     {
-        return (int)($this->scopeConfig->getValue(self::XML_PATH_LOG_LEVEL) ?? Logger::DEBUG);
+        $minLogLevel = ($this->scopeConfig->getValue(self::XML_PATH_LOG_LEVEL) ?? Logger::DEBUG);
+
+        return is_scalar($minLogLevel) ? (int)$minLogLevel : Logger::DEBUG;
     }
 }

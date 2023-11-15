@@ -29,17 +29,17 @@ class IziApiConfigProvider
      */
     public function getIziApiUrl(): string
     {
-        $iziApiUrl = (string)$this->scopeConfig->getValue(
+        $iziApiUrl = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_IZI_API_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             )
         );
 
-        if (empty($iziApiUrl)) {
+        if (empty($iziApiUrl) || !is_scalar($iziApiUrl)) {
             throw new InPostPayInvalidConfigurationException(__('Empty IZI API URL'));
         }
 
-        return $iziApiUrl;
+        return (string)$iziApiUrl;
     }
 }

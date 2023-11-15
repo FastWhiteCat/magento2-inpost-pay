@@ -15,7 +15,9 @@ class PublicKeyResponse extends DataObject
 
     public function getMerchantExternalId(): string
     {
-        return (string)$this->getData(self::MERCHANT_EXTERNAL_ID);
+        $merchantExternalId = $this->getData(self::MERCHANT_EXTERNAL_ID);
+
+        return is_scalar($merchantExternalId) ? (string)$merchantExternalId : '';
     }
 
     public function setMerchantExternalId(string $merchantExternalId): void
@@ -25,7 +27,9 @@ class PublicKeyResponse extends DataObject
 
     public function getPublicKeys(): array
     {
-        return (array)$this->getData(self::PUBLIC_KEYS);
+        $publicKeys = $this->getData(self::PUBLIC_KEYS);
+
+        return is_array($publicKeys) ? $publicKeys : [];
     }
 
     public function setPublicKeys(array $publicKeys): void

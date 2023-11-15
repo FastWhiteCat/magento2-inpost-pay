@@ -35,7 +35,7 @@ class PublicKeyRequest implements RequestInterface
             $uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $uri);
         }
 
-        return preg_replace('/{[a-zA-Z0-9_-]*}/', '', $uri);
+        return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $uri);
     }
 
     public function getApiUrl(): string
