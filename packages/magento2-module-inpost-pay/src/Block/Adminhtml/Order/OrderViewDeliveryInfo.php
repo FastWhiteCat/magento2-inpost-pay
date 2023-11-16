@@ -12,21 +12,19 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order;
-use Magento\Framework\Module\Manager as ModuleManager;
+use InPost\InPostPay\Provider\InPostDeliveryModuleProvider;
 use Magento\Payment\Model\Method\Adapter as InPostPayAdapter;
 use Psr\Log\LoggerInterface;
 
 class OrderViewDeliveryInfo extends Template
 {
-    private const INPOST_DELIVERY_MODULE_NAME = 'Smartmage_Inpost';
-
     protected $_template = 'InPost_InPostPay::order/view/info.phtml';
 
     public function __construct(
         private readonly CurrentOrderRegistry $currentOrderRegistry,
         private readonly InPostPayLockerIdProviderInterface $inPostPayLockerIdProvider,
         private readonly InPostPayAdapter $inPostPayAdapter,
-        private readonly ModuleManager $moduleManager,
+        private readonly InPostDeliveryModuleProvider $inPostDeliveryModuleProvider,
         private readonly Escaper $escaper,
         private readonly LoggerInterface $logger,
         Context $context,
@@ -51,7 +49,7 @@ class OrderViewDeliveryInfo extends Template
 
     public function canShowLockerInfo(): bool
     {
-        return $this->canShowInPostPayInfo() && !$this->isInPostDeliveryModuleEnabled();
+        return $this->canShowInPostPayInfo() && !$this->inPostDeliveryModuleProvider->isEnabled();
     }
 
     public function canShowInPostPayInfo(): bool
@@ -86,11 +84,6 @@ class OrderViewDeliveryInfo extends Template
         }
 
         return isset($orderPaymentCode) && $orderPaymentCode === $this->inPostPayAdapter->getCode();
-    }
-
-    private function isInPostDeliveryModuleEnabled(): bool
-    {
-        return $this->moduleManager->isEnabled(self::INPOST_DELIVERY_MODULE_NAME);
     }
 
     /**

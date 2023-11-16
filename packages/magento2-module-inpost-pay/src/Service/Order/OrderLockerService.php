@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\InPostPayLockerIdProviderInterface;
 use InPost\InPostPay\Api\OrderLockerServiceInterface;
 use InPost\InPostPay\Model\InPostPayOrderRepository;
+use InPost\InPostPay\Provider\InPostDeliveryModuleProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
@@ -18,6 +19,7 @@ class OrderLockerService implements OrderLockerServiceInterface
     public function __construct(
         private readonly InPostPayOrderRepository $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
+        private readonly InPostDeliveryModuleProvider $inPostDeliveryModuleProvider,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -28,7 +30,9 @@ class OrderLockerService implements OrderLockerServiceInterface
             $orderId = is_scalar($order->getId()) ? (int)$order->getId() : 0;
             $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
             $this->setLockerIdOnInPostOrder($inPostPayOrder, $lockerId);
-            $this->setLockerIdOnMagentoOrder($order, $lockerId);
+            if ($this->inPostDeliveryModuleProvider->isEnabled()) {
+                $this->setLockerIdOnMagentoOrder($order, $lockerId);
+            }
         } catch (LocalizedException $e) {
             $errorPhrase = __(
                 'Could not assign Locker "%1" to Order #%2. Reason: %3',
