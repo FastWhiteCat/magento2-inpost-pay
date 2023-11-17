@@ -72,7 +72,8 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $this->resource->load($inPostPayQuote, $inPostBasketId, InPostPayQuoteInterface::INPOST_BASKET_ID);
         if (!$inPostPayQuote->getQuoteId()) {
             throw new NoSuchEntityException(
-                __('InPost Pay Quote with InPost Basket ID "%1" does not exist.', $inPostBasketId));
+                __('InPost Pay Quote with InPost Basket ID "%1" does not exist.', $inPostBasketId)
+            );
         }
 
         return $inPostPayQuote;
