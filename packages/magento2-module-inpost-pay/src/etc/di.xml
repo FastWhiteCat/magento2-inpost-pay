@@ -46,6 +46,18 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter">
+        <arguments>
+            <argument name="converters" xsi:type="array">
+                <item name="summary" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketSummaryDataConverter</item>
+                <item name="delivery" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketDeliveryDataConverter</item>
+                <item name="promo_codes" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter</item>
+                <item name="products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketProductsDataConverter</item>
+                <item name="related_products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketRelatedProductsDataConverter</item>
+                <item name="consents" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketConsentsDataConverter</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Logger\Handler">
         <arguments>
             <argument name="debugConfigProvider" xsi:type="object">InPost\InPostPay\Provider\Config\DebugConfigProvider</argument>
@@ -95,6 +107,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\Order\OrderLockerService">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

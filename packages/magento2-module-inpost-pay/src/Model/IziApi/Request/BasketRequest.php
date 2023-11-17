@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Model\IziApi\Request;
+
+use InPost\InPostPay\Api\ApiConnector\RequestInterface;
+use InPost\InPostPay\Model\Request;
+use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
+use InPost\InPostPay\Service\ApiConnector\TokenGenerator;
+
+class BasketRequest extends Request implements RequestInterface
+{
+    private const BASKET_ID_PARAM = 'basket_id';
+
+    protected string $uri = '/v1/izi/basket/{basket_id}';
+
+    /**
+     * @param IziApiConfigProvider $iziApiConfigProvider
+     * @param TokenGenerator $tokenGenerator
+     */
+    public function __construct(
+        private readonly IziApiConfigProvider $iziApiConfigProvider,
+        private readonly TokenGenerator $tokenGenerator
+    ) {
+    }
+
+    public function getUri(): string
+    {
+        $uri = $this->uri;
+        $params = $this->getParams();
+        if (array_key_exists(self::BASKET_ID_PARAM, $params)
+            && is_scalar($params[self::BASKET_ID_PARAM])
+        ) {
+            $basketId = (string)$params[self::BASKET_ID_PARAM];
+            $uri = str_replace(sprintf('{%s}', self::BASKET_ID_PARAM), $basketId, $uri);
+        }
+
+        return $uri;
+    }
+
+    public function getApiUrl(): string
+    {
+        return $this->iziApiConfigProvider->getIziApiUrl();
+    }
+
+    public function getBearerToken(): ?string
+    {
+        return $this->tokenGenerator->generate()->getAccessToken();
+    }
+}

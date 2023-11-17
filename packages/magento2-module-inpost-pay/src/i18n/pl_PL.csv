@@ -44,3 +44,18 @@
 "IZI API Settings","Ustawienia IZI API",module,InPost_InPostPay
 "Debugging Settings","Ustawienia Debuggowania",module,InPost_InPostPay
 "Selected Paczkomat: %1","Wybrany Paczkomat: %1",module,InPost_InPostPay
+"InPost basket lifetime in seconds.","Czas życia koszyka InPost w sekundach.",module,InPost_InPostPay
+"Basket Lifetime","Czas życia koszyka",module,InPost_InPostPay
+"Accepted Payment Types in InPost Basket","Akceptowane Metody Płatności w aplikacji InPost",module,InPost_InPostPay
+"Card","Płatność kartą",module,InPost_InPostPay
+"Card token","Token karty",module,InPost_InPostPay
+"Google Pay","Google Pay",module,InPost_InPostPay
+"Apple Pay","Apple Pay",module,InPost_InPostPay
+"BLIK code","Kod BLIK",module,InPost_InPostPay
+"BLIK token","Token BLIK",module,InPost_InPostPay
+"Pay by link","Płatność linkiem",module,InPost_InPostPay
+"Shopping limit","Limit zakupowy",module,InPost_InPostPay
+"Deferred payment","Opóźniona płatność",module,InPost_InPostPay
+"Cash on delivery","Płatność przy odbiorze",module,InPost_InPostPay
+"Empty selection will allow all payment types in mobile application.","Nie wybranie żadnej opcji spowoduje umożliwienie wszystkich form płatności w aplikacji mobilnej.",module,InPost_InPostPay
+
