@@ -3,6 +3,8 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
+                type="InPost\InPostPay\Model\InPostPayQuote"/>
     <preference for="InPost\InPostPay\Api\InPostPayOrderRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayOrderRepository"/>
     <preference for="InPost\InPostPay\Api\OrderLockerServiceInterface"

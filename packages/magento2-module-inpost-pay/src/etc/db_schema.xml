@@ -18,4 +18,29 @@
             <column name="order_id"/>
         </constraint>
     </table>
+    <table name="inpost_pay_quote" resource="default" engine="innodb">
+        <column name="entity_id" xsi:type="int" unsigned="true" nullable="false" identity="true" comment="Entity id"/>
+        <column xsi:type="int" name="quote_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="basket_id" length="255" nullable="false"/>
+        <column xsi:type="varchar" name="inpost_basket_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="status" length="32" nullable="true"/>
+        <column xsi:type="varchar" name="phone_number" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="masked_phone_number" length="12" nullable="true"/>
+        <column xsi:type="tinyint" name="browser_trusted" nullable="true"/>
+        <column xsi:type="varchar" name="browser_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="surname" length="255" nullable="true"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="INPOST_PAY_QUOTE_QUOTE_QUOTE_ENTITY_ID"
+                    table="inpost_pay_quote" column="quote_id"
+                    referenceTable="quote" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_QUOTE_QUOTE_ID">
+            <column name="quote_id"/>
+        </constraint>
+    </table>
 </schema>

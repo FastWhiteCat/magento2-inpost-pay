@@ -12,5 +12,27 @@
             "INPOST_PAY_ORDER_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
             "INPOST_PAY_ORDER_ORDER_ID": true
         }
+    },
+    "inpost_pay_quote": {
+        "column": {
+            "entity_id": true,
+            "quote_id": true,
+            "basket_id": true,
+            "inpost_basket_id": true,
+            "status": true,
+            "phone_number": true,
+            "masked_phone_number": true,
+            "browser_trusted": true,
+            "browser_id": true,
+            "name": true,
+            "surname": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
+            "INPOST_PAY_QUOTE_QUOTE_ID": true
+        }
     }
 }
