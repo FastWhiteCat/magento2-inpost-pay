@@ -7,7 +7,7 @@ interface InPostPayQuoteInterface
 {
     public const TABLE_NAME = 'inpost_pay_quote';
     public const ENTITY_NAME = 'inpost_pay_quote';
-    public const ENTITY_ID = 'entity_id';
+    public const INPOST_PAY_QUOTE_ID = 'inpost_pay_quote_id';
     public const QUOTE_ID = 'quote_id';
     public const BASKET_ID = 'basket_id';
     public const INPOST_BASKET_ID = 'inpost_basket_id';
@@ -21,10 +21,13 @@ interface InPostPayQuoteInterface
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
+    public function getInPostPayQuoteId(): ?int;
+    public function setInPostPayQuoteId(int $inPostPayQuoteId): InPostPayQuoteInterface;
+
     public function getQuoteId(): int;
     public function setQuoteId(int $quoteId): InPostPayQuoteInterface;
 
-    public function getBasketId(): ?string;
+    public function getBasketId(): string;
     public function setBasketId(string $basketId): InPostPayQuoteInterface;
 
     public function getInpostBasketId(): ?string;
@@ -39,7 +42,7 @@ interface InPostPayQuoteInterface
     public function getMaskedPhoneNumber(): ?string;
     public function setMaskedPhoneNumber(string $maskedPhoneNumber): InPostPayQuoteInterface;
 
-    public function getBrowserTrusted(): ?bool;
+    public function getBrowserTrusted(): bool;
     public function setBrowserTrusted(bool $browserTrusted): InPostPayQuoteInterface;
 
     public function getBrowserId(): ?string;

@@ -13,7 +13,7 @@ class Collection extends AbstractCollection
 {
     protected $_eventPrefix = InPostPayQuoteInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayQuoteInterface::ENTITY_NAME;
-    protected $_idFieldName = InPostPayQuoteInterface::ENTITY_ID;
+    protected $_idFieldName = InPostPayQuoteInterface::INPOST_PAY_QUOTE_ID;
 
     /**
      * @inheritDoc

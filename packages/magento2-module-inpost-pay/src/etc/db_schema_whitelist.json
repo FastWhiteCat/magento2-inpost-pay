@@ -27,7 +27,8 @@
             "name": true,
             "surname": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "inpost_pay_quote_id": true
         },
         "constraint": {
             "PRIMARY": true,

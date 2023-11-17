@@ -18,6 +18,18 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         $this->_init(ResourceModel\InPostPayQuote::class);
     }
 
+    public function getInPostPayQuoteId(): ?int
+    {
+        $id = ($this->hasData(self::INPOST_PAY_QUOTE_ID)) ? $this->getData(self::INPOST_PAY_QUOTE_ID) : null;
+
+        return ($id && is_scalar($id)) ? (int)$id : null;
+    }
+
+    public function setInPostPayQuoteId(int $inPostPayQuoteId): InPostPayQuoteInterface
+    {
+        return $this->setData(self::INPOST_PAY_QUOTE_ID, $inPostPayQuoteId);
+    }
+
     public function getQuoteId(): int
     {
         $id = ($this->hasData(self::QUOTE_ID)) ? $this->getData(self::QUOTE_ID) : null;
@@ -34,7 +46,7 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return $this->setData(self::QUOTE_ID, $quoteId);
     }
 
-    public function getBasketId(): ?string
+    public function getBasketId(): string
     {
         $id = ($this->hasData(self::BASKET_ID)) ? $this->getData(self::BASKET_ID) : null;
 
@@ -42,7 +54,7 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
             return (string)$id;
         }
 
-        throw new LocalizedException(__('Invalid Baslet ID value.'));
+        throw new LocalizedException(__('Invalid Basket ID value.'));
     }
 
     public function setBasketId(string $basketId): InPostPayQuoteInterface
@@ -100,11 +112,9 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return $this->setData(self::MASKED_PHONE_NUMBER, $maskedPhoneNumber);
     }
 
-    public function getBrowserTrusted(): ?bool
+    public function getBrowserTrusted(): bool
     {
-        $browserTrusted = ($this->hasData(self::BROWSER_TRUSTED)) ? $this->getData(self::BROWSER_TRUSTED) : null;
-
-        return ($browserTrusted && is_scalar($browserTrusted)) ? (bool)$browserTrusted : null;
+        return (bool)$this->getData(self::BROWSER_TRUSTED);
     }
 
     public function setBrowserTrusted(bool $browserTrusted): InPostPayQuoteInterface
