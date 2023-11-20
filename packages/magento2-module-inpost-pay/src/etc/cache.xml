@@ -6,8 +6,9 @@
         <label>InPost Pay Public Key Version Cache</label>
         <description>Public key used to generate signature for InPost Pay incoming request validations.</description>
     </type>
-    <type name="inpost_pay_temrms_and_conditions" translate="label"
+    <type name="inpost_pay_temrms_and_conditions" translate="label,description"
           instance="InPost\InPostPay\Model\Cache\TermsAndConditions\Type">
         <label>Terms And Conditions Versions Cache</label>
+        <description>Terms and conditions needed in communication with InPost Pay API.</description>
     </type>
 </config>
