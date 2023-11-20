@@ -27,15 +27,14 @@ class Handler extends Base
 
     public function isHandling(array $record): bool
     {
-        $recordLevel = (isset($record['level'])) ? (int)$record['level'] : 0;
         $minLogLevel = ($this->debugConfigProvider) ? $this->debugConfigProvider->getMinLogLevel() : $this->level;
 
-        return $recordLevel >= $minLogLevel;
+        return (int)$record['level'] >= $minLogLevel;
     }
 
     public function handle(array $record): bool
     {
-        $recordMessage = (isset($record['message'])) ? (string)$record['message'] : '';
+        $recordMessage = (string)$record['message'];
         $record['message'] = sprintf('[%s] %s', $this->getLogId(), $recordMessage);
 
         return parent::handle($record);

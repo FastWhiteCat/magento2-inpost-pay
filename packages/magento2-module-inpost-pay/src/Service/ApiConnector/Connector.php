@@ -35,7 +35,7 @@ class Connector implements ConnectorInterface
 
         try {
             $this->createRequestLog($url, $headers, $params);
-            $response = $client->{$request->getMethod()}($url, ['form_params' => $params]);
+            $response = $client->{$request->getMethod()}($url, !empty($params) ? ['form_params' => $params] : []);
         } catch (Exception $e) {
             $errorMsg = __('InPost API endpoint "%1" responded with an error: %2', $url, $e->getMessage());
             $this->createResponseLog($errorMsg->render(), $e->getCode(), true);
@@ -53,7 +53,15 @@ class Connector implements ConnectorInterface
             $this->createResponseLog($responseBody, $statusCode);
         }
 
-        return $this->serializer->unserialize($responseBody);
+        $resultData = [];
+        $result = $this->serializer->unserialize($responseBody);
+        if (is_scalar($result)) {
+            $resultData['result'] = (string)$result;
+        } elseif (is_array($result)) {
+            $resultData = $result;
+        }
+
+        return $resultData;
     }
 
     private function getClient(array $headers): Client
@@ -110,7 +118,9 @@ class Connector implements ConnectorInterface
     private function createResponseLog(string $body, int $code, bool $critical = false): void
     {
         $logMessage = sprintf(
-            'API Response:%s. Content: %s', $code, $this->base64serializer->serialize(['body' => $body])
+            'API Response:%s. Content: %s',
+            $code,
+            $this->base64serializer->serialize(['body' => $body])
         );
 
         if ($critical) {

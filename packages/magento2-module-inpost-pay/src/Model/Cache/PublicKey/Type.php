@@ -14,7 +14,7 @@ class Type extends TagScope
     public const TTL = 86400;
 
     public function __construct(
-        private readonly FrontendPool $cacheFrontendPool
+        FrontendPool $cacheFrontendPool
     ) {
         parent::__construct($cacheFrontendPool->get(self::TYPE_IDENTIFIER), self::CACHE_TAG);
     }

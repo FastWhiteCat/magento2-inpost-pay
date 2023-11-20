@@ -1,10 +1,18 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
+                type="InPost\InPostPay\Model\InPostPayOrder"/>
+    <preference for="InPost\InPostPay\Api\InPostPayOrderRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayOrderRepository"/>
+    <preference for="InPost\InPostPay\Api\OrderLockerServiceInterface"
+                type="InPost\InPostPay\Service\Order\OrderLockerService"/>
     <preference for="InPost\InPostPay\Api\Validator\SignatureValidatorInterface"
                 type="InPost\InPostPay\Validator\SignatureValidator"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\ConnectorInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
+    <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
+                type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface" type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version" type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
@@ -73,6 +81,27 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Provider\InPostPayLockerIdProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo">
+        <arguments>
+            <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Adminhtml\Order\View\RegisterCurrentOrderPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\OrderLockerService">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

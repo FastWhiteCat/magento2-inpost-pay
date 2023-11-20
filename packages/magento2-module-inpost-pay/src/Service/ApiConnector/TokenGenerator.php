@@ -12,6 +12,7 @@ use InPost\InPostPay\Model\AuthApi\Response\OAuthTokenResponse as TokenResponse;
 use InPost\InPostPay\Model\AuthApi\Request\OAuthTokenRequestFactory as TokenRequestFactory;
 use InPost\InPostPay\Model\AuthApi\Response\OAuthTokenResponseFactory as TokenResponseFactory;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
+use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
 class TokenGenerator
@@ -37,7 +38,7 @@ class TokenGenerator
     /**
      * @return TokenResponse
      * @throws InPostPayInvalidConfigurationException
-     * @throws Exception
+     * @throws LocalizedException
      */
     public function generate(): TokenResponse
     {
@@ -55,17 +56,21 @@ class TokenGenerator
                 $result = $this->connector->sendRequest($request);
                 $this->tokenResponse = $this->handle($result);
             } catch (InPostPayInvalidConfigurationException $e) {
-                $this->logger->error(
-                    __('Could not generate token due to invalid configuration. Details: %1', $e->getMessage())
+                $errorPhrase = __(
+                    'Could not generate token due to invalid configuration. Details: %1',
+                    $e->getMessage()
                 );
+                $this->logger->error($errorPhrase->render());
 
-                throw $e;
+                throw new LocalizedException($errorPhrase);
             } catch (Exception $e) {
-                $this->logger->critical(
-                    __('There was a problem with processing token generation request. Details: %1', $e->getMessage())
+                $errorPhrase = __(
+                    'There was a problem with processing token generation request. Details: %1',
+                    $e->getMessage()
                 );
+                $this->logger->critical($errorPhrase->render());
 
-                throw $e;
+                throw new LocalizedException($errorPhrase);
             }
         }
 
@@ -77,9 +82,9 @@ class TokenGenerator
         $accessToken = (string)($result[TokenResponse::ACCESS_TOKEN] ?? '');
         $expiresIn = (int)($result[TokenResponse::EXPIRES_IN] ?? 0);
         $refreshExpiresIn = (int)($result[TokenResponse::REFRESH_EXPIRES_IN] ?? 0);
-        $tokenType = (string)($publicKeysNode[TokenResponse::TOKEN_TYPE] ?? '');
-        $notBeforePolicy = (int)($publicKeysNode[TokenResponse::NOT_BEFORE_POLICY] ?? 0);
-        $scope = (string)($publicKeysNode[TokenResponse::SCOPE] ?? '');
+        $tokenType = (string)($result[TokenResponse::TOKEN_TYPE] ?? '');
+        $notBeforePolicy = (int)($result[TokenResponse::NOT_BEFORE_POLICY] ?? 0);
+        $scope = (string)($result[TokenResponse::SCOPE] ?? '');
 
         /** @var TokenResponse $tokenResponse */
         $tokenResponse = $this->tokenResponseFactory->create();

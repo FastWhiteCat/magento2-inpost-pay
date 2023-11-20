@@ -17,7 +17,9 @@ class OAuthTokenResponse extends DataObject
 
     public function getAccessToken(): string
     {
-        return (string)$this->getData(self::ACCESS_TOKEN);
+        $accessToken = $this->getData(self::ACCESS_TOKEN);
+
+        return (is_scalar($accessToken)) ? (string)$accessToken : '';
     }
 
     public function setAccessToken(string $accessToken): void
@@ -27,7 +29,9 @@ class OAuthTokenResponse extends DataObject
 
     public function getExpiresIn(): int
     {
-        return (int)$this->getData(self::EXPIRES_IN);
+        $expiresIn = $this->getData(self::EXPIRES_IN);
+
+        return (is_scalar($expiresIn)) ? (int)$expiresIn : 0;
     }
 
     public function setExpiresIn(int $expiresIn): void
@@ -37,7 +41,9 @@ class OAuthTokenResponse extends DataObject
 
     public function getRefreshExpiresIn(): int
     {
-        return (int)$this->getData(self::REFRESH_EXPIRES_IN);
+        $refreshExpiresIn = $this->getData(self::REFRESH_EXPIRES_IN);
+
+        return (is_scalar($refreshExpiresIn)) ? (int)$refreshExpiresIn : 0;
     }
 
     public function setRefreshExpiresIn(int $refreshExpiresIn): void
@@ -47,7 +53,9 @@ class OAuthTokenResponse extends DataObject
 
     public function getTokenType(): string
     {
-        return (string)$this->getData(self::TOKEN_TYPE);
+        $tokenType = $this->getData(self::TOKEN_TYPE);
+
+        return (is_scalar($tokenType)) ? (string)$tokenType : '';
     }
 
     public function setTokenType(string $tokenType): void
@@ -57,7 +65,9 @@ class OAuthTokenResponse extends DataObject
 
     public function getNotBeforePolicy(): int
     {
-        return (int)$this->getData(self::NOT_BEFORE_POLICY);
+        $notBeforePolicy = $this->getData(self::NOT_BEFORE_POLICY);
+
+        return (is_scalar($notBeforePolicy)) ? (int)$notBeforePolicy : 0;
     }
 
     public function setNotBeforePolicy(int $notBeforePolicy): void
@@ -67,7 +77,9 @@ class OAuthTokenResponse extends DataObject
 
     public function getScope(): string
     {
-        return (string)$this->getData(self::SCOPE);
+        $scope = $this->getData(self::SCOPE);
+
+        return (is_scalar($scope)) ? (string)$scope : '';
     }
 
     public function setScope(string $scope): void
