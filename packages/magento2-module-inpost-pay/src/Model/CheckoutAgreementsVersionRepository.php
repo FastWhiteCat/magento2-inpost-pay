@@ -23,7 +23,7 @@ class CheckoutAgreementsVersionRepository implements CheckoutAgreementsVersionRe
         $connection = $this->resourceConnection->getConnection();
 
         $select = $connection->select()->from(
-            'checkout_agreement_version',
+            'inpost_pay_checkout_agreement_version',
             'version'
         )->where('agreement_id = ?', $agreementId);
 
@@ -38,7 +38,7 @@ class CheckoutAgreementsVersionRepository implements CheckoutAgreementsVersionRe
         $connection = $this->resourceConnection->getConnection();
 
         $connection->insertOnDuplicate(
-            'checkout_agreement_version',
+            'inpost_pay_checkout_agreement_version',
             $data,
             ['version']
         );
@@ -52,7 +52,7 @@ class CheckoutAgreementsVersionRepository implements CheckoutAgreementsVersionRe
         $connection = $this->resourceConnection->getConnection();
 
         $select = $connection->select()->from(
-            'checkout_agreement_version',
+            'inpost_pay_checkout_agreement_version',
             ['agreement_id', 'version']
         );
 

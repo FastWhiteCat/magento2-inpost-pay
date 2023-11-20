@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider;
 
+use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
 use InPost\InPostPay\Provider\Config\TermsAndConditionsMappingConfigProvider;
 use InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface;
 use Magento\CheckoutAgreements\Api\CheckoutAgreementsListInterface;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class ConsentsProvider
 {
@@ -27,7 +29,9 @@ class ConsentsProvider
         private readonly CheckoutAgreementsListInterface $checkoutAgreementsList,
         private readonly FilterBuilder $filterBuilder,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
-        private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
+        private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository,
+        private readonly TermsAndConditionsCacheType $termsAndConditionsCacheType,
+        private readonly SerializerInterface $serializer
     ) {
     }
 
@@ -36,33 +40,47 @@ class ConsentsProvider
      */
     public function getConsents(): array
     {
-        $termsAndConditionsMapping = $this->termsAndConditionsMappingConfigProvider->getTermsAndConditionsMapping();
+        $consents =
+            (string)$this->termsAndConditionsCacheType->load(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
 
-        if (!$termsAndConditionsMapping) {
-            return [];
+        if (empty($consents)) {
+            $termsAndConditionsMapping = $this->termsAndConditionsMappingConfigProvider->getTermsAndConditionsMapping();
+
+            if (!$termsAndConditionsMapping) {
+                return [];
+            }
+
+            $ids = array_column($termsAndConditionsMapping, self::MAGENTO_AGREEMENT_ID_FIELD);
+
+            $checkoutAgreementsArray = $this->getCheckoutAgreementsList($ids);
+            $checkoutAgreementsVersion = $this->getCheckoutAgreementsVersion($ids);
+
+            $consents = [];
+            foreach ($termsAndConditionsMapping as $item) {
+                $consents[] = [
+                    'consent_id' => $item[self::MAGENTO_AGREEMENT_ID_FIELD],
+                    'consent_link' => $item['agreement_url'],
+                    'consent_description' => substr(
+                        $checkoutAgreementsArray[$item[self::MAGENTO_AGREEMENT_ID_FIELD]]['name'],
+                        0,
+                        self::CONSENT_DESCRIPTION_MAX_LENGTH
+                    ),
+                    'consent_version' => $checkoutAgreementsVersion[$item[self::MAGENTO_AGREEMENT_ID_FIELD]],
+                    'requirement_type' => $item['requirement']
+                ];
+            }
+
+            $encodedConsentsData = (string)$this->serializer->serialize($consents);
+
+            $this->termsAndConditionsCacheType->save(
+                $encodedConsentsData,
+                TermsAndConditionsCacheType::TYPE_IDENTIFIER,
+                [TermsAndConditionsCacheType::CACHE_TAG],
+                TermsAndConditionsCacheType::TTL
+            );
         }
 
-        $ids = array_column($termsAndConditionsMapping, self::MAGENTO_AGREEMENT_ID_FIELD);
-
-        $checkoutAgreementsArray = $this->getCheckoutAgreementsList($ids);
-        $checkoutAgreementsVersion = $this->getCheckoutAgreementsVersion($ids);
-
-        $consents = [];
-        foreach ($termsAndConditionsMapping as $item) {
-            $consents[] = [
-                'consent_id' => $item[self::MAGENTO_AGREEMENT_ID_FIELD],
-                'consent_link' => $item['agreement_url'],
-                'consent_description' => substr(
-                    $checkoutAgreementsArray[$item[self::MAGENTO_AGREEMENT_ID_FIELD]]['name'],
-                    0,
-                    self::CONSENT_DESCRIPTION_MAX_LENGTH
-                ),
-                'consent_version' => $checkoutAgreementsVersion[$item[self::MAGENTO_AGREEMENT_ID_FIELD]],
-                'requirement_type' => $item['requirement']
-            ];
-        }
-
-        return $consents;
+        return is_array($consents) ? $consents : $this->serializer->unserialize($consents);
     }
 
     /**

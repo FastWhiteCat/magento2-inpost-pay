@@ -10,7 +10,7 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 
 class AddInitializationDataToCheckoutAgreementStore implements DataPatchInterface
 {
-    private const CHECKOUT_AGREEMENT_VERSION_TABLE = 'checkout_agreement_version';
+    private const CHECKOUT_AGREEMENT_VERSION_TABLE = 'inpost_pay_checkout_agreement_version';
 
     /**
      * AddProductSendLockerAttribute constructor.

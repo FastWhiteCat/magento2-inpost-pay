@@ -48,10 +48,7 @@ class UpdateCheckoutAgreementsVersionPlugin
             $checkoutAgreementVersion = $this->checkoutAgreementsVersionRepository
                 ->getCheckoutAgreementVersion((int)$agreement->getAgreementId());
             $data['agreement_id'] = $agreement->getAgreementId();
-            $data['version'] = 1;
-            if ($checkoutAgreementVersion) {
-                $data['version'] = $checkoutAgreementVersion + 1;
-            }
+            $data['version'] = uniqid();
 
             $this->checkoutAgreementsVersionRepository->save($data);
         }
