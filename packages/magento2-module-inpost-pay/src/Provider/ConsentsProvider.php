@@ -7,6 +7,7 @@ use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCa
 use InPost\InPostPay\Provider\Config\TermsAndConditionsMappingConfigProvider;
 use InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface;
 use Magento\CheckoutAgreements\Api\CheckoutAgreementsListInterface;
+use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -23,6 +24,8 @@ class ConsentsProvider
      * @param FilterBuilder $filterBuilder
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
+     * @param SerializerInterface $serializer
+     * @param CacheInterface $cache
      */
     public function __construct(
         private readonly TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider,
@@ -30,8 +33,8 @@ class ConsentsProvider
         private readonly FilterBuilder $filterBuilder,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository,
-        private readonly TermsAndConditionsCacheType $termsAndConditionsCacheType,
-        private readonly SerializerInterface $serializer
+        private readonly SerializerInterface $serializer,
+        private readonly CacheInterface $cache
     ) {
     }
 
@@ -40,8 +43,7 @@ class ConsentsProvider
      */
     public function getConsents(): array
     {
-        $consents =
-            (string)$this->termsAndConditionsCacheType->load(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
+        $consents = $this->cache->load(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
 
         if (empty($consents)) {
             $termsAndConditionsMapping = $this->termsAndConditionsMappingConfigProvider->getTermsAndConditionsMapping();
@@ -72,12 +74,16 @@ class ConsentsProvider
 
             $encodedConsentsData = (string)$this->serializer->serialize($consents);
 
-            $this->termsAndConditionsCacheType->save(
+            $this->cache->save(
                 $encodedConsentsData,
                 TermsAndConditionsCacheType::TYPE_IDENTIFIER,
                 [TermsAndConditionsCacheType::CACHE_TAG],
                 TermsAndConditionsCacheType::TTL
             );
+        }
+
+        if (empty($consents)) {
+            return [];
         }
 
         return is_array($consents) ? $consents : $this->serializer->unserialize($consents);

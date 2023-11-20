@@ -11,7 +11,7 @@ class Type extends TagScope
 {
     public const TYPE_IDENTIFIER = 'inpost_pay_terms_and_conditions';
     public const CACHE_TAG = 'INPOST_PAY_TERMS_AND_CONDITIONS';
-    public const TTL = 86400;
+    public const TTL = 2592000;
 
     public function __construct(
         FrontendPool $cacheFrontendPool

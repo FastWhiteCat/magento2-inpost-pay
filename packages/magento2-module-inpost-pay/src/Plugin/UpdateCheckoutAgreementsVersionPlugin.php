@@ -1,9 +1,11 @@
 <?php
 namespace InPost\InPostPay\Plugin;
 
+use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
 use Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface;
 use Magento\CheckoutAgreements\Api\Data\AgreementInterface;
 use InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface;
+use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class UpdateCheckoutAgreementsVersionPlugin
@@ -11,10 +13,12 @@ class UpdateCheckoutAgreementsVersionPlugin
     /**
      * @param CheckoutAgreementsRepositoryInterface $checkoutAgreementsRepository
      * @param CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
+     * @param CacheInterface $cache
      */
     public function __construct(
         private readonly CheckoutAgreementsRepositoryInterface $checkoutAgreementsRepository,
-        private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
+        private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository,
+        private readonly CacheInterface $cache
     ) {
     }
 
@@ -45,12 +49,11 @@ class UpdateCheckoutAgreementsVersionPlugin
         AgreementInterface $agreement
     ):void {
         if ($agreement->getData('changed_version')) {
-            $checkoutAgreementVersion = $this->checkoutAgreementsVersionRepository
-                ->getCheckoutAgreementVersion((int)$agreement->getAgreementId());
             $data['agreement_id'] = $agreement->getAgreementId();
             $data['version'] = uniqid();
 
             $this->checkoutAgreementsVersionRepository->save($data);
+            $this->cache->clean(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
         }
     }
 }
