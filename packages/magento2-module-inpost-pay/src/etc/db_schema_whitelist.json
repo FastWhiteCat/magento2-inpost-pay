@@ -15,7 +15,7 @@
     },
     "inpost_pay_quote": {
         "column": {
-            "entity_id": true,
+            "inpost_pay_quote_id": true,
             "quote_id": true,
             "basket_id": true,
             "inpost_basket_id": true,
@@ -27,8 +27,7 @@
             "name": true,
             "surname": true,
             "created_at": true,
-            "updated_at": true,
-            "inpost_pay_quote_id": true
+            "updated_at": true
         },
         "constraint": {
             "PRIMARY": true,
