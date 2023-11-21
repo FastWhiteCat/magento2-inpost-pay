@@ -35,7 +35,11 @@ class Connector implements ConnectorInterface
 
         try {
             $this->createRequestLog($url, $headers, $params);
-            $response = $client->{$request->getMethod()}($url, !empty($params) ? ['form_params' => $params] : []);
+            if (count($params) === count($params, COUNT_RECURSIVE)) {
+                $response = $client->{$request->getMethod()}($url, !empty($params) ? ['form_params' => $params] : []);
+            } else {
+                $response = $client->{$request->getMethod()}($url, !empty($params) ? $params : []);
+            }
         } catch (Exception $e) {
             $errorMsg = __('InPost API endpoint "%1" responded with an error: %2', $url, $e->getMessage());
             $this->createResponseLog($errorMsg->render(), $e->getCode(), true);
