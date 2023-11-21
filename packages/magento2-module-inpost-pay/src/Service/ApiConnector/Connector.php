@@ -10,6 +10,7 @@ use GuzzleHttp\ClientFactory;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Response;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Base64Json;
@@ -34,12 +35,18 @@ class Connector implements ConnectorInterface
         $params = $request->getParams();
 
         try {
-            $this->createRequestLog($url, $headers, $params);
-            if (count($params) === count($params, COUNT_RECURSIVE)) {
-                $response = $client->{$request->getMethod()}($url, !empty($params) ? ['form_params' => $params] : []);
-            } else {
-                $response = $client->{$request->getMethod()}($url, !empty($params) ? $params : []);
+            switch ($request->getContentType()) {
+                case (HttpClient::ENC_URLENCODED):
+                    $requestParams = !empty($params) ? ['form_params' => $params] : [];
+                    break;
+                case (HttpClient::ENC_FORMDATA):
+                    $requestParams = !empty($params) ? ['multipart' => $params] : [];
+                    break;
+                default:
+                    $requestParams = $params;
             }
+            $this->createRequestLog($url, $headers, $requestParams);
+            $response = $client->{$request->getMethod()}($url, $requestParams);
         } catch (Exception $e) {
             $errorMsg = __('InPost API endpoint "%1" responded with an error: %2', $url, $e->getMessage());
             $this->createResponseLog($errorMsg->render(), $e->getCode(), true);
