@@ -13,6 +13,13 @@
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
+    <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface" type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
+        <plugin name="update_checkout_agreement_version" type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
+    </type>
+    <type name="Magento\CheckoutAgreements\Api\Data\AgreementInterface">
+        <plugin name="update_checkout_agreement_version_new" type="InPost\InPostPay\Plugin\UpdateCheckoutAgreementsVersionPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
