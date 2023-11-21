@@ -44,3 +44,11 @@
 "IZI API Settings","Ustawienia IZI API",module,InPost_InPostPay
 "Debugging Settings","Ustawienia Debuggowania",module,InPost_InPostPay
 "Selected Paczkomat: %1","Wybrany Paczkomat: %1",module,InPost_InPostPay
+"Terms and Conditions Mapping", "Mapowanie zgód",module,InPost_InPostPay
+"Terms and Conditions Mapping Settings","Ustawienia mapowania zgód",module,InPost_InPostPay
+"Magento Terms and Conditions","Zgody Magento",module,InPost_InPostPay
+"Requirement","Wymagalność",module,InPost_InPostPay
+"Agreement url","Link do zgody",module,InPost_InPostPay
+"always","zawsze",module,InPost_InPostPay
+"only in new version","tylko gdy nowa wersja",module,InPost_InPostPay
+"optional","niewymagana",module,InPost_InPostPay

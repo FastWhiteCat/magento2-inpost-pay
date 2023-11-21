@@ -34,5 +34,15 @@
             "INPOST_PAY_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
             "INPOST_PAY_QUOTE_QUOTE_ID": true
         }
+    },
+    "inpost_pay_checkout_agreement_version": {
+        "column": {
+            "agreement_id": true,
+            "version": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_CHKT_AGRT_VERSION_AGRT_ID_CHKT_AGRT_AGRT_ID": true
+        }
     }
 }

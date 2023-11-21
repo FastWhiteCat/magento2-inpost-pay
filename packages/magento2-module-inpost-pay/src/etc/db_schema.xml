@@ -43,4 +43,14 @@
             <column name="quote_id"/>
         </constraint>
     </table>
+    <table name="inpost_pay_checkout_agreement_version" resource="default" engine="innodb">
+        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="version" length="255" nullable="false"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="agreement_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CHKT_AGRT_VER_AGRT_ID_CHKT_AGRT_AGRT_ID" table="checkout_agreement_version"
+                    column="agreement_id" referenceTable="checkout_agreement" referenceColumn="agreement_id"
+                    onDelete="CASCADE"/>
+    </table>
 </schema>
