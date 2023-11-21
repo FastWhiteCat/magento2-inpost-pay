@@ -43,11 +43,13 @@ class AddInitializationDataToCheckoutAgreementStore implements DataPatchInterfac
             ];
         }
 
-        $this->moduleDataSetup->getConnection()->insertArray(
-            self::CHECKOUT_AGREEMENT_VERSION_TABLE,
-            ['agreement_id', 'version'],
-            $data
-        );
+        if (!empty($data)) {
+            $this->moduleDataSetup->getConnection()->insertArray(
+                self::CHECKOUT_AGREEMENT_VERSION_TABLE,
+                ['agreement_id', 'version'],
+                $data
+            );
+        }
 
         $this->moduleDataSetup->getConnection()->endSetup();
 

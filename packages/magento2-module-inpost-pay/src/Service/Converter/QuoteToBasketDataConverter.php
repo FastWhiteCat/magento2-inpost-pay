@@ -26,11 +26,15 @@ class QuoteToBasketDataConverter implements QuoteToBasketDataConverterInterface
 
     public function convert(Quote $quote): array
     {
-        $basketData = [Basket::BROWSER_ID => $this->getBrowserIdFromCart($quote)];
+        $basketData = [
+            Basket::BROWSER_ID => $this->getBrowserIdFromCart($quote),
+            Basket::BASKET_ID => uniqid()
+        ];
 
         foreach ($this->converters as $converterKey => $converter) {
             $basketData[$converterKey] = $converter->convert($quote);
         }
+
         return $basketData;
     }
 

@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Api\ApiConnector\IziApi\Basket;
 
 interface BasketFieldInterface
 {
+    public const BASKET_ID = 'basket_id';
     public const BROWSER_ID = 'browser_id';
     public const SUMMARY = 'summary';
     public const BASKET_BASE_PRICE = 'basket_base_price';

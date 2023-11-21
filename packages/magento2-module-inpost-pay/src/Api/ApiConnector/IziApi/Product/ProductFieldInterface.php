@@ -15,6 +15,8 @@ interface ProductFieldInterface
     public const PRODUCT_LINK = 'product_link';
     public const PRODUCT_IMAGE = 'product_image';
     public const BASE_PRICE = 'base_price';
+    public const PROMO_PRICE = 'promo_price';
+    public const LOWEST_PRICE = 'lowest_price';
     public const QUANTITY = 'quantity';
     public const QUANTITY_TYPE = 'quantity_type';
     public const QUANTITY_UNIT = 'quantity_unit';

@@ -9,6 +9,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
+use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Quote\Model\Quote;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 
@@ -28,7 +29,7 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
         $regularPriceExclTax = 0.00;
         foreach ($quote->getItems() as $item) {
             $qty = (float)$item->getQty();
-            $regularPrice = $item->getProduct()->getPriceInfo()->getPrice('regular_price')->getAmount();
+            $regularPrice = $item->getProduct()->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
             $regularPriceExclTax += round($qty * (float)$regularPrice->getBaseAmount(), 2);
             $regularPriceInclTax += round($qty * (float)$regularPrice->getValue(), 2);
         }

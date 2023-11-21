@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use GuzzleHttp\Client;
+use Laminas\Http\Client as HttpClient;
 use GuzzleHttp\ClientFactory;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
@@ -34,8 +35,18 @@ class Connector implements ConnectorInterface
         $params = $request->getParams();
 
         try {
-            $this->createRequestLog($url, $headers, $params);
-            $response = $client->{$request->getMethod()}($url, !empty($params) ? ['form_params' => $params] : []);
+            switch ($request->getContentType()) {
+                case (HttpClient::ENC_URLENCODED):
+                    $requestParams = !empty($params) ? ['form_params' => $params] : [];
+                    break;
+                case (HttpClient::ENC_FORMDATA):
+                    $requestParams = !empty($params) ? ['multipart' => $params] : [];
+                    break;
+                default:
+                    $requestParams = $params;
+            }
+            $this->createRequestLog($url, $headers, $requestParams);
+            $response = $client->{$request->getMethod()}($url, $requestParams);
         } catch (Exception $e) {
             $errorMsg = __('InPost API endpoint "%1" responded with an error: %2', $url, $e->getMessage());
             $this->createResponseLog($errorMsg->render(), $e->getCode(), true);

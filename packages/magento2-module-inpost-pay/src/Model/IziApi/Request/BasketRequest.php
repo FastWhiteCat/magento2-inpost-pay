@@ -8,10 +8,16 @@ use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use InPost\InPostPay\Model\Request;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\TokenGenerator;
+use Laminas\Http\Client as HttpClient;
+use Laminas\Http\Request as HttpRequest;
+use Magento\Analytics\Model\Connector\Http\JsonConverter;
 
 class BasketRequest extends Request implements RequestInterface
 {
     private const BASKET_ID_PARAM = 'basket_id';
+
+    protected string $method = HttpRequest::METHOD_PUT;
+    protected ?string $contentType = JsonConverter::CONTENT_MEDIA_TYPE;
 
     protected string $uri = '/v1/izi/basket/{basket_id}';
 
@@ -34,6 +40,8 @@ class BasketRequest extends Request implements RequestInterface
         ) {
             $basketId = (string)$params[self::BASKET_ID_PARAM];
             $uri = str_replace(sprintf('{%s}', self::BASKET_ID_PARAM), $basketId, $uri);
+            unset($params[self::BASKET_ID_PARAM]);
+            $this->setParams($params);
         }
 
         return $uri;
