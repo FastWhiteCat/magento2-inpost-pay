@@ -42,6 +42,12 @@
         <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_QUOTE_QUOTE_ID">
             <column name="quote_id"/>
         </constraint>
+        <index referenceId="INPOST_PAY_QUOTE_INPOST_BASKET_ID" indexType="btree">
+            <column name="inpost_basket_id"/>
+        </index>
+        <index referenceId="INPOST_PAY_QUOTE_BASKET_ID" indexType="btree">
+            <column name="basket_id"/>
+        </index>
     </table>
     <table name="inpost_pay_checkout_agreement_version" resource="default" engine="innodb">
         <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false"/>
