@@ -30,3 +30,25 @@
 "There has been an error during signature validation: ""%1""","Wystąpił błąd podczas weryfikacji sygnatury: ""%1""",module,InPost_InPostPay
 "Signature validation failed for unknown reasons","Weryfikacja sygnatury nie powiodła się z nieznanego powodu",module,InPost_InPostPay
 "Signature is no longer valid","Sygnatura utraciła ważność",module,InPost_InPostPay
+"InPost Locker cannot be obtained because quote does not exist: %1","Paczkomat nie może zostać pobrany przez nieistniejący koszyk: %1",module,InPost_InPostPay
+"Cannot obtain order data.","Nie można pobrać danych zamówienia.",module,InPost_InPostPay
+"Could not save Locker "%1" on Cart ID %2. Reason: %3","Paczkomat 24/7 ""%1"" nie mógł zostać zapisany w koszyku ID %2. Powód: %3",module,InPost_InPostPay
+"Could not register currently viewed order (ID:%1). Reason: %2","Nie można zarejestrować aktualnie przeglądanego zamówienia (ID:%1). Powód: %2",module,InPost_InPostPay
+"Delivery method selected for this quote (ID: %1) is not InPost Paczkomat 24/7","Metodą dostawy wybraną dla tego koszyka (ID: %1) nie jest InPost Paczkomat 24/7",module,InPost_InPostPay
+"InPost Locker not set for Quote ID %1.","Paczkomat nie został wybrany dla koszyka ID %1.",module,InPost_InPostPay
+"InPost Locker ID cannot be obtained because order does not exist: %1","Paczkomat nie może zostać pobrany przez nieistniejące zamówienie: %1",module,InPost_InPostPay
+"Delivery method selected for this order #%1 is not InPost Paczkomat 24/7","Metodą dostawy wybraną dla tego zamówienia #%1 nie jest InPost Paczkomat 24/7",module,InPost_InPostPay
+"InPost Locker ID not set for order #%1.","Paczkomat nie został wybrany dla zamówienia #%1.",module,InPost_InPostPay
+"Order #%1 not found.","Nie znaleziono zamówienia #%1.",module,InPost_InPostPay
+"Shipment Mapping Settings","Mapowanie Metod Dostawy",module,InPost_InPostPay
+"IZI API Settings","Ustawienia IZI API",module,InPost_InPostPay
+"Debugging Settings","Ustawienia Debuggowania",module,InPost_InPostPay
+"Selected Paczkomat: %1","Wybrany Paczkomat: %1",module,InPost_InPostPay
+"Terms and Conditions Mapping", "Mapowanie zgód",module,InPost_InPostPay
+"Terms and Conditions Mapping Settings","Ustawienia mapowania zgód",module,InPost_InPostPay
+"Magento Terms and Conditions","Zgody Magento",module,InPost_InPostPay
+"Requirement","Wymagalność",module,InPost_InPostPay
+"Agreement url","Link do zgody",module,InPost_InPostPay
+"always","zawsze",module,InPost_InPostPay
+"only in new version","tylko gdy nowa wersja",module,InPost_InPostPay
+"optional","niewymagana",module,InPost_InPostPay

@@ -51,11 +51,11 @@ class PublicKeyResponseDataConverter
         }
 
         /** @var PublicKeyResponse $publicKeyResponse */
-        $publicKeyByVersionResponse = $this->publicKeyResponseFactory->create();
-        $publicKeyByVersionResponse->setMerchantExternalId($merchantExternalId);
-        $publicKeyByVersionResponse->setPublicKeys($publicKeys);
+        $publicKeyResponse = $this->publicKeyResponseFactory->create();
+        $publicKeyResponse->setMerchantExternalId($merchantExternalId);
+        $publicKeyResponse->setPublicKeys($publicKeys);
 
-        return $publicKeyByVersionResponse;
+        return $publicKeyResponse;
     }
 
     /**

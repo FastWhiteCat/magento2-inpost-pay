@@ -42,7 +42,12 @@ class SignatureValidator implements SignatureValidatorInterface
     ): bool {
         try {
             $this->validateRequestPublicKeyBase64Hash($requestPublicKeyVersion, $requestPublicKeyHash);
-            $this->validateSignature($requestSignature, $requestSignatureTimestamp, $requestPublicKeyVersion, $requestBody);
+            $this->validateSignature(
+                $requestSignature,
+                $requestSignatureTimestamp,
+                $requestPublicKeyVersion,
+                $requestBody
+            );
             $this->validateSignatureLifetime($requestSignatureTimestamp);
         } catch (AuthorizationException $e) {
             $this->logger->error(sprintf('Signature validation process failed. Reason: %s', $e->getMessage()));
@@ -85,6 +90,7 @@ class SignatureValidator implements SignatureValidatorInterface
         string $requestPublicKeyVersion,
         string $requestBody
     ): void {
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $decodedRequestSignature = base64_decode($requestSignature);
         $expectedSignature = $this->calculateSignature(
             $requestSignatureTimestamp,

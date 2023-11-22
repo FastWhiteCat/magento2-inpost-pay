@@ -13,7 +13,9 @@ class PublicKey extends DataObject
 
     public function getPublicKeyBase64(): string
     {
-        return (string)$this->getData(self::PUBLIC_KEY_BASE64);
+        $publicKeyBase64 = $this->getData(self::PUBLIC_KEY_BASE64);
+
+        return is_scalar($publicKeyBase64) ? (string)$publicKeyBase64 : '';
     }
 
     public function setPublicKeyBase64(string $publicKeyBase64): void
@@ -23,7 +25,9 @@ class PublicKey extends DataObject
 
     public function getVersion(): string
     {
-        return (string)$this->getData(self::VERSION);
+        $version = $this->getData(self::VERSION);
+
+        return is_scalar($version) ? (string)$version : '';
     }
 
     public function setVersion(string $version): void

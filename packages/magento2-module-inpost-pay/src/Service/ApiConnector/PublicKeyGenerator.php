@@ -42,7 +42,7 @@ class PublicKeyGenerator
             return $this->handle($result);
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with public key generation request. Details: %1', $e->getMessage());
-            $this->logger->critical($errorMsg);
+            $this->logger->critical($errorMsg->render());
 
             throw new LocalizedException($errorMsg);
         }
