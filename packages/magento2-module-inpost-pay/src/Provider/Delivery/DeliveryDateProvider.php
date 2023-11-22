@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Provider;
+namespace InPost\InPostPay\Provider\Delivery;
 
 use DateTime;
 use DateTimeZone;
@@ -24,19 +24,24 @@ class DeliveryDateProvider
     }
 
     /**
-     * This method should be modified with after plugin in case of customized delivery date calculations.
+     * This method should be modified with afterPlugin in case of customized delivery date calculations.
      * If not, configuration timestamp increment will be used.
+     *
+     * Parameters $shippingMethod and $quote exist only to allow easier delivery date customized calculation
      *
      * @param ShippingMethodInterface $shippingMethod
      * @param Quote $quote
      * @return int
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function calculateTimestamp(ShippingMethodInterface $shippingMethod, Quote $quote): int
     {
         try {
             $deadlineInDays = $this->shipmentMappingConfigProvider->getDeliveryDateDeadlineInDays();
             $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
-            $currentTimestamp = strtotime($currentDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT));
+            $currentTimestamp = strtotime(
+                $currentDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT)
+            );
 
             return $currentTimestamp + ($deadlineInDays * self::SECONDS_IN_DAY);
         } catch (Exception $e) {

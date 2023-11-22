@@ -66,3 +66,4 @@
 "always","zawsze",module,InPost_InPostPay
 "only in new version","tylko gdy nowa wersja",module,InPost_InPostPay
 "optional","niewymagana",module,InPost_InPostPay
+"No Coupon is required.","Kod Rabatowy nie jest wymagany.",module,InPost_InPostPay

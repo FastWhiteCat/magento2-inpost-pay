@@ -26,23 +26,12 @@ class QuoteToBasketDataConverter implements QuoteToBasketDataConverterInterface
 
     public function convert(Quote $quote): array
     {
-        $basketData = [
-            Basket::BROWSER_ID => $this->getBrowserIdFromCart($quote),
-            Basket::BASKET_ID => uniqid()
-        ];
-
+        $basketData = [];
         foreach ($this->converters as $converterKey => $converter) {
             $basketData[$converterKey] = $converter->convert($quote);
         }
 
         return $basketData;
-    }
-
-    private function getBrowserIdFromCart(Quote $quote): string
-    {
-        //TODO::fill after INPAY-28 is implemented from inpost_pay_quote.browser_id field
-
-        return '2d387d15-d4fe-43f8-85dc-32d46cfc3b53';
     }
 
     /**

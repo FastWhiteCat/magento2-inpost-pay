@@ -20,7 +20,6 @@ class AcceptedPaymentTypes implements OptionSourceInterface
     public const DEFERRED_PAYMENT = 'DEFERRED_PAYMENT';
     public const CASH_ON_DELIVERY = 'CASH_ON_DELIVERY';
 
-
     public function toOptionArray(): array
     {
         return [

@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
 use DateTime;
+use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use InPost\InPostPay\Model\Config\Source\AcceptedPaymentTypes;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
+use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
-use InPost\InPostPay\Provider\DeliveryDateProvider;
 
 class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterInterface
 {
+    private const DEFAULT_COUNTRY_ID = 'PL';
+
     public function __construct(
         private readonly IziApiConfigProvider $iziApiConfigProvider,
         private readonly DeliveryDateProvider $deliveryDateProvider,
@@ -30,24 +32,28 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
     public function convert(Quote $quote): array
     {
         $deliveries = [];
-        if ($quote->getShippingAddress()) {
-            $shippingMethods = $this->shippingMethodManager->getList((int)$quote->getId());
-            $courierShippingMethod = $this->getCourierShippingMethod($shippingMethods);
-            $pickupPointShippingMethod = $this->getPickupShippingMethod($shippingMethods);
+        $shippingAddress = $quote->getShippingAddress();
+        if (empty($shippingAddress->getCountryId())) {
+            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
+        }
 
-            if ($pickupPointShippingMethod) {
-                $deliveries[] = $this->getPickupData($pickupPointShippingMethod, $quote);
-            }
+        $shippingMethods = $this->shippingMethodManager->estimateByExtendedAddress(
+            (int)$quote->getId(),
+            $shippingAddress
+        );
+        $courierShippingMethod = $this->getCourierShippingMethod($shippingMethods);
+        $pickupPointShippingMethod = $this->getPickupShippingMethod($shippingMethods);
 
-            if ($courierShippingMethod) {
-                $deliveries[] = $this->getCourierData($courierShippingMethod, $quote);
-            }
+        if ($pickupPointShippingMethod) {
+            $deliveries[] = $this->getPickupData($pickupPointShippingMethod, $quote);
+        }
 
-            if (empty($deliveries)) {
-                throw new LocalizedException(__('No delivery method is allowed for this basket.'));
-            }
-        } else {
+        if ($courierShippingMethod) {
+            $deliveries[] = $this->getCourierData($courierShippingMethod, $quote);
+        }
 
+        if (empty($deliveries)) {
+            throw new LocalizedException(__('No delivery method is allowed for this basket.'));
         }
 
         return $deliveries;

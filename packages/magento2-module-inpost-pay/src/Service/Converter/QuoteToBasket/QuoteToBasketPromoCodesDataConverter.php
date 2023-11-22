@@ -40,7 +40,7 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
             } else {
                 $promoCodesData[] = [
                     'name' => $this->getRuleLabel($rule, (int)$quote->getStoreId()),
-                    'promo_code_value' => __('No Coupon')->render()
+                    'promo_code_value' => __('No Coupon is required.')->render()
                 ];
             }
         }
@@ -52,11 +52,14 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
     {
         $ruleLabel = null;
         $labels = $rule->getStoreLabels();
-        /** @var RuleLabel $label */
-        foreach ($labels as $label) {
-            if ($label->getStoreId() === $storeId) {
-                $ruleLabel = $label->getStoreLabel();
-                break;
+
+        if ($labels) {
+            /** @var RuleLabel $label */
+            foreach ($labels as $label) {
+                if ($label->getStoreId() === $storeId) {
+                    $ruleLabel = $label->getStoreLabel();
+                    break;
+                }
             }
         }
 
@@ -67,8 +70,8 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
     {
         /** @var CouponCollection $couponCollection */
         $couponCollection = $this->couponCollectionFactory->create();
-        $couponCollection->addFieldToFilter(Coupon::KEY_CODE, $couponCode)
-            ->addFieldToFilter(Coupon::KEY_RULE_ID, $ruleId)
+        $couponCollection->addFieldToFilter(Coupon::KEY_CODE, ['eq' => $couponCode])
+            ->addFieldToFilter(Coupon::KEY_RULE_ID, ['eq' => $ruleId])
             ->load();
 
         $coupon = null;

@@ -28,11 +28,18 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
         $discountExclTax = $address->getDiscountAmount() + $address->getDiscountTaxCompensationAmount();
         $regularPriceInclTax = 0.00;
         $regularPriceExclTax = 0.00;
-        foreach ($quote->getItems() as $item) {
-            $qty = (float)$item->getQty();
-            $regularPrice = $item->getProduct()->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
-            $regularPriceExclTax += round($qty * (float)$regularPrice->getBaseAmount(), 2);
-            $regularPriceInclTax += round($qty * (float)$regularPrice->getValue(), 2);
+        $quoteItems = $quote->getItems();
+        if ($quoteItems) {
+            foreach ($quote->getItems() as $item) {
+                $qty = (float)$item->getQty();
+                // @phpstan-ignore-next-line
+                $regularPrice = $item->getProduct()
+                    ->getPriceInfo()
+                    ->getPrice(RegularPrice::PRICE_CODE)
+                    ->getAmount();
+                $regularPriceExclTax += round($qty * (float)$regularPrice->getBaseAmount(), 2);
+                $regularPriceInclTax += round($qty * (float)$regularPrice->getValue(), 2);
+            }
         }
 
         return [

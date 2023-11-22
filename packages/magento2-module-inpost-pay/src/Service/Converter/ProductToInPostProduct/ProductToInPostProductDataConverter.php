@@ -73,9 +73,15 @@ class ProductToInPostProductDataConverter
 
     private function getProductImageUrl(Product $product): string
     {
-        return $this->imageHelper->init($product, 'product_page_image_small')
-            ->setImageFile($product->getData('small_image'))
-            ->getUrl();
+        $imageUrl = '';
+        $smallImageAttrValue = $product->getData('small_image');
+        if (is_scalar($smallImageAttrValue)) {
+            $imageUrl = $this->imageHelper->init($product, 'product_page_image_small')
+                ->setImageFile((string)$smallImageAttrValue)
+                ->getUrl();
+        }
+
+        return $imageUrl;
     }
 
     private function getProductAttributes(Product $product): array

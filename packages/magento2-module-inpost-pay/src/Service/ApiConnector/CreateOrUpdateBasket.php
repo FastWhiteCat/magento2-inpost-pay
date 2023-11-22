@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
+use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
@@ -28,14 +29,22 @@ class CreateOrUpdateBasket
 
     /**
      * @param Quote $quote
+     * @param string $browserId
+     * @param string $basketId
      * @return BasketResponse
      * @throws LocalizedException
      */
-    public function execute(Quote $quote): BasketResponse
+    public function execute(Quote $quote, string $browserId, string $basketId): BasketResponse
     {
         /** @var BasketRequest $request */
         $request = $this->basketRequestFactory->create();
-        $request->setParams($this->quoteToBasketDataConverter->convert($quote));
+
+        $basketData = array_merge(
+            [Basket::BROWSER_ID => $browserId, Basket::BASKET_ID => $basketId],
+            $this->quoteToBasketDataConverter->convert($quote)
+        );
+
+        $request->setParams($basketData);
 
         try {
             $result = $this->connector->sendRequest($request);
