@@ -43,7 +43,7 @@ class Connector implements ConnectorInterface
                     $requestParams = !empty($params) ? ['multipart' => $params] : [];
                     break;
                 default:
-                    $requestParams = $params;
+                    $requestParams = ['json' => $params];
             }
             $this->createRequestLog($url, $headers, $requestParams);
             $response = $client->{$request->getMethod()}($url, $requestParams);
@@ -56,7 +56,7 @@ class Connector implements ConnectorInterface
 
         $responseBody = (string)$response->getBody()->getContents();
         $statusCode = (int)$response->getStatusCode();
-        if ($statusCode !== Response::STATUS_CODE_200) {
+        if ($statusCode !== Response::STATUS_CODE_200 && $statusCode !== Response::STATUS_CODE_202) {
             $this->createResponseLog($responseBody, $statusCode, true);
 
             throw new LocalizedException(__('InPost API endpoint "%1" responded with %1 code.', $url, $statusCode));
@@ -65,7 +65,7 @@ class Connector implements ConnectorInterface
         }
 
         $resultData = [];
-        $result = $this->serializer->unserialize($responseBody);
+        $result = $responseBody ? $this->serializer->unserialize($responseBody) : [];
         if (is_scalar($result)) {
             $resultData['result'] = (string)$result;
         } elseif (is_array($result)) {

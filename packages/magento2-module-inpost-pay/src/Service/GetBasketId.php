@@ -5,8 +5,6 @@ namespace InPost\InPostPay\Service;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Math\Random;
-use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\CartInterface;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Model\InPostPayQuoteFactory;
 use InPost\InPostPay\Model\InPostPayQuoteRepository;
@@ -21,7 +19,8 @@ class GetBasketId
         private readonly Random $randomDataGenerator,
     ) {
     }
-    public function get(int $quoteId, $generateIfEmpty = false): string
+
+    public function get(int $quoteId, $generateIfEmpty = false): ?string
     {
         if (!$this->config->isEnabled()) {
             return '';
@@ -44,6 +43,6 @@ class GetBasketId
             $this->inPostPayQuote[$quoteId] = $inPostPayQuote;
         }
 
-        return $this->inPostPayQuote[$quoteId]->getBasketId();
+        return isset($this->inPostPayQuote[$quoteId]) ? $this->inPostPayQuote[$quoteId]->getBasketId() : null;
     }
 }

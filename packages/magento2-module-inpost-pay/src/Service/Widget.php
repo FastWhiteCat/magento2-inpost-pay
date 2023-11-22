@@ -29,18 +29,18 @@ class Widget implements WidgetInterface
         string $cartId,
         string $bindingPlace,
         string $browser,
-        ?string $prefix,
-        ?string $phoneNumber
+        ?string $prefix = null,
+        ?string $phoneNumber = null
     ): BasketInformationResponseInterface
     {
         $this->quoteRepository->getActive($cartId);
 
         $browser = $this->base64serializer->unserialize($browser);
         $browserArray = [
-            "user_agent" => $browser['user_agent'],
-            "description" => $browser['description'],
-            "platform" => $browser['platform'],
-            "architecture" => $browser['architecture'],
+            "user_agent" => $browser['user_agent'] ?? '',
+            "description" => $browser['description'] ?? '',
+            "platform" => $browser['platform'] ?? '',
+            "architecture" => $browser['architecture'] ?? '',
             "data_time" => date("Y-m-d\TH:i:s.000\Z"),
             "location" => "-",
             "customer_ip" => $this->request->getClientIp(),
@@ -55,11 +55,9 @@ class Widget implements WidgetInterface
             $phoneNumber
         );
 
-        $response = $this->basketInformationResponseInterfaceFactory->create();
-        $response->setData($result);
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$response');
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($response->getData(), true));
+        $basketInformationResponse = $this->basketInformationResponseInterfaceFactory->create();
+        $basketInformationResponse->setData($result);
 
-        return $response;
+        return $basketInformationResponse;
     }
 }

@@ -11,7 +11,6 @@ use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Service\GetBasketId;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Stdlib\CookieManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class BindingBasket
@@ -21,7 +20,6 @@ class BindingBasket
         private readonly BasketBindingRequestFactory $basketBindingRequestFactory,
         private readonly BasketBindingVerifyRequestFactory $basketBindingVerifyRequest,
         private readonly GetBasketId $getBasketId,
-        private readonly CookieManagerInterface $cookieManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -67,35 +65,26 @@ class BindingBasket
 
         /** @var PublicKeyRequest $request */
         $request = $this->basketBindingRequestFactory->create();
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$browser');
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($browser, true));
+        $params = [
+            'basket_id' => $basketId,
+            "binding_place" => $bindingPlace,
+            "browser" => $browser
+        ];
 
-        $phoneNumberArray = [];
         if ($prefix && $phoneNumber) {
-            $phoneNumberArray = [
+            $params['phone_number'] = [
                 'country_prefix' => $prefix,
                 'phone' => $phoneNumber,
                 ];
-            $bindingMethod = 'PHONE';
+            $params['binding_method'] = 'PHONE';
         } else {
-            $bindingMethod = 'DEEP_LINK';
+            $params['binding_method'] = 'DEEP_LINK';
         }
 
-        $params = [
-            'basket_id' => $basketId,
-            "binding_method" => $bindingMethod,
-            "binding_place" => $bindingPlace,
-            "phone_number" => $phoneNumberArray,
-            "browser" => $browser
-        ];
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$params');
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($params,true));
         $request->setParams($params);
 
         try {
             $result = $this->connector->sendRequest($request);
-            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$result');
-            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($result, true));
             $result['basket_id'] = $basketId;
             return $result;
         } catch (Exception $e) {

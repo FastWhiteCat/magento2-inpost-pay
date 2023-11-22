@@ -19,7 +19,7 @@ interface WidgetInterface
         string $cartId,
         string $bindingPlace,
         string $browser,
-        ?string $prefix,
-        ?string $phoneNumber
+        ?string $prefix = null,
+        ?string $phoneNumber = null
     ): BasketInformationResponseInterface;
 }
