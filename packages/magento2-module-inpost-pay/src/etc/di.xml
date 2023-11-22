@@ -16,6 +16,8 @@
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface" type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\WidgetInterface" type="InPost\InPostPay\Service\Widget" />
+    <preference for="InPost\InPostPay\Api\Data\BasketInformationResponseInterface" type="InPost\InPostPay\Model\BasketInformationResponse" />
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version" type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
     </type>

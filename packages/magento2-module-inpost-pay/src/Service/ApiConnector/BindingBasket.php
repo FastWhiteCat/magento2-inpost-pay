@@ -11,7 +11,7 @@ use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Service\GetBasketId;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Serialize\Serializer\Base64Json;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class BindingBasket
@@ -21,7 +21,7 @@ class BindingBasket
         private readonly BasketBindingRequestFactory $basketBindingRequestFactory,
         private readonly BasketBindingVerifyRequestFactory $basketBindingVerifyRequest,
         private readonly GetBasketId $getBasketId,
-        private readonly Base64Json $base64serializer,
+        private readonly CookieManagerInterface $cookieManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -57,11 +57,11 @@ class BindingBasket
     }
 
     public function bindBasket(
-        $quoteId,
-        $bindingPlace,
-        $browser,
-        $prefix = null,
-        $phoneNumber = null
+        int $quoteId,
+        string $bindingPlace,
+        array $browser,
+        ?string $prefix = null,
+        ?string $phoneNumber = null
     ): array {
         $basketId = $this->getBasketId->get($quoteId, true);
 
@@ -70,44 +70,39 @@ class BindingBasket
         \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$browser');
         \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($browser, true));
 
-        $browser = $this->base64serializer->unserialize($browser);
+        $phoneNumberArray = [];
         if ($prefix && $phoneNumber) {
+            $phoneNumberArray = [
+                'country_prefix' => $prefix,
+                'phone' => $phoneNumber,
+                ];
             $bindingMethod = 'PHONE';
         } else {
             $bindingMethod = 'DEEP_LINK';
         }
 
-        $request->setParams([
+        $params = [
             'basket_id' => $basketId,
-            "binding_method" => "DEEP_LINK",
-            "binding_place" => "PRODUCT_CARD",
-            "browser" =>
-//                $browser
-                [
-                "user_agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-                "description" => "Chrome",
-                "platform" => "macOS",
-                "architecture" => "5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-                "data_time" => "2023-11-20T15:55:38.581Z",
-                "location" => "-",
-                "customer_ip" => "000.000.000.00",
-                "port" => "443"
-            ],
-        ]);
+            "binding_method" => $bindingMethod,
+            "binding_place" => $bindingPlace,
+            "phone_number" => $phoneNumberArray,
+            "browser" => $browser
+        ];
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$params');
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($params,true));
+        $request->setParams($params);
 
         try {
             $result = $this->connector->sendRequest($request);
             \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$result');
             \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($result, true));
+            $result['basket_id'] = $basketId;
             return $result;
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with binding basket. Details: %1', $e->getMessage());
-//            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$errorMsg->render()');
-//            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug($e->getMessage());
             $this->logger->critical($errorMsg->render());
 
             throw new LocalizedException($errorMsg);
         }
     }
-
 }

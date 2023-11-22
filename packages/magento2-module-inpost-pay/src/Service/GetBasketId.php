@@ -10,11 +10,9 @@ use Magento\Quote\Api\Data\CartInterface;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Model\InPostPayQuoteFactory;
 use InPost\InPostPay\Model\InPostPayQuoteRepository;
-
-
 class GetBasketId
 {
-    private $inPostPayQuote;
+    private $inPostPayQuote = [];
 
     public function __construct(
         private readonly GeneralConfigProvider $config,
@@ -23,15 +21,13 @@ class GetBasketId
         private readonly Random $randomDataGenerator,
     ) {
     }
-
-
     public function get(int $quoteId, $generateIfEmpty = false): string
     {
         if (!$this->config->isEnabled()) {
             return '';
         }
 
-        if (!$this->inPostPayQuote) {
+        if (!isset($this->inPostPayQuote[$quoteId])) {
             try {
                 $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
             } catch (LocalizedException $e) {
@@ -45,9 +41,9 @@ class GetBasketId
                 $this->inPostPayQuoteRepository->save($inPostPayQuote);
             }
 
-            $this->inPostPayQuote = $inPostPayQuote;
+            $this->inPostPayQuote[$quoteId] = $inPostPayQuote;
         }
 
-        return $this->inPostPayQuote->getBasketId();
+        return $this->inPostPayQuote[$quoteId]->getBasketId();
     }
 }
