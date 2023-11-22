@@ -25,7 +25,7 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         private readonly IziApiConfigProvider $iziApiConfigProvider,
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
-        private readonly ShippingMethodManagementInterface $shippingMethodManager
+        private readonly ShippingMethodManagementInterface $shippingManager
     ) {
     }
 
@@ -36,11 +36,8 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         if (empty($shippingAddress->getCountryId())) {
             $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
         }
-
-        $shippingMethods = $this->shippingMethodManager->estimateByExtendedAddress(
-            (int)$quote->getId(),
-            $shippingAddress
-        );
+        // @phpstan-ignore-next-line
+        $shippingMethods = $this->shippingManager->estimateByExtendedAddress((int)$quote->getId(), $shippingAddress);
         $courierShippingMethod = $this->getCourierShippingMethod($shippingMethods);
         $pickupPointShippingMethod = $this->getPickupShippingMethod($shippingMethods);
 

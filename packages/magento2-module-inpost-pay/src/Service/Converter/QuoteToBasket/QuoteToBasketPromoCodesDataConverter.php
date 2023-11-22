@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Api\Data\RuleInterface;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\Data\RuleLabel;
@@ -12,12 +14,14 @@ use Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory as CouponColl
 use Magento\SalesRule\Model\ResourceModel\Coupon\Collection as CouponCollection;
 use Magento\SalesRule\Api\RuleRepositoryInterface;
 use Magento\Quote\Model\Quote;
+use Psr\Log\LoggerInterface;
 
 class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverterInterface
 {
     public function __construct(
         private readonly CouponCollectionFactory $couponCollectionFactory,
-        private readonly RuleRepositoryInterface $ruleRepository
+        private readonly RuleRepositoryInterface $ruleRepository,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -26,7 +30,14 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
         $promoCodesData = [];
         $appliedRuleIds = explode(',', (string)$quote->getAppliedRuleIds());
         foreach ($appliedRuleIds as $appliedRuleId) {
-            $rule = $this->ruleRepository->getById((int)$appliedRuleId);
+            try {
+                $rule = $this->ruleRepository->getById((int)$appliedRuleId);
+            } catch (NoSuchEntityException | LocalizedException $e) {
+                $this->logger->error($e->getMessage());
+
+                continue;
+            }
+
             // @phpstan-ignore-next-line
             $couponCode = (string)$quote->getCouponCode();
             if ((string)$rule->getCouponType() === RuleInterface::COUPON_TYPE_SPECIFIC_COUPON

@@ -30,7 +30,7 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
         $regularPriceExclTax = 0.00;
         $quoteItems = $quote->getItems();
         if ($quoteItems) {
-            foreach ($quote->getItems() as $item) {
+            foreach ($quoteItems as $item) {
                 $qty = (float)$item->getQty();
                 // @phpstan-ignore-next-line
                 $regularPrice = $item->getProduct()

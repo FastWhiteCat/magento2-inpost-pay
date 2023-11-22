@@ -37,12 +37,13 @@ class ProductToInPostProductDataConverter
         if ($quantity === null) {
             $quantity = $stockItemConfiguration->getMinSaleQty();
         }
+        $description = ($product->getData('short_description') ?? $product->getData('description'));
         $canCastQtyToInt = $this->canCastToInteger($quantity);
         $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
         $stockQuantity = $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
         $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
         $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
-        $description = (string)($product->getData('short_description') ?? $product->getData('description'));
+        $description = (is_scalar($description)) ? (string)$description : '';
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
         $regularPriceExclTax = round((float)$regularPrice->getBaseAmount(), 2);
         $regularPriceInclTax = round((float)$regularPrice->getValue(), 2);

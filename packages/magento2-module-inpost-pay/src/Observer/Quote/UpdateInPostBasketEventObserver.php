@@ -24,7 +24,6 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
     /**
      * @param Observer $observer
      * @return void
-     * @throws LocalizedException
      */
     public function execute(Observer $observer): void
     {
@@ -37,9 +36,7 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
                 $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
             } catch (LocalizedException $e) {
                 $errorMsg = 'Basket synchronization with InPost Pay was not successful.';
-                $this->logger->error(sprintf('%s Reason: %s', $errorMsg,  $e->getMessage()));
-
-//                throw new LocalizedException(__($errorMsg));
+                $this->logger->error(sprintf('%s Reason: %s', $errorMsg, $e->getMessage()));
             }
         }
     }
