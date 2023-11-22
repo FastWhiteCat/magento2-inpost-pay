@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
+use DateTime;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use InPost\InPostPay\Model\Config\Source\AcceptedPaymentTypes;
@@ -14,11 +15,13 @@ use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
+use InPost\InPostPay\Provider\DeliveryDateProvider;
 
 class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterInterface
 {
     public function __construct(
         private readonly IziApiConfigProvider $iziApiConfigProvider,
+        private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingMethodManager
     ) {
@@ -27,20 +30,24 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
     public function convert(Quote $quote): array
     {
         $deliveries = [];
-        $shippingMethods = $this->shippingMethodManager->getList((int)$quote->getId());
-        $courierShippingMethod = $this->getCourierShippingMethod($shippingMethods);
-        $pickupPointShippingMethod = $this->getPickupShippingMethod($shippingMethods);
+        if ($quote->getShippingAddress()) {
+            $shippingMethods = $this->shippingMethodManager->getList((int)$quote->getId());
+            $courierShippingMethod = $this->getCourierShippingMethod($shippingMethods);
+            $pickupPointShippingMethod = $this->getPickupShippingMethod($shippingMethods);
 
-        if ($pickupPointShippingMethod) {
-            $deliveries[] = $this->getPickupData($pickupPointShippingMethod);
-        }
+            if ($pickupPointShippingMethod) {
+                $deliveries[] = $this->getPickupData($pickupPointShippingMethod, $quote);
+            }
 
-        if ($courierShippingMethod) {
-            $deliveries[] = $this->getCourierData($courierShippingMethod);
-        }
+            if ($courierShippingMethod) {
+                $deliveries[] = $this->getCourierData($courierShippingMethod, $quote);
+            }
 
-        if (empty($deliveries)) {
-            throw new LocalizedException(__('No delivery method is allowed for this basket.'));
+            if (empty($deliveries)) {
+                throw new LocalizedException(__('No delivery method is allowed for this basket.'));
+            }
+        } else {
+
         }
 
         return $deliveries;
@@ -90,7 +97,7 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         return $pickupShippingMethod;
     }
 
-    private function getCourierData(ShippingMethodInterface $courierShippingMethod): array
+    private function getCourierData(ShippingMethodInterface $courierShippingMethod, Quote $quote): array
     {
         $courierPriceInclTax = round((float)$courierShippingMethod->getPriceInclTax(), 2);
         $courierPriceExclTax = round((float)$courierShippingMethod->getPriceExclTax(), 2);
@@ -111,6 +118,12 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
         $courierData = [
             Basket::DELIVERY_TYPE => Basket::DELIVERY_TYPE_COURIER,
+            Basket::DELIVERY_DATE => $this->formatInPostDate(
+                $this->deliveryDateProvider->calculateTimestamp(
+                    $courierShippingMethod,
+                    $quote
+                )
+            ),
             Basket::DELIVERY_OPTIONS => $deliveryOptions,
             Basket::DELIVERY_PRICE => $price
         ];
@@ -123,12 +136,18 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         return $courierData;
     }
 
-    private function getPickupData(ShippingMethodInterface $pickupPointShippingMethod): array
+    private function getPickupData(ShippingMethodInterface $pickupPointShippingMethod, Quote $quote): array
     {
         $pickupPriceInclTax = round((float)$pickupPointShippingMethod->getPriceInclTax(), 2);
         $pickupPriceExclTax = round((float)$pickupPointShippingMethod->getPriceExclTax(), 2);
         $pickupData = [
             Basket::DELIVERY_TYPE => Basket::DELIVERY_TYPE_PICKUP,
+            Basket::DELIVERY_DATE => $this->formatInPostDate(
+                $this->deliveryDateProvider->calculateTimestamp(
+                    $pickupPointShippingMethod,
+                    $quote
+                )
+            ),
             Basket::DELIVERY_OPTIONS => [],
             Basket::DELIVERY_PRICE => [
                 Basket::NET => $pickupPriceExclTax,
@@ -155,5 +174,13 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
 
         return $limit;
+    }
+
+    private function formatInPostDate(int $deliveryTimestamp): string
+    {
+        $deliveryDateTime = new DateTime();
+        $deliveryDateTime->setTimestamp($deliveryTimestamp);
+
+        return $deliveryDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT);
     }
 }

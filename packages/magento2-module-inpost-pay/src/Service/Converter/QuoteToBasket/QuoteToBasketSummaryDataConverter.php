@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
 use DateTime;
-use DateTimeInterface;
 use DateTimeZone;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
@@ -15,6 +14,8 @@ use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Bask
 
 class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInterface
 {
+    public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
+
     public function __construct(
         private readonly IziApiConfigProvider $iziApiConfigProvider
     ) {
@@ -60,12 +61,12 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
 
     private function calculateBasketExpirationDate(): string
     {
-        $currentDateTime = new DateTime('now', new DateTimeZone("UTC"));
-        $currentTimestamp = strtotime($currentDateTime->format(DateTimeInterface::ATOM));
+        $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
+        $currentTimestamp = strtotime($currentDateTime->format(self::INPOST_DATE_FORMAT));
 
         $expirationDateTime = new DateTime();
         $expirationDateTime->setTimestamp($currentTimestamp + $this->iziApiConfigProvider->getBasketLifetime());
 
-        return $expirationDateTime->format(DateTimeInterface::ATOM);
+        return $expirationDateTime->format(self::INPOST_DATE_FORMAT);
     }
 }

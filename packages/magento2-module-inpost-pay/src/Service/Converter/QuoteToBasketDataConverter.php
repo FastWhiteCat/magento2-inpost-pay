@@ -42,7 +42,7 @@ class QuoteToBasketDataConverter implements QuoteToBasketDataConverterInterface
     {
         //TODO::fill after INPAY-28 is implemented from inpost_pay_quote.browser_id field
 
-        return 'xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx';
+        return '2d387d15-d4fe-43f8-85dc-32d46cfc3b53';
     }
 
     /**

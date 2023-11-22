@@ -9,8 +9,11 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class ShipmentMappingConfigProvider
 {
+    public const DEFAULT_DELIVERY_DEADLINE = 7;
+
     private const XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER = 'payment/inpost_pay/inpost_courier_mapping';
     private const XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP = 'payment/inpost_pay/inpost_pickup_mapping';
+    private const XML_PATH_DELIVERY_DEADLINE_IN_DAYS = 'payment/inpost_pay/delivery_deadline_in_days';
     private const XML_PATH_FREE_SHIPPING_ENABLED_PATTERN = 'carriers/%s/free_shipping_enable';
     private const XML_PATH_FREE_SHIPPING_SUBTOTAL_PATTERN = 'carriers/%s/free_shipping_subtotal';
 
@@ -80,5 +83,12 @@ class ShipmentMappingConfigProvider
         $subtotalValue = $this->scopeConfig->getValue(sprintf($configPattern, $methodCode));
 
         return is_scalar($subtotalValue) ? round((float)$subtotalValue, 2) : null;
+    }
+
+    public function getDeliveryDateDeadlineInDays(): int
+    {
+        $deadlineInDays = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_DEADLINE_IN_DAYS);
+
+        return is_scalar($deadlineInDays) ? (int)$deadlineInDays : self::DEFAULT_DELIVERY_DEADLINE;
     }
 }
