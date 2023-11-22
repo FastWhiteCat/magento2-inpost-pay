@@ -22,7 +22,6 @@ interface BasketFieldInterface
     public const BASKET_NOTICE = 'basket_notice';
     public const DELIVERY = 'delivery';
     public const DELIVERY_TYPE = 'delivery_type';
-
     public const DELIVERY_TYPE_COURIER = 'COURIER';
     public const DELIVERY_TYPE_PICKUP = 'APM';
     public const DELIVERY_OPTION_NAME = 'delivery_name';

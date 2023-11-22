@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as ProductLinkCollection;
 use InPost\InPostPay\Service\Converter\ProductToInPostProduct\ProductToInPostProductDataConverter;
 use Magento\Catalog\Model\Config as CatalogConfig;
@@ -49,7 +50,7 @@ class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConv
             ->load();
 
         foreach ($productLinkCollection as $crossSellProduct) {
-            if ($crossSellProduct instanceof Product) {
+            if ($crossSellProduct instanceof Product && $crossSellProduct->getTypeId() === Type::TYPE_SIMPLE) {
                 // @phpstan-ignore-next-line
                 $crossSellProduct->setDoNotUseCategoryId(true);
                 $crossSellProducts[] = $crossSellProduct;
