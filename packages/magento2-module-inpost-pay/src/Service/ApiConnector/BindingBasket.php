@@ -86,7 +86,8 @@ class BindingBasket
         try {
             $result = $this->connector->sendRequest($request);
             $result['basket_id'] = $basketId;
-            return $result;
+
+            return [$result];
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with binding basket. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());

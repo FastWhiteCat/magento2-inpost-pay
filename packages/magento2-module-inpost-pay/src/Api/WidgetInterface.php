@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api;
 
-use InPost\InPostPay\Api\Data\BasketInformationResponseInterface;
-
 interface WidgetInterface
 {
     /**
@@ -13,7 +11,7 @@ interface WidgetInterface
      * @param string $browser
      * @param string|null $prefix
      * @param string|null $phoneNumber
-     * @return BasketInformationResponseInterface
+     * @return array
      */
     public function getPayData(
         string $cartId,
@@ -21,5 +19,5 @@ interface WidgetInterface
         string $browser,
         ?string $prefix = null,
         ?string $phoneNumber = null
-    ): BasketInformationResponseInterface;
+    ): array;
 }
