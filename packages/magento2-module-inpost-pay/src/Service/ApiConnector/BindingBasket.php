@@ -106,7 +106,7 @@ class BindingBasket
         $deepLink = $result[BasketInformationResponse::DEEP_LINK] ?? null;
         $deepLinkHms = $result[BasketInformationResponse::DEEP_LINK_HMS] ?? null;
 
-        /** @var BasketInformationResponse $tokenResponse */
+        /** @var BasketInformationResponse $basketInformationResponse */
         $basketInformationResponse = $this->basketInformationResponseFactory->create();
         $basketInformationResponse->setBasketId($basketId);
         if ($qrCode) {
