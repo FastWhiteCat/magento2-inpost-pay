@@ -8,9 +8,10 @@ use Magento\Framework\Math\Random;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Model\InPostPayQuoteFactory;
 use InPost\InPostPay\Model\InPostPayQuoteRepository;
+
 class GetBasketId
 {
-    private $inPostPayQuote = [];
+    private array $inPostPayQuote = [];
 
     public function __construct(
         private readonly GeneralConfigProvider $config,
@@ -20,7 +21,7 @@ class GetBasketId
     ) {
     }
 
-    public function get(int $quoteId, $generateIfEmpty = false): ?string
+    public function get(int $quoteId, bool $generateIfEmpty = false): ?string
     {
         if (!$this->config->isEnabled()) {
             return '';

@@ -1,9 +1,0 @@
-extend type Query {
-    test : Test! @resolver(class: "InPost\\InPostPay\\Model\\Resolver\\Test")
-}
-
-type Test {
-    identifier: String
-    title: String
-    post_url: String
-}

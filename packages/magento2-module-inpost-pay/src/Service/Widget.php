@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Service;
 use InPost\InPostPay\Api\Data\BasketInformationResponseInterface;
 use InPost\InPostPay\Api\Data\BasketInformationResponseInterfaceFactory;
 use InPost\InPostPay\Api\WidgetInterface;
-use Magento\Framework\App\RequestInterface;
+use Magento\Framework\HTTP\PhpEnvironment\Request;
 use InPost\InPostPay\Service\ApiConnector\BindingBasket;
 use Magento\Framework\Serialize\Serializer\Base64Json;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -14,7 +14,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 class Widget implements WidgetInterface
 {
     public function __construct(
-        private readonly RequestInterface $request,
+        private readonly Request $request,
         private readonly BindingBasket $bindingBasket,
         private readonly Base64Json $base64serializer,
         private readonly BasketInformationResponseInterfaceFactory $basketInformationResponseInterfaceFactory,
@@ -31,9 +31,8 @@ class Widget implements WidgetInterface
         string $browser,
         ?string $prefix = null,
         ?string $phoneNumber = null
-    ): BasketInformationResponseInterface
-    {
-        $this->quoteRepository->getActive($cartId);
+    ): BasketInformationResponseInterface {
+        $this->quoteRepository->getActive((int)$cartId);
 
         $browser = $this->base64serializer->unserialize($browser);
         $browserArray = [

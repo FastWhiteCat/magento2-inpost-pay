@@ -17,7 +17,6 @@ class InPostPayBlock extends Template
         parent::__construct($context, $data);
     }
 
-
     public function getInPostPayCartData(): array
     {
         $quoteId = $this->session->getQuoteId();

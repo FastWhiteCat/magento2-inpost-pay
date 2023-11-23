@@ -15,18 +15,17 @@ class BasketInformationResponse extends AbstractModel implements BasketInformati
 
     public function getBasketId(): string
     {
-        return $this->getData(self::BASKET_ID);
+        return (string)$this->getData(self::BASKET_ID);
     }
 
     public function setQrCode(?string $qrCode): BasketInformationResponseInterface
     {
         return $this->setData(self::QR_CODE, $qrCode);
-
     }
 
     public function getQrCode(): ?string
     {
-        return $this->getData(self::QR_CODE);
+        return $this->getData(self::QR_CODE) ? (string)$this->getData(self::QR_CODE) : null;
     }
 
     public function setDeepLink(?string $deepLink): BasketInformationResponseInterface
@@ -36,7 +35,7 @@ class BasketInformationResponse extends AbstractModel implements BasketInformati
 
     public function getDeepLink(): ?string
     {
-        return $this->getData(self::DEEP_LINK);
+        return $this->getData(self::DEEP_LINK) ? (string)$this->getData(self::DEEP_LINK) : null;
     }
 
     public function setDeepLinkHms(?string $deepLinkHms): BasketInformationResponseInterface
@@ -46,6 +45,6 @@ class BasketInformationResponse extends AbstractModel implements BasketInformati
 
     public function getDeepLinkHms(): ?string
     {
-        return $this->getData(self::DEEP_LINK_HMS);
+        return $this->getData(self::DEEP_LINK_HMS) ? (string)$this->getData(self::DEEP_LINK_HMS) : null;
     }
 }
