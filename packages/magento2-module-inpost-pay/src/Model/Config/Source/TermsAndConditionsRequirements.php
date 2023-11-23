@@ -17,9 +17,9 @@ class TermsAndConditionsRequirements implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['label' => self::ALWAYES, 'value' => __('always')],
-            ['label' => self::ONLY_IN_NEW_VERSION, 'value' => __('only in new version')],
-            ['label' => self::OPTIONAL, 'value' => __('optional')]
+            ['label' => self::ALWAYES, 'value' => self::ALWAYES],
+            ['label' => self::ONLY_IN_NEW_VERSION, 'value' => self::ONLY_IN_NEW_VERSION],
+            ['label' => self::OPTIONAL, 'value' => self::OPTIONAL]
         ];
     }
 }

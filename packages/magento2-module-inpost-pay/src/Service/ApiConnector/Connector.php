@@ -6,11 +6,11 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use GuzzleHttp\Client;
+use Laminas\Http\Client as HttpClient;
 use GuzzleHttp\ClientFactory;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
-use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Response;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Base64Json;
@@ -43,7 +43,7 @@ class Connector implements ConnectorInterface
                     $requestParams = !empty($params) ? ['multipart' => $params] : [];
                     break;
                 default:
-                    $requestParams = $params;
+                    $requestParams = ['json' => $params];
             }
             $this->createRequestLog($url, $headers, $requestParams);
             $response = $client->{$request->getMethod()}($url, $requestParams);

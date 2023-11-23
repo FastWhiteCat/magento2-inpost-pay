@@ -16,5 +16,11 @@
             <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
             <config_path>payment/inpost_pay/inpost_pickup_mapping</config_path>
         </field>
+        <field id="delivery_deadline_in_days" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+            <label>Delivery Deadline in Days</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/delivery_deadline_in_days</config_path>
+            <comment>This value is used to calculate delivery date for InPost Pay mobile app.</comment>
+        </field>
     </group>
 </include>
