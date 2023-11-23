@@ -18,16 +18,6 @@
             <column name="order_id"/>
         </constraint>
     </table>
-    <table name="inpost_pay_checkout_agreement_version" resource="default" engine="innodb">
-        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false"/>
-        <column xsi:type="varchar" name="version" length="255" nullable="false"/>
-        <constraint xsi:type="primary" referenceId="PRIMARY">
-            <column name="agreement_id"/>
-        </constraint>
-        <constraint xsi:type="foreign" referenceId="CHKT_AGRT_VER_AGRT_ID_CHKT_AGRT_AGRT_ID" table="checkout_agreement_version"
-                    column="agreement_id" referenceTable="checkout_agreement" referenceColumn="agreement_id"
-                    onDelete="CASCADE"/>
-    </table>
     <table name="inpost_pay_quote" resource="default" engine="innodb">
         <column name="inpost_pay_quote_id" xsi:type="int" unsigned="true" nullable="false" identity="true" comment="Entity id"/>
         <column xsi:type="int" name="quote_id" unsigned="true" nullable="false" identity="false"/>
@@ -49,8 +39,24 @@
                     table="inpost_pay_quote" column="quote_id"
                     referenceTable="quote" referenceColumn="entity_id"
                     onDelete="CASCADE"/>
-        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_QUOTE_QUOTE_ID">
+        <constraint xsi:type="unique" referenceId="INPOST_PAY_QUOTE_QUOTE_ID">
             <column name="quote_id"/>
         </constraint>
+        <index referenceId="INPOST_PAY_QUOTE_INPOST_BASKET_ID" indexType="btree">
+            <column name="inpost_basket_id"/>
+        </index>
+        <index referenceId="INPOST_PAY_QUOTE_BASKET_ID" indexType="btree">
+            <column name="basket_id"/>
+        </index>
+    </table>
+    <table name="inpost_pay_checkout_agreement_version" resource="default" engine="innodb">
+        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="version" length="255" nullable="false"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="agreement_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CHKT_AGRT_VER_AGRT_ID_CHKT_AGRT_AGRT_ID" table="checkout_agreement_version"
+                    column="agreement_id" referenceTable="checkout_agreement" referenceColumn="agreement_id"
+                    onDelete="CASCADE"/>
     </table>
 </schema>
