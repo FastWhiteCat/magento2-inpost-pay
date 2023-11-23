@@ -5,7 +5,8 @@ namespace InPost\InPostPay\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResults;
-use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 
@@ -14,28 +15,35 @@ interface InPostPayQuoteRepositoryInterface
     /**
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return InPostPayQuoteInterface
-     * @throws LocalizedException
+     * @throws CouldNotSaveException
      */
     public function save(InPostPayQuoteInterface $inPostPayQuote): InPostPayQuoteInterface;
 
     /**
-     * @param string $basketId
+     * @param int $id
      * @return InPostPayQuoteInterface
-     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function get(string $basketId): InPostPayQuoteInterface;
+    public function get(int $id): InPostPayQuoteInterface;
 
     /**
      * @param int $quoteId
      * @return InPostPayQuoteInterface
-     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getByQuoteId(int $quoteId): InPostPayQuoteInterface;
 
     /**
+     * @param string $basketId
+     * @return InPostPayQuoteInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByBasketId(string $basketId): InPostPayQuoteInterface;
+
+    /**
      * @param string $inPostBasketId
      * @return InPostPayQuoteInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getByInPostBasketId(string $inPostBasketId): InPostPayQuoteInterface;
 
@@ -48,15 +56,23 @@ interface InPostPayQuoteRepositoryInterface
     /**
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return bool true on success
-     * @throws LocalizedException
+     * @throws CouldNotDeleteException
      */
     public function delete(InPostPayQuoteInterface $inPostPayQuote): bool;
+
+    /**
+     * @param int $id
+     * @return bool true on success
+     * @throws NoSuchEntityException
+     * @throws CouldNotDeleteException
+     */
+    public function deleteById(int $id): bool;
 
     /**
      * @param string $basketId
      * @return bool true on success
      * @throws NoSuchEntityException
-     * @throws LocalizedException
+     * @throws CouldNotDeleteException
      */
-    public function deleteById(string $basketId): bool;
+    public function deleteByBasketId(string $basketId): bool;
 }

@@ -41,13 +41,13 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         return $inPostPayQuote;
     }
 
-    public function get(string $basketId): InPostPayQuoteInterface
+    public function get(int $id): InPostPayQuoteInterface
     {
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
         // @phpstan-ignore-next-line
-        $this->resource->load($inPostPayQuote, $basketId, InPostPayQuoteInterface::BASKET_ID);
+        $this->resource->load($inPostPayQuote, $id);
         if (!$inPostPayQuote->getQuoteId()) {
-            throw new NoSuchEntityException(__('InPost Pay Quote with basket ID "%1" does not exist.', $basketId));
+            throw new NoSuchEntityException(__('InPost Pay Quote with ID "%1" does not exist.', $id));
         }
 
         return $inPostPayQuote;
@@ -60,6 +60,20 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $this->resource->load($inPostPayQuote, $quoteId, InPostPayQuoteInterface::QUOTE_ID);
         if (!$inPostPayQuote->getQuoteId()) {
             throw new NoSuchEntityException(__('InPost Pay Quote with Quote ID "%1" does not exist.', $quoteId));
+        }
+
+        return $inPostPayQuote;
+    }
+
+    public function getByBasketId(string $basketId): InPostPayQuoteInterface
+    {
+        $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
+        // @phpstan-ignore-next-line
+        $this->resource->load($inPostPayQuote, $basketId, InPostPayQuoteInterface::BASKET_ID);
+        if (!$inPostPayQuote->getQuoteId()) {
+            throw new NoSuchEntityException(
+                __('InPost Pay Quote with InPost Basket ID "%1" does not exist.', $basketId)
+            );
         }
 
         return $inPostPayQuote;
@@ -109,8 +123,13 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         return true;
     }
 
-    public function deleteById(string $basketId): bool
+    public function deleteById(int $id): bool
     {
-        return $this->delete($this->get($basketId));
+        return $this->delete($this->get($id));
+    }
+
+    public function deleteByBasketId(string $basketId): bool
+    {
+        return $this->delete($this->getByBasketId($basketId));
     }
 }

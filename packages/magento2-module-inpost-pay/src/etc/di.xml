@@ -5,6 +5,8 @@
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
                 type="InPost\InPostPay\Model\InPostPayQuote"/>
+    <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\InPostPayOrderRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayOrderRepository"/>
     <preference for="InPost\InPostPay\Api\OrderLockerServiceInterface"
