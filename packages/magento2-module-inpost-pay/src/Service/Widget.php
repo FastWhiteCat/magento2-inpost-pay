@@ -43,12 +43,14 @@ class Widget implements WidgetInterface
             "port" => $this->request->getServer('SERVER_PORT')
         ];
 
-        return $this->bindingBasket->bindBasket(
+        $result = $this->bindingBasket->bindBasket(
             (int)$cartId,
             $bindingPlace,
             $browserArray,
             $prefix,
             $phoneNumber
         );
+
+        return [$result->getData()];
     }
 }
