@@ -30,7 +30,6 @@ class MerchantEndpoint
      */
     protected function validateRequest(): void
     {
-        return;
         $endpoint = $this->restRequest->getRequestUri();
         $requestSignature = (string)$this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
         $requestSignatureTimestamp = (string)$this->restRequest->getHeader(self::X_SIGNATURE_TIMESTAMP_HEADER, '');
