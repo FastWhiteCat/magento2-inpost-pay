@@ -26,8 +26,12 @@
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
     </type>
     <type name="Magento\CheckoutAgreements\Api\Data\AgreementInterface">
-        <plugin name="update_checkout_agreement_version_new"
+        <plugin name="InPost_InPostPay::updateCheckoutAgreementsVersionPlugin"
                 type="InPost\InPostPay\Plugin\UpdateCheckoutAgreementsVersionPlugin" />
+    </type>
+    <type name="Magento\Quote\Api\ChangeQuoteControlInterface">
+        <plugin name="InPost_InPostPay::allowRemoteQuoteChangeByInPostPayPlugin"
+                type="InPost\InPostPay\Plugin\Quote\AllowRemoteQuoteChangeByInPostPayPlugin" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
@@ -138,6 +142,15 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type><type name="InPost\InPostPay\Service\Cart\CartService">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketEvent">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

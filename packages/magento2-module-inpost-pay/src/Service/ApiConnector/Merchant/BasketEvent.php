@@ -78,7 +78,9 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
             $this->logger->info('Quote has not been changed after processing this payload.', $requestParams);
         }
 
-        return $this->quoteToBasketDataConverter->convert($quote);
+        $reloadedQuote = $this->reloadQuote((int)$quote->getId());
+
+        return $this->quoteToBasketDataConverter->convert($reloadedQuote ?? $quote);
     }
 
     private function isProductAddEvent(array $requestParams): bool
@@ -137,6 +139,12 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
         }
     }
 
+    /**
+     * @param Quote $quote
+     * @param array $requestParams
+     * @return bool
+     * @throws LocalizedException
+     */
     private function processAddToCart(Quote $quote, array $requestParams): bool
     {
         $productsData = [];
@@ -167,6 +175,12 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
         return true;
     }
 
+    /**
+     * @param Quote $quote
+     * @param array $requestParams
+     * @return bool
+     * @throws LocalizedException
+     */
     private function processApplyPromo(Quote $quote, array $requestParams): bool
     {
         if (isset($requestParams[self::PROMO_CODES_EVENT_DATA])
@@ -188,16 +202,26 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
 
     private function collectQtyFromProductData(array $productData): float
     {
-        $qty = 0;
+        $totalQuantity = 0;
         if (isset($productData[self::QUANTITY])
             && is_array($productData[self::QUANTITY])) {
-            foreach ($productData[self::QUANTITY] as $quantityData) {
-                if (isset($quantityData[self::QUANTITY]) && is_scalar($quantityData[self::QUANTITY])) {
-                    $qty += (float)$quantityData[self::QUANTITY];
-                }
+            foreach ($productData[self::QUANTITY] as $qty) {
+                $qty = (float)(is_scalar($qty) ? (float)$qty : 0);
+                $totalQuantity += $qty;
             }
         }
 
-        return (float)$qty;
+        return (float)$totalQuantity;
+    }
+
+    private function reloadQuote(int $quoteId): ?Quote
+    {
+        try {
+            $quote = $this->cartRepository->get($quoteId);
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error(__('Reloading quote failed. Reason: %1', $e->getMessage()));
+        }
+
+        return (isset($quote) && $quote instanceof Quote) ? $quote : null;
     }
 }

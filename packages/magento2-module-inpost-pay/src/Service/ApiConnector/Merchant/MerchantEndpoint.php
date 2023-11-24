@@ -30,7 +30,6 @@ class MerchantEndpoint
      */
     protected function validateRequest(): void
     {
-        return;
         $endpoint = $this->restRequest->getRequestUri();
         $requestSignature = $this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
         $requestSignature = is_scalar($requestSignature) ? (string)$requestSignature : '';
