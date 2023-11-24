@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\Cart;
 
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Checkout\Helper\Cart;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -33,29 +34,29 @@ class CartService
     /**
      * @param Quote $quote
      * @param int $productId
-     * @param int|float $qty
+     * @param float $qty
      * @return void
      * @throws LocalizedException
      */
-    public function addToCart(Quote $quote, int $productId, int|float $qty): void
+    public function addToCart(Quote $quote, int $productId, float $qty): void
     {
         try {
-            $quoteId = (int)$quote->getId();
+            $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
             $product = $this->productRepository->getById($productId);
-            $filter = new LocalizedToNormalized(['locale' => $this->localeResolver->getLocale()]);
-            $qty = $filter->filter((string)$this->requestQuantityProcessor->prepareQuantity($qty));
-            $quote->addProduct($product, $qty);
-            $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
-            $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
-            // @phpstan-ignore-next-line
-            $quote->setTotalsCollectedFlag(false);
-            $quote->collectTotals();
-            $this->cartRepository->save($quote);
-            $this->logger->debug(
-                sprintf('Product ID %s in qty %s has been added to quote ID %s', $productId, $qty, $quoteId)
-            );
+            if ($product instanceof Product) {
+                $quote->addProduct($product, (float)$qty);
+                $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
+                $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
+                // @phpstan-ignore-next-line
+                $quote->setTotalsCollectedFlag(false);
+                $quote->collectTotals();
+                $this->cartRepository->save($quote);
+                $this->logger->debug(
+                    sprintf('Product ID %s in qty %s has been added to quote ID %s', $productId, $qty, $quoteId)
+                );
+            }
         } catch (LocalizedException $e) {
-            $this->logger->error($e);
+            $this->logger->error($e->getMessage());
 
             throw new LocalizedException(
                 __('Could not add product ID %1 in quantity of %2 to cart.', (string)$productId, (string)$qty)
@@ -86,30 +87,54 @@ class CartService
                 $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
                 $this->cartRepository->save($quote);
             }
-            $coupon = $this->couponFactory->create();
-            $coupon->load($couponCode, 'code');
-            if (!$quote->getItemsCount()) {
-                if ($isCodeLengthValid && $coupon->getId()) {
-                    $quote->setCouponCode($couponCode);
-                    $this->logger->debug(
-                        sprintf('Coupon code %s has been applied to quote ID %s', $couponCode, (int)$quote->getId())
-                    );
-                } else {
-                    throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
-                }
+            if ($isCodeLengthValid) {
+                $this->applyCouponToQuote($quote, $couponCode, );
             } else {
-                if ($isCodeLengthValid && $coupon->getId() && $couponCode == $quote->getCouponCode()) {
-                    $this->logger->debug(
-                        sprintf('Coupon code %s has been applied to quote ID %s', $couponCode, (int)$quote->getId())
-                    );
-                } else {
-                    throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
-                }
+                throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
             }
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
             throw $e;
+        }
+    }
+
+    /**
+     * @param Quote $quote
+     * @param string $couponCode
+     * @return void
+     * @throws LocalizedException
+     */
+    private function applyCouponToQuote(Quote $quote, string $couponCode): void
+    {
+        $coupon = $this->couponFactory->create();
+        // @phpstan-ignore-next-line
+        $coupon->load($couponCode, 'code');
+        if (!$quote->getItemsCount()) {
+            if ($coupon->getId()) {
+                $quote->setCouponCode($couponCode);
+                $this->logger->debug(
+                    sprintf(
+                        'Coupon code %s has been applied to quote ID %s',
+                        $couponCode,
+                        is_scalar($quote->getId()) ? (string)$quote->getId() : ''
+                    )
+                );
+            } else {
+                throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
+            }
+        } else {
+            if ($coupon->getId() && $couponCode == $quote->getCouponCode()) {
+                $this->logger->debug(
+                    sprintf(
+                        'Coupon code %s has been applied to quote ID %s',
+                        $couponCode,
+                        is_scalar($quote->getId()) ? (string)$quote->getId() : ''
+                    )
+                );
+            } else {
+                throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
+            }
         }
     }
 }

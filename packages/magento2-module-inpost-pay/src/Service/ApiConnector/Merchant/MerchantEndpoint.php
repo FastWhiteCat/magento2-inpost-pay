@@ -18,9 +18,9 @@ class MerchantEndpoint
     public const REQUEST_BODY = 'request_body';
 
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly SignatureValidatorInterface $signatureValidator,
-        private readonly LoggerInterface $logger
+        protected readonly RestRequest $restRequest,
+        protected readonly SignatureValidatorInterface $signatureValidator,
+        protected readonly LoggerInterface $logger
     ) {
     }
 
@@ -32,14 +32,10 @@ class MerchantEndpoint
     {
         $endpoint = $this->restRequest->getRequestUri();
         $requestSignature = $this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
-        $requestSignature = is_scalar($requestSignature) ? (string)$requestSignature : '';
         $requestSignatureTimestamp = $this->restRequest->getHeader(self::X_SIGNATURE_TIMESTAMP_HEADER, '');
-        $requestSignatureTimestamp = is_scalar($requestSignatureTimestamp) ? (string)$requestSignatureTimestamp : '';
         $requestPublicKeyVersion = $this->restRequest->getHeader(self::X_SIGNATURE_PUBLIC_KEY_VERSION_HEADER, '');
-        $requestPublicKeyVersion = is_scalar($requestPublicKeyVersion) ? (string)$requestPublicKeyVersion : '';
         $requestPublicKeyHash = $this->restRequest->getHeader(self::X_SIGNATURE_PUBLIC_KEY_HASH_HEADER, '');
-        $requestPublicKeyHash = is_scalar($requestPublicKeyHash) ? (string)$requestPublicKeyHash : '';
-        $requestBody = is_scalar($this->restRequest->getContent()) ? (string)$this->restRequest->getContent() : '';
+        $requestBody = $this->restRequest->getContent();
 
         $requestData = [
             self::X_SIGNATURE_HEADER => $requestSignature,

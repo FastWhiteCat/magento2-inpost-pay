@@ -35,16 +35,24 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
     {
         $quote = $observer->getEvent()->getData('quote');
         if ($quote instanceof Quote && $this->canSync($quote)) {
+            $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : null;
+            if ($quoteId == null) {
+                $this->logger->error('Empty quote ID. Processing basket sync cannot be continued.');
+                return;
+            }
+
             try {
-                $inPostPayQuote = $this->getInPostPayQuoteByQuoteId((int)$quote->getId());
-                $this->createOrUpdateBasket->execute(
-                    $quote,
-                    $inPostPayQuote->getBrowserId(),
-                    $inPostPayQuote->getBasketId()
-                );
-                $this->logger->debug(
-                    sprintf('Basket for quote ID %s has been synchronously updated.', (string)$quote->getId())
-                );
+                $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
+                if ($inPostPayQuote && $inPostPayQuote->getBrowserId() && $inPostPayQuote->getBasketId()) {
+                    $this->createOrUpdateBasket->execute(
+                        $quote,
+                        $inPostPayQuote->getBrowserId(),
+                        $inPostPayQuote->getBasketId()
+                    );
+                    $this->logger->debug(
+                        sprintf('Basket for quote ID %s has been synchronously updated.', $quoteId)
+                    );
+                }
             } catch (LocalizedException $e) {
                 $errorMsg = 'Basket synchronization with InPost Pay was not successful.';
                 $this->logger->error(sprintf('%s Reason: %s', $errorMsg, $e->getMessage()));
@@ -57,8 +65,8 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         if ($quote->getData(self::SKIP_INPOST_PAY_SYNC_FLAG)) {
             return false;
         }
-
-        $inPostPayQuote = $this->getInPostPayQuoteByQuoteId((int)$quote->getId());
+        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
+        $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
         if (!$inPostPayQuote) {
             return false;
         }

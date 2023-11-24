@@ -38,7 +38,8 @@ class AllowRemoteQuoteChangeByInPostPayPlugin
     private function isInPostPayQuote(Quote $quote): bool
     {
         try {
-            $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$quote->getId());
+            $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
+            $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
         } catch (NoSuchEntityException | LocalizedException $e) {
             return false;
         }

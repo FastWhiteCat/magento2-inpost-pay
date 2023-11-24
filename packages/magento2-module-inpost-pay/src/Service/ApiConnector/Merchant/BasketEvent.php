@@ -41,9 +41,9 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
     ];
 
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly SignatureValidatorInterface $signatureValidator,
-        private readonly LoggerInterface $logger,
+        RestRequest $restRequest,
+        SignatureValidatorInterface $signatureValidator,
+        LoggerInterface $logger,
         private readonly JsonSerializer $jsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
@@ -64,6 +64,7 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
         $requestParams = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
+        $requestParams = is_array($requestParams) ? $requestParams : [];
 
         $result = false;
         if ($this->isProductAddEvent($requestParams)) {
@@ -183,18 +184,34 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
      */
     private function processApplyPromo(Quote $quote, array $requestParams): bool
     {
-        if (isset($requestParams[self::PROMO_CODES_EVENT_DATA])
-            && is_array($requestParams[self::PROMO_CODES_EVENT_DATA])
-        ) {
-            foreach ($requestParams[self::PROMO_CODES_EVENT_DATA] as $promoCodeData) {
+        $promoCodesData = [];
+        if (isset($requestParams[self::PROMO_CODES_EVENT_DATA])) {
+            $promoCodesData = $requestParams[self::PROMO_CODES_EVENT_DATA];
+        }
+
+        $promoCodeValue = null;
+        if (is_array($promoCodesData)) {
+            if (isset($promoCodesData[self::PROMO_CODE_VALUE])
+                && is_scalar($promoCodesData[self::PROMO_CODE_VALUE])
+            ) {
+                $promoCodeValue = (string)$promoCodesData[self::PROMO_CODE_VALUE];
+            }
+        }
+
+        if (!$promoCodeValue) {
+            foreach ($promoCodesData as $promoCodeData) {
                 if (isset($promoCodeData[self::PROMO_CODE_VALUE])
                     && is_scalar($promoCodeData[self::PROMO_CODE_VALUE])
                 ) {
-                    $this->cartService->applyPromo($quote, (string)$promoCodeData[self::PROMO_CODE_VALUE]);
-
-                    return true;
+                    $promoCodeValue = (string)$promoCodeData[self::PROMO_CODE_VALUE];
                 }
             }
+        }
+
+        if ($promoCodeValue) {
+            $this->cartService->applyPromo($quote, $promoCodeValue);
+
+            return true;
         }
 
         return false;
@@ -219,7 +236,7 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
         try {
             $quote = $this->cartRepository->get($quoteId);
         } catch (NoSuchEntityException $e) {
-            $this->logger->error(__('Reloading quote failed. Reason: %1', $e->getMessage()));
+            $this->logger->error(sprintf('Reloading quote failed. Reason: %s', $e->getMessage()));
         }
 
         return (isset($quote) && $quote instanceof Quote) ? $quote : null;
