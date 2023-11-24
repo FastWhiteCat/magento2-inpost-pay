@@ -79,7 +79,7 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
             $this->logger->info('Quote has not been changed after processing this payload.', $requestParams);
         }
 
-        $reloadedQuote = $this->reloadQuote((int)$quote->getId());
+        $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
 
         return $this->quoteToBasketDataConverter->convert($reloadedQuote ?? $quote);
     }
@@ -226,7 +226,6 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
             $promoCodesData = $requestParams[self::PROMO_CODES_EVENT_DATA];
         }
 
-        $promoCodeValue = null;
         if (is_array($promoCodesData)) {
             if (isset($promoCodesData[self::PROMO_CODE_VALUE])
                 && is_scalar($promoCodesData[self::PROMO_CODE_VALUE])
@@ -235,13 +234,11 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
             }
         }
 
-        if (!$promoCodeValue) {
-            foreach ($promoCodesData as $promoCodeData) {
-                if (isset($promoCodeData[self::PROMO_CODE_VALUE])
-                    && is_scalar($promoCodeData[self::PROMO_CODE_VALUE])
-                ) {
-                    return (string)$promoCodeData[self::PROMO_CODE_VALUE];
-                }
+        foreach ($promoCodesData as $promoCodeData) {
+            if (isset($promoCodeData[self::PROMO_CODE_VALUE])
+                && is_scalar($promoCodeData[self::PROMO_CODE_VALUE])
+            ) {
+                return (string)$promoCodeData[self::PROMO_CODE_VALUE];
             }
         }
 
