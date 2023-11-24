@@ -10,9 +10,6 @@ use Magento\Catalog\Model\Product;
 use Magento\Checkout\Helper\Cart;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Framework\Filter\LocalizedToNormalized;
-use Magento\Framework\Locale\ResolverInterface as LocaleResolver;
-use Magento\Checkout\Model\Cart\RequestQuantityProcessor;
 use Magento\Quote\Model\Quote;
 use Magento\SalesRule\Model\CouponFactory;
 use Psr\Log\LoggerInterface;
@@ -23,10 +20,8 @@ class CartService
 
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
-        private readonly RequestQuantityProcessor $requestQuantityProcessor,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly CouponFactory $couponFactory,
-        private readonly LocaleResolver $localeResolver,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -88,7 +83,7 @@ class CartService
                 $this->cartRepository->save($quote);
             }
             if ($isCodeLengthValid) {
-                $this->applyCouponToQuote($quote, $couponCode, );
+                $this->applyCouponToQuote($quote, $couponCode);
             } else {
                 throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
             }

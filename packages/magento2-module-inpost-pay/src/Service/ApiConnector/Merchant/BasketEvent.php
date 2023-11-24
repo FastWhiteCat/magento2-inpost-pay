@@ -184,30 +184,7 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
      */
     private function processApplyPromo(Quote $quote, array $requestParams): bool
     {
-        $promoCodesData = [];
-        if (isset($requestParams[self::PROMO_CODES_EVENT_DATA])) {
-            $promoCodesData = $requestParams[self::PROMO_CODES_EVENT_DATA];
-        }
-
-        $promoCodeValue = null;
-        if (is_array($promoCodesData)) {
-            if (isset($promoCodesData[self::PROMO_CODE_VALUE])
-                && is_scalar($promoCodesData[self::PROMO_CODE_VALUE])
-            ) {
-                $promoCodeValue = (string)$promoCodesData[self::PROMO_CODE_VALUE];
-            }
-        }
-
-        if (!$promoCodeValue) {
-            foreach ($promoCodesData as $promoCodeData) {
-                if (isset($promoCodeData[self::PROMO_CODE_VALUE])
-                    && is_scalar($promoCodeData[self::PROMO_CODE_VALUE])
-                ) {
-                    $promoCodeValue = (string)$promoCodeData[self::PROMO_CODE_VALUE];
-                }
-            }
-        }
-
+        $promoCodeValue = $this->extractPromoCodeFromRequestParams($requestParams);
         if ($promoCodeValue) {
             $this->cartService->applyPromo($quote, $promoCodeValue);
 
@@ -240,5 +217,34 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
         }
 
         return (isset($quote) && $quote instanceof Quote) ? $quote : null;
+    }
+
+    private function extractPromoCodeFromRequestParams(array $requestParams): ?string
+    {
+        $promoCodesData = [];
+        if (isset($requestParams[self::PROMO_CODES_EVENT_DATA])) {
+            $promoCodesData = $requestParams[self::PROMO_CODES_EVENT_DATA];
+        }
+
+        $promoCodeValue = null;
+        if (is_array($promoCodesData)) {
+            if (isset($promoCodesData[self::PROMO_CODE_VALUE])
+                && is_scalar($promoCodesData[self::PROMO_CODE_VALUE])
+            ) {
+                return (string)$promoCodesData[self::PROMO_CODE_VALUE];
+            }
+        }
+
+        if (!$promoCodeValue) {
+            foreach ($promoCodesData as $promoCodeData) {
+                if (isset($promoCodeData[self::PROMO_CODE_VALUE])
+                    && is_scalar($promoCodeData[self::PROMO_CODE_VALUE])
+                ) {
+                    return (string)$promoCodeData[self::PROMO_CODE_VALUE];
+                }
+            }
+        }
+
+        return null;
     }
 }

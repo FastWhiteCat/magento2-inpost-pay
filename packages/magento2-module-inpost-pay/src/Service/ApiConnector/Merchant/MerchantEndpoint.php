@@ -31,11 +31,14 @@ class MerchantEndpoint
     protected function validateRequest(): void
     {
         $endpoint = $this->restRequest->getRequestUri();
-        $requestSignature = $this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
-        $requestSignatureTimestamp = $this->restRequest->getHeader(self::X_SIGNATURE_TIMESTAMP_HEADER, '');
-        $requestPublicKeyVersion = $this->restRequest->getHeader(self::X_SIGNATURE_PUBLIC_KEY_VERSION_HEADER, '');
-        $requestPublicKeyHash = $this->restRequest->getHeader(self::X_SIGNATURE_PUBLIC_KEY_HASH_HEADER, '');
-        $requestBody = $this->restRequest->getContent();
+        $requestSignature = (string)$this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
+        $requestSignatureTimestamp = (string)$this->restRequest->getHeader(self::X_SIGNATURE_TIMESTAMP_HEADER, '');
+        $requestPublicKeyVersion = (string)$this->restRequest->getHeader(
+            self::X_SIGNATURE_PUBLIC_KEY_VERSION_HEADER,
+            ''
+        );
+        $requestPublicKeyHash = (string)$this->restRequest->getHeader(self::X_SIGNATURE_PUBLIC_KEY_HASH_HEADER, '');
+        $requestBody = (string)$this->restRequest->getContent();
 
         $requestData = [
             self::X_SIGNATURE_HEADER => $requestSignature,
