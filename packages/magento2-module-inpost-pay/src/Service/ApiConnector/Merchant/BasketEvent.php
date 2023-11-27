@@ -7,7 +7,6 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketEventInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Api\Validator\SignatureValidatorInterface;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
 use Magento\Framework\Exception\LocalizedException;
@@ -18,7 +17,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
-class BasketEvent extends MerchantEndpoint implements BasketEventInterface
+class BasketEvent implements BasketEventInterface
 {
     private const EVENT_TYPE = 'event_type';
     private const INCREMENTING_PRODUCT_QUANTITY_EVENT = 'PRODUCTS_QUANTITY';
@@ -41,16 +40,14 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
     ];
 
     public function __construct(
-        RestRequest $restRequest,
-        SignatureValidatorInterface $signatureValidator,
-        LoggerInterface $logger,
+        private readonly RestRequest $restRequest,
         private readonly JsonSerializer $jsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartService $cartService,
-        private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter
+        private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
+        private readonly LoggerInterface $logger
     ) {
-        parent::__construct($restRequest, $signatureValidator, $logger);
     }
 
     /**
@@ -60,7 +57,6 @@ class BasketEvent extends MerchantEndpoint implements BasketEventInterface
      */
     public function execute(string $basketId): array
     {
-        $this->validateRequest();
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
         $requestParams = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());

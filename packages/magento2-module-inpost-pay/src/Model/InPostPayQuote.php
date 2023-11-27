@@ -69,9 +69,9 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return ($id && is_scalar($id)) ? (string)$id : null;
     }
 
-    public function setInpostBasketId(string $basketId): InPostPayQuoteInterface
+    public function setInpostBasketId(string $inpostBasketId): InPostPayQuoteInterface
     {
-        return $this->setData(self::BASKET_ID, $basketId);
+        return $this->setData(self::INPOST_BASKET_ID, $inpostBasketId);
     }
 
     public function getStatus(): ?string
@@ -155,7 +155,7 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
 
     public function setSurname(string $surname): InPostPayQuoteInterface
     {
-        return $this->setData(self::STATUS, $surname);
+        return $this->setData(self::SURNAME, $surname);
     }
 
     public function getCreatedAt(): string
