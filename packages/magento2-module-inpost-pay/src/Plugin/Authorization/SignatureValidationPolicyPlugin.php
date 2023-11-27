@@ -51,7 +51,7 @@ class SignatureValidationPolicyPlugin
     }
 
     /**
-     * @return true on successful signature validation
+     * @return bool
      * @throws AuthorizationException
      */
     protected function isSignatureValid(): bool
