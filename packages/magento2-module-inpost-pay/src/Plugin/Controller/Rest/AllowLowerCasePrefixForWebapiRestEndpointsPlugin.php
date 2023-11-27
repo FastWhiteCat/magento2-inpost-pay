@@ -9,7 +9,7 @@ use Magento\Webapi\Controller\Rest\SynchronousRequestProcessor;
 
 class AllowLowerCasePrefixForWebapiRestEndpointsPlugin
 {
-        private const IZI_API_PROCESSOR_PATH = '/^\\/v\\d+\\/izi/';
+    private const IZI_API_PROCESSOR_PATH = '/^\\/v\\d+\\/izi/';
 
     /**
      * Plugin explanation:

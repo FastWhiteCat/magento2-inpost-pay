@@ -29,9 +29,9 @@ class SignatureValidationPolicyPlugin
     /**
      * @param PolicyInterface $subject
      * @param bool $result
-     * @param $roleId
-     * @param $resourceId
-     * @param $privilege
+     * @param string|null $roleId
+     * @param string|null $resourceId
+     * @param string|null $privilege
      * @return bool
      * @throws AuthorizationException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -39,9 +39,9 @@ class SignatureValidationPolicyPlugin
     public function afterIsAllowed(
         PolicyInterface $subject,
         bool $result,
-        $roleId,
-        $resourceId,
-        $privilege
+        ?string $roleId,
+        ?string $resourceId,
+        ?string $privilege
     ): bool {
         if ($resourceId === self::INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE && $this->isSignatureValid()) {
             $result = true;
@@ -56,7 +56,6 @@ class SignatureValidationPolicyPlugin
      */
     protected function isSignatureValid(): bool
     {
-        return true;
         $endpoint = $this->restRequest->getRequestUri();
         $requestSignature = (string)$this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
         $requestSignatureTimestamp = (string)$this->restRequest->getHeader(self::X_SIGNATURE_TIMESTAMP_HEADER, '');
