@@ -47,7 +47,7 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
 
             try {
                 $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
-                if ($inPostPayQuote && $inPostPayQuote->getBrowserId() && $inPostPayQuote->getBasketId()) {
+                if ($inPostPayQuote) {
                     $this->handleBasketExport($quote, $inPostPayQuote);
                 }
             } catch (LocalizedException $e) {
@@ -95,14 +95,16 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
             $this->basketCreateOrUpdatePublisher->publish($inPostPayQuote);
         } else {
             $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : null;
-            $this->createOrUpdateBasket->execute(
-                $quote,
-                $inPostPayQuote->getBrowserId(),
-                $inPostPayQuote->getBasketId()
-            );
-            $this->logger->debug(
-                sprintf('Basket for quote ID %s has been synchronously updated.', $quoteId)
-            );
+            $browserId = $inPostPayQuote->getBrowserId();
+            $basketId = $inPostPayQuote->getBasketId();
+            if ($browserId && $basketId) {
+                $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
+                $this->logger->debug(
+                    sprintf('Basket for quote ID %s has been synchronously updated.', $quoteId)
+                );
+            } else {
+                throw new LocalizedException(__('Quote with ID %1 is invalid.', $quoteId));
+            }
         }
     }
 }

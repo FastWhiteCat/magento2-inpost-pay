@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Model\Publisher;
 
 use Exception;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\MessageQueue\PublisherInterface;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\AsynchronousOperations\Api\Data\OperationInterface;
@@ -32,7 +33,12 @@ class BasketCreateOrUpdatePublisher
             $operation = $this->operationFactory->create();
             $operation->setStatus(OperationInterface::STATUS_TYPE_OPEN);
             $operation->setTopicName(self::TOPIC_NAME);
-            $operation->setSerializedData($this->jsonSerializer->serialize($basketData));
+            $serializedBasketData = $this->jsonSerializer->serialize($basketData);
+            if ($serializedBasketData) {
+                $operation->setSerializedData($serializedBasketData);
+            } else {
+                throw new LocalizedException(__('Unable to serialize basket data.'));
+            }
             $this->publisher->publish(self::TOPIC_NAME, $operation);
             $this->logger->debug(sprintf('Message added to queue! TOPIC: %s', self::TOPIC_NAME), $basketData);
         } catch (Exception $e) {

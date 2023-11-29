@@ -71,7 +71,8 @@ class BasketCreateOrUpdateConsumer
     {
         $topic = (string)$operation->getTopicName();
         if ($exception) {
-            $message = sprintf('Consuming failed [%s]. Basked ID: %s Reason: %s',
+            $message = sprintf(
+                'Consuming failed [%s]. Basked ID: %s Reason: %s',
                 $topic,
                 $basketId,
                 $exception->getMessage()
@@ -84,9 +85,11 @@ class BasketCreateOrUpdateConsumer
             $this->logger->info($message);
         }
 
-        $operation->setStatus($status ?? OperationInterface::STATUS_TYPE_COMPLETE)
-            ->setErrorCode($errorCode ?? null)
-            ->setResultMessage($message);
+        $operation->setStatus($status ?? OperationInterface::STATUS_TYPE_COMPLETE);
+        $operation->setResultMessage($message);
+        if (isset($errorCode)) {
+            $operation->setErrorCode($errorCode);
+        }
 
         $this->operationRepository->save($operation);
     }
