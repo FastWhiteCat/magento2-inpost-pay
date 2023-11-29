@@ -15,8 +15,8 @@
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
-    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketEventInterface"
-                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketEvent"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\Basket"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
@@ -152,7 +152,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketEvent">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Basket">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -162,12 +162,22 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketEvent">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Basket">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Publisher\BasketCreateOrUpdatePublisher">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Consumer\BasketCreateOrUpdateConsumer">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

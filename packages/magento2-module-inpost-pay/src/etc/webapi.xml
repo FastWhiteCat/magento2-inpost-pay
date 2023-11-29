@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/v1/izi/basket/:basketId" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="get"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
     <route url="/v1/izi/basket/:basketId/event" method="POST">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketEventInterface" method="execute"/>
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="update"/>
         <resources>
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
-use InPost\InPostPay\Api\ApiConnector\Merchant\BasketEventInterface;
+use InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\Cart\CartService;
@@ -17,7 +17,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
-class BasketEvent implements BasketEventInterface
+class Basket implements BasketInterface
 {
     private const EVENT_TYPE = 'event_type';
     private const INCREMENTING_PRODUCT_QUANTITY_EVENT = 'PRODUCTS_QUANTITY';
@@ -55,7 +55,20 @@ class BasketEvent implements BasketEventInterface
      * @return array
      * @throws LocalizedException
      */
-    public function execute(string $basketId): array
+    public function get(string $basketId): array
+    {
+        $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
+        $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+
+        return $this->quoteToBasketDataConverter->convert($quote);
+    }
+
+    /**
+     * @param string $basketId
+     * @return array
+     * @throws LocalizedException
+     */
+    public function update(string $basketId): array
     {
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
