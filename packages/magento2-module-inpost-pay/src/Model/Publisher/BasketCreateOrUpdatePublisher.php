@@ -34,7 +34,7 @@ class BasketCreateOrUpdatePublisher
             $operation->setStatus(OperationInterface::STATUS_TYPE_OPEN);
             $operation->setTopicName(self::TOPIC_NAME);
             $serializedBasketData = $this->jsonSerializer->serialize($basketData);
-            if ($serializedBasketData) {
+            if (is_string($serializedBasketData)) {
                 $operation->setSerializedData($serializedBasketData);
             } else {
                 throw new LocalizedException(__('Unable to serialize basket data.'));
