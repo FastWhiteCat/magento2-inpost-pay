@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\ApiConnector;
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
+use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequest;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Model\IziApi\Response\BasketInformationResponse;
@@ -66,7 +67,7 @@ class BindingBasket
     ): BasketInformationResponse {
         $basketId = $this->getBasketId->get($quoteId, true);
 
-        /** @var PublicKeyRequest $request */
+        /** @var BasketBindingRequest $request */
         $request = $this->basketBindingRequestFactory->create();
         $params = [
             'basket_id' => $basketId,

@@ -12,6 +12,8 @@ use Laminas\Http\Request as HttpRequest;
 
 class BasketBindingRequest extends Request implements RequestInterface
 {
+    private const BASKET_ID_PARAM = 'basket_id';
+
     protected string $uri = '/v1/izi/basket/{basket_id}/binding';
 
     protected string $method = HttpRequest::METHOD_POST;
@@ -31,40 +33,22 @@ class BasketBindingRequest extends Request implements RequestInterface
     public function getUri(): string
     {
         $uri = $this->uri;
-        foreach ($this->getParams() as $key => $value) {
-            if (is_array($value)) {
-                continue;
-            }
-
-            $uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $uri);
+        $params = $this->getParams();
+        if (array_key_exists(self::BASKET_ID_PARAM, $params)
+            && is_scalar($params[self::BASKET_ID_PARAM])
+        ) {
+            $basketId = (string)$params[self::BASKET_ID_PARAM];
+            $uri = str_replace(sprintf('{%s}', self::BASKET_ID_PARAM), $basketId, $uri);
+            unset($params[self::BASKET_ID_PARAM]);
+            $this->setParams($params);
         }
 
-        return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $uri);
+        return $uri;
     }
 
     public function getApiUrl(): string
     {
         return $this->iziApiConfigProvider->getIziApiUrl();
-    }
-
-    public function setParams(array $params): void
-    {
-        $this->params = $params;
-    }
-
-    public function getParams(): array
-    {
-        return $this->params;
-    }
-
-    public function getMethod(): string
-    {
-        return $this->method;
-    }
-
-    public function getContentType(): ?string
-    {
-        return $this->contentType;
     }
 
     public function getBearerToken(): ?string

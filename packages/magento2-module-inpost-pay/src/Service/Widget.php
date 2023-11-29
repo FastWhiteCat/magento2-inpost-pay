@@ -4,24 +4,25 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service;
 
 use InPost\InPostPay\Api\WidgetInterface;
-use Magento\Framework\HTTP\PhpEnvironment\Request;
 use InPost\InPostPay\Service\ApiConnector\BindingBasket;
+use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Serialize\Serializer\Base64Json;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class Widget implements WidgetInterface
 {
+    public const DEFAULT_DATE_FORMAT = "Y-m-d\TH:i:s.000\Z";
+
     public function __construct(
         private readonly Request $request,
         private readonly BindingBasket $bindingBasket,
         private readonly Base64Json $base64serializer,
         private readonly CartRepositoryInterface $quoteRepository,
+        private readonly TimezoneInterface $localeDate,
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPayData(
         string $cartId,
         string $bindingPlace,
@@ -37,7 +38,7 @@ class Widget implements WidgetInterface
             "description" => $browser['description'] ?? '',
             "platform" => $browser['platform'] ?? '',
             "architecture" => $browser['architecture'] ?? '',
-            "data_time" => date("Y-m-d\TH:i:s.000\Z"),
+            "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             "location" => "-",
             "customer_ip" => $this->request->getClientIp(),
             "port" => $this->request->getServer('SERVER_PORT')

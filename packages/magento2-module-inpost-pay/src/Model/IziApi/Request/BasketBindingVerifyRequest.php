@@ -23,21 +23,6 @@ class BasketBindingVerifyRequest extends Request implements RequestInterface
     ) {
     }
 
-    public function getUri(): string
-    {
-        $params = $this->getParams();
-        foreach ($params as $key => $value) {
-            if (str_contains($this->uri, $key)) {
-                $this->uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $this->uri);
-                unset($params[$key]);
-            }
-        }
-
-        $this->setParams($params);
-
-        return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $this->uri);
-    }
-
     public function getApiUrl(): string
     {
         return $this->iziApiConfigProvider->getIziApiUrl();

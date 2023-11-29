@@ -24,7 +24,7 @@ class GetBasketId
     public function get(int $quoteId, bool $generateIfEmpty = false): ?string
     {
         if (!$this->config->isEnabled()) {
-            return '';
+            return null;
         }
 
         if (!isset($this->inPostPayQuote[$quoteId])) {
