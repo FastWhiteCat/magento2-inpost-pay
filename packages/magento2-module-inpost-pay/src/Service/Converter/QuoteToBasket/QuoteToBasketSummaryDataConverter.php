@@ -25,10 +25,10 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
     public function convert(Quote $quote): array
     {
         $address = $quote->getShippingAddress();
-        $discountInclTax = DecimalCalculator::round($address->getDiscountAmount());
+        $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
         $discountExclTax = DecimalCalculator::add(
-            $address->getDiscountAmount(),
-            $address->getDiscountTaxCompensationAmount()
+            (float)$address->getDiscountAmount(),
+            (float)$address->getDiscountTaxCompensationAmount()
         );
 
         $regularPriceInclTax = $this->getTotalQuoteItemsRegularPrice($quote, true);
