@@ -10,6 +10,8 @@
                 <include path="InPost_InPostPay::system/general.xml"/>
                 <include path="InPost_InPostPay::system/sandbox.xml"/>
                 <include path="InPost_InPostPay::system/authorization.xml"/>
+                <include path="InPost_InPostPay::system/display.xml"/>
+                <include path="InPost_InPostPay::system/layout.xml"/>
                 <include path="InPost_InPostPay::system/shipment_mapping.xml"/>
                 <include path="InPost_InPostPay::system/terms_and_conditions.xml"/>
                 <include path="InPost_InPostPay::system/izi_api.xml"/>

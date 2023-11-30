@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="after.body.start">
+            <block class="InPost\InPostPay\Block\Script" name="inpost.init.script.minicart"
+                   template="InPost_InPostPay::initialize-script.phtml"
+                   ifconfig="payment/inpost_pay/show_in_minicart">
+                <arguments>
+                    <argument name="binding_place" xsi:type="string">BASKET_POPUP</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="minicart.addons">
+            <block class="InPost\InPostPay\Block\Widget" name="inpost.init.widget.minicart"
+                   template="InPost_InPostPay::initialize-widget.phtml" after="-"
+                   ifconfig="payment/inpost_pay/show_in_minicart">
+                <arguments>
+                    <argument name="binding_place" xsi:type="string">BASKET_POPUP</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

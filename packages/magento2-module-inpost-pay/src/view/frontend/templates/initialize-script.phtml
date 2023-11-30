@@ -1,0 +1,20 @@
+<?php
+
+use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
+
+/**
+ * @var InPost\InPostPay\Block\Script $block
+ */
+
+$sandboxMode = $block->isSandboxEnabled();
+$bindingPlace = $block->getBindingPlace();
+$shouldInitializeScript = $block->isEnabledInMiniCart() && $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME
+?>
+
+<?php if ($shouldInitializeScript): ?>
+    <?php if ($sandboxMode) : ?>
+        <script src="https://izi-sandbox.inpost.pl/inpostizi.js"></script>
+    <?php else: ?>
+        <script src="https://izi.inpost.pl/inpostizi.js"></script>
+    <?php endif; ?>
+<?php endif; ?>
