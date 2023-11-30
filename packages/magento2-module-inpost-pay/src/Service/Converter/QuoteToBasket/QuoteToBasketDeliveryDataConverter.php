@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
-use DateTime;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
@@ -123,11 +122,9 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
         $courierData = [
             Basket::DELIVERY_TYPE => Basket::DELIVERY_TYPE_COURIER,
-            Basket::DELIVERY_DATE => $this->formatInPostDate(
-                $this->deliveryDateProvider->calculateTimestamp(
-                    $courierShippingMethod,
-                    $quote
-                )
+            Basket::DELIVERY_DATE => $this->deliveryDateProvider->calculateDeliveryDate(
+                $courierShippingMethod,
+                $quote
             ),
             Basket::DELIVERY_OPTIONS => $deliveryOptions,
             Basket::DELIVERY_PRICE => $price
@@ -148,11 +145,9 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         $pickupTaxValue = DecimalCalculator::sub($pickupPriceInclTax, $pickupPriceExclTax);
         $pickupData = [
             Basket::DELIVERY_TYPE => Basket::DELIVERY_TYPE_PICKUP,
-            Basket::DELIVERY_DATE => $this->formatInPostDate(
-                $this->deliveryDateProvider->calculateTimestamp(
-                    $pickupPointShippingMethod,
-                    $quote
-                )
+            Basket::DELIVERY_DATE => $this->deliveryDateProvider->calculateDeliveryDate(
+                $pickupPointShippingMethod,
+                $quote
             ),
             Basket::DELIVERY_OPTIONS => [],
             Basket::DELIVERY_PRICE => [
@@ -180,13 +175,5 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
 
         return $limit;
-    }
-
-    private function formatInPostDate(int $deliveryTimestamp): string
-    {
-        $deliveryDateTime = new DateTime();
-        $deliveryDateTime->setTimestamp($deliveryTimestamp);
-
-        return $deliveryDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT);
     }
 }

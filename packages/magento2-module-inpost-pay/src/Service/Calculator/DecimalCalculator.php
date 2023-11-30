@@ -47,7 +47,7 @@ class DecimalCalculator
     }
 
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
-    public static function round(float|int $num, ?int $precision = 2): float
+    public static function round(float|int $num, int $precision = 2): float
     {
         return round($num, $precision);
     }

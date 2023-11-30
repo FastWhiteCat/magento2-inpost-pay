@@ -18,8 +18,6 @@ use Magento\Quote\Model\Quote;
 
 class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConverterInterface
 {
-    private const PRODUCT_LINK_TABLE_NAME = 'catalog_product_link';
-
     public function __construct(
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly ProductLinkCollectionFactory $productLinkCollectionFactory,

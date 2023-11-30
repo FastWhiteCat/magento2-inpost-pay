@@ -32,7 +32,7 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
         $appliedRuleIds = explode(',', (string)$quote->getAppliedRuleIds());
 
         try {
-            $storeId = $quote->getStoreId() ?? 0;
+            $storeId = (int)$quote->getStoreId();
             $promoCodesData = $this->collectSalesRulesData($appliedRuleIds, (string)$quote->getCouponCode(), $storeId);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
@@ -41,7 +41,7 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
         return $promoCodesData;
     }
 
-    private function collectSalesRulesData(array $appliedRuleIds, string $couponCode): array
+    private function collectSalesRulesData(array $appliedRuleIds, string $couponCode, int $storeId): array
     {
         $ruleIds = [];
         foreach ($appliedRuleIds as $appliedRuleId) {
@@ -61,7 +61,7 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
 
         $query->joinLeft(
             ['sl' => $this->getConnection()->getTableName(self::SALESRULE_LABEL_TABLE)],
-            's.rule_id = sl.rule_id',
+            sprintf('s.rule_id = sl.rule_id AND sl.store_id = %s', $storeId),
             ['rule_label' => new Zend_Db_Expr('COALESCE(sl.label, s.name)')]
         );
 
