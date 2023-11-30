@@ -74,10 +74,11 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
         $query->where('s.rule_id IN (?)', $ruleIds);
 
         $salesRuleData = [];
+        $noCode = __('No Coupon is required.')->render();
         foreach ($this->getConnection()->fetchAll($query) as $row) {
             $salesRuleData[] = [
                 'name' => (string)($row['rule_label'] ?? ''),
-                'promo_code_value' => (string)($row['rule_coupon'] ?? __('No Coupon is required.')->render()),
+                'promo_code_value' => !empty($row['rule_coupon']) ? (string)$row['rule_coupon'] : $noCode
             ];
         }
 

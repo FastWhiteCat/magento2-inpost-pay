@@ -31,7 +31,7 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         if ($quote instanceof Quote && $this->canSync($quote)) {
             //TODO:: browser_id and basket_id in INPAY-28
             $browserId = '2d387d15-d4fe-43f8-85dc-32d46cfc3b53';
-            $basketId = uniqid();
+            $basketId = 'eBhUFKsJjFQWRYWBSRAEtymGPy2ed5X9';
             try {
                 $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
             } catch (LocalizedException $e) {
