@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
+use Exception;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\SalesRule\Api\Data\RuleInterface;
-use Magento\SalesRule\Model\Coupon;
-use Magento\SalesRule\Model\Data\RuleLabel;
-use Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory as CouponCollectionFactory;
-use Magento\SalesRule\Model\ResourceModel\Coupon\Collection as CouponCollection;
-use Magento\SalesRule\Api\RuleRepositoryInterface;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
+use Zend_Db_Expr;
 
 class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverterInterface
 {
+    private const SALESRULE_TABLE = 'salesrule';
+    private const SALESRULE_LABEL_TABLE = 'salesrule_label';
+    private const SALESRULE_COUPON_TABLE = 'salesrule_coupon';
+
+    private ?AdapterInterface $connection = null;
+
     public function __construct(
-        private readonly CouponCollectionFactory $couponCollectionFactory,
-        private readonly RuleRepositoryInterface $ruleRepository,
+        private readonly ResourceConnection $resourceConnection,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -29,67 +30,66 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
     {
         $promoCodesData = [];
         $appliedRuleIds = explode(',', (string)$quote->getAppliedRuleIds());
-        foreach ($appliedRuleIds as $appliedRuleId) {
-            try {
-                $rule = $this->ruleRepository->getById((int)$appliedRuleId);
-            } catch (NoSuchEntityException | LocalizedException $e) {
-                $this->logger->error($e->getMessage());
 
-                continue;
-            }
-
-            // @phpstan-ignore-next-line
-            $couponCode = (string)$quote->getCouponCode();
-            if ((string)$rule->getCouponType() === RuleInterface::COUPON_TYPE_SPECIFIC_COUPON
-                && $couponCode
-                && $coupon = $this->getCouponByCode($couponCode, (int)$appliedRuleId)
-            ) {
-                $promoCodesData[] = [
-                    'name' => $this->getRuleLabel($rule, (int)$quote->getStoreId()),
-                    'promo_code_value' => (string)$coupon->getCode()
-                ];
-            } else {
-                $promoCodesData[] = [
-                    'name' => $this->getRuleLabel($rule, (int)$quote->getStoreId()),
-                    'promo_code_value' => __('No Coupon is required.')->render()
-                ];
-            }
+        try {
+            $storeId = $quote->getStoreId() ?? 0;
+            $promoCodesData = $this->collectSalesRulesData($appliedRuleIds, (string)$quote->getCouponCode(), $storeId);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
         }
 
         return $promoCodesData;
     }
 
-    private function getRuleLabel(RuleInterface $rule, int $storeId): string
+    private function collectSalesRulesData(array $appliedRuleIds, string $couponCode): array
     {
-        $ruleLabel = null;
-        $labels = $rule->getStoreLabels();
-
-        if ($labels) {
-            /** @var RuleLabel $label */
-            foreach ($labels as $label) {
-                if ($label->getStoreId() === $storeId) {
-                    $ruleLabel = $label->getStoreLabel();
-                    break;
-                }
+        $ruleIds = [];
+        foreach ($appliedRuleIds as $appliedRuleId) {
+            if (is_scalar($appliedRuleId)) {
+                $ruleIds[] = (int)$appliedRuleId;
             }
         }
 
-        return (string)($ruleLabel ?? $rule->getName());
-    }
-
-    private function getCouponByCode(string $couponCode, int $ruleId): ?Coupon
-    {
-        /** @var CouponCollection $couponCollection */
-        $couponCollection = $this->couponCollectionFactory->create();
-        $couponCollection->addFieldToFilter(Coupon::KEY_CODE, ['eq' => $couponCode])
-            ->addFieldToFilter(Coupon::KEY_RULE_ID, ['eq' => $ruleId])
-            ->load();
-
-        $coupon = null;
-        if ($couponCollection->count()) {
-            $coupon = $couponCollection->getFirstItem();
+        if (empty($ruleIds)) {
+            return [];
         }
 
-        return ($coupon instanceof Coupon && (int)$coupon->getRuleId() === $ruleId) ? $coupon : null;
+        $query = $this->getConnection()->select()->from(
+            ['s' => $this->getConnection()->getTableName(self::SALESRULE_TABLE)],
+            []
+        );
+
+        $query->joinLeft(
+            ['sl' => $this->getConnection()->getTableName(self::SALESRULE_LABEL_TABLE)],
+            's.rule_id = sl.rule_id',
+            ['rule_label' => new Zend_Db_Expr('COALESCE(sl.label, s.name)')]
+        );
+
+        $query->joinLeft(
+            ['sc' => $this->getConnection()->getTableName(self::SALESRULE_COUPON_TABLE)],
+            sprintf('s.rule_id = sc.rule_id AND sc.code = \'%s\'', $couponCode),
+            ['rule_coupon' => new Zend_Db_Expr('COALESCE(sc.code, \'\')')]
+        );
+
+        $query->where('s.rule_id IN (?)', $ruleIds);
+
+        $salesRuleData = [];
+        foreach ($this->getConnection()->fetchAll($query) as $row) {
+            $salesRuleData[] = [
+                'name' => (string)($row['rule_label'] ?? ''),
+                'promo_code_value' => (string)($row['rule_coupon'] ?? __('No Coupon is required.')->render()),
+            ];
+        }
+
+        return $salesRuleData;
+    }
+
+    private function getConnection(): AdapterInterface
+    {
+        if ($this->connection === null) {
+            $this->connection = $this->resourceConnection->getConnection();
+        }
+
+        return $this->connection;
     }
 }

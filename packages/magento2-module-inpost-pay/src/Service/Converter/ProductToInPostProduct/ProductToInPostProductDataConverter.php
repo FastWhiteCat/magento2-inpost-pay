@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\Converter\ProductToInPostProduct;
 
 use InPost\InPostPay\Api\ApiConnector\IziApi\Product\ProductFieldInterface as InPostProduct;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
@@ -45,8 +46,8 @@ class ProductToInPostProductDataConverter
         $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
         $description = (is_scalar($description)) ? (string)$description : '';
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
-        $regularPriceExclTax = round((float)$regularPrice->getBaseAmount(), 2);
-        $regularPriceInclTax = round((float)$regularPrice->getValue(), 2);
+        $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
+        $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
 
         return [
             InPostProduct::PRODUCT_ID => (int)$product->getId(),
@@ -59,7 +60,7 @@ class ProductToInPostProductDataConverter
             InPostProduct::BASE_PRICE => [
                 Basket::NET => $regularPriceExclTax,
                 Basket::GROSS => $regularPriceInclTax,
-                Basket::VAT =>  $regularPriceInclTax - $regularPriceExclTax
+                Basket::VAT =>  DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax)
             ],
             InPostProduct::QUANTITY => [
                 InPostProduct::QUANTITY => $canCastQtyToInt ? (int)$quantity : $quantity,

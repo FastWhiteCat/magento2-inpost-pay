@@ -11,6 +11,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as Produ
 use InPost\InPostPay\Service\Converter\ProductToInPostProduct\ProductToInPostProductDataConverter;
 use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Quote\Model\Quote;
+use Zend_Db_Select;
 
 class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConverterInterface
 {
@@ -24,9 +25,14 @@ class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConv
     {
         $crossSellData = [];
         $websiteId = (int)$quote->getStore()->getWebsiteId();
+        $cartProducts = [];
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
             $product = $quoteItem->getProduct();
-            foreach ($this->getCrossSellProducts($product, (int)$quote->getStoreId()) as $crossSellProduct) {
+            $cartProducts[(int)$product->getId()] = $product;
+        }
+
+        if ($cartProducts) {
+            foreach ($this->getCrossSellProducts($cartProducts, (int)$quote->getStoreId()) as $crossSellProduct) {
                 $crossSellData[] = $this->productToInPostProductDataConverter->convert($crossSellProduct, $websiteId);
             }
         }
@@ -35,20 +41,39 @@ class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConv
     }
 
     /**
-     * @param Product $product
+     * @param array $products
      * @param int $storeId
      * @return Product[]
      */
-    private function getCrossSellProducts(Product $product, int $storeId): array
+    private function getCrossSellProducts(array $products, int $storeId): array
     {
         $crossSellProducts = [];
-        /** @var ProductLinkCollection $productLinkCollection */
+        $product = current($products);
+        $allProductIds = array_keys($products);
+        if (!$product instanceof Product) {
+            return $crossSellProducts;
+        }
+
         $productLinkCollection = $product->getCrossSellProductCollection()
             ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
             ->setPositionOrder()
-            ->addStoreFilter($storeId)
-            ->load();
+            ->addStoreFilter($storeId);
 
+        $whereParts = [];
+        $productIdWherePart = sprintf('AND (links.product_id in (%s))', (int)$product->getId());
+        $productIdsWherePart = sprintf('AND (links.product_id in (%s))', implode(',', $allProductIds));
+        foreach ($productLinkCollection->getSelect()->getPart(Zend_Db_Select::WHERE) as $wherePart) {
+            if (str_contains($wherePart, $productIdWherePart)) {
+                $whereParts[] = str_replace($productIdWherePart, $productIdsWherePart, $wherePart);
+            } else {
+                $whereParts[] = $wherePart;
+            }
+        }
+
+        $productLinkCollection->getSelect()->setPart(Zend_Db_Select::WHERE, $whereParts);
+
+        $sql2 = $productLinkCollection->getSelect()->__toString();
+        $whereParts = $productLinkCollection->getSelect()->getPart(Zend_Db_Select::WHERE);
         foreach ($productLinkCollection as $crossSellProduct) {
             if ($crossSellProduct instanceof Product && $crossSellProduct->getTypeId() === Type::TYPE_SIMPLE) {
                 // @phpstan-ignore-next-line
