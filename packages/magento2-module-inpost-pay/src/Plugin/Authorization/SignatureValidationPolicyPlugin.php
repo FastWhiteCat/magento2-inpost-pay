@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant;
+namespace InPost\InPostPay\Plugin\Authorization;
 
+use Magento\Framework\Authorization\PolicyInterface;
 use InPost\InPostPay\Api\Validator\SignatureValidatorInterface;
 use Magento\Framework\Exception\AuthorizationException;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Psr\Log\LoggerInterface;
 
-class MerchantEndpoint
+class SignatureValidationPolicyPlugin
 {
+    private const INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE = 'inpost_pay_signature_validated_resource';
     public const X_SIGNATURE_HEADER = 'x-signature';
     public const X_SIGNATURE_TIMESTAMP_HEADER = 'x-signature-timestamp';
     public const X_SIGNATURE_PUBLIC_KEY_VERSION_HEADER = 'x-public-key-ver';
@@ -25,10 +27,34 @@ class MerchantEndpoint
     }
 
     /**
-     * @return void
+     * @param PolicyInterface $subject
+     * @param bool $result
+     * @param string|null $roleId
+     * @param string|null $resourceId
+     * @param string|null $privilege
+     * @return bool
+     * @throws AuthorizationException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function afterIsAllowed(
+        PolicyInterface $subject,
+        bool $result,
+        ?string $roleId,
+        ?string $resourceId,
+        ?string $privilege
+    ): bool {
+        if ($resourceId === self::INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE && $this->isSignatureValid()) {
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return bool
      * @throws AuthorizationException
      */
-    protected function validateRequest(): void
+    protected function isSignatureValid(): bool
     {
         $endpoint = $this->restRequest->getRequestUri();
         $requestSignature = (string)$this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
@@ -63,6 +89,8 @@ class MerchantEndpoint
 
             throw new AuthorizationException(__('Signature validation failed!'));
         }
+
+        return true;
     }
 
     private function logRequest(string $endpoint, array $requestData, string $errorMsg = ''): void

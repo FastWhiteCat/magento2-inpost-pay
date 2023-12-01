@@ -6,6 +6,8 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Model\Publisher\BasketCreateOrUpdatePublisher;
+use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -21,8 +23,10 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
     private ?InPostPayQuoteInterface $inPostPayQuote = null;
 
     public function __construct(
+        private readonly IziApiConfigProvider $iziApiConfigProvider,
         private readonly CreateOrUpdateBasket $createOrUpdateBasket,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly BasketCreateOrUpdatePublisher $basketCreateOrUpdatePublisher,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -43,15 +47,8 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
 
             try {
                 $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
-                if ($inPostPayQuote && $inPostPayQuote->getBrowserId() && $inPostPayQuote->getBasketId()) {
-                    $this->createOrUpdateBasket->execute(
-                        $quote,
-                        $inPostPayQuote->getBrowserId(),
-                        $inPostPayQuote->getBasketId()
-                    );
-                    $this->logger->debug(
-                        sprintf('Basket for quote ID %s has been synchronously updated.', $quoteId)
-                    );
+                if ($inPostPayQuote) {
+                    $this->handleBasketExport($quote, $inPostPayQuote);
                 }
             } catch (LocalizedException $e) {
                 $errorMsg = 'Basket synchronization with InPost Pay was not successful.';
@@ -87,5 +84,27 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         }
 
         return $this->inPostPayQuote;
+    }
+
+    /**
+     * @throws LocalizedException
+     */
+    private function handleBasketExport(Quote $quote, InPostPayQuoteInterface $inPostPayQuote): void
+    {
+        if ($this->iziApiConfigProvider->isAsyncBasketExportEnabled()) {
+            $this->basketCreateOrUpdatePublisher->publish($inPostPayQuote);
+        } else {
+            $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : null;
+            $browserId = $inPostPayQuote->getBrowserId();
+            $basketId = $inPostPayQuote->getBasketId();
+            if ($browserId && $basketId) {
+                $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
+                $this->logger->debug(
+                    sprintf('Basket for quote ID %s has been synchronously updated.', $quoteId)
+                );
+            } else {
+                throw new LocalizedException(__('Quote with ID %1 is invalid.', $quoteId));
+            }
+        }
     }
 }

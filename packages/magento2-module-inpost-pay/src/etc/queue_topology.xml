@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="magento" connection="db">
+        <binding id="inPostPayBasketCreateOrUpdateBinding"
+                 topic="inpost_pay.basket.create_or_update"
+                 destinationType="queue"
+                 destination="inpost_pay.basket.create_or_update"/>
+    </exchange>
+</config>

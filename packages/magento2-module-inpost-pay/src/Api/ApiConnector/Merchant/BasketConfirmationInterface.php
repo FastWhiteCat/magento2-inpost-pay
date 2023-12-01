@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\ApiConnector\Merchant;
 
-interface BasketEventInterface
+interface BasketConfirmationInterface
 {
     /**
      * @param string $basketId
