@@ -37,8 +37,10 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
                     ->getPriceInfo()
                     ->getPrice(RegularPrice::PRICE_CODE)
                     ->getAmount();
-                $regularPriceExclTax += round($qty * (float)$regularPrice->getBaseAmount(), 2);
-                $regularPriceInclTax += round($qty * (float)$regularPrice->getValue(), 2);
+                $baseRowPriceExclTax = round($qty * (float)$regularPrice->getBaseAmount(), 2);
+                $baseRowPriceInclTax = round($qty * (float)$regularPrice->getValue(), 2);
+                $regularPriceExclTax += $baseRowPriceExclTax;
+                $regularPriceInclTax += $baseRowPriceInclTax;
             }
         }
 
@@ -51,7 +53,7 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
             Basket::BASKET_FINAL_PRICE => [
                 Basket::NET => (float)$address->getSubtotal() + $discountExclTax,
                 Basket::GROSS => (float)$address->getSubtotalInclTax() + $discountInclTax,
-                Basket::VAT => (float)($address->getTaxAmount() - $address->getDiscountTaxCompensationAmount())
+                Basket::VAT => (float)($address->getTaxAmount())
             ],
             Basket::BASKET_PROMO_PRICE => [
                 Basket::NET => (float)$address->getSubtotal(),
