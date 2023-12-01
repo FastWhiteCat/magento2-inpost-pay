@@ -6,9 +6,9 @@ namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\Converter\ProductToInPostProduct\ProductToInPostProductDataConverter;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Product\ProductFieldInterface as InPostProduct;
-use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Quote\Model\Quote;
 
 class QuoteToBasketProductsDataConverter implements QuoteToBasketDataConverterInterface
@@ -29,12 +29,13 @@ class QuoteToBasketProductsDataConverter implements QuoteToBasketDataConverterIn
                 (float)$quoteItem->getQty()
             );
 
-            $priceExclTax = round((float)$quoteItem->getPrice(), 2);
-            $priceInclTax = round((float)$quoteItem->getPriceInclTax(), 2);
+            $priceExclTax = DecimalCalculator::round((float)$quoteItem->getPrice());
+            $priceInclTax = DecimalCalculator::round((float)$quoteItem->getPriceInclTax());
+            $taxValue = DecimalCalculator::sub($priceInclTax, $priceExclTax);
             $productData[InPostProduct::PROMO_PRICE] = [
                 Basket::NET => $priceExclTax,
                 Basket::GROSS => $priceInclTax,
-                Basket::VAT => $priceInclTax - $priceExclTax
+                Basket::VAT => $taxValue
             ];
 
             $productsData[] = $productData;

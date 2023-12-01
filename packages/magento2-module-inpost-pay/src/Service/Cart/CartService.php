@@ -7,11 +7,10 @@ namespace InPost\InPostPay\Service\Cart;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Checkout\Helper\Cart;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\CouponManagementInterface;
 use Magento\Quote\Model\Quote;
-use Magento\SalesRule\Model\CouponFactory;
 use Psr\Log\LoggerInterface;
 
 class CartService
@@ -21,7 +20,7 @@ class CartService
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly CartRepositoryInterface $cartRepository,
-        private readonly CouponFactory $couponFactory,
+        private readonly CouponManagementInterface $couponManagement,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -37,7 +36,7 @@ class CartService
     {
         try {
             $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
-            $product = $this->productRepository->getById($productId);
+            $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
             if ($product instanceof Product) {
                 $quote->addProduct($product, (float)$qty);
                 $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
@@ -64,72 +63,10 @@ class CartService
      */
     public function applyPromo(Quote $quote, string $couponCode): void
     {
-        $codeLength = strlen($couponCode);
-        if (!$codeLength) {
-            return;
-        }
-
-        try {
-            $isCodeLengthValid = $codeLength <= Cart::COUPON_CODE_MAX_LENGTH;
-            $itemsCount = $quote->getItemsCount();
-            if ($itemsCount) {
-                $quote->getShippingAddress()->setCollectShippingRates(true);
-                $quote->setCouponCode($isCodeLengthValid ? $couponCode : '');
-                // @phpstan-ignore-next-line
-                $quote->setTotalsCollectedFlag(false);
-                $quote->collectTotals();
-                $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
-                $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
-                $this->cartRepository->save($quote);
-            }
-            if ($isCodeLengthValid) {
-                $this->applyCouponToQuote($quote, $couponCode);
-            } else {
-                throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
-            }
-        } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage());
-
-            throw $e;
-        }
-    }
-
-    /**
-     * @param Quote $quote
-     * @param string $couponCode
-     * @return void
-     * @throws LocalizedException
-     */
-    private function applyCouponToQuote(Quote $quote, string $couponCode): void
-    {
-        $coupon = $this->couponFactory->create();
-        // @phpstan-ignore-next-line
-        $coupon->load($couponCode, 'code');
-        if (!$quote->getItemsCount()) {
-            if ($coupon->getId()) {
-                $quote->setCouponCode($couponCode);
-                $this->logger->debug(
-                    sprintf(
-                        'Coupon code %s has been applied to quote ID %s',
-                        $couponCode,
-                        is_scalar($quote->getId()) ? (string)$quote->getId() : ''
-                    )
-                );
-            } else {
-                throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
-            }
-        } else {
-            if ($coupon->getId() && $couponCode == $quote->getCouponCode()) {
-                $this->logger->debug(
-                    sprintf(
-                        'Coupon code %s has been applied to quote ID %s',
-                        $couponCode,
-                        is_scalar($quote->getId()) ? (string)$quote->getId() : ''
-                    )
-                );
-            } else {
-                throw new LocalizedException(__('The coupon code "%1" is not valid.', $couponCode));
-            }
+        if (is_scalar($quote->getId())) {
+            $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
+            $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
+            $this->couponManagement->set((int)$quote->getId(), $couponCode);
         }
     }
 }
