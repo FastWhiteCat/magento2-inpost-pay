@@ -12,7 +12,6 @@ class IziApiConfigProvider
     private const XML_PATH_IZI_API_URL = 'payment/inpost_pay/%sizi_api_url';
     private const XML_PATH_BASKET_LIFETIME = 'payment/inpost_pay/basket_lifetime';
     private const XML_PATH_ACCEPTED_PAYMENT_TYPES = 'payment/inpost_pay/accepted_payment_types';
-    private const DEFAULT_BASKET_LIFETIME = 604800;
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -46,7 +45,7 @@ class IziApiConfigProvider
         return (string)$iziApiUrl;
     }
 
-    public function getBasketLifetime(): int
+    public function getBasketLifetime(): ?int
     {
         $basketLifetime = $this->scopeConfig->getValue(self::XML_PATH_BASKET_LIFETIME);
 
@@ -54,7 +53,7 @@ class IziApiConfigProvider
             return (int)$basketLifetime;
         }
 
-        return self::DEFAULT_BASKET_LIFETIME;
+        return null;
     }
 
     public function getAcceptedPaymentTypes(): array
