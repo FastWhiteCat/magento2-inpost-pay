@@ -7,6 +7,8 @@
                 type="InPost\InPostPay\Model\InPostPayQuote"/>
     <preference for="InPost\InPostPay\Api\InPostPayOrderRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayOrderRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\OrderLockerServiceInterface"
                 type="InPost\InPostPay\Service\Order\OrderLockerService"/>
     <preference for="InPost\InPostPay\Api\Validator\SignatureValidatorInterface"
@@ -16,6 +18,11 @@
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface" type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface" type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface" type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
+    <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface" type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
+
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version" type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
     </type>
