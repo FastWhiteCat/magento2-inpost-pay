@@ -17,6 +17,8 @@
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\Basket"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\Order"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"

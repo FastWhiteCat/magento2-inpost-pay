@@ -19,4 +19,10 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
+    <route url="/v1/izi/order" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderInterface" method="create"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
 </routes>
