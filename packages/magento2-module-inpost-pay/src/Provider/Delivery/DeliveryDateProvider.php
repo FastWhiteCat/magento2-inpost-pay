@@ -31,10 +31,10 @@ class DeliveryDateProvider
      *
      * @param ShippingMethodInterface $shippingMethod
      * @param Quote $quote
-     * @return int
+     * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculateTimestamp(ShippingMethodInterface $shippingMethod, Quote $quote): int
+    public function calculateDeliveryDate(ShippingMethodInterface $shippingMethod, Quote $quote): string
     {
         try {
             $deadlineInDays = $this->shipmentMappingConfigProvider->getDeliveryDateDeadlineInDays();
@@ -43,11 +43,21 @@ class DeliveryDateProvider
                 $currentDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT)
             );
 
-            return $currentTimestamp + ($deadlineInDays * self::SECONDS_IN_DAY);
+            return $this->formatInPostDate($currentTimestamp + ($deadlineInDays * self::SECONDS_IN_DAY));
         } catch (Exception $e) {
             $this->logger->critical($e->getMessage());
 
-            return self::SECONDS_IN_DAY * ShipmentMappingConfigProvider::DEFAULT_DELIVERY_DEADLINE;
+            return $this->formatInPostDate(
+                self::SECONDS_IN_DAY * ShipmentMappingConfigProvider::DEFAULT_DELIVERY_DEADLINE
+            );
         }
+    }
+
+    private function formatInPostDate(int $deliveryTimestamp): string
+    {
+        $deliveryDateTime = new DateTime();
+        $deliveryDateTime->setTimestamp($deliveryTimestamp);
+
+        return $deliveryDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT);
     }
 }

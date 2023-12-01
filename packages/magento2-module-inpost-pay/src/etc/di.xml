@@ -155,4 +155,9 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>
