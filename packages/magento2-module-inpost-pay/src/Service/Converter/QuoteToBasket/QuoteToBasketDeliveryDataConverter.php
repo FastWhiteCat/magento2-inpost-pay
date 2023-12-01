@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
 
-use DateTime;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
@@ -12,6 +11,7 @@ use InPost\InPostPay\Model\Config\Source\AcceptedPaymentTypes;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
@@ -102,12 +102,13 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
 
     private function getCourierData(ShippingMethodInterface $courierShippingMethod, Quote $quote): array
     {
-        $courierPriceInclTax = round((float)$courierShippingMethod->getPriceInclTax(), 2);
-        $courierPriceExclTax = round((float)$courierShippingMethod->getPriceExclTax(), 2);
+        $courierPriceInclTax = DecimalCalculator::round((float)$courierShippingMethod->getPriceInclTax());
+        $courierPriceExclTax = DecimalCalculator::round((float)$courierShippingMethod->getPriceExclTax());
+        $courierTaxValue = DecimalCalculator::sub($courierPriceInclTax, $courierPriceExclTax);
         $price = [
             Basket::NET => $courierPriceExclTax,
             Basket::GROSS => $courierPriceInclTax,
-            Basket::VAT => $courierPriceInclTax - $courierPriceExclTax,
+            Basket::VAT => $courierTaxValue,
         ];
 
         $deliveryOptions = [];
@@ -121,11 +122,9 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
         $courierData = [
             Basket::DELIVERY_TYPE => Basket::DELIVERY_TYPE_COURIER,
-            Basket::DELIVERY_DATE => $this->formatInPostDate(
-                $this->deliveryDateProvider->calculateTimestamp(
-                    $courierShippingMethod,
-                    $quote
-                )
+            Basket::DELIVERY_DATE => $this->deliveryDateProvider->calculateDeliveryDate(
+                $courierShippingMethod,
+                $quote
             ),
             Basket::DELIVERY_OPTIONS => $deliveryOptions,
             Basket::DELIVERY_PRICE => $price
@@ -141,21 +140,20 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
 
     private function getPickupData(ShippingMethodInterface $pickupPointShippingMethod, Quote $quote): array
     {
-        $pickupPriceInclTax = round((float)$pickupPointShippingMethod->getPriceInclTax(), 2);
-        $pickupPriceExclTax = round((float)$pickupPointShippingMethod->getPriceExclTax(), 2);
+        $pickupPriceInclTax = DecimalCalculator::round((float)$pickupPointShippingMethod->getPriceInclTax());
+        $pickupPriceExclTax = DecimalCalculator::round((float)$pickupPointShippingMethod->getPriceExclTax());
+        $pickupTaxValue = DecimalCalculator::sub($pickupPriceInclTax, $pickupPriceExclTax);
         $pickupData = [
             Basket::DELIVERY_TYPE => Basket::DELIVERY_TYPE_PICKUP,
-            Basket::DELIVERY_DATE => $this->formatInPostDate(
-                $this->deliveryDateProvider->calculateTimestamp(
-                    $pickupPointShippingMethod,
-                    $quote
-                )
+            Basket::DELIVERY_DATE => $this->deliveryDateProvider->calculateDeliveryDate(
+                $pickupPointShippingMethod,
+                $quote
             ),
             Basket::DELIVERY_OPTIONS => [],
             Basket::DELIVERY_PRICE => [
                 Basket::NET => $pickupPriceExclTax,
                 Basket::GROSS => $pickupPriceInclTax,
-                Basket::VAT => $pickupPriceInclTax - $pickupPriceExclTax,
+                Basket::VAT => $pickupTaxValue,
             ]
         ];
 
@@ -177,13 +175,5 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
 
         return $limit;
-    }
-
-    private function formatInPostDate(int $deliveryTimestamp): string
-    {
-        $deliveryDateTime = new DateTime();
-        $deliveryDateTime->setTimestamp($deliveryTimestamp);
-
-        return $deliveryDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT);
     }
 }

@@ -6,7 +6,9 @@ namespace InPost\InPostPay\Service\Converter\ProductToInPostProduct;
 
 use InPost\InPostPay\Api\ApiConnector\IziApi\Product\ProductFieldInterface as InPostProduct;
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Escaper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -26,6 +28,7 @@ class ProductToInPostProductDataConverter
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
+        private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper
     ) {
     }
@@ -45,8 +48,8 @@ class ProductToInPostProductDataConverter
         $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
         $description = (is_scalar($description)) ? (string)$description : '';
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
-        $regularPriceExclTax = round((float)$regularPrice->getBaseAmount(), 2);
-        $regularPriceInclTax = round((float)$regularPrice->getValue(), 2);
+        $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
+        $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
 
         return [
             InPostProduct::PRODUCT_ID => (int)$product->getId(),
@@ -59,7 +62,7 @@ class ProductToInPostProductDataConverter
             InPostProduct::BASE_PRICE => [
                 Basket::NET => $regularPriceExclTax,
                 Basket::GROSS => $regularPriceInclTax,
-                Basket::VAT =>  $regularPriceInclTax - $regularPriceExclTax
+                Basket::VAT =>  DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax)
             ],
             InPostProduct::QUANTITY => [
                 InPostProduct::QUANTITY => $canCastQtyToInt ? (int)$quantity : $quantity,
@@ -101,8 +104,8 @@ class ProductToInPostProductDataConverter
                     $value = $attribute->getFrontend()->getValue($product);
                     if (is_string($value) && strlen(trim($value))) {
                         $productAttributesData[] = [
-                            InPostProduct::ATTRIBUTE_NAME => $attribute->getStoreLabel(),
-                            InPostProduct::ATTRIBUTE_VALUE => $value
+                            InPostProduct::ATTRIBUTE_NAME => $this->escaper->escapeUrl($attribute->getStoreLabel()),
+                            InPostProduct::ATTRIBUTE_VALUE => $this->escaper->escapeUrl($value)
                         ];
                     }
                 }
