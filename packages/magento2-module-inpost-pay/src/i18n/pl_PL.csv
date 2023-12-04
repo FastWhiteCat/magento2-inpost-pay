@@ -81,3 +81,4 @@
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
 "Unable to serialize basket data.","Nie udana próba serializacji danych koszyka.",module,InPost_InPostPay
+"An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi"
