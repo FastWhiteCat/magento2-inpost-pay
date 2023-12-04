@@ -9,5 +9,26 @@
             <label>IZI API URL</label>
             <config_path>payment/inpost_pay/izi_api_url</config_path>
         </field>
+        <field id="basket_lifetime" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+            <label>Basket Lifetime</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/basket_lifetime</config_path>
+            <comment>InPost basket lifetime in seconds.</comment>
+        </field>
+        <field id="accepted_payment_types" translate="label comment" type="multiselect" sortOrder="50" showInDefault="1"
+               canRestore="1">
+            <label>Accepted Payment Types in InPost Basket</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\AcceptedPaymentTypes</source_model>
+            <can_be_empty>1</can_be_empty>
+            <comment>Empty selection will allow all payment types in mobile application.</comment>
+            <config_path>payment/inpost_pay/accepted_payment_types</config_path>
+        </field>
+        <field id="async_basket_export" translate="label comment" type="select" sortOrder="60"
+               showInDefault="1" canRestore="1">
+            <label>Enable asynchronous basket export</label>
+            <comment>If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/async_basket_export</config_path>
+        </field>
     </group>
 </include>

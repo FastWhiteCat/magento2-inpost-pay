@@ -6,12 +6,12 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use GuzzleHttp\Client;
+use Laminas\Http\Client as HttpClient;
 use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Psr7\Response as GuzzleHttpResponse;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
-use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Response;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Base64Json;

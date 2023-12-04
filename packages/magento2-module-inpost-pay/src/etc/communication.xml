@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="inpost_pay.basket.create_or_update"
+           request="Magento\AsynchronousOperations\Api\Data\OperationInterface">
+        <handler name="inPostPayBasketCreateOrUpdateConsumer"
+                 type="InPost\InPostPay\Model\Consumer\BasketCreateOrUpdateConsumer"
+                 method="process" />
+    </topic>
+</config>

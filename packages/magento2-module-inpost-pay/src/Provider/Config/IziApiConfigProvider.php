@@ -10,6 +10,9 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 class IziApiConfigProvider
 {
     private const XML_PATH_IZI_API_URL = 'payment/inpost_pay/%sizi_api_url';
+    private const XML_PATH_BASKET_LIFETIME = 'payment/inpost_pay/basket_lifetime';
+    private const XML_PATH_ACCEPTED_PAYMENT_TYPES = 'payment/inpost_pay/accepted_payment_types';
+    private const XML_PATH_ASYNC_BASKET_EXPORT = 'payment/inpost_pay/async_basket_export';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -41,5 +44,32 @@ class IziApiConfigProvider
         }
 
         return (string)$iziApiUrl;
+    }
+
+    public function getBasketLifetime(): ?int
+    {
+        $basketLifetime = $this->scopeConfig->getValue(self::XML_PATH_BASKET_LIFETIME);
+
+        if (!empty($basketLifetime) && is_scalar($basketLifetime)) {
+            return (int)$basketLifetime;
+        }
+
+        return null;
+    }
+
+    public function getAcceptedPaymentTypes(): array
+    {
+        $acceptedPaymentTypes = $this->scopeConfig->getValue(self::XML_PATH_ACCEPTED_PAYMENT_TYPES);
+
+        if (!empty($acceptedPaymentTypes) && is_scalar($acceptedPaymentTypes)) {
+            return explode(',', (string)$acceptedPaymentTypes);
+        }
+
+        return [];
+    }
+
+    public function isAsyncBasketExportEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_ASYNC_BASKET_EXPORT);
     }
 }

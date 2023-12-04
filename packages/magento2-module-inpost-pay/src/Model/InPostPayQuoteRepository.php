@@ -41,13 +41,13 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         return $inPostPayQuote;
     }
 
-    public function get(int $id): InPostPayQuoteInterface
+    public function get(int $inPostPayQuoteId): InPostPayQuoteInterface
     {
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
         // @phpstan-ignore-next-line
-        $this->resource->load($inPostPayQuote, $id);
+        $this->resource->load($inPostPayQuote, $inPostPayQuoteId);
         if (!$inPostPayQuote->getQuoteId()) {
-            throw new NoSuchEntityException(__('InPost Pay Quote with ID "%1" does not exist.', $id));
+            throw new NoSuchEntityException(__('InPost Pay Quote with ID "%1" does not exist.', $inPostPayQuoteId));
         }
 
         return $inPostPayQuote;
@@ -72,7 +72,7 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $this->resource->load($inPostPayQuote, $basketId, InPostPayQuoteInterface::BASKET_ID);
         if (!$inPostPayQuote->getQuoteId()) {
             throw new NoSuchEntityException(
-                __('InPost Pay Quote with InPost Basket ID "%1" does not exist.', $basketId)
+                __('InPost Pay Quote with Basket ID "%1" does not exist.', $basketId)
             );
         }
 
