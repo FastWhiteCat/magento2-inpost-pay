@@ -11,6 +11,7 @@ use InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Monolog\Logger;
 
 class GetConfirmation implements GetConfirmationInterface
 {
@@ -18,11 +19,13 @@ class GetConfirmation implements GetConfirmationInterface
      * @param CartRepositoryInterface           $cartRepository
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
      * @param ConfirmationInterfaceFactory      $confirmationInterfaceFactory
+     * @param Logger                            $logger
      */
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly ConfirmationInterfaceFactory $confirmationInterfaceFactory
+        private readonly ConfirmationInterfaceFactory $confirmationInterfaceFactory,
+        private readonly Logger $logger
     ) {
     }
 
@@ -30,20 +33,21 @@ class GetConfirmation implements GetConfirmationInterface
     {
         try {
             $cart   = $this->cartRepository->get($cartId);
-            $result = $this->inPostPayQuoteRepository->getByQuoteId((int)$cart->getId());
+            $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$cart->getId());
 
             $data = [
-                'message'             => $this->getProperMessage($result->getStatus())->render(),
-                'status'              => $result->getStatus() ?: '0',
-                'browser_id'          => $result->getBrowserId(),
-                'browser_trusted'     => $result->getBrowserTrusted(),
-                'name'                => $result->getName(),
-                'surname'             => $result->getSurname(),
-                'masked_phone_number' => $result->getMaskedPhoneNumber()
+                'message'             => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
+                'status'              => $inpostPayQuote->getStatus() ?: '0',
+                'browser_id'          => $inpostPayQuote->getBrowserId(),
+                'browser_trusted'     => $inpostPayQuote->getBrowserTrusted(),
+                'name'                => $inpostPayQuote->getName(),
+                'surname'             => $inpostPayQuote->getSurname(),
+                'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
             ];
 
             return $this->confirmationInterfaceFactory->create(['data' => $data]);
         } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
             $data = [
                 'message' => __('Basket not found!')->render()
             ];
@@ -53,14 +57,14 @@ class GetConfirmation implements GetConfirmationInterface
     }
 
     /**
-     * @param string|null $getStatus
+     * @param string|null $status
      *
      * @return Phrase
      */
-    private function getProperMessage(?string $getStatus): Phrase
+    private function getProperMessage(?string $status): Phrase
     {
-        return match ($getStatus) {
-            null => __('Pending'),
+        return match ($status) {
+            default => __('Pending'),
             'SUCCESS' => __('Success'),
             'REJECT' => __('Reject')
         };

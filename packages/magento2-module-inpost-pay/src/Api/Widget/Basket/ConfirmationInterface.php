@@ -7,6 +7,8 @@ namespace InPost\InPostPay\Api\Widget\Basket;
  */
 interface ConfirmationInterface
 {
+    public const MESSAGE = 'message';
+
     /**
      * @return string
      */

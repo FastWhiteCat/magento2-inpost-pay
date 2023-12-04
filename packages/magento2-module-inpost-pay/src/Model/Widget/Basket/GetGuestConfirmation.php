@@ -12,6 +12,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Quote\Model\QuoteIdMask;
 use Magento\Quote\Model\QuoteIdMaskFactory;
+use Monolog\Logger;
 
 class GetGuestConfirmation implements GetGuestConfirmationInterface
 {
@@ -19,51 +20,56 @@ class GetGuestConfirmation implements GetGuestConfirmationInterface
      * @param QuoteIdMaskFactory                $quoteIdMaskFactory
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
      * @param ConfirmationInterfaceFactory      $confirmationInterfaceFactory
+     * @param Logger                            $logger
      */
     public function __construct(
         private readonly QuoteIdMaskFactory $quoteIdMaskFactory,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly ConfirmationInterfaceFactory $confirmationInterfaceFactory
+        private readonly ConfirmationInterfaceFactory $confirmationInterfaceFactory,
+        private readonly Logger $logger
     ) {
     }
 
     public function execute(string $cartId): ConfirmationInterface
     {
-        /** @var $quoteIdMask QuoteIdMask */
+        /**
+         * @phpstan-ignore-next-line
+         * @var $quoteIdMask QuoteIdMask
+         */
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
         try {
-            $result = $this->inPostPayQuoteRepository->getByQuoteId((int)$quoteIdMask->getQuoteId());
+            $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$quoteIdMask->getQuoteId());
 
             $data = [
-                'message'             => $this->getProperMessage($result->getStatus())->render(),
-                'status'              => $result->getStatus() ?: '0',
-                'browser_id'          => $result->getBrowserId(),
-                'browser_trusted'     => $result->getBrowserTrusted(),
-                'name'                => $result->getName(),
-                'surname'             => $result->getSurname(),
-                'masked_phone_number' => $result->getMaskedPhoneNumber()
+                'message'             => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
+                'status'              => $inpostPayQuote->getStatus() ?: '0',
+                'browser_id'          => $inpostPayQuote->getBrowserId(),
+                'browser_trusted'     => $inpostPayQuote->getBrowserTrusted(),
+                'name'                => $inpostPayQuote->getName(),
+                'surname'             => $inpostPayQuote->getSurname(),
+                'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
             ];
         } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
             $data = [
                 'message' => __('Basket not found!')->render()
             ];
         }
 
         return $this->confirmationInterfaceFactory->create(['data' => $data]);
-
     }
 
     /**
-     * @param string|null $getStatus
+     * @param string|null $status
      *
      * @return Phrase
      */
-    private function getProperMessage(?string $getStatus): Phrase
+    private function getProperMessage(?string $status): Phrase
     {
-        return match ($getStatus) {
-            null => __('Pending'),
-            'success' => __('Success'),
-            'reject' => __('Reject')
+        return match ($status) {
+            'SUCCESS' => __('Success'),
+            'REJECT' => __('Reject'),
+            default => __('Pending')
         };
     }
 

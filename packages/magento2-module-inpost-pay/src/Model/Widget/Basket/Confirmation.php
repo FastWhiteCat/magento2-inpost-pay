@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Model\Widget\Basket;
 
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface;
 use Magento\Framework\DataObject;
 
@@ -11,36 +12,50 @@ class Confirmation extends DataObject implements ConfirmationInterface
 {
     public function getMessage(): string
     {
-        return $this->getData('message');
+        $message = $this->getData(ConfirmationInterface::MESSAGE);
+
+        return (is_scalar($message)) ? (string)$message : '';
     }
 
     public function getStatus(): ?string
     {
-        return $this->getData('status');
+        $data = $this->getData(InPostPayQuoteInterface::STATUS);
+
+        return is_string($data) ? $data : null;
     }
 
     public function getBrowserId(): ?string
     {
-        return $this->getData('browser_id');
+        $data = $this->getData(InPostPayQuoteInterface::BROWSER_ID);
+
+        return is_string($data) ? $data : null;
     }
 
     public function getBrowserTrusted(): ?bool
     {
-        return $this->getData('browser_trusted');
+        $data = $this->getData(InPostPayQuoteInterface::BROWSER_TRUSTED);
+
+        return is_bool($data) ? $data : null;
     }
 
     public function getName(): ?string
     {
-        return $this->getData('name');
+        $data = $this->getData(InPostPayQuoteInterface::NAME);
+
+        return is_string($data) ? $data : null;
     }
 
     public function getSurname(): ?string
     {
-        return $this->getData('surname');
+        $data = $this->getData(InPostPayQuoteInterface::SURNAME);
+
+        return is_string($data) ? $data : null;
     }
 
     public function getMaskedPhoneNumber(): ?string
     {
-        return $this->getData('masked_phone_number');
+        $data = $this->getData(InPostPayQuoteInterface::MASKED_PHONE_NUMBER);
+
+        return is_string($data) ? $data : null;
     }
 }
