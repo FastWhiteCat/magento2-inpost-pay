@@ -69,3 +69,15 @@
 "No Coupon is required.","Kod Rabatowy nie jest wymagany.",module,InPost_InPostPay
 "There was a problem with basket request. Details: %1","Wystąpił problem z żądaniem synchronizacji koszyka InPost Pay. Szczegóły: %1",module,InPost_InPostPay
 "No delivery method is allowed for this basket.","Brak metod dostawy dostępnych dla tego koszyka InPost Pay",module,InPost_InPostPay
+"Signature validation failed!","Weryfikacja sygnatury nie przebiegła pomyślnie!",module,InPost_InPostPay
+"Basket status has not been confirmed. Expected: %1 Received: %2","Status koszyka nie został potwierdzony. Oczekiwany: %1 Otrzymany: %2",module,InPost_InPostPay
+"Masked phone number: %1 is not same as in merchant quote ID: %2.","Maska numeru telefonu: %1 różni się od tej zapisanej w koszyku sklepu o ID: %2.",module,InPost_InPostPay
+"Name: %1 is not same as in merchant quote ID: %2.","Imię użytkownika: %1 różni się od tej zapisanej w koszyku sklepu o ID: %2.",module,InPost_InPostPay
+"Surname: %1 is not same as in merchant quote ID: %2.","Nazwisko użytkownika: %1 różni się od tej zapisanej w koszyku sklepu o ID: %2.",module,InPost_InPostPay
+"Browser binding was not complete. Browser is not trusted.","Proces powiązania przeglądarki nie został pomyślnie ukończony. Przeglądarka nie jest zaufana.",module,InPost_InPostPay
+"Browser ID does not match value saved in merchant quote ID: %1.","ID powiązanej przeglądarki różni się od tej zapisanej w koszyku sklepu ID: %1.",module,InPost_InPostPay
+"Cannot confirm basket. Reason: %1","Nie udało się potwierdzić koszyka. Powód: %1",module,InPost_InPostPay
+"If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.","Jeśli włączono dane koszyka będą eksportowane z wykorzystaniem wbudowanego systemu kolejkowania wiadomości. Wymagane jest po stronie infrastruktury serwerowej utrzymywanie uruchomionego procesu przetwarzającego kolejkę inpost_pay.basket.create_or_update",module,InPost_InPostPay
+"Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
+"Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
+"Unable to serialize basket data.","Nie udana próba serializacji danych koszyka.",module,InPost_InPostPay
