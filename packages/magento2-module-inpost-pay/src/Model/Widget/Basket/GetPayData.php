@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service;
+namespace InPost\InPostPay\Model\Widget\Basket;
 
-use InPost\InPostPay\Api\WidgetInterface;
+use InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface;
 use InPost\InPostPay\Service\ApiConnector\BindingBasket;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Serialize\Serializer\Base64Json;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
 
-class Widget implements WidgetInterface
+class GetPayData implements GetPayDataInterface
 {
     public const DEFAULT_DATE_FORMAT = "Y-m-d\TH:i:s.000\Z";
 
@@ -23,7 +23,7 @@ class Widget implements WidgetInterface
     ) {
     }
 
-    public function getPayData(
+    public function execute(
         string $cartId,
         string $bindingPlace,
         string $browser,

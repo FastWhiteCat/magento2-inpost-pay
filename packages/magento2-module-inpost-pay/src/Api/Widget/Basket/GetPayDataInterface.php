@@ -1,9 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Api;
+namespace InPost\InPostPay\Api\Widget\Basket;
 
-interface WidgetInterface
+/**
+ * @api
+ */
+interface GetPayDataInterface
 {
     /**
      * @param string $cartId
@@ -13,7 +16,7 @@ interface WidgetInterface
      * @param string|null $phoneNumber
      * @return array
      */
-    public function getPayData(
+    public function execute(
         string $cartId,
         string $bindingPlace,
         string $browser,

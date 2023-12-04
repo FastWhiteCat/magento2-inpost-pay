@@ -23,7 +23,14 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
-    <preference for="InPost\InPostPay\Api\WidgetInterface" type="InPost\InPostPay\Service\Widget" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestMobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetMobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\MobileLink" />
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
