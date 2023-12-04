@@ -10,20 +10,19 @@ use InPost\InPostPay\Api\Widget\Basket\ConfirmationInterfaceFactory;
 use InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
-use Magento\Quote\Model\QuoteIdMask;
-use Magento\Quote\Model\QuoteIdMaskFactory;
+use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
 use Monolog\Logger;
 
 class GetGuestConfirmation implements GetGuestConfirmationInterface
 {
     /**
-     * @param QuoteIdMaskFactory                $quoteIdMaskFactory
+     * @param MaskedQuoteIdToQuoteIdInterface   $maskedQuoteIdToQuoteId
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
      * @param ConfirmationInterfaceFactory      $confirmationInterfaceFactory
      * @param Logger                            $logger
      */
     public function __construct(
-        private readonly QuoteIdMaskFactory $quoteIdMaskFactory,
+        private readonly MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly ConfirmationInterfaceFactory $confirmationInterfaceFactory,
         private readonly Logger $logger
@@ -32,13 +31,9 @@ class GetGuestConfirmation implements GetGuestConfirmationInterface
 
     public function execute(string $cartId): ConfirmationInterface
     {
-        /**
-         * @phpstan-ignore-next-line
-         * @var $quoteIdMask QuoteIdMask
-         */
-        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
         try {
-            $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$quoteIdMask->getQuoteId());
+            $quoteId = $this->maskedQuoteIdToQuoteId->execute($cartId);
+            $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
 
             $data = [
                 'message'             => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
