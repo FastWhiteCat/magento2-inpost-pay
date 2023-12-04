@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface;
 use InPost\InPostPay\Api\Widget\Basket\ConfirmationInterfaceFactory;
 use InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
@@ -37,7 +38,7 @@ class GetGuestConfirmation implements GetGuestConfirmationInterface
 
             $data = [
                 'message'             => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
-                'status'              => $inpostPayQuote->getStatus() ?: '0',
+                'status'              => $inpostPayQuote->getStatus(),
                 'browser_id'          => $inpostPayQuote->getBrowserId(),
                 'browser_trusted'     => $inpostPayQuote->getBrowserTrusted(),
                 'name'                => $inpostPayQuote->getName(),
@@ -55,16 +56,16 @@ class GetGuestConfirmation implements GetGuestConfirmationInterface
     }
 
     /**
-     * @param string|null $status
+     * @param string $status
      *
      * @return Phrase
      */
-    private function getProperMessage(?string $status): Phrase
+    private function getProperMessage(string $status): Phrase
     {
         return match ($status) {
-            'SUCCESS' => __('Success'),
-            'REJECT' => __('Reject'),
-            default => __('Pending')
+            default => __('Pending'),
+            InPostBasketStatus::SUCCESS->value => __('Success'),
+            InPostBasketStatus::REJECT->value => __('Reject')
         };
     }
 }

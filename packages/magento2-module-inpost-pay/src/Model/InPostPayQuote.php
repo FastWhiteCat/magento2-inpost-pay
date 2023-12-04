@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 
@@ -74,11 +75,11 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return $this->setData(self::INPOST_BASKET_ID, $inpostBasketId);
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         $status = ($this->hasData(self::STATUS)) ? $this->getData(self::STATUS) : null;
 
-        return ($status && is_scalar($status)) ? (string)$status : null;
+        return ($status && is_scalar($status)) ? (string)$status : InPostBasketStatus::PENDING->value;
     }
 
     public function setStatus(string $status): InPostPayQuoteInterface
