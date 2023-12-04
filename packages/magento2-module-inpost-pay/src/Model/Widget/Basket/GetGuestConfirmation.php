@@ -67,5 +67,4 @@ class GetGuestConfirmation implements GetGuestConfirmationInterface
             default => __('Pending')
         };
     }
-
 }
