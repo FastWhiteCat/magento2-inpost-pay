@@ -253,4 +253,23 @@ class Basket implements BasketInterface
 
         return null;
     }
+
+    /**
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
+     */
+    public function delete(string $basketId): void
+    {
+        $this->logger->info(
+            'DELETE Request - 1/2 Received delete request for basket id - {basketId}',
+            ['basketId' => $basketId]
+        );
+        try {
+            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
+        } catch (NoSuchEntityException|LocalizedException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
+            throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
+        }
+        $this->logger->info('DELETE Request - 2/2 Deleted basket id - {basketId}', ['basketId' => $basketId]);
+    }
 }

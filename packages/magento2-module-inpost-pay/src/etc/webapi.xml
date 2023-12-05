@@ -19,6 +19,12 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
+    <route url="/v1/izi/basket/:basketId/binding" method="DELETE">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="delete"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
     <route url="/v1/izi/basket/:basketId/confirmation" method="POST">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface" method="execute"/>
         <resources>
