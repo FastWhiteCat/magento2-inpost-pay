@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/izi/basket_information/:cartId" method="POST">
+        <service class="InPost\InPostPay\Api\WidgetInterface" method="getPayData" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
     <route url="/v1/izi/basket/:basketId" method="GET">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="get"/>
         <resources>

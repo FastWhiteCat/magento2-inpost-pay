@@ -23,6 +23,7 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\WidgetInterface" type="InPost\InPostPay\Service\Widget" />
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
