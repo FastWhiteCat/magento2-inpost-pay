@@ -23,6 +23,7 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\WidgetInterface" type="InPost\InPostPay\Service\Widget" />
     <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface"
                 type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
     <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface"

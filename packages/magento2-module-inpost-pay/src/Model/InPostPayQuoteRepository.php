@@ -123,8 +123,13 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         return true;
     }
 
-    public function deleteById(int $inPostPayQuoteId): bool
+    public function deleteById(int $id): bool
     {
-        return $this->delete($this->get($inPostPayQuoteId));
+        return $this->delete($this->get($id));
+    }
+
+    public function deleteByBasketId(string $basketId): bool
+    {
+        return $this->delete($this->getByBasketId($basketId));
     }
 }
