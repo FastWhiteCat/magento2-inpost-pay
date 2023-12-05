@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface;
 use InPost\InPostPay\Api\Widget\Basket\MobileLinkInterfaceFactory;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\BindingBasket;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
@@ -30,10 +31,10 @@ class GetMobileLink implements GetMobileLinkInterface
             $result = $this->bindingBasket->checkBinding((int)$cart->getId());
 
             if (isset($result['inpost_basket_id'])) {
-                if($this->sandboxConfigProvider->isSandboxEnabled()) {
-                    $link = 'inpost://izilinksandbox?basket_id=' + $result['inpost_basket_id'];
+                if ($this->sandboxConfigProvider->isSandboxEnabled()) {
+                    $link = 'inpost://izilinksandbox?basket_id=' . $result['inpost_basket_id'];
                 } else {
-                    $link = 'inpost://izilink?basket_id=' + $result['inpost_basket_id'];
+                    $link = 'inpost://izilink?basket_id=' . $result['inpost_basket_id'];
                 }
 
                 $data = ['link' => $link];
