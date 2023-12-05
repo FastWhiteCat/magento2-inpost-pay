@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\DeliveryFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\AddressDetailsFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\PhoneNumberFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\DeliveryAddressFactory;
+use InPost\InPostPay\Model\Dto\Order\AddressDetailsFactory;
+use InPost\InPostPay\Model\Dto\Order\DeliveryAddressFactory;
+use InPost\InPostPay\Model\Dto\Order\DeliveryFactory;
+use InPost\InPostPay\Model\Dto\Order\PhoneNumberFactory;
 
 class DtoDeliveryFactory
 {
@@ -28,8 +28,26 @@ class DtoDeliveryFactory
             $delivery->setDeliveryType((string)$data[Delivery::DELIVERY_TYPE]);
         }
 
+        if (isset($data[Delivery::DELIVERY_CODES]) && is_array($data[Delivery::DELIVERY_CODES])) {
+            $deliveryCodes = [];
+            foreach ($data[Delivery::DELIVERY_CODES] as $deliveryCode) {
+                if (is_scalar($deliveryCode)) {
+                    $deliveryCodes[] = (string)$deliveryCode;
+                }
+            }
+            $delivery->setDeliveryCodes($deliveryCodes);
+        }
+
         if (isset($data[Delivery::MAIL]) && is_scalar($data[Delivery::MAIL])) {
             $delivery->setMail((string)$data[Delivery::MAIL]);
+        }
+
+        if (isset($data[Delivery::DELIVERY_POINT]) && is_scalar($data[Delivery::DELIVERY_POINT])) {
+            $delivery->setDeliveryPoint((string)$data[Delivery::DELIVERY_POINT]);
+        }
+
+        if (isset($data[Delivery::COURIER_NOTE]) && is_scalar($data[Delivery::COURIER_NOTE])) {
+            $delivery->setCourierNote((string)$data[Delivery::COURIER_NOTE]);
         }
 
         $delivery->setPhoneNumber($this->preparePhoneNumber($data));

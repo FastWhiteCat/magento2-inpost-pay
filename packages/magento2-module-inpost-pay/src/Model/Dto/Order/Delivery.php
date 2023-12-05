@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\PhoneNumberFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\DeliveryAddressFactory;
+use InPost\InPostPay\Model\Dto\Order\DeliveryAddressFactory;
+use InPost\InPostPay\Model\Dto\Order\PhoneNumberFactory;
 
 class Delivery
 {
@@ -13,9 +13,15 @@ class Delivery
     public const MAIL = 'mail';
     public const PHONE_NUMBER = 'phone_number';
     public const DELIVERY_ADDRESS = 'delivery_address';
+    public const DELIVERY_CODES = 'delivery_codes';
+    public const DELIVERY_POINT = 'delivery_point';
+    public const COURIER_NOTE = 'courier_note';
 
     private ?string $deliveryType;
+    private ?array $deliveryCodes;
     private ?string $mail;
+    private ?string $deliveryPoint;
+    private ?string $courierNote;
     private ?PhoneNumber $phoneNumber;
     private ?DeliveryAddress $deliveryAddress;
 
@@ -35,6 +41,16 @@ class Delivery
         $this->deliveryType = $deliveryType;
     }
 
+    public function getDeliveryCodes(): array
+    {
+        return (array)$this->deliveryCodes;
+    }
+
+    public function setDeliveryCodes(array $deliveryCodes): void
+    {
+        $this->deliveryCodes = $deliveryCodes;
+    }
+
     public function getMail(): string
     {
         return (string)$this->mail;
@@ -43,6 +59,26 @@ class Delivery
     public function setMail(string $mail): void
     {
         $this->mail = $mail;
+    }
+
+    public function getDeliveryPoint(): ?string
+    {
+        return $this->deliveryPoint;
+    }
+
+    public function setDeliveryPoint(string $deliveryPoint): void
+    {
+        $this->deliveryPoint = $deliveryPoint;
+    }
+
+    public function getCourierNote(): string
+    {
+        return (string)$this->courierNote;
+    }
+
+    public function setCourierNote(string $courierNote): void
+    {
+        $this->courierNote = $courierNote;
     }
 
     public function getPhoneNumber(): PhoneNumber

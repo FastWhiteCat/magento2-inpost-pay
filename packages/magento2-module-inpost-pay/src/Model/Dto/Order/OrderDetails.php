@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\BasketPriceFactory;
+use InPost\InPostPay\Model\Dto\Order\BasketPriceFactory;
 
 class OrderDetails
 {
@@ -12,8 +12,11 @@ class OrderDetails
     public const CURRENCY = 'currency';
     public const BASKET_PRICE = 'basket_price';
     public const PAYMENT_TYPE = 'payment_type';
+    public const ORDER_COMMENTS = 'order_comments';
+    public const COMMENTS = 'comments';
 
     private ?string $basketId;
+    private ?string $orderComments;
     private ?BasketPrice $basketPrice;
     private ?string $currency;
     private ?string $paymentType;
@@ -30,7 +33,17 @@ class OrderDetails
 
     public function setBasketId(string $basketId): void
     {
-        $this->basketId= $basketId;
+        $this->basketId = $basketId;
+    }
+
+    public function getOrderComments(): string
+    {
+        return (string)$this->orderComments;
+    }
+
+    public function setOrderComments(string $orderComments): void
+    {
+        $this->orderComments = $orderComments;
     }
 
     public function getBasketPrice(): BasketPrice

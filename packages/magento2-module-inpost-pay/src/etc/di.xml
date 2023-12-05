@@ -25,6 +25,8 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
+                type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
@@ -79,6 +81,29 @@
                 <item name="products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketProductsDataConverter</item>
                 <item name="related_products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketRelatedProductsDataConverter</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketConsentsDataConverter</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\OrderValidator">
+        <arguments>
+            <argument name="orderValidators" xsi:type="array">
+                <item name="basket_price" xsi:type="object">InPost\InPostPay\Validator\Order\BasketPriceValidator</item>
+                <item name="payment_type" xsi:type="object">InPost\InPostPay\Validator\Order\PaymentTypeValidator</item>
+                <item name="delivery" xsi:type="object">InPost\InPostPay\Validator\Order\DeliveryValidator</item>
+                <item name="consents" xsi:type="object">InPost\InPostPay\Validator\Order\ConsentsValidator</item>
+                <item name="billing_information" xsi:type="object">InPost\InPostPay\Validator\Order\BillingInformationValidator</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+        <arguments>
+            <argument name="orderProcessingSteps" xsi:type="array">
+                <item name="assign_customer" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\AssignCustomerStep</item>
+                <item name="billing_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\BillingAddressStep</item>
+                <item name="shipping_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ShippingAddressStep</item>
+                <item name="delivery_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\DeliveryMethodStep</item>
+                <item name="payment_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\PaymentMethodStep</item>
+                <item name="reload_quote" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ReloadQuoteStep</item>
             </argument>
         </arguments>
     </type>
@@ -185,6 +210,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

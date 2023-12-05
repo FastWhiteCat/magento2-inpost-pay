@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
 class Consent
 {

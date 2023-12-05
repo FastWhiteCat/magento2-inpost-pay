@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Service\Order\Creator\Steps;
+
+use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface;
+use InPost\InPostPay\Api\OrderProcessingStepInterface;
+use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
+use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
+use InPost\InPostPay\Service\Cart\CartService;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote;
+use Psr\Log\LoggerInterface;
+
+class DeliveryMethodStep extends OrderProcessingStep implements OrderProcessingStepInterface
+{
+    public function __construct(
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($logger);
+    }
+
+    /**
+     * @param Quote $quote
+     * @param OrderDto $orderDto
+     * @return void
+     * @throws InPostPayInvalidConfigurationException
+     */
+    public function process(Quote $quote, OrderDto $orderDto): void
+    {
+        if ($orderDto->getDelivery()->getDeliveryType() === BasketFieldInterface::DELIVERY_TYPE_PICKUP) {
+            $deliveryMethod = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForInPostPickup();
+        } else {
+            $deliveryMethod = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForInPostCourier();
+        }
+
+        $shippingAddress = $quote->getShippingAddress();
+        $shippingAddress->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->setShippingMethod($deliveryMethod);
+        $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
+        $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
+        $this->cartRepository->save($quote);
+
+        $this->createLog(
+            sprintf('Delivery method %s has been applied to quote ID: %s', $deliveryMethod, (int)$quote->getId())
+        );
+    }
+}

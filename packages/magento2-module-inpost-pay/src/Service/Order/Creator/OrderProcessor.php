@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Service\Order\Creator;
+
+use InPost\InPostPay\Api\OrderProcessingStepInterface;
+use InPost\InPostPay\Api\OrderProcessorInterface;
+use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Api\CartManagementInterface;
+use Magento\Quote\Api\PaymentMethodManagementInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Psr\Log\LoggerInterface;
+
+class OrderProcessor implements OrderProcessorInterface
+{
+    /**
+     * @var OrderProcessingStepInterface[]
+     */
+    private array $orderProcessingSteps = [];
+
+    public function __construct(
+        private readonly CartManagementInterface $cartManagement,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly PaymentMethodManagementInterface $paymentMethodManagement,
+        private readonly LoggerInterface $logger,
+        array $orderProcessingSteps
+    ) {
+        $this->initOrderProcessingSteps($orderProcessingSteps);
+    }
+
+    /**
+     * @param Quote $quote
+     * @param OrderDto $orderDto
+     * @return Order
+     * @throws LocalizedException
+     */
+    public function execute(Quote $quote, OrderDto $orderDto): Order
+    {
+        try {
+            foreach ($this->orderProcessingSteps as $orderProcessingStep) {
+                $orderProcessingStep->process($quote, $orderDto);
+            }
+
+            $order = $this->createOrderFromQuote($quote);
+            $this->logger->info(
+                sprintf(
+                    'Successfully created InPost Pay Order #%s from Quote ID: %s',
+                    $order->getIncrementId(),
+                    $quote->getId()
+                )
+            );
+
+            return $order;
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param Quote $quote
+     * @return Order
+     * @throws CouldNotSaveException
+     * @throws LocalizedException
+     */
+    private function createOrderFromQuote(Quote $quote): Order
+    {
+        $cartId = (int)$quote->getId();
+        $paymentMethod = $this->paymentMethodManagement->get($cartId);
+        $orderId = $this->cartManagement->placeOrder($cartId, $paymentMethod);
+        $order = $this->orderRepository->get((int)$orderId);
+
+        if ($order instanceof Order && $order->getId()) {
+            return $order;
+        } else {
+            throw new LocalizedException(__('Something went wrong while placing order.'));
+        }
+    }
+
+    /**
+     * @param array $orderProcessingSteps
+     * @return void
+     * @throws LocalizedException
+     */
+    private function initOrderProcessingSteps(array $orderProcessingSteps): void
+    {
+        foreach ($orderProcessingSteps as $stepCode => $orderProcessingStep) {
+            if ($orderProcessingStep instanceof OrderProcessingStepInterface) {
+                $orderProcessingStep->setStepCode($stepCode);
+                $this->orderProcessingSteps[] = $orderProcessingStep;
+            }
+        }
+
+        if (empty($this->orderProcessingSteps)) {
+            throw new LocalizedException(__('InPost Pay order processing steps are undefined.'));
+        }
+    }
+}

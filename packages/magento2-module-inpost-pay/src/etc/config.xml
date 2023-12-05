@@ -3,7 +3,8 @@
     <default>
         <payment>
             <inpost_pay>
-                <enabled>0</enabled>
+                <active>0</active>
+                <can_use_checkout>1</can_use_checkout>
                 <model>InPostPayPaymentFacade</model>
                 <title>InPost Pay</title>
                 <order_status>pending</order_status>

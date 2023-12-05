@@ -2,20 +2,22 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto;
+namespace InPost\InPostPay\Model\Dto;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\Consent;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\DtoAccountInfoFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\DtoOrderDetailsFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\DtoDeliveryFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\ConsentFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\OrderFactory;
+use InPost\InPostPay\Model\Dto\Order\Consent;
+use InPost\InPostPay\Model\Dto\Order\DtoAccountInfoFactory;
+use InPost\InPostPay\Model\Dto\Order\DtoDeliveryFactory;
+use InPost\InPostPay\Model\Dto\Order\DtoOrderDetailsFactory;
+use InPost\InPostPay\Model\Dto\Order\DtoInvoiceDetailsFactory;
+use InPost\InPostPay\Model\Dto\Order\ConsentFactory;
+use InPost\InPostPay\Model\Dto\OrderFactory;
 
 class DtoOrderFactory
 {
     public function __construct(
         private readonly OrderFactory $orderFactory,
         private readonly DtoOrderDetailsFactory $dtoOrderDetailsFactory,
+        private readonly DtoInvoiceDetailsFactory $dtoInvoiceDetailsFactory,
         private readonly DtoAccountInfoFactory $dtoAccountInfoFactory,
         private readonly DtoDeliveryFactory $dtoDeliveryFactory,
         private readonly ConsentFactory $dtoConsentFactory
@@ -27,6 +29,7 @@ class DtoOrderFactory
         /** @var Order $orderDto */
         $orderDto = $this->orderFactory->create();
         $orderDetailsData = (array)($data[Order::ORDER_DETAILS] ?? []);
+        $invoiceDetailsData = (array)($data[Order::INVOICE_DETAILS] ?? []);
         $accountInfoData = (array)($data[Order::ACCOUNT_INFO] ?? []);
         $deliveryData = (array)($data[Order::DELIVERY] ?? []);
         $consentsData = (array)($data[Order::CONSENTS] ?? []);
@@ -34,6 +37,10 @@ class DtoOrderFactory
         $orderDto->setOrderDetails($this->dtoOrderDetailsFactory->create($orderDetailsData));
         $orderDto->setAccountInfo($this->dtoAccountInfoFactory->create($accountInfoData));
         $orderDto->setDelivery($this->dtoDeliveryFactory->create($deliveryData));
+
+        if ($invoiceDetailsData) {
+            $orderDto->setInvoiceDetails($this->dtoInvoiceDetailsFactory->create($invoiceDetailsData));
+        }
 
         $consents = [];
         foreach ($consentsData as $consentData) {

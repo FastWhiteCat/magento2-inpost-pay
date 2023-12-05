@@ -2,39 +2,27 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\AddressDetailsFactory;
+use InPost\InPostPay\Model\Dto\Order\AddressDetailsFactory;
 
-class DeliveryAddress
+class ClientAddress
 {
-    public const NAME = 'name';
     public const COUNTRY_CODE = 'country_code';
     public const ADDRESS = 'address';
-    public const CITY = 'city';
-    public const POSTAL_CODE = 'postal_code';
     public const ADDRESS_DETAILS = 'address_details';
+    public const CITY = 'city';
+    public const POSTAL_CODE = 'city';
 
-    private ?string $name;
     private ?string $countryCode;
     private ?string $address;
+    private ?AddressDetails $addressDetails;
     private ?string $city;
     private ?string $postalCode;
-    private ?AddressDetails $addressDetails;
 
     public function __construct(
         private readonly AddressDetailsFactory $addressDetailsFactory
     ) {
-    }
-
-    public function getName(): string
-    {
-        return (string)$this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     public function getCountryCode(): string
@@ -57,9 +45,23 @@ class DeliveryAddress
         $this->address = $address;
     }
 
+    public function getAddressDetails(): AddressDetails
+    {
+        if ($this->addressDetails === null) {
+            $this->addressDetails = $this->addressDetailsFactory->create();
+        }
+
+        return $this->addressDetails;
+    }
+
+    public function setAddressDetails(AddressDetails $addressDetails): void
+    {
+        $this->addressDetails = $addressDetails;
+    }
+
     public function getCity(): string
     {
-        return $this->city;
+        return (string)$this->city;
     }
 
     public function setCity(string $city): void
@@ -75,19 +77,5 @@ class DeliveryAddress
     public function setPostalCode(string $postalCode): void
     {
         $this->postalCode = $postalCode;
-    }
-
-    public function getAddressDetails(): AddressDetails
-    {
-        if ($this->addressDetails === null) {
-            $this->addressDetails = $this->addressDetailsFactory->create();
-        }
-
-        return $this->addressDetails;
-    }
-
-    public function setAddressDetails(AddressDetails $addressDetails): void
-    {
-        $this->addressDetails = $addressDetails;
     }
 }

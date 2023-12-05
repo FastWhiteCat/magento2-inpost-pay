@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\BasketPriceFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\OrderDetailsFactory;
+use InPost\InPostPay\Model\Dto\Order\BasketPriceFactory;
+use InPost\InPostPay\Model\Dto\Order\OrderDetailsFactory;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 
 class DtoOrderDetailsFactory
@@ -39,6 +39,7 @@ class DtoOrderDetailsFactory
             $basketPriceData = (array)$data[OrderDetails::BASKET_PRICE];
         }
 
+        $orderDetails->setOrderComments($this->prepareOrderComments($data));
         $orderDetails->setBasketPrice($this->prepareBasketPrice($basketPriceData));
 
         return $orderDetails;
@@ -62,5 +63,22 @@ class DtoOrderDetailsFactory
         }
 
         return $basketPrice;
+    }
+
+    private function prepareOrderComments(array $data): string
+    {
+        $comment = '';
+        if (isset($data[OrderDetails::ORDER_COMMENTS]) && is_scalar($data[OrderDetails::ORDER_COMMENTS])) {
+            $comment = (string)$data[OrderDetails::ORDER_COMMENTS];
+        } elseif (isset($data[OrderDetails::COMMENTS]) && is_scalar($data[OrderDetails::COMMENTS])) {
+            $comment = (string)$data[OrderDetails::COMMENTS];
+        } elseif (isset($data[OrderDetails::ORDER_COMMENTS]) && is_array($data[OrderDetails::ORDER_COMMENTS])) {
+            $orderComments = $data[OrderDetails::ORDER_COMMENTS];
+            if (isset($orderComments[OrderDetails::COMMENTS]) && is_scalar($orderComments[OrderDetails::COMMENTS])) {
+                $comment = (string)$orderComments[OrderDetails::COMMENTS];
+            }
+        }
+
+        return $comment;
     }
 }

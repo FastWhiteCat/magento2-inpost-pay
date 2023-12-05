@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order;
+namespace InPost\InPostPay\Model\Dto\Order;
 
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\ClientAddressFactory;
-use InPost\InPostPay\Service\ApiConnector\Merchant\Dto\Order\PhoneNumberFactory;
+use InPost\InPostPay\Model\Dto\Order\ClientAddressFactory;
+use InPost\InPostPay\Model\Dto\Order\PhoneNumberFactory;
 
 class AccountInfo
 {
