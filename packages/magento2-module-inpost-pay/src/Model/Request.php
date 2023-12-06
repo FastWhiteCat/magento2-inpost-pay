@@ -15,12 +15,17 @@ class Request
 
     public function getUri(): string
     {
-        $uri = $this->uri;
-        foreach ($this->getParams() as $key => $value) {
-            $uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $uri);
+        $params = $this->getParams();
+        foreach ($params as $key => $value) {
+            if (str_contains($this->uri, $key)) {
+                $this->uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $this->uri);
+                unset($params[$key]);
+            }
         }
 
-        return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $uri);
+        $this->setParams($params);
+
+        return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $this->uri);
     }
 
     public function setParams(array $params): void

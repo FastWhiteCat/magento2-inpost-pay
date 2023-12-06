@@ -21,8 +21,8 @@
                 <widget_color_variant>primary</widget_color_variant>
                 <widget_dark_mode>0</widget_dark_mode>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
-                <basket_lifetime>604800</basket_lifetime>
                 <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
+                <async_basket_export>0</async_basket_export>
                 <sandbox_enabled>0</sandbox_enabled>
                 <sandbox_client_id></sandbox_client_id>
                 <sandbox_client_secret></sandbox_client_secret>

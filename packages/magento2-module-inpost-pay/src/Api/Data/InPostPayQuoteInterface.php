@@ -33,7 +33,7 @@ interface InPostPayQuoteInterface
     public function getInpostBasketId(): ?string;
     public function setInpostBasketId(string $inpostBasketId): InPostPayQuoteInterface;
 
-    public function getStatus(): ?string;
+    public function getStatus(): string;
     public function setStatus(string $status): InPostPayQuoteInterface;
 
     public function getPhoneNumber(): ?string;
