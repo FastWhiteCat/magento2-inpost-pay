@@ -7,7 +7,7 @@
             <resource ref="anonymous" />
         </resources>
     </route>
-    <route url="/V1/inpost-basket/:cartId/get-pay-data" method="POST">
+    <route url="/V1/inpost-basket/mine/get-pay-data" method="POST">
         <service class="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface" method="execute" />
         <resources>
             <resource ref="self" />
