@@ -25,8 +25,27 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+<<<<<<< HEAD
     <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
                 type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
+=======
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestPayData" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestMobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetMobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\MobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
+    <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
+>>>>>>> develop
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
@@ -220,12 +239,25 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+<<<<<<< HEAD
     <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+=======
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
+>>>>>>> develop
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+<<<<<<< HEAD
     <type name="InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep">
+=======
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetMobileLink">
+>>>>>>> develop
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
