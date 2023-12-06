@@ -23,6 +23,8 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestPayData" />
     <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
                 type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
     <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"

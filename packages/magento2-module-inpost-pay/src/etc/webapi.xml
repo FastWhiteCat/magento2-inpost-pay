@@ -2,10 +2,19 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/V1/inpost-basket/:cartId/get-pay-data" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface" method="execute" />
+        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface" method="execute" />
         <resources>
             <resource ref="anonymous" />
         </resources>
+    </route>
+    <route url="/V1/inpost-basket/:cartId/get-pay-data" method="POST">
+        <service class="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface" method="execute" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
     </route>
     <route url="/v1/izi/basket/:basketId" method="GET">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="get"/>

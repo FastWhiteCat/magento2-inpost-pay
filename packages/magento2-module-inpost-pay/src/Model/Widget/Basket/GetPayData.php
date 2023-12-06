@@ -24,7 +24,7 @@ class GetPayData implements GetPayDataInterface
     }
 
     public function execute(
-        string $cartId,
+        int $cartId,
         string $bindingPlace,
         string $browser,
         ?string $prefix = null,
