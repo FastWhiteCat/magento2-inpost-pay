@@ -20,6 +20,7 @@ $isCartPage = $block->isEnabledOnCart() && $bindingPlace === DisplayConfigProvid
 $productId = $isProductPage ? $block->getProductId() : "";
 $language = $block->getCurrentLanguageCode();
 $cartItemsCount = $block->getCartItemsCount();
+$cartId = $block->getQuoteId();
 $layoutConfig = $block->getLayoutConfig();
 ?>
 
@@ -37,4 +38,14 @@ $layoutConfig = $block->getLayoutConfig();
         count="<?= $cartItemsCount ?>"
         binding_place="<?= $bindingPlace ?>">
     </inpost-izi-button>
+
+    <script type="text/x-magento-init">
+        {
+            "*" : {
+                "InpostPayMerchantWidget" : {
+                    "cartId": "<?= $cartId ?>"
+                }
+            }
+        }
+    </script>
 <?php endif;

@@ -11,6 +11,8 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Checkout\Model\Session as CheckoutSession;
 
 class Widget extends Template
@@ -20,6 +22,8 @@ class Widget extends Template
      * @param DisplayConfigProvider $displayConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
+     * @param CartRepositoryInterface $quoteRepository
+     * @param QuoteIdMaskFactory $quoteIdMaskFactory
      * @param Context $context
      * @param array $data
      */
@@ -28,12 +32,16 @@ class Widget extends Template
         private readonly DisplayConfigProvider $displayConfigProvider,
         ResolverInterface $localeResolver,
         CheckoutSession $checkoutSession,
+        CartRepositoryInterface $quoteRepository,
+        QuoteIdMaskFactory $quoteIdMaskFactory,
         Context $context,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->localeResolver = $localeResolver;
         $this->checkoutSession = $checkoutSession;
+        $this->quoteRepository = $quoteRepository;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
     }
 
     /**
@@ -87,6 +95,34 @@ class Widget extends Template
             return $quote->getItemsSummaryQty();
         } catch (NoSuchEntityException|LocalizedException $e) {
             return 0;
+        }
+    }
+    /**
+     * @return string
+     */
+    public function getQuoteId(): string
+    {
+        try {
+            if ($this->checkoutSession->getQuote()->getId()) {
+                $quote = $this->quoteRepository->get($this->checkoutSession->getQuote()->getId());
+
+                $quoteData = $quote->toArray();
+
+                if (!$quote->getCustomer()->getId()) {
+                    /** @var $quoteIdMask \Magento\Quote\Model\QuoteIdMask */
+                    $quoteIdMask = $this->quoteIdMaskFactory->create();
+                    return $quoteIdMask->load(
+                        $this->checkoutSession->getQuote()->getId(),
+                        'quote_id'
+                    )->getMaskedId();
+                }
+
+                return $quoteData['entity_id'];
+            }
+
+            return "";
+        } catch (NoSuchEntityException|LocalizedException $e) {
+            return "";
         }
     }
     public function getProductId(): int
