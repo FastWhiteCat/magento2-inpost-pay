@@ -62,10 +62,10 @@ define([
             var body = $('body');
             var isLoggedIn = _.has(customerData.get('customer')(), 'fullname');
             var url = !isLoggedIn
-                ? urlBuilder.build('rest/V1/izi/basket_information/' +
-                    (getConfig().cartId || ""))
-                : urlBuilder.build('rest/V1/izi/basket_information/' +
-                    (getConfig().cartId || ""));
+                ? urlBuilder.build('rest/V1/inpost-basket/' +
+                    (getConfig().cartId || "")) +
+                    '/get-pay-data'
+                : urlBuilder.build('rest/V1/inpost-basket/mine/get-pay-data');
 
             var browserData = window.iziGetBrowserData({base64: true});
             var data = {
