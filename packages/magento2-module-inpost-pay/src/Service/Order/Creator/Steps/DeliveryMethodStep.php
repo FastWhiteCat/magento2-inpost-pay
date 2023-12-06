@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use InPost\InPostPay\Model\Dto\Order as OrderDto;
@@ -33,11 +32,17 @@ class DeliveryMethodStep extends OrderProcessingStep implements OrderProcessingS
      */
     public function process(Quote $quote, OrderDto $orderDto): void
     {
-        if ($orderDto->getDelivery()->getDeliveryType() === BasketFieldInterface::DELIVERY_TYPE_PICKUP) {
-            $deliveryMethod = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForInPostPickup();
+        $deliveryType = $orderDto->getDelivery()->getDeliveryType();
+        if ($orderDto->getDelivery()->getDeliveryCodes()) {
+            $deliveryOption = implode('', $orderDto->getDelivery()->getDeliveryCodes());
         } else {
-            $deliveryMethod = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForInPostCourier();
+            $deliveryOption = ShipmentMappingConfigProvider::OPTION_STANDARD;
         }
+
+        $deliveryMethod = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
+            $deliveryType,
+            $deliveryOption
+        );
 
         $shippingAddress = $quote->getShippingAddress();
         $shippingAddress->setCollectShippingRates(true)

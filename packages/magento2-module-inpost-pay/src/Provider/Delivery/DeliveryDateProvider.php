@@ -27,14 +27,13 @@ class DeliveryDateProvider
      * This method should be modified with afterPlugin in case of customized delivery date calculations.
      * If not, configuration timestamp increment will be used.
      *
-     * Parameters $shippingMethod and $quote exist only to allow easier delivery date customized calculation
+     * Parameters $shippingMethod exist only to allow easier delivery date customized calculation
      *
      * @param ShippingMethodInterface $shippingMethod
-     * @param Quote $quote
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculateDeliveryDate(ShippingMethodInterface $shippingMethod, Quote $quote): string
+    public function calculateDeliveryDate(ShippingMethodInterface $shippingMethod): string
     {
         try {
             $deadlineInDays = $this->shipmentMappingConfigProvider->getDeliveryDateDeadlineInDays();

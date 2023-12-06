@@ -101,4 +101,6 @@
 "Empty Tax ID.","Pusty numer VAT.",module,InPost_InPostPay
 "Empty Empty Company Name.","Pusta Nazwa Firmy.",module,InPost_InPostPay
 "Delivery method %1 requires chosen point.","Metoda dostawy %1 wymaga wybranego punktu",module,InPost_InPostPay
-"An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi"
+"An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi",module,InPost_InPostPay
+"Shipment Mapping Settings for Courier Delivery","Ustawienia mapowania opcji dostawy kurierem",module,InPost_InPostPay
+"Shipment Mapping Settings for Pickup Delivery","Ustawienia mapowania opcji dostawy przez Paczkomat 24/7",module,InPost_InPostPay

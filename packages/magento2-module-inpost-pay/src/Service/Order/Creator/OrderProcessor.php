@@ -38,7 +38,7 @@ class OrderProcessor implements OrderProcessorInterface
         array $orderPostProcessingSteps
     ) {
         $this->initOrderProcessingSteps($orderProcessingSteps);
-        $this->initOrderPostProcessingSteps($orderProcessingSteps);
+        $this->initOrderPostProcessingSteps($orderPostProcessingSteps);
     }
 
     /**

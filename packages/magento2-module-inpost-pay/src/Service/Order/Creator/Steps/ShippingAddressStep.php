@@ -8,14 +8,26 @@ use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Model\Dto\Order as OrderDto;
 use InPost\InPostPay\Model\Dto\Order\AddressDetails;
 use InPost\InPostPay\Model\Dto\Order\PhoneNumber;
+use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
+use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\ShippingAddressManagement;
+use Psr\Log\LoggerInterface;
 
 class ShippingAddressStep extends OrderProcessingStep implements OrderProcessingStepInterface
 {
+    public function __construct(
+        private readonly ShippingAddressManagement $shippingAddressManagement,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($logger);
+    }
+
     public function process(Quote $quote, OrderDto $orderDto): void
     {
         $deliveryAddress = $orderDto->getDelivery()->getDeliveryAddress();
         $shippingAddress = $quote->getShippingAddress();
+        $shippingAddress->setEmail($orderDto->getAccountInfo()->getMail());
         $shippingAddress->setFirstname($orderDto->getAccountInfo()->getName());
         $shippingAddress->setLastname($orderDto->getAccountInfo()->getSurname());
         $shippingAddress->setStreet(
@@ -25,6 +37,11 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $shippingAddress->setPostcode($deliveryAddress->getPostalCode());
         $shippingAddress->setCountryId($deliveryAddress->getCountryCode());
         $shippingAddress->setTelephone($this->combinePhoneNumber($orderDto->getDelivery()->getPhoneNumber()));
+        $shippingAddress->setRegionId(801);
+        $quote->setShippingAddress($shippingAddress);
+        $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
+        $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
+        $this->shippingAddressManagement->assign((int)$quote->getId(), $shippingAddress);
 
         $this->createLog(sprintf('Shipping address has been applied to quote ID: %s', (int)$quote->getId()));
     }

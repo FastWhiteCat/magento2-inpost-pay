@@ -45,7 +45,7 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 
     public function setOrderId(int $orderId): InPostPayOrderInterface
     {
-        return $this->setData(self::INPOST_PAY_ORDER_ID, $orderId);
+        return $this->setData(self::ORDER_ID, $orderId);
     }
 
     public function getLockerId(): ?string
