@@ -8,6 +8,7 @@ use Exception;
 use GuzzleHttp\Client;
 use Laminas\Http\Client as HttpClient;
 use GuzzleHttp\ClientFactory;
+use GuzzleHttp\Psr7\Response as GuzzleHttpResponse;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
@@ -54,25 +55,7 @@ class Connector implements ConnectorInterface
             throw new LocalizedException($errorMsg);
         }
 
-        $responseBody = (string)$response->getBody()->getContents();
-        $statusCode = (int)$response->getStatusCode();
-        if ($statusCode !== Response::STATUS_CODE_200) {
-            $this->createResponseLog($responseBody, $statusCode, true);
-
-            throw new LocalizedException(__('InPost API endpoint "%1" responded with %1 code.', $url, $statusCode));
-        } else {
-            $this->createResponseLog($responseBody, $statusCode);
-        }
-
-        $resultData = [];
-        $result = $this->serializer->unserialize($responseBody);
-        if (is_scalar($result)) {
-            $resultData['result'] = (string)$result;
-        } elseif (is_array($result)) {
-            $resultData = $result;
-        }
-
-        return $resultData;
+        return $this->handleResponse($response, $url);
     }
 
     private function getClient(array $headers): Client
@@ -139,5 +122,28 @@ class Connector implements ConnectorInterface
         } else {
             $this->logger->debug($logMessage);
         }
+    }
+
+    private function handleResponse(GuzzleHttpResponse $response, string $url): array
+    {
+        $responseBody = (string)$response->getBody()->getContents();
+        $statusCode = (int)$response->getStatusCode();
+        if ($statusCode !== Response::STATUS_CODE_200 && $statusCode !== Response::STATUS_CODE_202) {
+            $this->createResponseLog($responseBody, $statusCode, true);
+
+            throw new LocalizedException(__('InPost API endpoint "%1" responded with %1 code.', $url, $statusCode));
+        } else {
+            $this->createResponseLog($responseBody, $statusCode);
+        }
+
+        $resultData = [];
+        $result = $responseBody ? $this->serializer->unserialize($responseBody) : [];
+        if (is_scalar($result)) {
+            $resultData['result'] = (string)$result;
+        } elseif (is_array($result)) {
+            $resultData = $result;
+        }
+
+        return $resultData;
     }
 }

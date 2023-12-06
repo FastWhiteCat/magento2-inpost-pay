@@ -65,9 +65,6 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
         return $inPostPayOrder;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getList(SearchCriteriaInterface $searchCriteria): SearchResults
     {
         $collection = $this->productSalesRestrictionLockCollectionFactory->create();
