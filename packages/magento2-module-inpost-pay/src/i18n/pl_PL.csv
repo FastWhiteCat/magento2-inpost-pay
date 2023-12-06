@@ -81,7 +81,6 @@
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
 "Unable to serialize basket data.","Nie udana próba serializacji danych koszyka.",module,InPost_InPostPay
-<<<<<<< HEAD
 "Order currency is incorrect. Expected: %1 Received: %2","Niezgodność waluty zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
 "Order final Gross value is incorrect. Expected: %1 Received: %2","Niezgodność finalnej kwoty Brutto zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
 "Order final Net value is incorrect. Expected: %1 Received: %2","Niezgodność finalnej kwoty Netto zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
@@ -102,6 +101,4 @@
 "Empty Tax ID.","Pusty numer VAT.",module,InPost_InPostPay
 "Empty Empty Company Name.","Pusta Nazwa Firmy.",module,InPost_InPostPay
 "Delivery method %1 requires chosen point.","Metoda dostawy %1 wymaga wybranego punktu",module,InPost_InPostPay
-=======
 "An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi"
->>>>>>> develop
