@@ -17,4 +17,11 @@ interface BasketInterface
      * @return array
      */
     public function update(string $basketId): array;
+
+    /**
+     * @param string $basketId
+     *
+     * @return void
+     */
+    public function delete(string $basketId): void;
 }
