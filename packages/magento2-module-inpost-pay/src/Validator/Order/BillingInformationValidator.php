@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Model\Dto\Order as DtoOrder;
 use InPost\InPostPay\Model\Dto\Order\AccountInfo;
 use InPost\InPostPay\Model\Dto\Order\ClientAddress;
+use InPost\InPostPay\Model\Dto\Order\InvoiceDetails;
 use InPost\InPostPay\Model\Dto\Order\PhoneNumber;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
@@ -19,7 +20,7 @@ class BillingInformationValidator implements OrderValidatorInterface
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, DtoOrder $orderDto): void
     {
         if ($orderDto->getInvoiceDetails()) {
-            //todo:: invoice data validation
+            $this->validateInvoiceDetails($orderDto->getInvoiceDetails());
         } else {
             $accountInfo = $orderDto->getAccountInfo();
             $this->validateName($accountInfo, $inPostPayQuote);
@@ -115,6 +116,39 @@ class BillingInformationValidator implements OrderValidatorInterface
             || (empty($addressDetails->getBuilding()) && empty($addressDetails->getFlat()))
         ) {
             throw new LocalizedException(__('Incomplete billing address data.'));
+        }
+    }
+
+    /**
+     * @param InvoiceDetails $invoiceDetails
+     * @return void
+     * @throws LocalizedException
+     */
+    private function validateInvoiceDetails(InvoiceDetails $invoiceDetails): void
+    {
+        if ($invoiceDetails->getLegalForm() !== InvoiceDetails::LEGAL_FORM_PERSON
+            && $invoiceDetails->getLegalForm() !== InvoiceDetails::LEGAL_FORM_COMPANY
+        ) {
+            throw new LocalizedException(__('Invalid invoice legal form.'));
+        }
+
+        if ($invoiceDetails->getLegalForm() === InvoiceDetails::LEGAL_FORM_COMPANY) {
+            if (empty($invoiceDetails->getTaxId())) {
+                throw new LocalizedException(__('Empty Tax ID.'));
+            }
+
+            if (empty($invoiceDetails->getCompanyName())) {
+                throw new LocalizedException(__('Empty Company Name.'));
+            }
+        }
+
+        if (empty($invoiceDetails->getCity())
+            || empty($invoiceDetails->getCountryCode())
+            || empty($invoiceDetails->getPostalCode())
+            || empty($invoiceDetails->getStreet())
+            || (empty($invoiceDetails->getBuilding()) && empty($invoiceDetails->getFlat()))
+        ) {
+            throw new LocalizedException(__('Incomplete invoice address data.'));
         }
     }
 }

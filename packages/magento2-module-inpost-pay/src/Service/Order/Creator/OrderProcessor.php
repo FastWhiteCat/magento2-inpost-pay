@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
+use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Model\Dto\Order as OrderDto;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -23,14 +24,21 @@ class OrderProcessor implements OrderProcessorInterface
      */
     private array $orderProcessingSteps = [];
 
+    /**
+     * @var OrderPostProcessingStepInterface[]
+     */
+    private array $orderPostProcessingSteps = [];
+
     public function __construct(
         private readonly CartManagementInterface $cartManagement,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly PaymentMethodManagementInterface $paymentMethodManagement,
         private readonly LoggerInterface $logger,
-        array $orderProcessingSteps
+        array $orderProcessingSteps,
+        array $orderPostProcessingSteps
     ) {
         $this->initOrderProcessingSteps($orderProcessingSteps);
+        $this->initOrderPostProcessingSteps($orderProcessingSteps);
     }
 
     /**
@@ -47,6 +55,11 @@ class OrderProcessor implements OrderProcessorInterface
             }
 
             $order = $this->createOrderFromQuote($quote);
+
+            foreach ($this->orderPostProcessingSteps as $orderPostProcessingStep) {
+                $orderPostProcessingStep->process($order, $orderDto);
+            }
+
             $this->logger->info(
                 sprintf(
                     'Successfully created InPost Pay Order #%s from Quote ID: %s',
@@ -99,6 +112,25 @@ class OrderProcessor implements OrderProcessorInterface
 
         if (empty($this->orderProcessingSteps)) {
             throw new LocalizedException(__('InPost Pay order processing steps are undefined.'));
+        }
+    }
+
+    /**
+     * @param array $orderPostProcessingSteps
+     * @return void
+     * @throws LocalizedException
+     */
+    private function initOrderPostProcessingSteps(array $orderPostProcessingSteps): void
+    {
+        foreach ($orderPostProcessingSteps as $stepCode => $orderPostProcessingStep) {
+            if ($orderPostProcessingStep instanceof OrderPostProcessingStepInterface) {
+                $orderPostProcessingStep->setStepCode($stepCode);
+                $this->orderPostProcessingSteps[] = $orderPostProcessingStep;
+            }
+        }
+
+        if (empty($this->orderPostProcessingSteps)) {
+            throw new LocalizedException(__('InPost Pay order post processing steps are undefined.'));
         }
     }
 }

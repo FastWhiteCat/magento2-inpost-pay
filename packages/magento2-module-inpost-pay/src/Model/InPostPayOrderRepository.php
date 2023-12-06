@@ -20,6 +20,9 @@ use InPost\InPostPay\Model\ResourceModel\InPostPayOrder\CollectionFactory;
 
 class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
 {
+    private array $inPostPayOrdersByIds = [];
+    private array $inPostPayOrdersByOrderIds = [];
+
     public function __construct(
         private readonly CollectionProcessorInterface $collectionProcessor,
         private readonly InPostPayOrderResource $resource,
@@ -34,6 +37,14 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
         try {
             // @phpstan-ignore-next-line
             $this->resource->save($inPostPayOrder);
+
+            if (isset($this->inPostPayOrdersByIds[$inPostPayOrder->getOrderId()])) {
+                unset($this->inPostPayOrdersByIds[$inPostPayOrder->getOrderId()]);
+            }
+
+            if (isset($this->inPostPayOrdersByOrderIds[(int)$inPostPayOrder->getInPostPayOrderId()])) {
+                unset($this->inPostPayOrdersByOrderIds[(int)$inPostPayOrder->getInPostPayOrderId()]);
+            }
         } catch (Exception $e) {
             throw new CouldNotSaveException(__('Could not save InPost Pay Order: %1', $e->getMessage()));
         }
@@ -41,8 +52,15 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
         return $inPostPayOrder;
     }
 
-    public function get(int $inPostPayOrderId): InPostPayOrderInterface
+    public function get(int $inPostPayOrderId, bool $forceReload = false): InPostPayOrderInterface
     {
+        if (!$forceReload
+            && isset($this->inPostPayOrdersByIds[$inPostPayOrderId])
+            && $this->inPostPayOrdersByIds[$inPostPayOrderId] instanceof InPostPayOrderInterface
+        ) {
+            return $this->inPostPayOrdersByIds[$inPostPayOrderId];
+        }
+
         $inPostPayOrder = $this->inPostPayOrderInterfaceFactory->create();
         // @phpstan-ignore-next-line
         $this->resource->load($inPostPayOrder, $inPostPayOrderId);
@@ -50,17 +68,31 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
             throw new NoSuchEntityException(__('InPost Pay Order with ID "%1" does not exist.', $inPostPayOrderId));
         }
 
+        $this->inPostPayOrdersByIds[(int)$inPostPayOrder->getInPostPayOrderId()] = $inPostPayOrder;
+        $this->inPostPayOrdersByOrderIds[$inPostPayOrder->getOrderId()] = $inPostPayOrder;
+
         return $inPostPayOrder;
     }
 
-    public function getByOrderId(int $orderId): InPostPayOrderInterface
+    public function getByOrderId(int $orderId, bool $forceReload = false): InPostPayOrderInterface
     {
+        if (!$forceReload
+            && isset($this->inPostPayOrdersByOrderIds[$orderId])
+            && $this->inPostPayOrdersByOrderIds[$orderId] instanceof InPostPayOrderInterface
+        ) {
+            return $this->inPostPayOrdersByOrderIds[$orderId];
+        }
+
+        /** @var InPostPayOrderInterface $inPostPayOrder */
         $inPostPayOrder = $this->inPostPayOrderInterfaceFactory->create();
         // @phpstan-ignore-next-line
         $this->resource->load($inPostPayOrder, $orderId, InPostPayOrderInterface::ORDER_ID);
         if (!$inPostPayOrder->getInPostPayOrderId()) {
             throw new NoSuchEntityException(__('InPost Pay Order with Order ID "%1" does not exist.', $orderId));
         }
+
+        $this->inPostPayOrdersByIds[(int)$inPostPayOrder->getInPostPayOrderId()] = $inPostPayOrder;
+        $this->inPostPayOrdersByOrderIds[$inPostPayOrder->getOrderId()] = $inPostPayOrder;
 
         return $inPostPayOrder;
     }
@@ -89,8 +121,18 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
     public function delete(InPostPayOrderInterface $inPostPayOrder): bool
     {
         try {
+            $orderId = $inPostPayOrder->getOrderId();
+            $inPostPayOrderId = (int)$inPostPayOrder->getInPostPayOrderId();
             // @phpstan-ignore-next-line
             $this->resource->delete($inPostPayOrder);
+
+            if (isset($this->inPostPayOrdersByIds[$inPostPayOrderId])) {
+                unset($this->inPostPayOrdersByIds[$inPostPayOrderId]);
+            }
+
+            if (isset($this->inPostPayOrdersByOrderIds[$orderId])) {
+                unset($this->inPostPayOrdersByOrderIds[$orderId]);
+            }
         } catch (Exception $e) {
             throw new CouldNotDeleteException(__('Could not delete InPost Pay Order: %1', $e->getMessage()));
         }

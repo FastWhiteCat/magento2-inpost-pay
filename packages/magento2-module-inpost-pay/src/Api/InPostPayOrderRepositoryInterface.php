@@ -21,17 +21,19 @@ interface InPostPayOrderRepositoryInterface
 
     /**
      * @param int $inPostPayOrderId
+     * @param bool $forceReload
      * @return InPostPayOrderInterface
      * @throws LocalizedException
      */
-    public function get(int $inPostPayOrderId): InPostPayOrderInterface;
+    public function get(int $inPostPayOrderId, bool $forceReload = false): InPostPayOrderInterface;
 
     /**
      * @param int $orderId
+     * @param bool $forceReload
      * @return InPostPayOrderInterface
      * @throws LocalizedException
      */
-    public function getByOrderId(int $orderId): InPostPayOrderInterface;
+    public function getByOrderId(int $orderId, bool $forceReload = false): InPostPayOrderInterface;
 
     /**
      * @param SearchCriteriaInterface $searchCriteria

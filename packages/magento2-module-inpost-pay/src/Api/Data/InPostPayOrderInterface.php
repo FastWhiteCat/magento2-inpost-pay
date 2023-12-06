@@ -13,6 +13,7 @@ interface InPostPayOrderInterface
     public const INPOST_PAY_ORDER_ID = 'inpost_pay_order_id';
     public const ORDER_ID = 'order_id';
     public const LOCKER_ID = 'locker_id';
+    public const DELIVERY_OPTIONS = 'delivery_options';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -27,6 +28,8 @@ interface InPostPayOrderInterface
     public function setOrderId(int $orderId): InPostPayOrderInterface;
     public function getLockerId(): ?string;
     public function setLockerId(string $lockerId): InPostPayOrderInterface;
+    public function getDeliveryOptions(): array;
+    public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface;
 
     /**
      * @return string

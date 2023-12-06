@@ -10,6 +10,8 @@ use Magento\Framework\Model\AbstractModel;
 
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
+    private const DELIVERY_OPTIONS_SEPARATOR = ',';
+
     protected $_eventPrefix = InPostPayOrderInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayOrderInterface::ENTITY_NAME;
 
@@ -56,6 +58,21 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     public function setLockerId(string $lockerId): InPostPayOrderInterface
     {
         return $this->setData(self::LOCKER_ID, $lockerId);
+    }
+
+    public function getDeliveryOptions(): array
+    {
+        $deliveryOptions = $this->getData(self::DELIVERY_OPTIONS);
+        if (!empty($deliveryOptions) && is_scalar($deliveryOptions)) {
+            return explode(self::DELIVERY_OPTIONS_SEPARATOR, $deliveryOptions);
+        }
+
+        return [];
+    }
+
+    public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface
+    {
+        return $this->setData(self::DELIVERY_OPTIONS, implode(self::DELIVERY_OPTIONS_SEPARATOR, $deliveryOptions));
     }
 
     public function getCreatedAt(): string

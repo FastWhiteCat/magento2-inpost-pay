@@ -103,7 +103,13 @@
                 <item name="shipping_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ShippingAddressStep</item>
                 <item name="delivery_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\DeliveryMethodStep</item>
                 <item name="payment_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\PaymentMethodStep</item>
+                <item name="customer_note" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\CustomerNoteStep</item>
                 <item name="reload_quote" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ReloadQuoteStep</item>
+            </argument>
+            <argument name="orderPostProcessingSteps" xsi:type="array">
+                <item name="init_inpost_pay_order" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\InitInPostPayOrderStep</item>
+                <item name="save_pickup_point" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SavePickupPointStep</item>
+                <item name="save_delivery_options" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveDeliveryOptionsStep</item>
             </argument>
         </arguments>
     </type>
