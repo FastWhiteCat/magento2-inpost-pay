@@ -32,13 +32,13 @@ define([
 
         iziCanBeBound: function (productId) {
             if (!productId) {
-                return true; // ? or false
+                return false;
             }
 
             var $productForm = $('#product_addtocart_form');
 
             if (!$productForm.length) {
-                return true; // ? or false
+                return false;
             }
             var $groupedProductElements = $productForm.find('[name*="super_group"]')
             if ($groupedProductElements.length) {
@@ -59,8 +59,8 @@ define([
         },
 
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
-            var body = $('body');
             var isLoggedIn = _.has(customerData.get('customer')(), 'fullname');
+            var cartId = customerData.get('cart')().cartId || getConfig().cartId || "";
             var url = !isLoggedIn
                 ? urlBuilder.build('rest/V1/inpost-basket/' +
                     (getConfig().cartId || "")) +
@@ -73,10 +73,8 @@ define([
                 number: phoneNumber || "",
                 browser: browserData,
                 binding_place: bindingPlace,
-                cartId: getConfig().cartId || ""
+                cartId: cartId
             };
-
-            body.trigger('processStart');
 
             return new Promise(function (resolve, reject) {
                 $.ajax({
@@ -89,15 +87,12 @@ define([
                     .done(function (data) {
                         // nie testowane - brak poprawnej zwrotki z BE
                         if (Object.keys(data).length === 1 && data.basketId) {
-                            body.trigger('processStop');
                             resolve([]);
                         }
 
-                        body.trigger('processStop');
                         resolve(data);
                     })
                     .fail(function (xhr, textStatus) {
-                        body.trigger('processStop');
                         reject(new Error('Network problem: ' + textStatus));
                     });
             });
@@ -115,20 +110,133 @@ define([
         },
 
         iziMobileLink: function () {
-
+            return new Promise(function (resolve, reject) {
+                $.ajax({
+                    url: urlBuilder.build('rest/V1/izi/basket/binding'),
+                    method: 'GET',
+                })
+                    .done(function (data) {
+                        resolve(data)
+                    })
+                    .fail(function (xhr, textStatus) {
+                        reject(new Error('Network problem: ' + textStatus));
+                    });
+            });
         },
 
         iziGetIsBound: function () {
+            let timeoutId;
 
+            return new Promise((resolve, reject) => {
+                checkIsBound(resolve, reject);
+            });
+
+            function checkIsBound(resolve, reject) {
+                $.ajax({
+                    url: urlBuilder.build('rest/V1/izi/getIsBound/'),
+                    method: 'GET',
+                })
+                    .done(function (data) {
+                        if (data.phone_number) {
+                            resolve(data);
+                        } else if (data.action) {
+                            if (timeoutId) {
+                                clearTimeout(timeoutId);
+                            }
+
+                            switch (data.action) {
+                                case 'close':
+                                    reject(new Error("Połączenie zostało przerwane, spróbuj ponownie."));
+                                    break;
+                                case 'retry':
+                                    timeoutId = setTimeout(function()  {
+                                        checkIsBound(resolve, reject)
+                                    },10000);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else if (data.error_code) {
+                            reject(new Error(data.error_code));
+                        } else {
+                            timeoutId = setTimeout(function()  {
+                                checkIsBound(resolve, reject)
+                            },10000);
+                        }
+                    })
+                    .fail(function (xhr, textStatus) {
+                        reject(new Error('Network problem: ' + textStatus));
+                    });
+            }
         },
 
         iziGetOrderComplete: function () {
+            let timeoutId;
+
+            return new Promise((resolve, reject) => {
+                checkOrderStatus(resolve, reject);
+            });
+
+            function checkOrderStatus(resolve, reject) {
+                $.ajax({
+                    url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
+                    method: 'GET',
+                })
+                    .done(function (data) {
+                        if (data.action && data.action === 'refresh') {
+                            timeoutId = setTimeout(function()  {
+                                checkOrderStatus(resolve, reject)
+                            },10000);
+                        } else if (data.action && data.action === 'redirect') {
+                            resolve(data)
+                        }
+
+                        reject(new Error('Nieoczekiwany status'));
+
+                        if (data.action) {
+                            resolve(data)
+                        } else {
+                            timeoutId = setTimeout(function()  {
+                                checkOrderStatus(resolve, reject)
+                            },10000);
+                        }
+                    })
+                    .fail(function (xhr, textStatus) {
+                        reject(new Error('Network problem: ' + textStatus));
+                    });
+            }
         },
 
         iziBindingDelete: function () {
+            return new Promise(function (resolve, reject) {
+                $.ajax({
+                    url: urlBuilder.build('rest/V1/izi/basket/binding'),
+                    method: 'GET',
+                })
+                    .done(function (data) {
+                        resolve()
+                    })
+                    .fail(function (xhr, textStatus) {
+                        reject(new Error('Network problem: ' + textStatus));
+                    });
+            });
         },
 
-        iziAddToCart: async function () {
+        iziAddToCart: function (id) {
+            if (!id || !window.iziCanBeBound(id)) {
+                return new Error('Nie podano id produktu lub nie mozna dodac produktu do koszyka');
+            }
+
+            $("#product_addtocart_form").submit();
+
+            return new Promise(function (resolve, reject) {
+                var cartSubscriber = customerData.get('cart').subscribe(function (cartData) {
+                    cartSubscriber.dispose();
+                    resolve();
+                });
+            }).then().catch(function(error) {
+                return new Error(error)
+            });
         },
 
         bindEvents: function () {
@@ -166,7 +274,7 @@ define([
             } else if (test(/samsungbrowser/i)) {
                 return 'Samsung Browser';
             } else {
-                return 'Unknown browser'; // or translated
+                return 'Unknown browser';
             }
         }
     });
