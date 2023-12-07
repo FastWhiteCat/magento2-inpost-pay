@@ -23,6 +23,9 @@ class Order implements OrderInterface
     private const REQUEST_PREFIX = 'ORDER_REQUEST';
     private const RESPONSE_PREFIX = 'ORDER_RESPONSE';
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly RestRequest $restRequest,
         private readonly JsonSerializer $jsonSerializer,
@@ -44,13 +47,17 @@ class Order implements OrderInterface
     public function create(): array
     {
         try {
-            $requestParams = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
+            $requestParams = (array)$this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
             $this->createRequestDebugLog(self::REQUEST_PREFIX, __METHOD__, $requestParams);
             $dtoOrder = $this->dtoOrderFactory->create($requestParams);
-            $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($dtoOrder->getOrderDetails()->getBasketId());
+            // @phpstan-ignore-next-line
+            $basketId = $dtoOrder->getOrderDetails()->getBasketId();
+            $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($basketId);
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
             if ($quote instanceof Quote && $quote->getId()) {
+                // @phpstan-ignore-next-line
                 $this->orderValidator->validate($quote, $inPostPayQuote, $dtoOrder);
+                // @phpstan-ignore-next-line
                 $order = $this->orderProcessor->execute($quote, $dtoOrder);
                 $orderData = $this->orderToInPostOrderConverter->convert($order);
                 $this->createRequestDebugLog(self::RESPONSE_PREFIX, __METHOD__, $orderData);

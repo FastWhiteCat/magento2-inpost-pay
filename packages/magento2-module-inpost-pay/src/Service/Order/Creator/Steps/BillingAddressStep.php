@@ -29,12 +29,13 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
 
     public function process(Quote $quote, OrderDto $orderDto): void
     {
+        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         $accountAddress = $orderDto->getAccountInfo()->getClientAddress();
         $invoiceDetails = $orderDto->getInvoiceDetails();
         /** @var AddressInterface $billingAddress */
         $billingAddress = $this->addressFactory->create();
+        $billingAddress->setEmail($orderDto->getAccountInfo()->getMail());
         if ($invoiceDetails) {
-            $billingAddress->setEmail($orderDto->getAccountInfo()->getMail());
             $billingAddress->setFirstname($invoiceDetails->getName());
             $billingAddress->setLastname($invoiceDetails->getSurname());
             $billingAddress->setCompany($invoiceDetails->getCompanyName());
@@ -47,7 +48,6 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setTelephone($this->combinePhoneNumber($orderDto->getAccountInfo()->getPhoneNumber()));
             $billingAddress->setVatId($this->combineVatId($invoiceDetails));
         } else {
-            $billingAddress->setEmail($orderDto->getAccountInfo()->getMail());
             $billingAddress->setFirstname($orderDto->getAccountInfo()->getName());
             $billingAddress->setLastname($orderDto->getAccountInfo()->getSurname());
             $billingAddress->setStreet(
@@ -61,16 +61,16 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $quote->setBillingAddress($billingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
-        $this->billingAddressManagement->assign((int)$quote->getId(), $billingAddress);
+        $this->billingAddressManagement->assign($quoteId, $billingAddress);
 
-        $this->createLog(sprintf('Billing address has been applied to quote ID: %s', (int)$quote->getId()));
+        $this->createLog(sprintf('Billing address has been applied to quote ID: %s', $quoteId));
     }
 
     private function combineAddressToOneLine(AddressDetails $addressDetails): string
     {
         $addressLine = $addressDetails->getStreet();
         $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
-        if ($addressNumber) {
+        if (!empty($addressNumber)) {
             $addressLine = sprintf('%s %s', $addressLine, $addressNumber);
         }
 
@@ -81,7 +81,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
     {
         $addressLine = $invoiceDetails->getStreet();
         $addressNumber = implode('/', [$invoiceDetails->getBuilding(), $invoiceDetails->getFlat()]);
-        if ($addressNumber) {
+        if (!empty($addressNumber)) {
             $addressLine = sprintf('%s %s', $addressLine, $addressNumber);
         }
 

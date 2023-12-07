@@ -18,15 +18,7 @@ class DtoInvoiceDetailsFactory
         /** @var InvoiceDetails $invoiceDetails */
         $invoiceDetails = $this->invoiceDetailsFactory->create();
 
-        if (isset($data[InvoiceDetails::LEGAL_FORM]) && is_scalar($data[InvoiceDetails::LEGAL_FORM])) {
-            $legalForm = (string)$data[InvoiceDetails::LEGAL_FORM];
-            if ($legalForm === InvoiceDetails::LEGAL_FORM_PERSON
-                || $legalForm === InvoiceDetails::LEGAL_FORM_COMPANY
-            ) {
-                $invoiceDetails->setLegalForm($legalForm);
-            }
-        }
-
+        $this->setLegalFormData($invoiceDetails, $data);
         $this->setCompanyData($invoiceDetails, $data);
         $this->setAddressData($invoiceDetails, $data);
 
@@ -40,13 +32,34 @@ class DtoInvoiceDetailsFactory
             $invoiceDetails->setRegistrationDataEdited((string)$data[InvoiceDetails::REGISTRATION_DATA_EDITED]);
         }
 
-        if (isset($data[InvoiceDetails::ADDITIONAL_INFORMATION]) && is_scalar($data[InvoiceDetails::ADDITIONAL_INFORMATION])) {
+        if (isset($data[InvoiceDetails::ADDITIONAL_INFORMATION])
+            && is_scalar($data[InvoiceDetails::ADDITIONAL_INFORMATION])
+        ) {
             $invoiceDetails->setAdditionalInformation((string)$data[InvoiceDetails::ADDITIONAL_INFORMATION]);
         }
 
         return $invoiceDetails;
     }
 
+    private function setLegalFormData(InvoiceDetails $invoiceDetails, array $data): void
+    {
+        if (isset($data[InvoiceDetails::LEGAL_FORM]) && is_scalar($data[InvoiceDetails::LEGAL_FORM])) {
+            $legalForm = (string)$data[InvoiceDetails::LEGAL_FORM];
+            if ($legalForm === InvoiceDetails::LEGAL_FORM_PERSON
+                || $legalForm === InvoiceDetails::LEGAL_FORM_COMPANY
+            ) {
+                $invoiceDetails->setLegalForm($legalForm);
+            }
+        }
+    }
+
+    /**
+     * @param InvoiceDetails $invoiceDetails
+     * @param array $data
+     * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function setCompanyData(InvoiceDetails $invoiceDetails, array $data): void
     {
         if (isset($data[InvoiceDetails::TAX_ID_PREFIX]) && is_scalar($data[InvoiceDetails::TAX_ID_PREFIX])) {
@@ -70,6 +83,13 @@ class DtoInvoiceDetailsFactory
         }
     }
 
+    /**
+     * @param InvoiceDetails $invoiceDetails
+     * @param array $data
+     * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function setAddressData(InvoiceDetails $invoiceDetails, array $data): void
     {
         if (isset($data[InvoiceDetails::COUNTRY_CODE]) && is_scalar($data[InvoiceDetails::COUNTRY_CODE])) {

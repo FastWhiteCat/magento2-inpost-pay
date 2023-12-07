@@ -64,7 +64,7 @@ class OrderProcessor implements OrderProcessorInterface
                 sprintf(
                     'Successfully created InPost Pay Order #%s from Quote ID: %s',
                     $order->getIncrementId(),
-                    $quote->getId()
+                    (is_scalar($quote->getId())) ? (string)$quote->getId() : ''
                 )
             );
 
@@ -84,7 +84,7 @@ class OrderProcessor implements OrderProcessorInterface
      */
     private function createOrderFromQuote(Quote $quote): Order
     {
-        $cartId = (int)$quote->getId();
+        $cartId = (int)((is_scalar($quote->getId())) ? (int)$quote->getId() : null);
         $paymentMethod = $this->paymentMethodManagement->get($cartId);
         $orderId = $this->cartManagement->placeOrder($cartId, $paymentMethod);
         $order = $this->orderRepository->get((int)$orderId);

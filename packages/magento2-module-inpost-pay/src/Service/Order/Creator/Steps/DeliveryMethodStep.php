@@ -51,9 +51,9 @@ class DeliveryMethodStep extends OrderProcessingStep implements OrderProcessingS
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
         $this->cartRepository->save($quote);
-
+        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         $this->createLog(
-            sprintf('Delivery method %s has been applied to quote ID: %s', $deliveryMethod, (int)$quote->getId())
+            sprintf('Delivery method %s has been applied to quote ID: %s', $deliveryMethod, $quoteId)
         );
     }
 }

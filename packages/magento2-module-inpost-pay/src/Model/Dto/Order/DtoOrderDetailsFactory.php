@@ -22,7 +22,6 @@ class DtoOrderDetailsFactory
         $orderDetails = $this->orderDetailsFactory->create();
         $basketPriceData = [];
 
-
         if (isset($data[OrderDetails::BASKET_ID]) && is_scalar($data[OrderDetails::BASKET_ID])) {
             $orderDetails->setBasketId((string)$data[OrderDetails::BASKET_ID]);
         }

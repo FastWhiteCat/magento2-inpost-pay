@@ -27,7 +27,8 @@ class InitInPostPayOrderStep extends OrderProcessingStep implements OrderPostPro
     {
         /** @var InPostPayOrderInterface $inPostPayOrder */
         $inPostPayOrder = $this->inPostPayOrderFactory->create();
-        $inPostPayOrder->setOrderId((int)$order->getEntityId());
+        $orderId = (int)(is_scalar($order->getEntityId()) ? $order->getEntityId() : null);
+        $inPostPayOrder->setOrderId($orderId);
         $this->inPostPayOrderRepository->save($inPostPayOrder);
 
         $this->createLog(

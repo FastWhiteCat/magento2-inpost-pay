@@ -69,30 +69,7 @@ class DtoAccountInfoFactory
 
         if (isset($data[AccountInfo::CLIENT_ADDRESS]) && is_array($data[AccountInfo::CLIENT_ADDRESS])) {
             $clientAddressData = (array)$data[AccountInfo::CLIENT_ADDRESS];
-            if (isset($clientAddressData[ClientAddress::ADDRESS])
-                && is_scalar($clientAddressData[ClientAddress::ADDRESS])
-            ) {
-                $clientAddress->setAddress((string)$clientAddressData[ClientAddress::ADDRESS]);
-            }
-
-            if (isset($clientAddressData[ClientAddress::CITY])
-                && is_scalar($clientAddressData[ClientAddress::CITY])
-            ) {
-                $clientAddress->setCity((string)$clientAddressData[ClientAddress::CITY]);
-            }
-
-            if (isset($clientAddressData[ClientAddress::POSTAL_CODE])
-                && is_scalar($clientAddressData[ClientAddress::POSTAL_CODE])
-            ) {
-                $clientAddress->setPostalCode((string)$clientAddressData[ClientAddress::POSTAL_CODE]);
-            }
-
-            if (isset($clientAddressData[ClientAddress::COUNTRY_CODE])
-                && is_scalar($clientAddressData[ClientAddress::COUNTRY_CODE])
-            ) {
-                $clientAddress->setCountryCode((string)$clientAddressData[ClientAddress::COUNTRY_CODE]);
-            }
-
+            $this->appendClientAddressWithAddressData($clientAddress, $clientAddressData);
             if (isset($clientAddressData[ClientAddress::ADDRESS_DETAILS])
                 && is_array($clientAddressData[ClientAddress::ADDRESS_DETAILS])
             ) {
@@ -103,6 +80,33 @@ class DtoAccountInfoFactory
         $clientAddress->setAddressDetails($addressDetails);
 
         return $clientAddress;
+    }
+
+    private function appendClientAddressWithAddressData(ClientAddress $clientAddress, array $clientAddressData): void
+    {
+        if (isset($clientAddressData[ClientAddress::ADDRESS])
+            && is_scalar($clientAddressData[ClientAddress::ADDRESS])
+        ) {
+            $clientAddress->setAddress((string)$clientAddressData[ClientAddress::ADDRESS]);
+        }
+
+        if (isset($clientAddressData[ClientAddress::CITY])
+            && is_scalar($clientAddressData[ClientAddress::CITY])
+        ) {
+            $clientAddress->setCity((string)$clientAddressData[ClientAddress::CITY]);
+        }
+
+        if (isset($clientAddressData[ClientAddress::POSTAL_CODE])
+            && is_scalar($clientAddressData[ClientAddress::POSTAL_CODE])
+        ) {
+            $clientAddress->setPostalCode((string)$clientAddressData[ClientAddress::POSTAL_CODE]);
+        }
+
+        if (isset($clientAddressData[ClientAddress::COUNTRY_CODE])
+            && is_scalar($clientAddressData[ClientAddress::COUNTRY_CODE])
+        ) {
+            $clientAddress->setCountryCode((string)$clientAddressData[ClientAddress::COUNTRY_CODE]);
+        }
     }
 
     private function prepareAddressDetails(array $data): AddressDetails

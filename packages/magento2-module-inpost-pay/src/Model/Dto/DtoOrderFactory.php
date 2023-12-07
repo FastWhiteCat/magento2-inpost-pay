@@ -34,11 +34,15 @@ class DtoOrderFactory
         $deliveryData = (array)($data[Order::DELIVERY] ?? []);
         $consentsData = (array)($data[Order::CONSENTS] ?? []);
 
+        // @phpstan-ignore-next-line
         $orderDto->setOrderDetails($this->dtoOrderDetailsFactory->create($orderDetailsData));
+        // @phpstan-ignore-next-line
         $orderDto->setAccountInfo($this->dtoAccountInfoFactory->create($accountInfoData));
+        // @phpstan-ignore-next-line
         $orderDto->setDelivery($this->dtoDeliveryFactory->create($deliveryData));
 
         if ($invoiceDetailsData) {
+            // @phpstan-ignore-next-line
             $orderDto->setInvoiceDetails($this->dtoInvoiceDetailsFactory->create($invoiceDetailsData));
         }
 

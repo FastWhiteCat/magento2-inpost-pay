@@ -64,7 +64,7 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     {
         $deliveryOptions = $this->getData(self::DELIVERY_OPTIONS);
         if (!empty($deliveryOptions) && is_scalar($deliveryOptions)) {
-            return explode(self::DELIVERY_OPTIONS_SEPARATOR, $deliveryOptions);
+            return explode(self::DELIVERY_OPTIONS_SEPARATOR, (string)$deliveryOptions);
         }
 
         return [];

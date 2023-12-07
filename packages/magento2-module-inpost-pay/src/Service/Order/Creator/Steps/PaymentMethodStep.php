@@ -39,7 +39,7 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
             sprintf(
                 'Payment method %s has been applied to quote ID: %s',
                 self::INPOST_PAY_PAYMENT_METHOD_CODE,
-                (int)$quote->getId()
+                (int)(is_scalar($quote->getId()) ? $quote->getId() : null)
             )
         );
     }
@@ -61,7 +61,7 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
         $this->createLog(
             sprintf(
                 'Customer Note has been applied to quote ID: %s. Content: %s',
-                (int)$quote->getId(),
+                (int)(is_scalar($quote->getId()) ? $quote->getId() : null),
                 $customerNote
             )
         );

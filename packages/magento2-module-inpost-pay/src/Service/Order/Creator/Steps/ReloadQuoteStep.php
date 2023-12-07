@@ -24,7 +24,8 @@ class ReloadQuoteStep extends OrderProcessingStep implements OrderProcessingStep
 
     public function process(Quote $quote, OrderDto $orderDto): void
     {
-        $quote = $this->cartRepository->get((int)$quote->getId());
+        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
+        $quote = $this->cartRepository->get($quoteId);
         if ($quote instanceof Quote) {
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);

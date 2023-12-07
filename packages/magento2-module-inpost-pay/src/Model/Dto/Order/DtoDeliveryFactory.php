@@ -28,17 +28,6 @@ class DtoDeliveryFactory
             $delivery->setDeliveryType((string)$data[Delivery::DELIVERY_TYPE]);
         }
 
-        if (isset($data[Delivery::DELIVERY_CODES]) && is_array($data[Delivery::DELIVERY_CODES])) {
-            $deliveryCodes = [];
-            foreach ($data[Delivery::DELIVERY_CODES] as $deliveryCode) {
-                if (is_scalar($deliveryCode)) {
-                    $deliveryCodes[] = (string)$deliveryCode;
-                }
-            }
-            asort($deliveryCodes);
-            $delivery->setDeliveryCodes($deliveryCodes);
-        }
-
         if (isset($data[Delivery::MAIL]) && is_scalar($data[Delivery::MAIL])) {
             $delivery->setMail((string)$data[Delivery::MAIL]);
         }
@@ -53,9 +42,24 @@ class DtoDeliveryFactory
 
         $delivery->setPhoneNumber($this->preparePhoneNumber($data));
         $delivery->setDeliveryAddress($this->prepareDeliveryAddress($data));
-
+        $delivery->setDeliveryCodes($this->prepareDeliveryCodes($data));
 
         return $delivery;
+    }
+
+    private function prepareDeliveryCodes(array $data): array
+    {
+        $deliveryCodes = [];
+        if (isset($data[Delivery::DELIVERY_CODES]) && is_array($data[Delivery::DELIVERY_CODES])) {
+            foreach ($data[Delivery::DELIVERY_CODES] as $deliveryCode) {
+                if (is_scalar($deliveryCode)) {
+                    $deliveryCodes[] = (string)$deliveryCode;
+                }
+            }
+            asort($deliveryCodes);
+        }
+
+        return $deliveryCodes;
     }
 
     public function preparePhoneNumber(array $data): PhoneNumber
@@ -86,36 +90,7 @@ class DtoDeliveryFactory
 
         if (isset($data[Delivery::DELIVERY_ADDRESS]) && is_array($data[Delivery::DELIVERY_ADDRESS])) {
             $deliveryAddressData = (array)$data[Delivery::DELIVERY_ADDRESS];
-            if (isset($deliveryAddressData[DeliveryAddress::NAME])
-                && is_scalar($deliveryAddressData[DeliveryAddress::NAME])
-            ) {
-                $deliveryAddress->setName((string)$deliveryAddressData[DeliveryAddress::NAME]);
-            }
-
-            if (isset($deliveryAddressData[DeliveryAddress::COUNTRY_CODE])
-                && is_scalar($deliveryAddressData[DeliveryAddress::COUNTRY_CODE])
-            ) {
-                $deliveryAddress->setCountryCode((string)$deliveryAddressData[DeliveryAddress::COUNTRY_CODE]);
-            }
-
-            if (isset($deliveryAddressData[DeliveryAddress::ADDRESS])
-                && is_scalar($deliveryAddressData[DeliveryAddress::ADDRESS])
-            ) {
-                $deliveryAddress->setAddress((string)$deliveryAddressData[DeliveryAddress::ADDRESS]);
-            }
-
-            if (isset($deliveryAddressData[DeliveryAddress::CITY])
-                && is_scalar($deliveryAddressData[DeliveryAddress::CITY])
-            ) {
-                $deliveryAddress->setCity((string)$deliveryAddressData[DeliveryAddress::CITY]);
-            }
-
-            if (isset($deliveryAddressData[DeliveryAddress::POSTAL_CODE])
-                && is_scalar($deliveryAddressData[DeliveryAddress::POSTAL_CODE])
-            ) {
-                $deliveryAddress->setPostalCode((string)$deliveryAddressData[DeliveryAddress::POSTAL_CODE]);
-            }
-
+            $this->appendClientAddressWithAddressData($deliveryAddress, $deliveryAddressData);
             if (isset($deliveryAddressData[DeliveryAddress::ADDRESS_DETAILS])
                 && is_array($deliveryAddressData[DeliveryAddress::ADDRESS_DETAILS])
             ) {
@@ -126,6 +101,39 @@ class DtoDeliveryFactory
         $deliveryAddress->setAddressDetails($addressDetails);
 
         return $deliveryAddress;
+    }
+
+    private function appendClientAddressWithAddressData(DeliveryAddress $deliveryAddress, $deliveryAddressData): void
+    {
+        if (isset($deliveryAddressData[DeliveryAddress::NAME])
+            && is_scalar($deliveryAddressData[DeliveryAddress::NAME])
+        ) {
+            $deliveryAddress->setName((string)$deliveryAddressData[DeliveryAddress::NAME]);
+        }
+
+        if (isset($deliveryAddressData[DeliveryAddress::COUNTRY_CODE])
+            && is_scalar($deliveryAddressData[DeliveryAddress::COUNTRY_CODE])
+        ) {
+            $deliveryAddress->setCountryCode((string)$deliveryAddressData[DeliveryAddress::COUNTRY_CODE]);
+        }
+
+        if (isset($deliveryAddressData[DeliveryAddress::ADDRESS])
+            && is_scalar($deliveryAddressData[DeliveryAddress::ADDRESS])
+        ) {
+            $deliveryAddress->setAddress((string)$deliveryAddressData[DeliveryAddress::ADDRESS]);
+        }
+
+        if (isset($deliveryAddressData[DeliveryAddress::CITY])
+            && is_scalar($deliveryAddressData[DeliveryAddress::CITY])
+        ) {
+            $deliveryAddress->setCity((string)$deliveryAddressData[DeliveryAddress::CITY]);
+        }
+
+        if (isset($deliveryAddressData[DeliveryAddress::POSTAL_CODE])
+            && is_scalar($deliveryAddressData[DeliveryAddress::POSTAL_CODE])
+        ) {
+            $deliveryAddress->setPostalCode((string)$deliveryAddressData[DeliveryAddress::POSTAL_CODE]);
+        }
     }
 
     private function prepareAddressDetails(array $data): AddressDetails

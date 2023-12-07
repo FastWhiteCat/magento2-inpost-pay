@@ -59,7 +59,7 @@ class DeliveryAddress
 
     public function getCity(): string
     {
-        return $this->city;
+        return (string)$this->city;
     }
 
     public function setCity(string $city): void

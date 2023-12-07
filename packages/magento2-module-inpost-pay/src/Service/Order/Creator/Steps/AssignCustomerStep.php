@@ -23,6 +23,7 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
 
     public function process(Quote $quote, OrderDto $orderDto): void
     {
+        // @phpstan-ignore-next-line
         $quoteCustomerId = (int)$quote->getCustomer()->getId();
         $email = $orderDto->getAccountInfo()->getMail();
         $websiteId = (int)$quote->getStore()->getWebsiteId();

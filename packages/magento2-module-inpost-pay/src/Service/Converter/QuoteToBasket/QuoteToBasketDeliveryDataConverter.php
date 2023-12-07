@@ -104,7 +104,11 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
                 $option
             );
             foreach ($quoteAvailableShippingMethods as $shippingMethod) {
-                $allowedMethodCode = sprintf('%s_%s', $shippingMethod->getCarrierCode(), $shippingMethod->getMethodCode());
+                $allowedMethodCode = sprintf(
+                    '%s_%s',
+                    $shippingMethod->getCarrierCode(),
+                    $shippingMethod->getMethodCode()
+                );
                 if ($shippingMethod instanceof ShippingMethodInterface && $allowedMethodCode === $mappedMethodCode) {
                     $mappedShippingMethod = $shippingMethod;
                     break;

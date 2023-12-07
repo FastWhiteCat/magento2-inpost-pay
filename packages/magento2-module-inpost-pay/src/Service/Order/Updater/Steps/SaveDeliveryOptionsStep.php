@@ -23,7 +23,8 @@ class SaveDeliveryOptionsStep extends OrderProcessingStep implements OrderPostPr
 
     public function process(Order $order, OrderDto $orderDto): void
     {
-        $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId((int)$order->getEntityId());
+        $orderId = (int)(is_scalar($order->getEntityId()) ? $order->getEntityId() : null);
+        $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
         $inPostPayOrder->setDeliveryOptions($orderDto->getDelivery()->getDeliveryCodes());
         $this->inPostPayOrderRepository->save($inPostPayOrder);
 

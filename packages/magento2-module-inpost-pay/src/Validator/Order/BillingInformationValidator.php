@@ -126,6 +126,25 @@ class BillingInformationValidator implements OrderValidatorInterface
      */
     private function validateInvoiceDetails(InvoiceDetails $invoiceDetails): void
     {
+        $this->validateLegalForm($invoiceDetails);
+
+        if (empty($invoiceDetails->getCity())
+            || empty($invoiceDetails->getCountryCode())
+            || empty($invoiceDetails->getPostalCode())
+            || empty($invoiceDetails->getStreet())
+            || (empty($invoiceDetails->getBuilding()) && empty($invoiceDetails->getFlat()))
+        ) {
+            throw new LocalizedException(__('Incomplete invoice address data.'));
+        }
+    }
+
+    /**
+     * @param InvoiceDetails $invoiceDetails
+     * @return void
+     * @throws LocalizedException
+     */
+    private function validateLegalForm(InvoiceDetails $invoiceDetails): void
+    {
         if ($invoiceDetails->getLegalForm() !== InvoiceDetails::LEGAL_FORM_PERSON
             && $invoiceDetails->getLegalForm() !== InvoiceDetails::LEGAL_FORM_COMPANY
         ) {
@@ -140,15 +159,6 @@ class BillingInformationValidator implements OrderValidatorInterface
             if (empty($invoiceDetails->getCompanyName())) {
                 throw new LocalizedException(__('Empty Company Name.'));
             }
-        }
-
-        if (empty($invoiceDetails->getCity())
-            || empty($invoiceDetails->getCountryCode())
-            || empty($invoiceDetails->getPostalCode())
-            || empty($invoiceDetails->getStreet())
-            || (empty($invoiceDetails->getBuilding()) && empty($invoiceDetails->getFlat()))
-        ) {
-            throw new LocalizedException(__('Incomplete invoice address data.'));
         }
     }
 }

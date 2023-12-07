@@ -44,7 +44,8 @@ class ShipmentMappingConfigProvider
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInvalidConfigurationException(
-                __('InPost Courier not mapped for delivery type: %1 with option: %2', $deliveryType, $option));
+                __('InPost Courier not mapped for delivery type: %1 with option: %2', $deliveryType, $option)
+            );
         }
 
         return (string)$carrier;

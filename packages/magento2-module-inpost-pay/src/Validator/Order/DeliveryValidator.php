@@ -98,7 +98,7 @@ class DeliveryValidator implements OrderValidatorInterface
         if (empty($shippingAddress->getCountryId())) {
             $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
         }
-
+        // @phpstan-ignore-next-line
         $shippingMethods = $this->shippingManager->estimateByExtendedAddress((int)$quote->getId(), $shippingAddress);
         foreach ($shippingMethods as $shippingMethod) {
             $allowedMethodCode = sprintf('%s_%s', $shippingMethod->getCarrierCode(), $shippingMethod->getMethodCode());

@@ -28,9 +28,11 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
 
     public function process(Quote $quote, OrderDto $orderDto): void
     {
+        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         $deliveryAddress = $orderDto->getDelivery()->getDeliveryAddress();
         /** @var AddressInterface $shippingAddress */
         $shippingAddress = $this->addressFactory->create();
+        $shippingAddress->setCustomerAddressId(null);
         $shippingAddress->setEmail($orderDto->getAccountInfo()->getMail());
         $shippingAddress->setFirstname($orderDto->getAccountInfo()->getName());
         $shippingAddress->setLastname($orderDto->getAccountInfo()->getSurname());
@@ -44,16 +46,16 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $quote->setShippingAddress($shippingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
-        $this->shippingAddressManagement->assign((int)$quote->getId(), $shippingAddress);
+        $this->shippingAddressManagement->assign($quoteId, $shippingAddress);
 
-        $this->createLog(sprintf('Shipping address has been applied to quote ID: %s', (int)$quote->getId()));
+        $this->createLog(sprintf('Shipping address has been applied to quote ID: %s', $quoteId));
     }
 
     private function combineAddressToOneLine(AddressDetails $addressDetails): string
     {
         $addressLine = $addressDetails->getStreet();
         $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
-        if ($addressNumber) {
+        if (!empty($addressNumber)) {
             $addressLine = sprintf('%s %s', $addressLine, $addressNumber);
         }
 
