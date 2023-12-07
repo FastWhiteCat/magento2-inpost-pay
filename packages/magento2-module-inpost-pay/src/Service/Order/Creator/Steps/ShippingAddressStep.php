@@ -55,11 +55,8 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
     {
         $addressLine = $addressDetails->getStreet();
         $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
-        if (!empty($addressNumber)) {
-            $addressLine = sprintf('%s %s', $addressLine, $addressNumber);
-        }
 
-        return $addressLine;
+        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
     }
 
     private function combinePhoneNumber(PhoneNumber $phoneNumber): string

@@ -103,8 +103,17 @@ class DtoDeliveryFactory
         return $deliveryAddress;
     }
 
-    private function appendClientAddressWithAddressData(DeliveryAddress $deliveryAddress, $deliveryAddressData): void
-    {
+    /**
+     * @param DeliveryAddress $deliveryAddress
+     * @param array $deliveryAddressData
+     * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    private function appendClientAddressWithAddressData(
+        DeliveryAddress $deliveryAddress,
+        array $deliveryAddressData
+    ): void {
         if (isset($deliveryAddressData[DeliveryAddress::NAME])
             && is_scalar($deliveryAddressData[DeliveryAddress::NAME])
         ) {

@@ -70,22 +70,16 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
     {
         $addressLine = $addressDetails->getStreet();
         $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
-        if (!empty($addressNumber)) {
-            $addressLine = sprintf('%s %s', $addressLine, $addressNumber);
-        }
 
-        return $addressLine;
+        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
     }
 
     private function combineInvoiceAddressToOneLine(InvoiceDetails $invoiceDetails): string
     {
         $addressLine = $invoiceDetails->getStreet();
         $addressNumber = implode('/', [$invoiceDetails->getBuilding(), $invoiceDetails->getFlat()]);
-        if (!empty($addressNumber)) {
-            $addressLine = sprintf('%s %s', $addressLine, $addressNumber);
-        }
 
-        return $addressLine;
+        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
     }
 
     private function combinePhoneNumber(PhoneNumber $phoneNumber): string
