@@ -23,6 +23,7 @@ $cartItemsCount = $block->getCartItemsCount();
 $cartId = $block->getQuoteId();
 $layoutConfig = $block->getLayoutConfig();
 ?>
+<?= $block->getBlockHtml('formkey') ?>
 
 <?php if ($bindingPlace === DisplayConfigProvider::THANK_YOU_PAGE_BINDING_PLACE_NAME): ?>
     <inpost-thank-you/>

@@ -59,21 +59,14 @@ define([
         },
 
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
-            var isLoggedIn = _.has(customerData.get('customer')(), 'fullname');
-            var cartId = customerData.get('cart')().cartId || getConfig().cartId || "";
-            var url = !isLoggedIn
-                ? urlBuilder.build('rest/V1/inpost-basket/' +
-                    (getConfig().cartId || "")) +
-                    '/get-pay-data'
-                : urlBuilder.build('rest/V1/inpost-basket/mine/get-pay-data');
+            var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
 
             var browserData = window.iziGetBrowserData({base64: true});
             var data = {
-                prefix: prefix || "",
+                prefix: prefix.toString() || "",
                 number: phoneNumber || "",
                 browser: browserData,
-                binding_place: bindingPlace,
-                cartId: cartId
+                binding_place: bindingPlace
             };
 
             return new Promise(function (resolve, reject) {
@@ -112,7 +105,7 @@ define([
         iziMobileLink: function () {
             return new Promise(function (resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/basket/binding'),
+                    url: urlBuilder.build('inpostizi/MobileLink/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
                     method: 'GET',
                 })
                     .done(function (data) {
@@ -133,7 +126,10 @@ define([
 
             function checkIsBound(resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/getIsBound/'),
+                    url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                        + '/form_key/'
+                        + $.mage.cookies.get('form_key')
+                    ),
                     method: 'GET',
                 })
                     .done(function (data) {
