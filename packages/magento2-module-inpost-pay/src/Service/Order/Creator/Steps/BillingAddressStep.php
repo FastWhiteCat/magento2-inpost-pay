@@ -12,14 +12,15 @@ use InPost\InPostPay\Model\Dto\Order\PhoneNumber;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Api\BillingAddressManagementInterface;
-use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\AddressInterfaceFactory;
+use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Model\Quote;
-use Magento\Quote\Model\Quote\Address\BillingAddressPersister;
 use Psr\Log\LoggerInterface;
 
 class BillingAddressStep extends OrderProcessingStep implements OrderProcessingStepInterface
 {
     public function __construct(
+        private readonly AddressInterfaceFactory $addressFactory,
         private readonly BillingAddressManagementInterface $billingAddressManagement,
         LoggerInterface $logger
     ) {
@@ -28,10 +29,10 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
 
     public function process(Quote $quote, OrderDto $orderDto): void
     {
-        //TODO:: create address from scratch
         $accountAddress = $orderDto->getAccountInfo()->getClientAddress();
-        $billingAddress = $quote->getBillingAddress();
         $invoiceDetails = $orderDto->getInvoiceDetails();
+        /** @var AddressInterface $billingAddress */
+        $billingAddress = $this->addressFactory->create();
         if ($invoiceDetails) {
             $billingAddress->setEmail($orderDto->getAccountInfo()->getMail());
             $billingAddress->setFirstname($invoiceDetails->getName());
@@ -45,7 +46,6 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setCountryId($invoiceDetails->getCountryCode());
             $billingAddress->setTelephone($this->combinePhoneNumber($orderDto->getAccountInfo()->getPhoneNumber()));
             $billingAddress->setVatId($this->combineVatId($invoiceDetails));
-            $billingAddress->setRegionId(801);
         } else {
             $billingAddress->setEmail($orderDto->getAccountInfo()->getMail());
             $billingAddress->setFirstname($orderDto->getAccountInfo()->getName());
@@ -57,7 +57,6 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setPostcode($accountAddress->getPostalCode());
             $billingAddress->setCountryId($accountAddress->getCountryCode());
             $billingAddress->setTelephone($this->combinePhoneNumber($orderDto->getAccountInfo()->getPhoneNumber()));
-            $billingAddress->setRegionId(801);
         }
         $quote->setBillingAddress($billingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);

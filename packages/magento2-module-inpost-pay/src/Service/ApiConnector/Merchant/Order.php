@@ -12,6 +12,7 @@ use InPost\InPostPay\Service\Converter\OrderToInPostOrderConverter;
 use InPost\InPostPay\Validator\OrderValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
+use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -19,9 +20,13 @@ use Psr\Log\LoggerInterface;
 
 class Order implements OrderInterface
 {
+    private const REQUEST_PREFIX = 'ORDER_REQUEST';
+    private const RESPONSE_PREFIX = 'ORDER_RESPONSE';
+
     public function __construct(
         private readonly RestRequest $restRequest,
         private readonly JsonSerializer $jsonSerializer,
+        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly DtoOrderFactory $dtoOrderFactory,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartRepositoryInterface $cartRepository,
@@ -40,14 +45,17 @@ class Order implements OrderInterface
     {
         try {
             $requestParams = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
+            $this->createRequestDebugLog(self::REQUEST_PREFIX, __METHOD__, $requestParams);
             $dtoOrder = $this->dtoOrderFactory->create($requestParams);
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($dtoOrder->getOrderDetails()->getBasketId());
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
             if ($quote instanceof Quote && $quote->getId()) {
                 $this->orderValidator->validate($quote, $inPostPayQuote, $dtoOrder);
                 $order = $this->orderProcessor->execute($quote, $dtoOrder);
+                $orderData = $this->orderToInPostOrderConverter->convert($order);
+                $this->createRequestDebugLog(self::RESPONSE_PREFIX, __METHOD__, $orderData);
 
-                return $this->orderToInPostOrderConverter->convert($order);
+                return $orderData;
             } else {
                 throw new LocalizedException(__('Quote not found.'));
             }
@@ -56,5 +64,12 @@ class Order implements OrderInterface
 
             throw new LocalizedException(__('Order could not be created. Reason: %1', $e->getMessage()));
         }
+    }
+
+    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    {
+        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
+        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
+        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
     }
 }

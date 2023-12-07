@@ -10,8 +10,8 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
+use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -29,6 +29,8 @@ class Basket implements BasketInterface
     private const PROMO_CODE_VALUE = 'promo_code_value';
     private const PRODUCT_ID = 'product_id';
     private const QUANTITY = 'quantity';
+    private const REQUEST_PREFIX = 'BASKET_REQUEST';
+    private const RESPONSE_PREFIX = 'BASKET_RESPONSE';
 
     private array $addToCartEvents = [
         self::INCREMENTING_PRODUCT_QUANTITY_EVENT,
@@ -42,6 +44,7 @@ class Basket implements BasketInterface
     public function __construct(
         private readonly RestRequest $restRequest,
         private readonly JsonSerializer $jsonSerializer,
+        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartService $cartService,
@@ -57,10 +60,16 @@ class Basket implements BasketInterface
      */
     public function get(string $basketId): array
     {
+        $logMessage = sprintf('Quote data for Basket ID: %s', $basketId);
+        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage);
+
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+        $basketData = $this->quoteToBasketDataConverter->convert($quote);
 
-        return $this->quoteToBasketDataConverter->convert($quote);
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
+
+        return $basketData;
     }
 
     /**
@@ -74,6 +83,9 @@ class Basket implements BasketInterface
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
         $requestParams = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
         $requestParams = is_array($requestParams) ? $requestParams : [];
+
+        $logMessage = sprintf('Quote update for Basket ID: %s', $basketId);
+        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage, $requestParams);
 
         $result = false;
         if ($this->isProductAddEvent($requestParams)) {
@@ -89,8 +101,10 @@ class Basket implements BasketInterface
         }
 
         $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
+        $basketData = $this->quoteToBasketDataConverter->convert($reloadedQuote ?? $quote);
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
 
-        return $this->quoteToBasketDataConverter->convert($reloadedQuote ?? $quote);
+        return $basketData;
     }
 
     private function isProductAddEvent(array $requestParams): bool
@@ -120,7 +134,7 @@ class Basket implements BasketInterface
     {
         try {
             return $this->inPostPayQuoteRepository->getByBasketId($basketId);
-        } catch (NoSuchEntityException $e) {
+        } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
             throw $e;
@@ -142,7 +156,7 @@ class Basket implements BasketInterface
             } else {
                 throw new LocalizedException(__('Quote with ID %1 is invalid.', $quoteId));
             }
-        } catch (NoSuchEntityException | LocalizedException $e) {
+        } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
             throw $e;
@@ -221,7 +235,7 @@ class Basket implements BasketInterface
     {
         try {
             $quote = $this->cartRepository->get($quoteId);
-        } catch (NoSuchEntityException $e) {
+        } catch (LocalizedException $e) {
             $this->logger->error(sprintf('Reloading quote failed. Reason: %s', $e->getMessage()));
         }
 
@@ -255,21 +269,27 @@ class Basket implements BasketInterface
     }
 
     /**
-     * @throws NoSuchEntityException
      * @throws LocalizedException
      */
     public function delete(string $basketId): void
     {
-        $this->logger->info(
-            'DELETE Request - 1/2 Received delete request for basket id - {basketId}',
-            ['basketId' => $basketId]
-        );
+        $logMessage = sprintf('Delete Basket ID: %s', $basketId);
+        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage);
+
         try {
             $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
-        } catch (NoSuchEntityException|LocalizedException $e) {
+        } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
         }
-        $this->logger->info('DELETE Request - 2/2 Deleted basket id - {basketId}', ['basketId' => $basketId]);
+
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage);
+    }
+
+    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    {
+        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
+        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
+        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
     }
 }

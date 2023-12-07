@@ -119,7 +119,6 @@
                 <item name="shipping_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ShippingAddressStep</item>
                 <item name="delivery_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\DeliveryMethodStep</item>
                 <item name="payment_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\PaymentMethodStep</item>
-                <item name="customer_note" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\CustomerNoteStep</item>
                 <item name="reload_quote" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ReloadQuoteStep</item>
             </argument>
             <argument name="orderPostProcessingSteps" xsi:type="array">

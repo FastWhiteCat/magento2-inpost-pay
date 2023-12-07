@@ -18,9 +18,15 @@
         </field>
         <field id="inpost_courier_cod_mapping" translate="label" type="select" sortOrder="20"
                showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Cash on Delivery Courier Delivery</label>
+            <label>Cash on Delivery Courier</label>
             <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
             <config_path>payment/inpost_pay/inpost_courier_cod_mapping</config_path>
+        </field>
+        <field id="inpost_courier_codpww_mapping" translate="label" type="select" sortOrder="25"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Cash on Delivery Courier - Weekend Delivery</label>
+            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
+            <config_path>payment/inpost_pay/inpost_courier_codpww_mapping</config_path>
         </field>
     </group>
 </include>

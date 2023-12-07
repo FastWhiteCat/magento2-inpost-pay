@@ -14,6 +14,7 @@ class ShipmentMappingConfigProvider
     public const OPTION_STANDARD = 'STANDARD';
     public const OPTION_WEEKEND_DELIVERY = 'PWW';
     public const OPTION_CASH_ON_DELIVERY = 'COD';
+    public const OPTION_CASH_ON_DELIVERY_WEEKEND = 'CODPWW';
     public const DELIVERY_TYPE_APM = 'APM';
     public const DELIVERY_TYPE_COURIER = 'COURIER';
     private const XML_PATH_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
@@ -56,7 +57,7 @@ class ShipmentMappingConfigProvider
 
     public function getNonStandardDeliveryOptions(): array
     {
-        return [self::OPTION_WEEKEND_DELIVERY, self::OPTION_CASH_ON_DELIVERY];
+        return [self::OPTION_WEEKEND_DELIVERY, self::OPTION_CASH_ON_DELIVERY, self::OPTION_CASH_ON_DELIVERY_WEEKEND];
     }
 
     public function isFreeShippingEnabledForCarrier(string $code, string $method = ''): bool

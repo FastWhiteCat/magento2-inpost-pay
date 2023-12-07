@@ -28,6 +28,7 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
         $payment = $quote->getPayment();
         $payment->setMethod(self::INPOST_PAY_PAYMENT_METHOD_CODE);
         $quote->setPayment($payment);
+        $this->addCustomerNote($quote, $orderDto);
         // @phpstan-ignore-next-line
         $quote->setInventoryProcessed(false);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
@@ -39,6 +40,29 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
                 'Payment method %s has been applied to quote ID: %s',
                 self::INPOST_PAY_PAYMENT_METHOD_CODE,
                 (int)$quote->getId()
+            )
+        );
+    }
+
+    public function addCustomerNote(Quote $quote, OrderDto $orderDto): void
+    {
+        $customerNotes = [];
+        if ($orderDto->getOrderDetails()->getOrderComments()) {
+            $customerNotes[] = $orderDto->getOrderDetails()->getOrderComments();
+        }
+        $invoiceDetails = $orderDto->getInvoiceDetails();
+        if ($invoiceDetails && $invoiceDetails->getAdditionalInformation()) {
+            $customerNotes[] = $invoiceDetails->getAdditionalInformation();
+        }
+
+        $customerNote = implode('. ', $customerNotes);
+        $quote->setCustomerNote($customerNote);
+
+        $this->createLog(
+            sprintf(
+                'Customer Note has been applied to quote ID: %s. Content: %s',
+                (int)$quote->getId(),
+                $customerNote
             )
         );
     }

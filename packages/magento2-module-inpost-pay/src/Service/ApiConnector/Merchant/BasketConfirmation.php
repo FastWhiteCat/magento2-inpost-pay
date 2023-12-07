@@ -11,6 +11,7 @@ use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
+use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -30,9 +31,13 @@ class BasketConfirmation implements BasketConfirmationInterface
     private const NAME_PARAM = 'name';
     private const SURNAME_PARAM = 'surname';
 
+    private const REQUEST_PREFIX = 'BASKET_CONFIRMATION_REQUEST';
+    private const RESPONSE_PREFIX = 'BASKET_CONFIRMATION_RESPONSE';
+
     public function __construct(
         private readonly RestRequest $restRequest,
         private readonly JsonSerializer $jsonSerializer,
+        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
@@ -53,6 +58,9 @@ class BasketConfirmation implements BasketConfirmationInterface
             $payload = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
             $payload = is_array($payload) ? $payload : [];
 
+            $logMessage = sprintf('Confirmation for Basket ID: %s', $basketId);
+            $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage, $payload);
+
             $inPostPayQuote->setStatus($this->extractStatus($payload));
             $inPostPayQuote->setInpostBasketId($this->extractInPostBasketId($payload));
             $inPostPayQuote->setMaskedPhoneNumber($this->extractMaskedPhoneNumber($payload));
@@ -72,7 +80,10 @@ class BasketConfirmation implements BasketConfirmationInterface
             throw new LocalizedException($errorMsg);
         }
 
-        return $this->quoteToBasketDataConverter->convert($quote);
+        $basketData = $this->quoteToBasketDataConverter->convert($quote);
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
+
+        return $basketData;
     }
 
     /**
@@ -217,5 +228,12 @@ class BasketConfirmation implements BasketConfirmationInterface
         }
 
         return $browserTrusted;
+    }
+
+    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    {
+        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
+        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
+        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
     }
 }

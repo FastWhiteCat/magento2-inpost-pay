@@ -12,11 +12,14 @@ use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ShippingAddressManagement;
+use Magento\Quote\Api\Data\AddressInterfaceFactory;
+use Magento\Quote\Api\Data\AddressInterface;
 use Psr\Log\LoggerInterface;
 
 class ShippingAddressStep extends OrderProcessingStep implements OrderProcessingStepInterface
 {
     public function __construct(
+        private readonly AddressInterfaceFactory $addressFactory,
         private readonly ShippingAddressManagement $shippingAddressManagement,
         LoggerInterface $logger
     ) {
@@ -26,7 +29,8 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
     public function process(Quote $quote, OrderDto $orderDto): void
     {
         $deliveryAddress = $orderDto->getDelivery()->getDeliveryAddress();
-        $shippingAddress = $quote->getShippingAddress();
+        /** @var AddressInterface $shippingAddress */
+        $shippingAddress = $this->addressFactory->create();
         $shippingAddress->setEmail($orderDto->getAccountInfo()->getMail());
         $shippingAddress->setFirstname($orderDto->getAccountInfo()->getName());
         $shippingAddress->setLastname($orderDto->getAccountInfo()->getSurname());
@@ -37,7 +41,6 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $shippingAddress->setPostcode($deliveryAddress->getPostalCode());
         $shippingAddress->setCountryId($deliveryAddress->getCountryCode());
         $shippingAddress->setTelephone($this->combinePhoneNumber($orderDto->getDelivery()->getPhoneNumber()));
-        $shippingAddress->setRegionId(801);
         $quote->setShippingAddress($shippingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);

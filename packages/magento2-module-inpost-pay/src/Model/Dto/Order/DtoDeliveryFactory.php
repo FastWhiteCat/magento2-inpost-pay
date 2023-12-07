@@ -35,6 +35,7 @@ class DtoDeliveryFactory
                     $deliveryCodes[] = (string)$deliveryCode;
                 }
             }
+            asort($deliveryCodes);
             $delivery->setDeliveryCodes($deliveryCodes);
         }
 
