@@ -48,7 +48,7 @@ class Order implements OrderInterface
     {
         try {
             $requestParams = (array)$this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
-            $this->createRequestDebugLog(self::REQUEST_PREFIX, __METHOD__, $requestParams);
+            $this->createRequestDebugLog(self::REQUEST_PREFIX,  'Order Create', $requestParams);
             $dtoOrder = $this->dtoOrderFactory->create($requestParams);
             // @phpstan-ignore-next-line
             $basketId = $dtoOrder->getOrderDetails()->getBasketId();
@@ -60,7 +60,7 @@ class Order implements OrderInterface
                 // @phpstan-ignore-next-line
                 $order = $this->orderProcessor->execute($quote, $dtoOrder);
                 $orderData = $this->orderToInPostOrderConverter->convert($order);
-                $this->createRequestDebugLog(self::RESPONSE_PREFIX, __METHOD__, $orderData);
+                $this->createRequestDebugLog(self::RESPONSE_PREFIX, 'Order Create', $orderData);
 
                 return $orderData;
             } else {
