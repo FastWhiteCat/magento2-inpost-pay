@@ -7,6 +7,17 @@ define([
 ], function (Component, $, customerData, urlBuilder, _) {
     'use strict';
 
+    var LONG_POLLING_TIME = 10000;
+    var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var PRODUCT_TYPES = {
+        CONFIGURABLE: 'configurable',
+        SIMPLE: 'simple',
+        GROUPED: 'grouped',
+        VIRTUAL: 'virtual',
+        DOWNLOADABLE: 'downloadable',
+        BUNDLE: 'bundle'
+    }
+
     return Component.extend({
         initialize: function (config) {
             this._super();
@@ -23,6 +34,10 @@ define([
             window.iziBindingDelete = this.iziBindingDelete;
             window.iziAddToCart = this.iziAddToCart;
             window.getBrowserDescription = this.getBrowserDescription;
+            window.abortRequest = this.abortRequest;
+            window.checkIfProductIsAdded = this.checkIfProductIsAdded;
+            window.setTimerAndRunCallback = this.setTimerAndRunCallback;
+
             window.getConfig = function (defaultConfig = config) {
                 return defaultConfig;
             }
@@ -32,24 +47,26 @@ define([
 
         iziCanBeBound: function (productId) {
             if (!productId) {
-                return false;
+                return true;
             }
 
-            var $productForm = $('#product_addtocart_form');
+            var $productInput = $('[name="product"][value="' + productId + '"]');
+            var $productForm = $productInput.parent('#product_addtocart_form');
 
             if (!$productForm.length) {
-                return false;
+                return true;
             }
+
             var $groupedProductElements = $productForm.find('[name*="super_group"]')
             if ($groupedProductElements.length) {
-                return !!$groupedProductElements.filter(function() {
+                return !!$groupedProductElements.filter(function () {
                     return this.value > 0;
                 }).length
             }
 
             var $configurableProductOptions = $productForm.find('[name*="super_attribute"]')
             if ($configurableProductOptions.length) {
-                return !$configurableProductOptions.filter(function() {
+                return !$configurableProductOptions.filter(function () {
                     return this.value === "";
                 }).length
             }
@@ -60,10 +77,9 @@ define([
 
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
-
             var browserData = window.iziGetBrowserData({base64: true});
             var data = {
-                prefix: prefix.toString() || "",
+                prefix: prefix && prefix.toString() || "",
                 number: phoneNumber || "",
                 browser: browserData,
                 binding_place: bindingPlace
@@ -78,15 +94,10 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        // nie testowane - brak poprawnej zwrotki z BE
-                        if (Object.keys(data).length === 1 && data.basketId) {
-                            resolve([]);
-                        }
-
-                        resolve(data);
+                        resolve(Object.keys(data).length === 1 && data.basketId ? [] : data)
                     })
                     .fail(function (xhr, textStatus) {
-                        reject(new Error('Network problem: ' + textStatus));
+                        reject(new Error($.mage.__('Network problem: ') + textStatus));
                     });
             });
         },
@@ -112,20 +123,19 @@ define([
                         resolve(data)
                     })
                     .fail(function (xhr, textStatus) {
-                        reject(new Error('Network problem: ' + textStatus));
+                        reject(new Error($.mage.__('Network problem: ') + textStatus));
                     });
             });
         },
 
         iziGetIsBound: function () {
-            let timeoutId;
-
             return new Promise((resolve, reject) => {
                 checkIsBound(resolve, reject);
             });
 
             function checkIsBound(resolve, reject) {
-                $.ajax({
+                abortRequest(xhrForBasketConfirmation)
+                xhrForBasketConfirmation = $.ajax({
                     url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
                         + '/form_key/'
                         + $.mage.cookies.get('form_key')
@@ -135,19 +145,18 @@ define([
                     .done(function (data) {
                         if (data.phone_number) {
                             resolve(data);
-                        } else if (data.action) {
+                        } else if (data.status) {
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
+                                abortRequest(xhrForBasketConfirmation)
                             }
 
-                            switch (data.action) {
-                                case 'close':
-                                    reject(new Error("Połączenie zostało przerwane, spróbuj ponownie."));
+                            switch (data.status) {
+                                case 'REJECT':
+                                    reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
                                     break;
-                                case 'retry':
-                                    timeoutId = setTimeout(function()  {
-                                        checkIsBound(resolve, reject)
-                                    },10000);
+                                case 'PENDING':
+                                    setTimerAndRunCallback(checkIsBound);
                                     break;
                                 default:
                                     break;
@@ -155,83 +164,71 @@ define([
                         } else if (data.error_code) {
                             reject(new Error(data.error_code));
                         } else {
-                            timeoutId = setTimeout(function()  {
-                                checkIsBound(resolve, reject)
-                            },10000);
+                            setTimerAndRunCallback(checkIsBound)
                         }
                     })
                     .fail(function (xhr, textStatus) {
-                        reject(new Error('Network problem: ' + textStatus));
+                        reject(new Error($.mage.__('Network problem: ') + textStatus));
                     });
             }
         },
 
         iziGetOrderComplete: function () {
-            let timeoutId;
-
+            //TODO check statuses from BE, change url when endpoint will be changed to controller
             return new Promise((resolve, reject) => {
                 checkOrderStatus(resolve, reject);
             });
 
             function checkOrderStatus(resolve, reject) {
-                $.ajax({
+                abortRequest(xhrForOrderConfirmation)
+                xhrForOrderConfirmation = $.ajax({
                     url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
                     method: 'GET',
                 })
                     .done(function (data) {
                         if (data.action && data.action === 'refresh') {
-                            timeoutId = setTimeout(function()  {
-                                checkOrderStatus(resolve, reject)
-                            },10000);
+                            setTimerAndRunCallback(checkOrderStatus);
                         } else if (data.action && data.action === 'redirect') {
                             resolve(data)
                         }
 
-                        reject(new Error('Nieoczekiwany status'));
-
-                        if (data.action) {
-                            resolve(data)
-                        } else {
-                            timeoutId = setTimeout(function()  {
-                                checkOrderStatus(resolve, reject)
-                            },10000);
-                        }
+                        reject(new Error($.mage.__('Unhandled status')));
                     })
                     .fail(function (xhr, textStatus) {
-                        reject(new Error('Network problem: ' + textStatus));
+                        reject(new Error($.mage.__('Network problem: ') + textStatus));
                     });
             }
         },
 
         iziBindingDelete: function () {
+            //TODO change url when endpoint will be changed to controller
             return new Promise(function (resolve, reject) {
                 $.ajax({
                     url: urlBuilder.build('rest/V1/izi/basket/binding'),
                     method: 'GET',
                 })
-                    .done(function (data) {
+                    .done(function () {
                         resolve()
                     })
                     .fail(function (xhr, textStatus) {
-                        reject(new Error('Network problem: ' + textStatus));
+                        reject(new Error($.mage.__('Network problem: ') + textStatus));
                     });
             });
         },
 
         iziAddToCart: function (id) {
-            if (!id || !window.iziCanBeBound(id)) {
-                return new Error('Nie podano id produktu lub nie mozna dodac produktu do koszyka');
-            }
+            if (!id || !window.iziCanBeBound(id)) return;
 
-            $("#product_addtocart_form").submit();
+            var $productInput = $('[name="product"][value="' + id + '"]');
+            var $productForm = $productInput.parent('#product_addtocart_form');
+            var isProductAdded = checkIfProductIsAdded(id, customerData.get("cart")(), $productForm)
 
-            return new Promise(function (resolve, reject) {
-                var cartSubscriber = customerData.get('cart').subscribe(function (cartData) {
-                    cartSubscriber.dispose();
-                    resolve();
-                });
-            }).then().catch(function(error) {
-                return new Error(error)
+            if (isProductAdded) return;
+
+            $productForm.submit();
+
+            var cartSubscriber = customerData.get('cart').subscribe(function () {
+                cartSubscriber.dispose();
             });
         },
 
@@ -240,12 +237,16 @@ define([
                 var $iziButtons = $("inpost-izi-button");
                 if (!$iziButtons.length) return;
 
-                var event = new CustomEvent("inpost-update-count", { detail: cartData.summary_count });
+                var event = new CustomEvent("inpost-update-count", {detail: cartData.summary_count});
 
-                $iziButtons.each(function() {
+                $iziButtons.each(function () {
                     this.dispatchEvent(event)
                 });
             });
+
+            document.addEventListener('iziModalEventClose', function () {
+                abortRequest(xhrForBasketConfirmation)
+            })
         },
 
         getBrowserDescription: function () {
@@ -271,6 +272,64 @@ define([
                 return 'Samsung Browser';
             } else {
                 return 'Unknown browser';
+            }
+        },
+
+        abortRequest: function (request) {
+            if (request && request.readyState !== 1) {
+                clearTimeout(timeoutId);
+                request.abort();
+                request = null;
+            }
+        },
+
+        setTimerAndRunCallback: function (callback) {
+            timeoutId = setTimeout(function () {
+                callback();
+            }, LONG_POLLING_TIME);
+        },
+
+        checkIfProductIsAdded: function (id, cartData, $productForm) {
+            if (cartData.items
+                && cartData.items.some((item) => item.product_id === id && item.product_type === PRODUCT_TYPES.SIMPLE))
+                return true;
+
+            var $configurableProductOptions = $productForm.find('[data-attribute-code]')
+
+            if ($configurableProductOptions.length) {
+                var configurableProducts = cartData.items.filter(function (item) {
+                    return item.product_id === id;
+                })
+                var productOptions = 0;
+
+                return configurableProducts.some(function (item) {
+                    _.each(item.options, function (option, index) {
+                        if (option.option_id.toString() === $configurableProductOptions[index].dataset.attributeId
+                            && option.option_value === $configurableProductOptions[index].dataset.optionSelected)
+                            productOptions++;
+                    })
+
+                    var isAddedProduct = productOptions === $configurableProductOptions.length;
+                    productOptions = 0;
+
+                    return isAddedProduct
+                })
+            }
+
+            var $groupedProductElements = $productForm.find('[name*="super_group"]')
+            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
+                return this.value > 0;
+            })
+
+            //TODO add more specific validation of grouped product
+            if (simpleProductsInGrouped.length) {
+                var addedSimpleProducts = 0;
+                _.each(simpleProductsInGrouped, function (item) {
+                    if (cartData.items.some(function (cartItem) {
+                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
+                    })) addedSimpleProducts++
+                })
+                return addedSimpleProducts === simpleProductsInGrouped.length;
             }
         }
     });
