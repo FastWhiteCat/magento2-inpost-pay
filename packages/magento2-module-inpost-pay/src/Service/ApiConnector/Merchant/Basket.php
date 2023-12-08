@@ -6,6 +6,8 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory as BasketDataFactory;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
@@ -49,16 +51,17 @@ class Basket implements BasketInterface
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartService $cartService,
         private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
+        private readonly BasketDataFactory $basketDataFactory,
         private readonly LoggerInterface $logger
     ) {
     }
 
     /**
      * @param string $basketId
-     * @return array
+     * @return BasketDataInterface
      * @throws LocalizedException
      */
-    public function get(string $basketId): array
+    public function get(string $basketId): BasketDataInterface
     {
         $logMessage = sprintf('Quote data for Basket ID: %s', $basketId);
         $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage);
@@ -69,15 +72,32 @@ class Basket implements BasketInterface
 
         $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
 
+        /** @var BasketDataInterface $basketData */
+        $basketData = $this->basketDataFactory->create();
+        $summary = $basketData->getSummary();
+        $finalPrice = $summary->getBasketFinalPrice();
+        $finalPrice->setNet(100);
+        $finalPrice->setGross(123);
+        $finalPrice->setVat(23);
+        $promoPrice = $summary->getBasketPromoPrice();
+        $promoPrice->setNet(100);
+        $promoPrice->setGross(123);
+        $promoPrice->setVat(23);
+        $basePrice = $summary->getBasketBasePrice();
+        $basePrice->setNet(100);
+        $basePrice->setGross(123);
+        $basePrice->setVat(23);
+        $basketData->setBrowserId('test123');
+
         return $basketData;
     }
 
     /**
      * @param string $basketId
-     * @return array
+     * @return BasketDataInterface
      * @throws LocalizedException
      */
-    public function update(string $basketId): array
+    public function update(string $basketId): BasketDataInterface
     {
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
@@ -103,6 +123,24 @@ class Basket implements BasketInterface
         $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
         $basketData = $this->quoteToBasketDataConverter->convert($reloadedQuote ?? $quote);
         $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
+
+
+        /** @var BasketDataInterface $basketData */
+        $basketData = $this->basketDataFactory->create();
+        $summary = $basketData->getSummary();
+        $finalPrice = $summary->getBasketFinalPrice();
+        $finalPrice->setNet(100);
+        $finalPrice->setGross(123);
+        $finalPrice->setVat(23);
+        $promoPrice = $summary->getBasketPromoPrice();
+        $promoPrice->setNet(100);
+        $promoPrice->setGross(123);
+        $promoPrice->setVat(23);
+        $basePrice = $summary->getBasketBasePrice();
+        $basePrice->setNet(100);
+        $basePrice->setGross(123);
+        $basePrice->setVat(23);
+        $basketData->setBrowserId('test123');
 
         return $basketData;
     }

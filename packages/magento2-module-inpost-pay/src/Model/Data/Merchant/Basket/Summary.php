@@ -1,0 +1,152 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Model\Data\Merchant\Basket;
+
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
+use Magento\Framework\DataObject;
+
+class Summary extends DataObject implements SummaryInterface
+{
+    private const DEFAULT_COUNTRY_CODE = 'PL';
+
+    /**
+     * @param PriceInterfaceFactory $priceFactory
+     * @param array $data
+     */
+    public function __construct(
+        private readonly PriceInterfaceFactory $priceFactory,
+        array $data = []
+    ) {
+        parent::__construct($data);
+    }
+
+    /**
+     * @return PriceInterface
+     */
+    public function getBasketBasePrice(): PriceInterface
+    {
+        $basketBasePrice = $this->getData(self::BASKET_BASE_PRICE);
+
+        if ($basketBasePrice instanceof PriceInterface) {
+            return $basketBasePrice;
+        }
+
+        return $this->priceFactory->create();
+    }
+
+    /**
+     * @param PriceInterface $basketBasePrice
+     * @return void
+     */
+    public function setBasketBasePrice(PriceInterface $basketBasePrice): void
+    {
+        $this->setData(self::BASKET_BASE_PRICE, $basketBasePrice);
+    }
+
+    /**
+     * @return PriceInterface
+     */
+    public function getBasketFinalPrice(): PriceInterface
+    {
+        $basketFinalPrice = $this->getData(self::BASKET_FINAL_PRICE);
+
+        if ($basketFinalPrice instanceof PriceInterface) {
+            return $basketFinalPrice;
+        }
+
+        return $this->priceFactory->create();
+    }
+
+    /**
+     * @param PriceInterface $basketFinalPrice
+     * @return void
+     */
+    public function setBasketFinalPrice(PriceInterface $basketFinalPrice): void
+    {
+        $this->setData(self::BASKET_FINAL_PRICE, $basketFinalPrice);
+    }
+
+    /**
+     * @return PriceInterface
+     */
+    public function getBasketPromoPrice(): PriceInterface
+    {
+        $basketPromoPrice = $this->getData(self::BASKET_PROMO_PRICE);
+
+        if ($basketPromoPrice instanceof PriceInterface) {
+            return $basketPromoPrice;
+        }
+
+        return $this->priceFactory->create();
+    }
+
+    /**
+     * @param PriceInterface $basketPromoPrice
+     * @return void
+     */
+    public function setBasketPromoPrice(PriceInterface $basketPromoPrice): void
+    {
+        $this->setData(self::BASKET_PROMO_PRICE, $basketPromoPrice);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrency(): string
+    {
+        $currency = $this->getData(self::CURRENCY);
+
+        return is_scalar($currency) ? (string)$currency : self::DEFAULT_COUNTRY_CODE;
+    }
+
+    /**
+     * @param string $currency
+     * @return void
+     */
+    public function setCurrency(string $currency): void
+    {
+        $this->setData(self::CURRENCY, $currency);
+    }
+
+    /**
+     * @return string
+     */
+    public function getBasketAdditionalInformation(): string
+    {
+        $additionalInfo = $this->getData(self::BASKET_ADDITIONAL_INFORMATION);
+
+        return is_scalar($additionalInfo) ? (string)$additionalInfo : '';
+    }
+
+    /**
+     * @param string $basketAdditionalInformation
+     * @return void
+     */
+    public function setBasketAdditionalInformation(string $basketAdditionalInformation): void
+    {
+        $this->setData(self::BASKET_ADDITIONAL_INFORMATION, $basketAdditionalInformation);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPaymentType(): array
+    {
+        $paymentTypes = $this->getData(self::PAYMENT_TYPE);
+
+        return is_array($paymentTypes) ? $paymentTypes : [];
+    }
+
+    /**
+     * @param string[] $paymentType
+     * @return void
+     */
+    public function setPaymentType(array $paymentType): void
+    {
+        $this->setData(self::PAYMENT_TYPE, $paymentType);
+    }
+}

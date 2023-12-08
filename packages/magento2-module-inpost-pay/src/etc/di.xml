@@ -1,6 +1,28 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BasketInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Summary"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Price"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Delivery"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Delivery\DeliveryOption"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromoCode"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\ProductAttribute"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity"/>
+
+
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
@@ -54,6 +76,14 @@
     <type name="Magento\Quote\Api\ChangeQuoteControlInterface">
         <plugin name="InPost_InPostPay::allowRemoteQuoteChangeByInPostPayPlugin"
                 type="InPost\InPostPay\Plugin\Quote\AllowRemoteQuoteChangeByInPostPayPlugin" />
+    </type>
+    <type name="Magento\Webapi\Model\Rest\Swagger\Generator">
+        <plugin name="InPost_InPostPay::swaggerGetListOfServicesPlugin"
+                type="InPost\InPostPay\Plugin\Swagger\SwaggerGetListOfServicesPlugin" />
+    </type>
+    <type name="\Magento\Framework\Webapi\Authorization">
+        <plugin name="InPost_InPostPay::swaggerAllowAclResourcePlugin"
+                type="InPost\InPostPay\Plugin\Swagger\SwaggerAllowAclResourcePlugin" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>

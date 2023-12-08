@@ -13,72 +13,72 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
-    <route url="/v1/izi/basket/:basketId/binding" method="DELETE">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="delete"/>
-        <resources>
-            <resource ref="inpost_pay_signature_validated_resource" />
-        </resources>
-    </route>
-    <route url="/v1/izi/basket/:basketId/confirmation" method="POST">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface" method="execute"/>
-        <resources>
-            <resource ref="inpost_pay_signature_validated_resource" />
-        </resources>
-    </route>
-    <route url="/v1/izi/order" method="POST">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderInterface" method="create"/>
-        <resources>
-            <resource ref="inpost_pay_signature_validated_resource" />
-        </resources>
-    </route>
+<!--    <route url="/v1/izi/basket/:basketId/binding" method="DELETE">-->
+<!--        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="delete"/>-->
+<!--        <resources>-->
+<!--            <resource ref="inpost_pay_signature_validated_resource" />-->
+<!--        </resources>-->
+<!--    </route>-->
+<!--    <route url="/v1/izi/basket/:basketId/confirmation" method="POST">-->
+<!--        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface" method="execute"/>-->
+<!--        <resources>-->
+<!--            <resource ref="inpost_pay_signature_validated_resource" />-->
+<!--        </resources>-->
+<!--    </route>-->
+<!--    <route url="/v1/izi/order" method="POST">-->
+<!--        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderInterface" method="create"/>-->
+<!--        <resources>-->
+<!--            <resource ref="inpost_pay_signature_validated_resource" />-->
+<!--        </resources>-->
+<!--    </route>-->
 
-    <route url="/V1/inpost-basket/:cartId/mobile-link" method="GET">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface" method="execute"/>
-        <resources>
-            <resource ref="anonymous" />
-        </resources>
-    </route>
-    <route url="/V1/inpost-basket/mine/mobile-link" method="GET">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface" method="execute"/>
-        <resources>
-            <resource ref="self" />
-        </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
-    </route>
-    <route url="/V1/inpost-basket/:cartId/get-pay-data" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface" method="execute" />
-        <resources>
-            <resource ref="anonymous" />
-        </resources>
-    </route>
-    <route url="/V1/inpost-basket/mine/get-pay-data" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface" method="execute" />
-        <resources>
-            <resource ref="self" />
-        </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
-    </route>
+<!--    <route url="/V1/inpost-basket/:cartId/mobile-link" method="GET">-->
+<!--        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface" method="execute"/>-->
+<!--        <resources>-->
+<!--            <resource ref="anonymous" />-->
+<!--        </resources>-->
+<!--    </route>-->
+<!--    <route url="/V1/inpost-basket/mine/mobile-link" method="GET">-->
+<!--        <service class="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface" method="execute"/>-->
+<!--        <resources>-->
+<!--            <resource ref="self" />-->
+<!--        </resources>-->
+<!--        <data>-->
+<!--            <parameter name="cartId" force="true">%cart_id%</parameter>-->
+<!--        </data>-->
+<!--    </route>-->
+<!--    <route url="/V1/inpost-basket/:cartId/get-pay-data" method="POST">-->
+<!--        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface" method="execute" />-->
+<!--        <resources>-->
+<!--            <resource ref="anonymous" />-->
+<!--        </resources>-->
+<!--    </route>-->
+<!--    <route url="/V1/inpost-basket/mine/get-pay-data" method="POST">-->
+<!--        <service class="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface" method="execute" />-->
+<!--        <resources>-->
+<!--            <resource ref="self" />-->
+<!--        </resources>-->
+<!--        <data>-->
+<!--            <parameter name="cartId" force="true">%cart_id%</parameter>-->
+<!--        </data>-->
+<!--    </route>-->
 
-    <!-- Managing InPost Basket guest confirmation -->
-    <route url="/V1/inpost-basket/:cartId/confirmation" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface" method="execute"/>
-        <resources>
-            <resource ref="anonymous" />
-        </resources>
-    </route>
+<!--    &lt;!&ndash; Managing InPost Basket guest confirmation &ndash;&gt;-->
+<!--    <route url="/V1/inpost-basket/:cartId/confirmation" method="POST">-->
+<!--        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface" method="execute"/>-->
+<!--        <resources>-->
+<!--            <resource ref="anonymous" />-->
+<!--        </resources>-->
+<!--    </route>-->
 
-    <!-- Managing InPost Basket guest confirmation -->
-    <route url="/V1/inpost-basket/mine/confirmation" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface" method="execute"/>
-        <resources>
-            <resource ref="self" />
-        </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
-    </route>
+<!--    &lt;!&ndash; Managing InPost Basket guest confirmation &ndash;&gt;-->
+<!--    <route url="/V1/inpost-basket/mine/confirmation" method="POST">-->
+<!--        <service class="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface" method="execute"/>-->
+<!--        <resources>-->
+<!--            <resource ref="self" />-->
+<!--        </resources>-->
+<!--        <data>-->
+<!--            <parameter name="cartId" force="true">%cart_id%</parameter>-->
+<!--        </data>-->
+<!--    </route>-->
 </routes>
