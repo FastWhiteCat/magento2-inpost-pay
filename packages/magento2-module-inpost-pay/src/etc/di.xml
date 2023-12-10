@@ -21,8 +21,6 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\ProductAttribute"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity"/>
-
-
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
@@ -118,15 +116,27 @@
             </argument>
         </arguments>
     </virtualType>
-    <type name="InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter">
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <arguments>
             <argument name="converters" xsi:type="array">
-                <item name="summary" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketSummaryDataConverter</item>
-                <item name="delivery" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketDeliveryDataConverter</item>
-                <item name="promo_codes" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter</item>
-                <item name="products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketProductsDataConverter</item>
-                <item name="related_products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketRelatedProductsDataConverter</item>
-                <item name="consents" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketConsentsDataConverter</item>
+                <item name="summary" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer
+                </item>
+                <item name="delivery" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryDataTransfer
+                </item>
+                <item name="promo_codes" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer
+                </item>
+                <item name="products" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer
+                </item>
+                <item name="related_products" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer
+                </item>
+                <item name="consents" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer
+                </item>
             </argument>
         </arguments>
     </type>
@@ -211,7 +221,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter">
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -260,7 +270,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter">
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -291,6 +301,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Order">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\InPostBasketToArrayConverter">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

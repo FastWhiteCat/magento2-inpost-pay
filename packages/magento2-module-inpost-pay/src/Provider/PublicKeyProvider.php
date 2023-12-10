@@ -7,7 +7,7 @@ namespace InPost\InPostPay\Provider;
 use InPost\InPostPay\Model\IziApi\Response\PublicKeyResponse;
 use InPost\InPostPay\Model\Cache\PublicKey\Type as PublicKeyCacheType;
 use InPost\InPostPay\Service\ApiConnector\PublicKeyGenerator;
-use InPost\InPostPay\Service\Converter\PublicKeyResponseDataConverter;
+use InPost\InPostPay\Service\DataTransfer\PublicKeyResponseDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;
 
@@ -16,10 +16,10 @@ class PublicKeyProvider
     private array $cachedResponses = [];
 
     public function __construct(
-        private readonly PublicKeyCacheType $publicKeyCacheType,
-        private readonly PublicKeyGenerator $publicKeyGenerator,
-        private readonly PublicKeyResponseDataConverter $publicKeyResponseDataConverter,
-        private readonly SerializerInterface $serializer
+        private readonly PublicKeyCacheType            $publicKeyCacheType,
+        private readonly PublicKeyGenerator            $publicKeyGenerator,
+        private readonly PublicKeyResponseDataTransfer $publicKeyResponseDataTransfer,
+        private readonly SerializerInterface           $serializer
     ) {
     }
 
@@ -65,7 +65,7 @@ class PublicKeyProvider
         if (empty($encodedPublicKeyData)) {
             $publicKeyResponse = $this->publicKeyGenerator->generate($version);
             $encodedPublicKeyData = (string)$this->serializer->serialize(
-                $this->publicKeyResponseDataConverter->convertToArray($publicKeyResponse)
+                $this->publicKeyResponseDataTransfer->convertToArray($publicKeyResponse)
             );
             $this->publicKeyCacheType->save(
                 $encodedPublicKeyData,
@@ -75,7 +75,7 @@ class PublicKeyProvider
             );
         }
 
-        $this->cachedResponses[$version] = $this->publicKeyResponseDataConverter->convertToResponseObject(
+        $this->cachedResponses[$version] = $this->publicKeyResponseDataTransfer->convertToResponseObject(
             (array)$this->serializer->unserialize($encodedPublicKeyData)
         );
 

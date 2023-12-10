@@ -6,11 +6,11 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
-use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory as BasketDataFactory;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\Cart\CartService;
-use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
+use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
@@ -50,8 +50,8 @@ class Basket implements BasketInterface
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartService $cartService,
-        private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
-        private readonly BasketDataFactory $basketDataFactory,
+        private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
+        private readonly BasketInterfaceFactory $basketFactory,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -68,28 +68,12 @@ class Basket implements BasketInterface
 
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-        $basketData = $this->quoteToBasketDataConverter->convert($quote);
+        $basket = $this->basketFactory->create();
+        $this->quoteToBasketDataTransfer->transfer($quote, $basket);
 
-        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basket->getData());
 
-        /** @var BasketDataInterface $basketData */
-        $basketData = $this->basketDataFactory->create();
-        $summary = $basketData->getSummary();
-        $finalPrice = $summary->getBasketFinalPrice();
-        $finalPrice->setNet(100);
-        $finalPrice->setGross(123);
-        $finalPrice->setVat(23);
-        $promoPrice = $summary->getBasketPromoPrice();
-        $promoPrice->setNet(100);
-        $promoPrice->setGross(123);
-        $promoPrice->setVat(23);
-        $basePrice = $summary->getBasketBasePrice();
-        $basePrice->setNet(100);
-        $basePrice->setGross(123);
-        $basePrice->setVat(23);
-        $basketData->setBrowserId('test123');
-
-        return $basketData;
+        return $basket;
     }
 
     /**
@@ -121,28 +105,30 @@ class Basket implements BasketInterface
         }
 
         $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
-        $basketData = $this->quoteToBasketDataConverter->convert($reloadedQuote ?? $quote);
-        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
+        $basket = $this->basketFactory->create();
+        $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
 
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basket->getData());
 
-        /** @var BasketDataInterface $basketData */
-        $basketData = $this->basketDataFactory->create();
-        $summary = $basketData->getSummary();
-        $finalPrice = $summary->getBasketFinalPrice();
-        $finalPrice->setNet(100);
-        $finalPrice->setGross(123);
-        $finalPrice->setVat(23);
-        $promoPrice = $summary->getBasketPromoPrice();
-        $promoPrice->setNet(100);
-        $promoPrice->setGross(123);
-        $promoPrice->setVat(23);
-        $basePrice = $summary->getBasketBasePrice();
-        $basePrice->setNet(100);
-        $basePrice->setGross(123);
-        $basePrice->setVat(23);
-        $basketData->setBrowserId('test123');
+        return $basket;
+    }
 
-        return $basketData;
+    /**
+     * @throws LocalizedException
+     */
+    public function delete(string $basketId): void
+    {
+        $logMessage = sprintf('Delete Basket ID: %s', $basketId);
+        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage);
+
+        try {
+            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
+            throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
+        }
+
+        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage);
     }
 
     private function isProductAddEvent(array $requestParams): bool
@@ -304,24 +290,6 @@ class Basket implements BasketInterface
         }
 
         return null;
-    }
-
-    /**
-     * @throws LocalizedException
-     */
-    public function delete(string $basketId): void
-    {
-        $logMessage = sprintf('Delete Basket ID: %s', $basketId);
-        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage);
-
-        try {
-            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
-        } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage(), $e->getTrace());
-            throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
-        }
-
-        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage);
     }
 
     private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void

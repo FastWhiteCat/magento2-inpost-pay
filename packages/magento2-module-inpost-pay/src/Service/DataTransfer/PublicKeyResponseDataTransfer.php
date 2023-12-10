@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter;
+namespace InPost\InPostPay\Service\DataTransfer;
 
 use InPost\InPostPay\Model\IziApi\Response\Data\PublicKey;
 use InPost\InPostPay\Model\IziApi\Response\PublicKeyResponse;
 use InPost\InPostPay\Model\IziApi\Response\PublicKeyResponseFactory;
 use InPost\InPostPay\Model\IziApi\Response\Data\PublicKeyFactory;
 
-class PublicKeyResponseDataConverter
+class PublicKeyResponseDataTransfer
 {
     public function __construct(
         private readonly PublicKeyResponseFactory $publicKeyResponseFactory,

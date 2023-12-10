@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
+namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use DateTime;
 use DateTimeZone;
-use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
+use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Quote\Model\Quote;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 
-class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInterface
+class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInterface
 {
     public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
@@ -22,7 +23,7 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
     ) {
     }
 
-    public function convert(Quote $quote): array
+    public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $address = $quote->getShippingAddress();
         $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
@@ -47,34 +48,35 @@ class QuoteToBasketSummaryDataConverter implements QuoteToBasketDataConverterInt
         $promoPriceExclTax = DecimalCalculator::round((float)$address->getSubtotal());
         $promoPriceTax = DecimalCalculator::sub($promoPriceInclTax, $promoPriceExclTax);
 
-        $summaryData = [
-            Basket::BASKET_BASE_PRICE => [
-                Basket::NET => $regularPriceExclTax,
-                Basket::GROSS => $regularPriceInclTax,
-                Basket::VAT => $regularPriceTax
-            ],
-            Basket::BASKET_FINAL_PRICE => [
-                Basket::NET => $finalPriceExclTax,
-                Basket::GROSS => $finalPriceInclTax,
-                Basket::VAT => $finalPriceTax
-            ],
-            Basket::BASKET_PROMO_PRICE => [
-                Basket::NET => $promoPriceExclTax,
-                Basket::GROSS => $promoPriceInclTax,
-                Basket::VAT => $promoPriceTax,
-            ],
-            Basket::CURRENCY => $quote->getQuoteCurrencyCode(),
-            Basket::BASKET_ADDITIONAL_INFORMATION => '',
-            Basket::PAYMENT_TYPE => $this->iziApiConfigProvider->getAcceptedPaymentTypes(),
-            Basket::BASKET_NOTICE => null
-        ];
+        $summary = $basket->getSummary();
+        $basketBasePrice = $summary->getBasketBasePrice();
+        $basketBasePrice->setNet($regularPriceExclTax);
+        $basketBasePrice->setGross($regularPriceInclTax);
+        $basketBasePrice->setVat($regularPriceTax);
+        $summary->setBasketBasePrice($basketBasePrice);
+
+        $basketFinalPrice = $summary->getBasketFinalPrice();
+        $basketFinalPrice->setNet($finalPriceExclTax);
+        $basketFinalPrice->setGross($finalPriceInclTax);
+        $basketFinalPrice->setVat($finalPriceTax);
+        $summary->setBasketFinalPrice($basketFinalPrice);
+
+        $basketPromoPrice = $summary->getBasketPromoPrice();
+        $basketPromoPrice->setNet($promoPriceExclTax);
+        $basketPromoPrice->setGross($promoPriceInclTax);
+        $basketPromoPrice->setVat($promoPriceTax);
+        $summary->setBasketPromoPrice($basketPromoPrice);
+
+        $summary->setCurrency($quote->getQuoteCurrencyCode());
+        $summary->setBasketAdditionalInformation('');
+        $summary->setPaymentType($this->iziApiConfigProvider->getAcceptedPaymentTypes());
 
         $basketExpirationDate = $this->calculateBasketExpirationDate();
         if ($basketExpirationDate) {
-            $summaryData[Basket::BASKET_EXPIRATION_DATE] = $this->calculateBasketExpirationDate();
+            $summary->setBasketExpirationDate($basketExpirationDate);
         }
 
-        return $summaryData;
+        $basket->setSummary($summary);
     }
 
     private function calculateBasketExpirationDate(): ?string

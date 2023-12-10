@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter;
+namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
 use Magento\Sales\Model\Order;
 
-class OrderToInPostOrderConverter
+class OrderToInPostOrderDataTransfer
 {
-    public function convert(Order $order): array
+    public function transfer(Order $order): array
     {
         return [
             'order' => [

@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
+namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
-use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
+use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
@@ -15,18 +20,20 @@ use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 
-class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterInterface
+class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
     private const DEFAULT_COUNTRY_ID = 'PL';
 
     public function __construct(
+        private readonly DeliveryInterfaceFactory $deliveryFactory,
+        private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager
     ) {
     }
 
-    public function convert(Quote $quote): array
+    public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $shippingAddress = $quote->getShippingAddress();
         if (empty($shippingAddress->getCountryId())) {
@@ -40,9 +47,13 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
             throw new LocalizedException(__('No delivery method is allowed for this basket.'));
         }
 
-        return $deliveries;
+        $basket->setDelivery($deliveries);
     }
 
+    /**
+     * @param DeliveryInterface[] $quoteAvailableShippingMethods
+     * @return array
+     */
     private function prepareMappedShippingMethodsData(array $quoteAvailableShippingMethods): array
     {
         $deliveryData = [];
@@ -56,15 +67,19 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
                 continue;
             }
 
-            $deliveryTypeData = [
-                Basket::DELIVERY_TYPE => $deliveryType,
-                Basket::DELIVERY_DATE => $this->deliveryDateProvider->calculateDeliveryDate($shippingMethod),
-                Basket::DELIVERY_PRICE => $this->getDeliveryMethodPricing($shippingMethod)
-            ];
+            /** @var DeliveryInterface $delivery */
+            $delivery = $this->deliveryFactory->create();
+            $delivery->setDeliveryType($deliveryType);
+            $delivery->setDeliveryDate($this->deliveryDateProvider->calculateDeliveryDate($shippingMethod));
+            $deliverPrice = $delivery->getDeliveryPrice();
+            $deliverPrice->setNet(DecimalCalculator::round((float)$shippingMethod->getPriceExclTax()));
+            $deliverPrice->setGross(DecimalCalculator::round((float)$shippingMethod->getPriceInclTax()));
+            $deliverPrice->setVat(DecimalCalculator::sub($deliverPrice->getGross(), $deliverPrice->getNet()));
+            $delivery->setDeliveryPrice($deliverPrice);
 
             $freeShippingLimit = $this->getFreeShippingLimit($shippingMethod);
             if ($freeShippingLimit) {
-                $deliveryTypeData[Basket::FREE_DELIVERY_MINIMUM_GROSS_PRICE] = $freeShippingLimit;
+                $delivery->setFreeDeliveryMinimumGrossPrice($freeShippingLimit);
             }
 
             $optionsData = [];
@@ -79,15 +94,20 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
                     continue;
                 }
 
-                $optionsData[] = [
-                    Basket::DELIVERY_OPTION_NAME => $optionShippingMethod->getMethodTitle(),
-                    Basket::DELIVERY_OPTION_CODE => $optionCode,
-                    Basket::DELIVERY_OPTION_PRICE => $this->getDeliveryMethodPricing($optionShippingMethod),
-                ];
+                /** @var DeliveryOptionInterface $deliveryOption */
+                $deliveryOption = $this->deliveryOptionFactory->create();
+                $deliveryOption->setDeliveryName($optionShippingMethod->getMethodTitle());
+                $deliveryOption->setDeliveryCodeValue($optionCode);
+                $optionPrice = $deliveryOption->getDeliveryOptionPrice();
+                $optionPrice->setNet(DecimalCalculator::round((float)$optionShippingMethod->getPriceExclTax()));
+                $optionPrice->setGross(DecimalCalculator::round((float)$optionShippingMethod->getPriceInclTax()));
+                $optionPrice->setVat(DecimalCalculator::sub($optionPrice->getGross(), $optionPrice->getNet()));
+                $deliveryOption->setDeliveryOptionPrice($optionPrice);
+                $optionsData[] = $deliveryOption;
             }
 
-            $deliveryTypeData[Basket::DELIVERY_OPTIONS] = $optionsData;
-            $deliveryData[] = $deliveryTypeData;
+            $delivery->setDeliveryOptions($optionsData);
+            $deliveryData[] = $delivery;
         }
 
         return $deliveryData;
@@ -119,19 +139,6 @@ class QuoteToBasketDeliveryDataConverter implements QuoteToBasketDataConverterIn
         }
 
         return $mappedShippingMethod ?? null;
-    }
-
-    private function getDeliveryMethodPricing(ShippingMethodInterface $pickupPointShippingMethod): array
-    {
-        $pickupPriceInclTax = DecimalCalculator::round((float)$pickupPointShippingMethod->getPriceInclTax());
-        $pickupPriceExclTax = DecimalCalculator::round((float)$pickupPointShippingMethod->getPriceExclTax());
-        $pickupTaxValue = DecimalCalculator::sub($pickupPriceInclTax, $pickupPriceExclTax);
-
-        return [
-            Basket::NET => $pickupPriceExclTax,
-            Basket::GROSS => $pickupPriceInclTax,
-            Basket::VAT => $pickupTaxValue
-        ];
     }
 
     private function getFreeShippingLimit(ShippingMethodInterface $pickupPointShippingMethod): ?float

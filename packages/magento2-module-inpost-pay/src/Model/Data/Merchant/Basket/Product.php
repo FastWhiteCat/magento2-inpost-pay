@@ -161,7 +161,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @return PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
      */
     public function getBasePrice(): PriceInterface
     {
@@ -175,7 +175,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @param PriceInterface $basePrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $basePrice
      * @return void
      */
     public function setBasePrice(PriceInterface $basePrice): void
@@ -184,7 +184,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @return PriceInterface|null
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null
      */
     public function getLowestPrice(): ?PriceInterface
     {
@@ -198,7 +198,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @param PriceInterface|null $lowestPrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null $lowestPrice
      * @return void
      */
     public function setLowestPrice(?PriceInterface $lowestPrice): void
@@ -207,7 +207,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @return PriceInterface|null
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null
      */
     public function getPromoPrice(): ?PriceInterface
     {
@@ -221,7 +221,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @param PriceInterface|null $promoPrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null $promoPrice
      * @return void
      */
     public function setPromoPrice(?PriceInterface $promoPrice): void
@@ -230,7 +230,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @return QuantityInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface
      */
     public function getQuantity(): QuantityInterface
     {
@@ -244,7 +244,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @param QuantityInterface $quantity
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface $quantity
      * @return void
      */
     public function setQuantity(QuantityInterface $quantity): void
@@ -253,7 +253,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @return ProductAttributeInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface[]
      */
     public function getProductAttributes(): array
     {
@@ -263,7 +263,7 @@ class Product extends DataObject implements ProductInterface
     }
 
     /**
-     * @param ProductAttributeInterface[] $productAttributes
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface[] $productAttributes
      * @return void
      */
     public function setProductAttributes(array $productAttributes): void

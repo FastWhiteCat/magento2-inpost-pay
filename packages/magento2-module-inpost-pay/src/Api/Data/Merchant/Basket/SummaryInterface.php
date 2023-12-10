@@ -11,6 +11,7 @@ interface SummaryInterface
     public const BASKET_PROMO_PRICE = 'basket_promo_price';
     public const CURRENCY = 'currency';
     public const BASKET_ADDITIONAL_INFORMATION = 'basket_additional_information';
+    public const BASKET_EXPIRATION_DATE = 'basket_expiration_date';
     public const PAYMENT_TYPE = 'payment_type';
 
     /**
@@ -78,4 +79,15 @@ interface SummaryInterface
      * @return void
      */
     public function setPaymentType(array $paymentType): void;
+
+    /**
+     * @return string|null
+     */
+    public function getBasketExpirationDate(): ?string;
+
+    /**
+     * @param string|null $basketExpirationDate
+     * @return void
+     */
+    public function setBasketExpirationDate(?string $basketExpirationDate): void;
 }

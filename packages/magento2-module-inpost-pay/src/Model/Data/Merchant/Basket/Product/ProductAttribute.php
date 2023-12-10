@@ -25,7 +25,7 @@ class ProductAttribute extends DataObject implements ProductAttributeInterface
      */
     public function setAttributeName(string $attributeName): void
     {
-        $this->setData(self::ATTRIBUTE_VALUE, $attributeName);
+        $this->setData(self::ATTRIBUTE_NAME, $attributeName);
     }
 
     /**

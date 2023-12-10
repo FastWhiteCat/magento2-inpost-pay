@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter;
+namespace InPost\InPostPay\Service\DataTransfer;
 
+use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InvalidArgumentException;
 use Magento\Quote\Model\Quote;
-use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use Psr\Log\LoggerInterface;
 
-class QuoteToBasketDataConverter implements QuoteToBasketDataConverterInterface
+class QuoteToBasketDataTransfer
 {
     /**
-     * @var QuoteToBasketDataConverterInterface[]
+     * @var QuoteToBasketDataTransferInterface[]
      */
     private array $converters = [];
 
@@ -24,14 +24,11 @@ class QuoteToBasketDataConverter implements QuoteToBasketDataConverterInterface
         $this->initConverters($converters);
     }
 
-    public function convert(Quote $quote): array
+    public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $basketData = [];
-        foreach ($this->converters as $converterKey => $converter) {
-            $basketData[$converterKey] = $converter->convert($quote);
+        foreach ($this->converters as $converter) {
+            $converter->transfer($quote, $basket);
         }
-
-        return $basketData;
     }
 
     /**
@@ -42,7 +39,7 @@ class QuoteToBasketDataConverter implements QuoteToBasketDataConverterInterface
     private function initConverters(array $converters): void
     {
         foreach ($converters as $converterKey => $converter) {
-            if ($converter instanceof QuoteToBasketDataConverterInterface) {
+            if ($converter instanceof QuoteToBasketDataTransferInterface) {
                 $this->converters[$converterKey] = $converter;
             } else {
                 $errorMsg = sprintf('Quote to Basket converter: %s is not valid.', $converterKey);

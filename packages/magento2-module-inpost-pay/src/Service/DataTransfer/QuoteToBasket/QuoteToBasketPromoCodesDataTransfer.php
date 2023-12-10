@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
+namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use Exception;
-use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 use Zend_Db_Expr;
 
-class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverterInterface
+class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferInterface
 {
     private const SALESRULE_TABLE = 'salesrule';
     private const SALESRULE_LABEL_TABLE = 'salesrule_label';
@@ -21,24 +24,32 @@ class QuoteToBasketPromoCodesDataConverter implements QuoteToBasketDataConverter
     private ?AdapterInterface $connection = null;
 
     public function __construct(
+        private readonly PromoCodeInterfaceFactory $promoCodeFactory,
         private readonly ResourceConnection $resourceConnection,
         private readonly LoggerInterface $logger
     ) {
     }
 
-    public function convert(Quote $quote): array
+    public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $promoCodesData = [];
+        $promoCodes = [];
         $appliedRuleIds = explode(',', (string)$quote->getAppliedRuleIds());
 
         try {
             $storeId = (int)$quote->getStoreId();
             $promoCodesData = $this->collectSalesRulesData($appliedRuleIds, (string)$quote->getCouponCode(), $storeId);
+            foreach ($promoCodesData as $promoCodeData) {
+                /** @var PromoCodeInterface $promoCode */
+                $promoCode = $this->promoCodeFactory->create();
+                $promoCode->setPromoCodeValue($promoCodeData[PromoCodeInterface::PROMO_CODE_VALUE]);
+                $promoCode->setName($promoCodeData[PromoCodeInterface::NAME]);
+                $promoCodes[] = $promoCode;
+            }
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
 
-        return $promoCodesData;
+        $basket->setPromoCodes($promoCodes);
     }
 
     private function collectSalesRulesData(array $appliedRuleIds, string $couponCode, int $storeId): array

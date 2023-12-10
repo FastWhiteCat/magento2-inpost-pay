@@ -61,7 +61,7 @@ class DeliveryOption extends DataObject implements DeliveryOptionInterface
     }
 
     /**
-     * @return PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
      */
     public function getDeliveryOptionPrice(): PriceInterface
     {
@@ -75,7 +75,7 @@ class DeliveryOption extends DataObject implements DeliveryOptionInterface
     }
 
     /**
-     * @param PriceInterface $deliveryOptionPrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $deliveryOptionPrice
      * @return void
      */
     public function setDeliveryOptionPrice(PriceInterface $deliveryOptionPrice): void

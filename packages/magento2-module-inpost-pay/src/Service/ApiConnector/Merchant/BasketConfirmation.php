@@ -7,7 +7,7 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
+use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
@@ -35,13 +35,13 @@ class BasketConfirmation implements BasketConfirmationInterface
     private const RESPONSE_PREFIX = 'BASKET_CONFIRMATION_RESPONSE';
 
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
-        private readonly Base64JsonSerializer $base64JsonSerializer,
-        private readonly CartRepositoryInterface $cartRepository,
+        private readonly RestRequest                       $restRequest,
+        private readonly JsonSerializer                    $jsonSerializer,
+        private readonly Base64JsonSerializer              $base64JsonSerializer,
+        private readonly CartRepositoryInterface           $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
-        private readonly LoggerInterface $logger
+        private readonly QuoteToBasketDataTransfer         $quoteToBasketDataTransfer,
+        private readonly LoggerInterface                   $logger
     ) {
     }
 
@@ -80,7 +80,7 @@ class BasketConfirmation implements BasketConfirmationInterface
             throw new LocalizedException($errorMsg);
         }
 
-        $basketData = $this->quoteToBasketDataConverter->convert($quote);
+        $basketData = $this->quoteToBasketDataTransfer->transfer($quote);
         $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basketData);
 
         return $basketData;

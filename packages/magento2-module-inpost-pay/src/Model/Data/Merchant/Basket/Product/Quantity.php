@@ -13,20 +13,28 @@ class Quantity extends DataObject implements QuantityInterface
     private const DEFAULT_UNIT = 'pcs';
 
     /**
-     * @return float
+     * @return float|int
      */
-    public function getQuantity(): float
+    public function getQuantity(): float|int
     {
         $quantity = $this->getData(self::QUANTITY);
 
-        return is_scalar($quantity) ? (float)$quantity : 0.00;
+        if (is_float($quantity)) {
+            return (float)$quantity;
+        }
+
+        if (is_int($quantity)) {
+            return (int)$quantity;
+        }
+
+        return 0.00;
     }
 
     /**
-     * @param float $quantity
+     * @param float|int $quantity
      * @return void
      */
-    public function setQuantity(float $quantity): void
+    public function setQuantity(float|int $quantity): void
     {
         $this->setData(self::QUANTITY, $quantity);
     }

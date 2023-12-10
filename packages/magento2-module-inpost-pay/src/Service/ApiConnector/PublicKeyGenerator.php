@@ -9,17 +9,17 @@ use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
 use InPost\InPostPay\Model\IziApi\Response\PublicKeyResponse;
 use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequestFactory;
-use InPost\InPostPay\Service\Converter\PublicKeyResponseDataConverter;
+use InPost\InPostPay\Service\DataTransfer\PublicKeyResponseDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
 class PublicKeyGenerator
 {
     public function __construct(
-        private readonly ConnectorInterface $connector,
-        private readonly PublicKeyRequestFactory $publicKeyRequestFactory,
-        private readonly PublicKeyResponseDataConverter $publicKeyResponseDataConverter,
-        private readonly LoggerInterface $logger
+        private readonly ConnectorInterface            $connector,
+        private readonly PublicKeyRequestFactory       $publicKeyRequestFactory,
+        private readonly PublicKeyResponseDataTransfer $publicKeyResponseDataTransfer,
+        private readonly LoggerInterface               $logger
     ) {
     }
 
@@ -50,6 +50,6 @@ class PublicKeyGenerator
 
     private function handle(array $result): PublicKeyResponse
     {
-        return $this->publicKeyResponseDataConverter->convertToResponseObject($result);
+        return $this->publicKeyResponseDataTransfer->convertToResponseObject($result);
     }
 }

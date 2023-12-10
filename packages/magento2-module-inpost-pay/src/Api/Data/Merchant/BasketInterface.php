@@ -19,15 +19,15 @@ interface BasketInterface
     public const CONSENTS = 'consents';
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBrowserId(): string;
+    public function getBrowserId(): ?string;
 
     /**
-     * @param string $browserId
+     * @param string|null $browserId
      * @return void
      */
-    public function setBrowserId(string $browserId): void;
+    public function setBrowserId(string|null $browserId): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface
@@ -41,15 +41,15 @@ interface BasketInterface
     public function setSummary(SummaryInterface $summary): void;
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface[]
      */
-    public function getDelivery(): DeliveryInterface;
+    public function getDelivery(): array;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface $delivery
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface[] $deliveries
      * @return void
      */
-    public function setDelivery(DeliveryInterface $delivery): void;
+    public function setDelivery(array $deliveries): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[]

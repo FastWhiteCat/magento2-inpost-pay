@@ -2,33 +2,36 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter\QuoteToBasket;
+namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
-use Magento\Catalog\Model\Product\Link;
-use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as ProductCollection;
-use Magento\Catalog\Model\ResourceModel\Product\Link\CollectionFactory as ProductLinkCollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Product\Link\Collection as ProductLinkCollection;
-use InPost\InPostPay\Api\Data\Converter\QuoteToBasketDataConverterInterface;
-use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\Product\Type;
-use InPost\InPostPay\Service\Converter\ProductToInPostProduct\ProductToInPostProductDataConverter;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
+use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\Catalog\Model\Config as CatalogConfig;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Link;
+use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\ResourceModel\Product\Link\Collection as ProductLinkCollection;
+use Magento\Catalog\Model\ResourceModel\Product\Link\CollectionFactory as ProductLinkCollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as ProductCollection;
+use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use Magento\Quote\Model\Quote;
 
-class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConverterInterface
+class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTransferInterface
 {
     public function __construct(
+        private readonly ProductInterfaceFactory $productFactory,
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly ProductLinkCollectionFactory $productLinkCollectionFactory,
-        private readonly ProductToInPostProductDataConverter $productToInPostProductDataConverter,
+        private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly CatalogConfig $catalogConfig
     ) {
     }
 
-    public function convert(Quote $quote): array
+    public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $crossSellData = [];
+        $inPostCrossSellProducts = [];
         $websiteId = (int)$quote->getStore()->getWebsiteId();
         $cartProductIds = [];
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
@@ -37,11 +40,17 @@ class QuoteToBasketRelatedProductsDataConverter implements QuoteToBasketDataConv
 
         if ($cartProductIds) {
             foreach ($this->getCrossSellProducts($cartProductIds, (int)$quote->getStoreId()) as $crossSellProduct) {
-                $crossSellData[] = $this->productToInPostProductDataConverter->convert($crossSellProduct, $websiteId);
+                $inPostCrossSellProduct = $this->productFactory->create();
+                $this->productToInPostProductDataTransfer->transfer(
+                    $crossSellProduct,
+                    $inPostCrossSellProduct,
+                    $websiteId
+                );
+                $inPostCrossSellProducts[] = $inPostCrossSellProduct;
             }
         }
 
-        return $crossSellData;
+        $basket->setRelatedProducts($inPostCrossSellProducts);
     }
 
     /**

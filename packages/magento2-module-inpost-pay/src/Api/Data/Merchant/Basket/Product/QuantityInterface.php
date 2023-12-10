@@ -13,15 +13,15 @@ interface QuantityInterface
     public const MAX_QUANTITY = 'max_quantity';
 
     /**
-     * @return float
+     * @return float|int
      */
-    public function getQuantity(): float;
+    public function getQuantity(): float|int;
 
     /**
-     * @param float $quantity
+     * @param float|int $quantity
      * @return void
      */
-    public function setQuantity(float $quantity): void;
+    public function setQuantity(float|int $quantity): void;
 
     /**
      * @return string

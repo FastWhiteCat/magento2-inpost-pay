@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Service\Converter\ProductToInPostProduct;
+namespace InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct;
 
 use InPost\InPostPay\Api\ApiConnector\IziApi\Product\ProductFieldInterface as InPostProduct;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Escaper;
@@ -17,13 +19,14 @@ use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Model\Product;
 
-class ProductToInPostProductDataConverter
+class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
     public const QTY_UNIT = 'pcs';
 
     public function __construct(
+        private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
@@ -33,8 +36,12 @@ class ProductToInPostProductDataConverter
     ) {
     }
 
-    public function convert(Product $product, int $websiteId, ?float $quantity = null): array
-    {
+    public function transfer(
+        Product $product,
+        ProductInterface $inPostProduct,
+        int $websiteId,
+        ?float $quantity = null
+    ): void {
         $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
         $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
         if ($quantity === null) {
@@ -51,28 +58,26 @@ class ProductToInPostProductDataConverter
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
 
-        return [
-            InPostProduct::PRODUCT_ID => (int)$product->getId(),
-            InPostProduct::PRODUCT_CATEGORY => (int)max($product->getCategoryIds()),
-            InPostProduct::EAN => (string)$product->getSku(),
-            InPostProduct::PRODUCT_NAME => (string)$product->getName(),
-            InPostProduct::PRODUCT_DESCRIPTION => $description,
-            InPostProduct::PRODUCT_LINK => $product->getProductUrl(),
-            InPostProduct::PRODUCT_IMAGE => $this->getProductImageUrl($product),
-            InPostProduct::BASE_PRICE => [
-                Basket::NET => $regularPriceExclTax,
-                Basket::GROSS => $regularPriceInclTax,
-                Basket::VAT =>  DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax)
-            ],
-            InPostProduct::QUANTITY => [
-                InPostProduct::QUANTITY => $canCastQtyToInt ? (int)$quantity : $quantity,
-                InPostProduct::QUANTITY_TYPE => $canCastQtyToInt ? self::INT_QTY : self::FLOAT_QTY,
-                InPostProduct::QUANTITY_UNIT => self::QTY_UNIT,
-                InPostProduct::AVAILABLE_QUANTITY => $stockQuantity,
-                InPostProduct::MAX_QUANTITY => $maxQuantity,
-            ],
-            InPostProduct::PRODUCT_ATTRIBUTES => $this->getProductAttributes($product)
-        ];
+        $inPostProduct->setProductId((string)$product->getId());
+        $inPostProduct->setProductCategory((string)max($product->getCategoryIds()));
+        $inPostProduct->setEan((string)$product->getSku());
+        $inPostProduct->setProductName((string)$product->getName());
+        $inPostProduct->setProductDescription($description);
+        $inPostProduct->setProductLink($product->getProductUrl());
+        $inPostProduct->setProductImage($this->getProductImageUrl($product));
+        $basePrice = $inPostProduct->getBasePrice();
+        $basePrice->setNet($regularPriceExclTax);
+        $basePrice->setGross($regularPriceInclTax);
+        $basePrice->setVat(DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax));
+        $inPostProduct->setBasePrice($basePrice);
+        $quantityObj = $inPostProduct->getQuantity();
+        $quantityObj->setQuantity($canCastQtyToInt ? (int)$quantity : $quantity);
+        $quantityObj->setQuantityType($canCastQtyToInt ? self::INT_QTY : self::FLOAT_QTY);
+        $quantityObj->setQuantityUnit(self::QTY_UNIT);
+        $quantityObj->setAvailableQuantity($stockQuantity);
+        $quantityObj->setMaxQuantity($maxQuantity);
+        $inPostProduct->setQuantity($quantityObj);
+        $inPostProduct->setProductAttributes($this->getProductAttributes($product));
     }
 
     private function getProductImageUrl(Product $product): string
@@ -103,10 +108,12 @@ class ProductToInPostProductDataConverter
                 if ($attribute->getIsVisibleOnFront()) {
                     $value = $attribute->getFrontend()->getValue($product);
                     if (is_string($value) && strlen(trim($value))) {
-                        $productAttributesData[] = [
-                            InPostProduct::ATTRIBUTE_NAME => $this->escaper->escapeUrl($attribute->getStoreLabel()),
-                            InPostProduct::ATTRIBUTE_VALUE => $this->escaper->escapeUrl($value)
-                        ];
+                        /** @var ProductAttributeInterface $inPostProductAttribute */
+                        $inPostProductAttribute = $this->productAttributeFactory->create();
+                        $storeLabel = $attribute->getStoreLabel((int)$product->getStoreId());
+                        $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($storeLabel));
+                        $inPostProductAttribute->setAttributeValue($this->escaper->escapeUrl($value));
+                        $productAttributesData[] = $inPostProductAttribute;
                     }
                 }
             }

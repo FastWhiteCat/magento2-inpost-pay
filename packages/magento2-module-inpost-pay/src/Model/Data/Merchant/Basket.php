@@ -5,51 +5,49 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Basket extends DataObject implements BasketInterface
+class Basket extends DataObject implements BasketInterface, ExtensibleDataInterface
 {
     /**
      * @param SummaryInterfaceFactory $summaryFactory
-     * @param DeliveryInterfaceFactory $deliveryFactory
      * @param array $data
      */
     public function __construct(
         private readonly SummaryInterfaceFactory $summaryFactory,
-        private readonly DeliveryInterfaceFactory $deliveryFactory,
         array $data = []
     ) {
         parent::__construct($data);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBrowserId(): string
+    public function getBrowserId(): ?string
     {
         $browserId = $this->getData(self::BROWSER_ID);
 
-        return is_scalar($browserId) ? (string)$browserId : '';
+        return is_scalar($browserId) ? (string)$browserId : null;
     }
 
     /**
-     * @param string $browserId
+     * @param string|null $browserId
      * @return void
      */
-    public function setBrowserId(string $browserId): void
+    public function setBrowserId(?string $browserId): void
     {
         $this->setData(self::BROWSER_ID, $browserId);
     }
 
     /**
-     * @return SummaryInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface
      */
     public function getSummary(): SummaryInterface
     {
@@ -63,7 +61,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @param SummaryInterface $summary
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface $summary
      * @return void
      */
     public function setSummary(SummaryInterface $summary): void
@@ -72,30 +70,26 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @return DeliveryInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface[]
      */
-    public function getDelivery(): DeliveryInterface
+    public function getDelivery(): array
     {
-        $delivery = $this->getData(self::DELIVERY);
+        $deliveries = $this->getData(self::DELIVERY);
 
-        if ($delivery instanceof DeliveryInterface) {
-            return $delivery;
-        }
-
-        return $this->deliveryFactory->create();
+        return is_array($deliveries) ? $deliveries : [];
     }
 
     /**
-     * @param DeliveryInterface $delivery
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface[] $deliveries
      * @return void
      */
-    public function setDelivery(DeliveryInterface $delivery): void
+    public function setDelivery(array $deliveries): void
     {
-        $this->setData(self::DELIVERY, $delivery);
+        $this->setData(self::DELIVERY, $deliveries);
     }
 
     /**
-     * @return PromoCodeInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[]
      */
     public function getPromoCodes(): array
     {
@@ -105,7 +99,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @param PromoCodeInterface[] $promoCodes
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[] $promoCodes
      * @return void
      */
     public function setPromoCodes(array $promoCodes): void
@@ -114,7 +108,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @return ProductInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[]
      */
     public function getProducts(): array
     {
@@ -124,7 +118,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @param ProductInterface[] $products
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[] $products
      * @return void
      */
     public function setProducts(array $products): void
@@ -133,7 +127,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @return ProductInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[]
      */
     public function getRelatedProducts(): array
     {
@@ -143,7 +137,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @param ProductInterface[] $relatedProducts
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[] $relatedProducts
      * @return void
      */
     public function setRelatedProducts(array $relatedProducts): void
@@ -152,7 +146,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @return ConsentInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface[]
      */
     public function getConsents(): array
     {
@@ -162,7 +156,7 @@ class Basket extends DataObject implements BasketInterface
     }
 
     /**
-     * @param ConsentInterface[] $consents
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface[] $consents
      * @return void
      */
     public function setConsents(array $consents): void

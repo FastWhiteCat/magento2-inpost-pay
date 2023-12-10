@@ -8,7 +8,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
-use InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketSummaryDataConverter;
+use InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
@@ -39,7 +39,7 @@ class DeliveryDateProvider
             $deadlineInDays = $this->shipmentMappingConfigProvider->getDeliveryDateDeadlineInDays();
             $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
             $currentTimestamp = strtotime(
-                $currentDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT)
+                $currentDateTime->format(QuoteToBasketSummaryDataTransfer::INPOST_DATE_FORMAT)
             );
 
             return $this->formatInPostDate($currentTimestamp + ($deadlineInDays * self::SECONDS_IN_DAY));
@@ -57,6 +57,6 @@ class DeliveryDateProvider
         $deliveryDateTime = new DateTime();
         $deliveryDateTime->setTimestamp($deliveryTimestamp);
 
-        return $deliveryDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT);
+        return $deliveryDateTime->format(QuoteToBasketSummaryDataTransfer::INPOST_DATE_FORMAT);
     }
 }

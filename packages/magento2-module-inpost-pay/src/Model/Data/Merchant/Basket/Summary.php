@@ -25,7 +25,7 @@ class Summary extends DataObject implements SummaryInterface
     }
 
     /**
-     * @return PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
      */
     public function getBasketBasePrice(): PriceInterface
     {
@@ -39,7 +39,7 @@ class Summary extends DataObject implements SummaryInterface
     }
 
     /**
-     * @param PriceInterface $basketBasePrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $basketBasePrice
      * @return void
      */
     public function setBasketBasePrice(PriceInterface $basketBasePrice): void
@@ -48,7 +48,7 @@ class Summary extends DataObject implements SummaryInterface
     }
 
     /**
-     * @return PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
      */
     public function getBasketFinalPrice(): PriceInterface
     {
@@ -62,7 +62,7 @@ class Summary extends DataObject implements SummaryInterface
     }
 
     /**
-     * @param PriceInterface $basketFinalPrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $basketFinalPrice
      * @return void
      */
     public function setBasketFinalPrice(PriceInterface $basketFinalPrice): void
@@ -71,7 +71,7 @@ class Summary extends DataObject implements SummaryInterface
     }
 
     /**
-     * @return PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
      */
     public function getBasketPromoPrice(): PriceInterface
     {
@@ -85,7 +85,7 @@ class Summary extends DataObject implements SummaryInterface
     }
 
     /**
-     * @param PriceInterface $basketPromoPrice
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $basketPromoPrice
      * @return void
      */
     public function setBasketPromoPrice(PriceInterface $basketPromoPrice): void
@@ -148,5 +148,24 @@ class Summary extends DataObject implements SummaryInterface
     public function setPaymentType(array $paymentType): void
     {
         $this->setData(self::PAYMENT_TYPE, $paymentType);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBasketExpirationDate(): ?string
+    {
+        $basketExpirationDate = $this->getData(self::BASKET_EXPIRATION_DATE);
+
+        return is_scalar($basketExpirationDate) ? (string)$basketExpirationDate : null;
+    }
+
+    /**
+     * @param string|null $basketExpirationDate
+     * @return void
+     */
+    public function setBasketExpirationDate(?string $basketExpirationDate): void
+    {
+        $this->setData(self::BASKET_EXPIRATION_DATE, $basketExpirationDate);
     }
 }

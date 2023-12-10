@@ -8,11 +8,11 @@ use InPost\InPostPay\Api\ApiConnector\Merchant\OrderInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Model\Dto\DtoOrderFactory;
-use InPost\InPostPay\Service\Converter\OrderToInPostOrderConverter;
+use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDataTransfer;
 use InPost\InPostPay\Validator\OrderValidator;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
+use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -27,16 +27,16 @@ class Order implements OrderInterface
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
-        private readonly Base64JsonSerializer $base64JsonSerializer,
-        private readonly DtoOrderFactory $dtoOrderFactory,
+        private readonly RestRequest                       $restRequest,
+        private readonly JsonSerializer                    $jsonSerializer,
+        private readonly Base64JsonSerializer              $base64JsonSerializer,
+        private readonly DtoOrderFactory                   $dtoOrderFactory,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly CartRepositoryInterface $cartRepository,
-        private readonly OrderValidator $orderValidator,
-        private readonly OrderProcessorInterface $orderProcessor,
-        private readonly OrderToInPostOrderConverter $orderToInPostOrderConverter,
-        private readonly LoggerInterface $logger
+        private readonly CartRepositoryInterface           $cartRepository,
+        private readonly OrderValidator                    $orderValidator,
+        private readonly OrderProcessorInterface           $orderProcessor,
+        private readonly OrderToInPostOrderDataTransfer    $orderToInPostOrderDataTransfer,
+        private readonly LoggerInterface                   $logger
     ) {
     }
 
@@ -59,7 +59,7 @@ class Order implements OrderInterface
                 $this->orderValidator->validate($quote, $inPostPayQuote, $dtoOrder);
                 // @phpstan-ignore-next-line
                 $order = $this->orderProcessor->execute($quote, $dtoOrder);
-                $orderData = $this->orderToInPostOrderConverter->convert($order);
+                $orderData = $this->orderToInPostOrderDataTransfer->transfer($order);
                 $this->createRequestDebugLog(self::RESPONSE_PREFIX, 'Order Create', $orderData);
 
                 return $orderData;
