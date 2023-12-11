@@ -58,6 +58,42 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::LOCKER_ID, $lockerId);
     }
 
+    public function getOrderStatus(): ?string
+    {
+        $orderStatus = ($this->hasData(self::ORDER_STATUS)) ? $this->getData(self::ORDER_STATUS) : null;
+
+        return ($orderStatus && is_scalar($orderStatus)) ? (string)$orderStatus : null;
+    }
+
+    public function setOrderStatus(string $orderStatus): InPostPayOrderInterface
+    {
+        return $this->setData(self::ORDER_STATUS, $orderStatus);
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        $phoneNumber = ($this->hasData(self::PHONE_NUMBER)) ? $this->getData(self::PHONE_NUMBER) : null;
+
+        return ($phoneNumber && is_scalar($phoneNumber)) ? (string)$phoneNumber : null;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): InPostPayOrderInterface
+    {
+        return $this->setData(self::PHONE_NUMBER, $phoneNumber);
+    }
+
+    public function getPrefix(): ?string
+    {
+        $prefix = ($this->hasData(self::PREFIX)) ? $this->getData(self::PREFIX) : null;
+
+        return ($prefix && is_scalar($prefix)) ? (string)$prefix : null;
+    }
+
+    public function setPrefix(string $prefix): InPostPayOrderInterface
+    {
+        return $this->setData(self::PREFIX, $prefix);
+    }
+
     public function getCreatedAt(): string
     {
         $createdAt = $this->getData(self::CREATED_AT);

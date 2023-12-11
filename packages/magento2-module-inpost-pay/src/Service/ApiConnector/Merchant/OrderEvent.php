@@ -4,15 +4,17 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
-use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
 use InPost\InPostPay\Api\Data\UpdateOrderResponseInterface;
+use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponseFactory;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -22,20 +24,13 @@ use Psr\Log\LoggerInterface;
 class OrderEvent implements OrderEventInterface
 {
     public const SKIP_INPOST_PAY_SYNC_FLAG = 'skip_inpost_pay_sync';
-    private const PHONE_NUMBER_PARAM = 'phone_number';
-    private const PHONE_PARAM = 'phone';
-    private const COUNTRY_PREFIX_PARAM = 'country_prefix';
-    private const EVENT_DATA = 'event_data';
-    private const PAYMENT_STATUS = 'payment_status';
     private const PAYMENT_STATUS_AUTHORIZED = 'AUTHORIZED';
     private const INPOST_PAY_METHOD_CODE = 'inpost_pay';
-    private const ORDER_STATUS = 'order_status';
-    private const ORDER_STATUS_PROCESSING = 'ORDER_PROCESSING';
     private const ORDER_STATUS_REJECTED = 'ORDER_REJECTED';
+    private const ORDER_STATUS_COMPLETED = 'ORDER_COMPLETED';
 
     public function __construct(
         private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
@@ -45,33 +40,42 @@ class OrderEvent implements OrderEventInterface
     ) {
     }
 
-    public function execute(string $orderId): UpdateOrderResponseInterface
-    {
+    public function execute(
+        string $orderId,
+        string $eventId,
+        string $eventDataTime,
+        PhoneNumberInterface $phoneNumber,
+        EventDataInterface $eventData
+    ): UpdateOrderResponseInterface {
         try {
             /**
              * @var Order $order
              */
             $order = $this->getOrderByIncrementId($orderId);
-            $this->checkInPostPayOrderExist((int)$order->getId());
+            $orderEntityId = is_scalar($order->getEntityId()) ? (int)$order->getEntityId() : 0;
+            $inPostPayOrder = $this->getInPostPayOrder($orderEntityId);
 
-            $payload = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
-            $payload = is_array($payload) ? $payload : [];
+            $phone = $phoneNumber->getCountryPrefix() . $phoneNumber->getPhone();
 
-            $phoneNumber = $this->extractPhoneNumber($payload);
-
-            if (($order->getShippingAddress() && $phoneNumber !== $order->getShippingAddress()->getTelephone()) ||
+            if (($order->getShippingAddress() && $phone !== $order->getShippingAddress()->getTelephone()) ||
                 ($order->getPayment() && $order->getPayment()->getMethod() !== self::INPOST_PAY_METHOD_CODE)
             ) {
                 throw new NoSuchEntityException(__('Order not found.'));
             }
 
-            $paymentStatus = $this->extractDataFromEventData($payload, self::PAYMENT_STATUS);
-            $orderStatus = $this->extractDataFromEventData($payload, self::ORDER_STATUS);
+            $paymentStatus = $eventData->getPaymentStatus();
+            $orderStatus = $eventData->getOrderStatus();
 
             if ($paymentStatus === self::PAYMENT_STATUS_AUTHORIZED) {
                 $this->updateOrderPayment($order);
+                $this->addOrderCommentAndSave($order);
+                $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_COMPLETED);
+                $inPostPayOrderStatus = self::ORDER_STATUS_COMPLETED;
             } elseif ($orderStatus === self::ORDER_STATUS_REJECTED) {
                 $this->updateOrderStatus($order);
+                $this->addOrderCommentAndSave($order);
+                $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_REJECTED);
+                $inPostPayOrderStatus = self::ORDER_STATUS_REJECTED;
             } else {
                 throw new OrderNotUpdateException();
             }
@@ -93,7 +97,7 @@ class OrderEvent implements OrderEventInterface
         }
 
         $data = [
-            UpdateOrderResponseInterface::ORDER_STATUS => $this->getInPostOrderStatus($order),
+            UpdateOrderResponseInterface::ORDER_STATUS => $inPostPayOrderStatus,
             UpdateOrderResponseInterface::ORDER_MERCHANT_STATUS_DESCRIPTION => $order->getStatusLabel(),
             UpdateOrderResponseInterface::DELIVERY_REFERENCES_LIST => $this->getTrackingNumbers($order)
         ];
@@ -126,10 +130,10 @@ class OrderEvent implements OrderEventInterface
         return $order;
     }
 
-    private function checkInPostPayOrderExist(int $orderId): void
+    private function getInPostPayOrder(int $orderId): InPostPayOrderInterface
     {
         try {
-            $this->inPostPayOrderRepository->getByOrderId($orderId);
+            return $this->inPostPayOrderRepository->getByOrderId($orderId);
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -137,48 +141,16 @@ class OrderEvent implements OrderEventInterface
         }
     }
 
-    private function extractDataFromEventData(array $payload, string $dataName): string
-    {
-        $data = '';
-        if (isset($payload[self::EVENT_DATA]) && is_array($payload[self::EVENT_DATA])) {
-            $eventData = $payload[self::EVENT_DATA];
-            if (isset($eventData[$dataName]) && is_string($eventData[$dataName])) {
-                $data = trim((string)$eventData[$dataName]);
-            }
-        }
-
-        return $data;
-    }
-
-    private function extractPhoneNumber(array $payload): string
-    {
-        $countryPrefix = '';
-        $phoneNumber = '';
-        if (isset($payload[self::PHONE_NUMBER_PARAM]) && is_array($payload[self::PHONE_NUMBER_PARAM])) {
-            $phoneNumberData = $payload[self::PHONE_NUMBER_PARAM];
-            if (isset($phoneNumberData[self::PHONE_PARAM]) && is_string($phoneNumberData[self::PHONE_PARAM])) {
-                $phoneNumber = trim((string)$phoneNumberData[self::PHONE_PARAM]);
-            }
-
-            if (isset($phoneNumberData[self::COUNTRY_PREFIX_PARAM])
-                && is_string($phoneNumberData[self::COUNTRY_PREFIX_PARAM])
-            ) {
-                $countryPrefix = trim((string)$phoneNumberData[self::COUNTRY_PREFIX_PARAM]);
-            }
-        }
-
-        return $countryPrefix . $phoneNumber;
-    }
-
     private function updateOrderPayment(Order $order): void
     {
         if ($order->getStatus() === $this->generalConfigProvider->getNewOrderStatus()) {
             $payment = $order->getPayment();
-            $payment->capture();
-            $order->setIsInProcess(true);
+            if ($payment) {
+                $payment->capture();
+                $order->setIsInProcess(true);
 
-            $this->addOrderCommentAndSave($order);
-            return;
+                return;
+            }
         }
 
         throw new OrderNotUpdateException();
@@ -189,7 +161,7 @@ class OrderEvent implements OrderEventInterface
         if (!$order->isCanceled()) {
             if ($order->canCancel()) {
                 $order->cancel();
-                $this->addOrderCommentAndSave($order);
+
                 return;
             }
         }
@@ -200,10 +172,10 @@ class OrderEvent implements OrderEventInterface
     private function addOrderCommentAndSave(Order $order): void
     {
         $order->addCommentToStatusHistory('Order updated by InPostPay, full request: '
-            . (string)$this->restRequest->getContent());
+            . $this->restRequest->getContent());
 
         $order->setData(self::SKIP_INPOST_PAY_SYNC_FLAG, true);
-        $order = $this->orderRepository->save($order);
+        $this->orderRepository->save($order);
         $this->logger->info(sprintf('Order with ID %s has been updated.', $order->getId()));
     }
 
@@ -219,19 +191,9 @@ class OrderEvent implements OrderEventInterface
         return $trackNumbers;
     }
 
-    private function getInPostOrderStatus(Order $order): string
+    private function updateInPostPayOrderStatus(InPostPayOrderInterface $inPostPayOrder, string $status): void
     {
-        switch ($order->getStatus()) {
-            case Order::STATE_PROCESSING:
-                $orderStatus = self::ORDER_STATUS_PROCESSING;
-                break;
-            case Order::STATE_CANCELED:
-                $orderStatus = self::ORDER_STATUS_REJECTED;
-                break;
-            default:
-                $orderStatus = '';
-        }
-
-        return $orderStatus;
+        $inPostPayOrder->setOrderStatus($status);
+        $this->inPostPayOrderRepository->save($inPostPayOrder);
     }
 }

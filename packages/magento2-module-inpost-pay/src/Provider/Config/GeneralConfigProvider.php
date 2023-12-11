@@ -36,7 +36,7 @@ class GeneralConfigProvider
      */
     public function getNewOrderStatus(): string
     {
-        return $this->scopeConfig->getValue(
+        return (string)$this->scopeConfig->getValue(
             self::XML_PATH_INPOST_PAY_NEW_ORDER_STATUS,
             ScopeInterface::SCOPE_WEBSITE
         );
