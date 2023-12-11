@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
@@ -18,7 +19,10 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
-class OrderEvent implements \InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class OrderEvent implements OrderEventInterface
 {
     public const SKIP_INPOST_PAY_SYNC_FLAG = 'skip_inpost_pay_sync';
     private const PAYMENT_STATUS_AUTHORIZED = 'AUTHORIZED';
