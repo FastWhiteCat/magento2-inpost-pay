@@ -36,9 +36,10 @@ class GeneralConfigProvider
      */
     public function getNewOrderStatus(): string
     {
-        return (string)$this->scopeConfig->getValue(
-            self::XML_PATH_INPOST_PAY_NEW_ORDER_STATUS,
-            ScopeInterface::SCOPE_WEBSITE
-        );
+        $orderStatus = $this->scopeConfig->getValue(
+                self::XML_PATH_INPOST_PAY_NEW_ORDER_STATUS,
+                ScopeInterface::SCOPE_WEBSITE);
+
+        return is_scalar($orderStatus) ? (string)$orderStatus : '';
     }
 }

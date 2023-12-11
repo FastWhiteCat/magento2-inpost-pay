@@ -12,11 +12,9 @@ use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponseFactory;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Exception\LocalizedException;
+use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
@@ -33,9 +31,9 @@ class OrderEvent implements OrderEventInterface
         private readonly RestRequest $restRequest,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly UpdateOrderResponseFactory $updateOrderResponseFactory,
+        private readonly GetOrderByIncrementId $getOrderByIncrementId,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -51,35 +49,9 @@ class OrderEvent implements OrderEventInterface
             /**
              * @var Order $order
              */
-            $order = $this->getOrderByIncrementId($orderId);
-            $orderEntityId = is_scalar($order->getEntityId()) ? (int)$order->getEntityId() : 0;
-            $inPostPayOrder = $this->getInPostPayOrder($orderEntityId);
-
-            $phone = $phoneNumber->getCountryPrefix() . $phoneNumber->getPhone();
-
-            if (($order->getShippingAddress() && $phone !== $order->getShippingAddress()->getTelephone()) ||
-                ($order->getPayment() && $order->getPayment()->getMethod() !== self::INPOST_PAY_METHOD_CODE)
-            ) {
-                throw new NoSuchEntityException(__('Order not found.'));
-            }
-
-            $paymentStatus = $eventData->getPaymentStatus();
-            $orderStatus = $eventData->getOrderStatus();
-
-            if ($paymentStatus === self::PAYMENT_STATUS_AUTHORIZED) {
-                $this->updateOrderPayment($order);
-                $this->addOrderCommentAndSave($order);
-                $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_COMPLETED);
-                $inPostPayOrderStatus = self::ORDER_STATUS_COMPLETED;
-            } elseif ($orderStatus === self::ORDER_STATUS_REJECTED) {
-                $this->updateOrderStatus($order);
-                $this->addOrderCommentAndSave($order);
-                $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_REJECTED);
-                $inPostPayOrderStatus = self::ORDER_STATUS_REJECTED;
-            } else {
-                throw new OrderNotUpdateException();
-            }
-
+            $order = $this->getOrderByIncrementId->get($orderId);
+            $this->checkIfCanProcess($order, $phoneNumber);
+            $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');
             $this->logger->error($e->getMessage());
@@ -89,11 +61,6 @@ class OrderEvent implements OrderEventInterface
             $this->logger->error($e->getMessage());
 
             throw new OrderNotUpdateException();
-        } catch (LocalizedException $e) {
-            $errorMsg = __('Cannot update order. Reason: %1', $e->getMessage());
-            $this->logger->error($errorMsg->render());
-
-            throw new LocalizedException($errorMsg);
         }
 
         $data = [
@@ -105,29 +72,14 @@ class OrderEvent implements OrderEventInterface
         return $this->updateOrderResponseFactory->create(['data' => $data]);
     }
 
-    /**
-     * @param string $incrementId
-     * @return OrderInterface
-     * @throws NoSuchEntityException
-     */
-    private function getOrderByIncrementId(string $incrementId): OrderInterface
+    private function checkIfCanProcess(Order $order, PhoneNumberInterface $phoneNumber): void
     {
-        $criteria = $this->searchCriteriaBuilder
-            ->addFilter(OrderInterface::INCREMENT_ID, $incrementId)
-            ->create();
-        $orders = $this->orderRepository->getList($criteria)->getItems();
-
-        if (count($orders)) {
-            if (current($orders) instanceof OrderInterface) {
-                $order = current($orders);
-            }
+        $phone = $phoneNumber->getCountryPrefix() . $phoneNumber->getPhone();
+        if (($order->getShippingAddress() && $phone !== $order->getShippingAddress()->getTelephone()) ||
+            ($order->getPayment() && $order->getPayment()->getMethod() !== self::INPOST_PAY_METHOD_CODE)
+        ) {
+            throw new NoSuchEntityException(__('Order not found.'));
         }
-
-        if (!isset($order)) {
-            throw new NoSuchEntityException(__('Order #%1 not found.'));
-        }
-
-        return $order;
     }
 
     private function getInPostPayOrder(int $orderId): InPostPayOrderInterface
@@ -141,11 +93,36 @@ class OrderEvent implements OrderEventInterface
         }
     }
 
+    private function updateOrder(Order $order, EventDataInterface $eventData): string
+    {
+        $orderEntityId = is_scalar($order->getEntityId()) ? (int)$order->getEntityId() : 0;
+        $inPostPayOrder = $this->getInPostPayOrder($orderEntityId);
+        $paymentStatus = $eventData->getPaymentStatus();
+        $orderStatus = $eventData->getOrderStatus();
+
+        if ($paymentStatus === self::PAYMENT_STATUS_AUTHORIZED) {
+            $this->updateOrderPayment($order);
+            $this->addOrderCommentAndSave($order);
+            $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_COMPLETED);
+            return self::ORDER_STATUS_COMPLETED;
+        }
+
+        if ($orderStatus === self::ORDER_STATUS_REJECTED) {
+            $this->updateOrderStatus($order);
+            $this->addOrderCommentAndSave($order);
+            $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_REJECTED);
+            return self::ORDER_STATUS_REJECTED;
+        }
+
+        throw new OrderNotUpdateException();
+    }
+
     private function updateOrderPayment(Order $order): void
     {
         if ($order->getStatus() === $this->generalConfigProvider->getNewOrderStatus()) {
             $payment = $order->getPayment();
             if ($payment) {
+                /** @var \Magento\Sales\Model\Order\Payment $payment */
                 $payment->capture();
                 $order->setIsInProcess(true);
 
@@ -176,7 +153,8 @@ class OrderEvent implements OrderEventInterface
 
         $order->setData(self::SKIP_INPOST_PAY_SYNC_FLAG, true);
         $this->orderRepository->save($order);
-        $this->logger->info(sprintf('Order with ID %s has been updated.', $order->getId()));
+        $orderEntityId = is_scalar($order->getEntityId()) ? (int)$order->getEntityId() : 0;
+        $this->logger->info(sprintf('Order with ID %s has been updated.', $orderEntityId));
     }
 
     private function getTrackingNumbers(Order $order): array
