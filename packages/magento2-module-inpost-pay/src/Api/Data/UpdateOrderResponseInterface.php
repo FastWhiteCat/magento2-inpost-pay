@@ -32,12 +32,12 @@ interface UpdateOrderResponseInterface
     public function setOrderMerchantStatusDescription(string $statusDescription): void;
 
     /**
-     * @return array|null
+     * @return string[]|null
      */
     public function getDeliveryReferencesList(): ?array;
 
     /**
-     * @param array $deliveryReferencesList
+     * @param string[] $deliveryReferencesList
      * @return void
      */
     public function setDeliveryReferencesList(array $deliveryReferencesList): void;
