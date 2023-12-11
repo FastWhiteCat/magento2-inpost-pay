@@ -48,6 +48,9 @@ class OrderEvent implements OrderEventInterface
     public function execute(string $orderId): UpdateOrderResponseInterface
     {
         try {
+            /**
+             * @var Order $order
+             */
             $order = $this->getOrderByIncrementId($orderId);
             $this->checkInPostPayOrderExist((int)$order->getId());
 
@@ -81,8 +84,8 @@ class OrderEvent implements OrderEventInterface
         } catch (OrderNotUpdateException $e) {
             $this->logger->error($e->getMessage());
 
-            throw $e;
-        }catch (LocalizedException $e) {
+            throw new OrderNotUpdateException();
+        } catch (LocalizedException $e) {
             $errorMsg = __('Cannot update order. Reason: %1', $e->getMessage());
             $this->logger->error($errorMsg->render());
 
@@ -197,8 +200,7 @@ class OrderEvent implements OrderEventInterface
     private function addOrderCommentAndSave(Order $order): void
     {
         $order->addCommentToStatusHistory('Order updated by InPostPay, full request: '
-            . (string)$this->restRequest->getContent()
-        );
+            . (string)$this->restRequest->getContent());
 
         $order->setData(self::SKIP_INPOST_PAY_SYNC_FLAG, true);
         $order = $this->orderRepository->save($order);

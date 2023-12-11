@@ -17,7 +17,8 @@ class OrderNotUpdateException extends Exception
         $code = 0
     ) {
         if ($phrase === null) {
-            $phrase = new Phrase(self::ORDER_NOT_UPDATE_ERROR_MSG);
+            $msg = self::ORDER_NOT_UPDATE_ERROR_MSG;
+            $phrase = new Phrase($msg);
         }
 
         parent::__construct(
