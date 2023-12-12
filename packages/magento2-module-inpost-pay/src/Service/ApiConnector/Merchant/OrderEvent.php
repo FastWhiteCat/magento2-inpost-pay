@@ -27,8 +27,8 @@ class OrderEvent implements OrderEventInterface
     public const SKIP_INPOST_PAY_SYNC_FLAG = 'skip_inpost_pay_sync';
     private const PAYMENT_STATUS_AUTHORIZED = 'AUTHORIZED';
     private const INPOST_PAY_METHOD_CODE = 'inpost_pay';
-    private const ORDER_STATUS_REJECTED = 'ORDER_REJECTED';
-    private const ORDER_STATUS_COMPLETED = 'ORDER_COMPLETED';
+    public const ORDER_STATUS_REJECTED = 'ORDER_REJECTED';
+    public const ORDER_STATUS_COMPLETED = 'ORDER_COMPLETED';
 
     public function __construct(
         private readonly RestRequest $restRequest,
