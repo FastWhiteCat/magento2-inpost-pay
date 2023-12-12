@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Provider\Config;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class TermsAndConditionsMappingConfigProvider
 {
@@ -27,7 +28,8 @@ class TermsAndConditionsMappingConfigProvider
      */
     public function getTermsAndConditionsMapping(): array
     {
-        $value = $this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING);
+        $value = $this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING,
+            ScopeInterface::SCOPE_STORE);
 
         $termsAndConditions = null;
         if (is_scalar($value)) {
