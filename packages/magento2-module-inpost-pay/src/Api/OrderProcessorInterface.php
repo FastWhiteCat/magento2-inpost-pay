@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api;
 
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -13,9 +13,9 @@ interface OrderProcessorInterface
 {
     /**
      * @param Quote $quote
-     * @param OrderDto $orderDto
+     * @param OrderInterface $inPostOrder
      * @return Order
      * @throws LocalizedException
      */
-    public function execute(Quote $quote, OrderDto $orderDto): Order;
+    public function execute(Quote $quote, OrderInterface $inPostOrder): Order;
 }

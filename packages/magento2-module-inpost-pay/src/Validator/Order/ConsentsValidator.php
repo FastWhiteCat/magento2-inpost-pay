@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Validator\Order;
 
-use InPost\InPostPay\Api\ApiConnector\IziApi\Consent\ConsentFieldInterface as ConsentField;
+use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
-use InPost\InPostPay\Model\Dto\Order as DtoOrder;
-use InPost\InPostPay\Model\Dto\Order\Consent;
+use InPost\InPostPay\Model\Data\Merchant\Order\AcceptedConsent;
 use InPost\InPostPay\Provider\ConsentsProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
@@ -21,30 +21,29 @@ class ConsentsValidator implements OrderValidatorInterface
     ) {
     }
 
-    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, DtoOrder $orderDto): void
+    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
-        $orderConsents = $orderDto->getConsents();
+        $acceptedConsents = $inPostOrder->getConsents();
         foreach ($this->consentsProvider->getConsents() as $configConsent) {
-            $consentId = (string)($configConsent[ConsentField::CONSENT_ID] ?? '');
-            $consentVersion = (string)($configConsent[ConsentField::CONSENT_VERSION] ?? '');
-            $requirementType = $configConsent[ConsentField::REQUIREMENT_TYPE] ?? '';
+            $consentId = (string)($configConsent[AcceptedConsentInterface::CONSENT_ID] ?? '');
+            $consentVersion = (string)($configConsent[AcceptedConsentInterface::CONSENT_VERSION] ?? '');
+            $requirementType = $configConsent[AcceptedConsentInterface::REQUIREMENT_TYPE] ?? '';
             if ($requirementType === TermsAndConditionsRequirements::ALWAYS
                 || $requirementType === TermsAndConditionsRequirements::ONLY_IN_NEW_VERSION
             ) {
                 try {
-                    $this->checkIfAcceptedAndVersion($orderConsents, $consentId, $consentVersion);
+                    $this->checkIfAcceptedAndVersion($acceptedConsents, $consentId, $consentVersion);
                 } catch (LocalizedException $e) {
                     throw new LocalizedException(
                         __('Consents validation failed. Reason: %1', $e->getMessage())
                     );
                 }
-
             }
         }
     }
 
     /**
-     * @param Consent[] $orderConsents
+     * @param AcceptedConsent[] $orderConsents
      * @param string $consentId
      * @param string $version
      * @return void
@@ -65,7 +64,7 @@ class ConsentsValidator implements OrderValidatorInterface
                     );
                 }
 
-                if (!$orderConsent->isAccepted()) {
+                if (!$orderConsent->getIsAccepted()) {
                     throw new LocalizedException(__('Consent %1 has not been accepted.', $consentId));
                 }
             }

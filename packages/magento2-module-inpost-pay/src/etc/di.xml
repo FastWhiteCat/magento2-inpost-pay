@@ -21,6 +21,39 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\ProductAttribute"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Browser"/>
+
+    <preference for="InPost\InPostPay\Api\Data\Merchant\OrderInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AcceptedConsent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AccountInfo"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AddressDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\ClientAddress"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\DeliveryAddress"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\Delivery"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\InvoiceDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails"/>
+
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\QuantityChange"/>
+
+
+
+
+
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
@@ -35,10 +68,14 @@
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
-    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface"
-                type="InPost\InPostPay\Service\ApiConnector\Merchant\Basket"/>
-    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderInterface"
-                type="InPost\InPostPay\Service\ApiConnector\Merchant\Order"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketGet"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketDelete"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
@@ -240,7 +277,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Basket">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketGet">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -250,7 +287,12 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Basket">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketDelete">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -300,7 +342,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Order">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

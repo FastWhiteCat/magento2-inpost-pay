@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
@@ -22,7 +23,15 @@ class ReloadQuoteStep extends OrderProcessingStep implements OrderProcessingStep
         parent::__construct($logger);
     }
 
-    public function process(Quote $quote, OrderDto $orderDto): void
+    /**
+     * @param Quote $quote
+     * @param OrderInterface $inPostOrder
+     * @return void
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         $quote = $this->cartRepository->get($quoteId);

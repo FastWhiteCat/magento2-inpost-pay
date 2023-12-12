@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
-use InPost\InPostPay\Model\Dto\Order\AddressDetails;
-use InPost\InPostPay\Model\Dto\Order\InvoiceDetails;
-use InPost\InPostPay\Model\Dto\Order\PhoneNumber;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Api\BillingAddressManagementInterface;
-use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Api\Data\AddressInterface;
+use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
@@ -27,14 +27,14 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         parent::__construct($logger);
     }
 
-    public function process(Quote $quote, OrderDto $orderDto): void
+    public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
-        $accountAddress = $orderDto->getAccountInfo()->getClientAddress();
-        $invoiceDetails = $orderDto->getInvoiceDetails();
+        $accountAddress = $inPostOrder->getAccountInfo()->getClientAddress();
+        $invoiceDetails = $inPostOrder->getInvoiceDetails();
         /** @var AddressInterface $billingAddress */
         $billingAddress = $this->addressFactory->create();
-        $billingAddress->setEmail($orderDto->getAccountInfo()->getMail());
+        $billingAddress->setEmail($inPostOrder->getAccountInfo()->getMail());
         if ($invoiceDetails) {
             $billingAddress->setFirstname($invoiceDetails->getName());
             $billingAddress->setLastname($invoiceDetails->getSurname());
@@ -45,18 +45,18 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setCity($invoiceDetails->getCity());
             $billingAddress->setPostcode($invoiceDetails->getPostalCode());
             $billingAddress->setCountryId($invoiceDetails->getCountryCode());
-            $billingAddress->setTelephone($this->combinePhoneNumber($orderDto->getAccountInfo()->getPhoneNumber()));
+            $billingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getAccountInfo()->getPhoneNumber()));
             $billingAddress->setVatId($this->combineVatId($invoiceDetails));
         } else {
-            $billingAddress->setFirstname($orderDto->getAccountInfo()->getName());
-            $billingAddress->setLastname($orderDto->getAccountInfo()->getSurname());
+            $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
+            $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
             $billingAddress->setStreet(
-                $this->combineAddressToOneLine($orderDto->getAccountInfo()->getClientAddress()->getAddressDetails())
+                $this->combineAddressToOneLine($inPostOrder->getAccountInfo()->getClientAddress()->getAddressDetails())
             );
             $billingAddress->setCity($accountAddress->getCity());
             $billingAddress->setPostcode($accountAddress->getPostalCode());
             $billingAddress->setCountryId($accountAddress->getCountryCode());
-            $billingAddress->setTelephone($this->combinePhoneNumber($orderDto->getAccountInfo()->getPhoneNumber()));
+            $billingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getAccountInfo()->getPhoneNumber()));
         }
         $quote->setBillingAddress($billingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
@@ -66,7 +66,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $this->createLog(sprintf('Billing address has been applied to quote ID: %s', $quoteId));
     }
 
-    private function combineAddressToOneLine(AddressDetails $addressDetails): string
+    private function combineAddressToOneLine(AddressDetailsInterface $addressDetails): string
     {
         $addressLine = $addressDetails->getStreet();
         $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
@@ -74,7 +74,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
     }
 
-    private function combineInvoiceAddressToOneLine(InvoiceDetails $invoiceDetails): string
+    private function combineInvoiceAddressToOneLine(InvoiceDetailsInterface $invoiceDetails): string
     {
         $addressLine = $invoiceDetails->getStreet();
         $addressNumber = implode('/', [$invoiceDetails->getBuilding(), $invoiceDetails->getFlat()]);
@@ -82,12 +82,12 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
     }
 
-    private function combinePhoneNumber(PhoneNumber $phoneNumber): string
+    private function combinePhoneNumber(PhoneNumberInterface $phoneNumber): string
     {
         return sprintf('%s%s', $phoneNumber->getCountryPrefix(), $phoneNumber->getPhone());
     }
 
-    private function combineVatId(InvoiceDetails $invoiceDetails): string
+    private function combineVatId(InvoiceDetailsInterface $invoiceDetails): string
     {
         return sprintf('%s%s', $invoiceDetails->getTaxIdPrefix(), $invoiceDetails->getTaxId());
     }

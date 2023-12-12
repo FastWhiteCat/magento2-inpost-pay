@@ -10,6 +10,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 
 interface BasketInterface
 {
+    public const BASKET_ID = 'browser_id';
     public const BROWSER_ID = 'browser_id';
     public const SUMMARY = 'summary';
     public const DELIVERY = 'delivery';
@@ -28,6 +29,17 @@ interface BasketInterface
      * @return void
      */
     public function setBrowserId(string|null $browserId): void;
+
+    /**
+     * @return string|null
+     */
+    public function getBasketId(): ?string;
+
+    /**
+     * @param string|null $basketId
+     * @return void
+     */
+    public function setBasketId(string|null $basketId): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface

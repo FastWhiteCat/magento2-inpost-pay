@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -23,12 +23,12 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
         parent::__construct($logger);
     }
 
-    public function process(Quote $quote, OrderDto $orderDto): void
+    public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
         $payment = $quote->getPayment();
         $payment->setMethod(self::INPOST_PAY_PAYMENT_METHOD_CODE);
         $quote->setPayment($payment);
-        $this->addCustomerNote($quote, $orderDto);
+        $this->addCustomerNote($quote, $inPostOrder);
         // @phpstan-ignore-next-line
         $quote->setInventoryProcessed(false);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
@@ -44,13 +44,13 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
         );
     }
 
-    public function addCustomerNote(Quote $quote, OrderDto $orderDto): void
+    public function addCustomerNote(Quote $quote, OrderInterface $inPostOrder): void
     {
         $customerNotes = [];
-        if ($orderDto->getOrderDetails()->getOrderComments()) {
-            $customerNotes[] = $orderDto->getOrderDetails()->getOrderComments();
+        if ($inPostOrder->getOrderDetails()->getOrderComments()) {
+            $customerNotes[] = $inPostOrder->getOrderDetails()->getOrderComments();
         }
-        $invoiceDetails = $orderDto->getInvoiceDetails();
+        $invoiceDetails = $inPostOrder->getInvoiceDetails();
         if ($invoiceDetails && $invoiceDetails->getAdditionalInformation()) {
             $customerNotes[] = $invoiceDetails->getAdditionalInformation();
         }

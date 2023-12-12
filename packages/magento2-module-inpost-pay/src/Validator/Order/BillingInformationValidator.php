@@ -5,24 +5,25 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Validator\Order;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
-use InPost\InPostPay\Model\Dto\Order as DtoOrder;
-use InPost\InPostPay\Model\Dto\Order\AccountInfo;
-use InPost\InPostPay\Model\Dto\Order\ClientAddress;
-use InPost\InPostPay\Model\Dto\Order\InvoiceDetails;
-use InPost\InPostPay\Model\Dto\Order\PhoneNumber;
+use InPost\InPostPay\Enum\InPostInvoiceLegalForm;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 
 class BillingInformationValidator implements OrderValidatorInterface
 {
 
-    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, DtoOrder $orderDto): void
+    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
-        if ($orderDto->getInvoiceDetails()) {
-            $this->validateInvoiceDetails($orderDto->getInvoiceDetails());
+        if ($inPostOrder->getInvoiceDetails()) {
+            $this->validateInvoiceDetails($inPostOrder->getInvoiceDetails());
         } else {
-            $accountInfo = $orderDto->getAccountInfo();
+            $accountInfo = $inPostOrder->getAccountInfo();
             $this->validateName($accountInfo, $inPostPayQuote);
             $this->validateSurname($accountInfo, $inPostPayQuote);
             $this->validatePhoneNumber($accountInfo->getPhoneNumber(), $inPostPayQuote);
@@ -32,12 +33,12 @@ class BillingInformationValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param AccountInfo $accountInfo
+     * @param AccountInfoInterface $accountInfo
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return void
      * @throws LocalizedException
      */
-    private function validateName(AccountInfo $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
+    private function validateName(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
     {
         if ($accountInfo->getName() !== $inPostPayQuote->getName()) {
             throw new LocalizedException(
@@ -51,12 +52,12 @@ class BillingInformationValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param AccountInfo $accountInfo
+     * @param AccountInfoInterface $accountInfo
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return void
      * @throws LocalizedException
      */
-    private function validateSurname(AccountInfo $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
+    private function validateSurname(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
     {
         if ($accountInfo->getSurname() !== $inPostPayQuote->getSurname()) {
             throw new LocalizedException(
@@ -70,13 +71,15 @@ class BillingInformationValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param PhoneNumber $phoneNumber
+     * @param PhoneNumberInterface $phoneNumber
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return void
      * @throws LocalizedException
      */
-    private function validatePhoneNumber(PhoneNumber $phoneNumber, InPostPayQuoteInterface $inPostPayQuote): void
-    {
+    private function validatePhoneNumber(
+        PhoneNumberInterface $phoneNumber,
+        InPostPayQuoteInterface $inPostPayQuote
+    ): void {
         $phoneNumberValue = trim($phoneNumber->getCountryPrefix()) . trim($phoneNumber->getPhone());
         if ($phoneNumberValue !== $inPostPayQuote->getPhoneNumber()) {
             throw new LocalizedException(
@@ -102,11 +105,11 @@ class BillingInformationValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param ClientAddress $clientAddress
+     * @param ClientAddressInterface $clientAddress
      * @return void
      * @throws LocalizedException
      */
-    private function validateBillingAddress(ClientAddress $clientAddress): void
+    private function validateBillingAddress(ClientAddressInterface $clientAddress): void
     {
         $addressDetails = $clientAddress->getAddressDetails();
         if (empty($clientAddress->getCity())
@@ -120,11 +123,11 @@ class BillingInformationValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param InvoiceDetails $invoiceDetails
+     * @param InvoiceDetailsInterface $invoiceDetails
      * @return void
      * @throws LocalizedException
      */
-    private function validateInvoiceDetails(InvoiceDetails $invoiceDetails): void
+    private function validateInvoiceDetails(InvoiceDetailsInterface $invoiceDetails): void
     {
         $this->validateLegalForm($invoiceDetails);
 
@@ -139,26 +142,29 @@ class BillingInformationValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param InvoiceDetails $invoiceDetails
+     * @param InvoiceDetailsInterface $invoiceDetails
      * @return void
      * @throws LocalizedException
      */
-    private function validateLegalForm(InvoiceDetails $invoiceDetails): void
+    private function validateLegalForm(InvoiceDetailsInterface $invoiceDetails): void
     {
-        if ($invoiceDetails->getLegalForm() !== InvoiceDetails::LEGAL_FORM_PERSON
-            && $invoiceDetails->getLegalForm() !== InvoiceDetails::LEGAL_FORM_COMPANY
-        ) {
-            throw new LocalizedException(__('Invalid invoice legal form.'));
-        }
+        switch ($invoiceDetails->getLegalForm()) {
+            case InPostInvoiceLegalForm::PERSON->value:
+                if (empty($invoiceDetails->getName())) {
+                    throw new LocalizedException(__('Empty Name.'));
+                }
+                break;
+            case InPostInvoiceLegalForm::COMPANY->value:
+                if (empty($invoiceDetails->getTaxId())) {
+                    throw new LocalizedException(__('Empty Tax ID.'));
+                }
 
-        if ($invoiceDetails->getLegalForm() === InvoiceDetails::LEGAL_FORM_COMPANY) {
-            if (empty($invoiceDetails->getTaxId())) {
-                throw new LocalizedException(__('Empty Tax ID.'));
-            }
-
-            if (empty($invoiceDetails->getCompanyName())) {
-                throw new LocalizedException(__('Empty Company Name.'));
-            }
+                if (empty($invoiceDetails->getCompanyName())) {
+                    throw new LocalizedException(__('Empty Company Name.'));
+                }
+                break;
+            default:
+                throw new LocalizedException(__('Invalid invoice legal form.'));
         }
     }
 }

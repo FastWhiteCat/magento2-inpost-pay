@@ -47,6 +47,25 @@ class Basket extends DataObject implements BasketInterface, ExtensibleDataInterf
     }
 
     /**
+     * @return string|null
+     */
+    public function getBasketId(): ?string
+    {
+        $basketId = $this->getData(self::BASKET_ID);
+
+        return is_scalar($basketId) ? (string)$basketId : null;
+    }
+
+    /**
+     * @param string|null $basketId
+     * @return void
+     */
+    public function setBasketId(?string $basketId): void
+    {
+        $this->setData(self::BASKET_ID, $basketId);
+    }
+
+    /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface
      */
     public function getSummary(): SummaryInterface

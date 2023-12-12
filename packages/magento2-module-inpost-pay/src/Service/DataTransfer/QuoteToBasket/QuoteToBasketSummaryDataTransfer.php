@@ -6,7 +6,6 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use DateTime;
 use DateTimeZone;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;

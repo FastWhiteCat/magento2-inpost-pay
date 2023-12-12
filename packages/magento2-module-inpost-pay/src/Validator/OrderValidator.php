@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © Fast White Cat S.A. All rights reserved.
- * See LICENSE_FASTWHITECAT for license details.
- */
 
 declare(strict_types=1);
 
@@ -10,10 +6,10 @@ namespace InPost\InPostPay\Validator;
 
 use http\Exception\InvalidArgumentException;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
-use InPost\InPostPay\Model\Dto\Order as DtoOrder;
+use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
-use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 
 class OrderValidator
 {
@@ -31,14 +27,14 @@ class OrderValidator
     /**
      * @param Quote $quote
      * @param InPostPayQuoteInterface $inPostPayQuote
-     * @param DtoOrder $orderDto
+     * @param OrderInterface $inPostOrder
      * @return true on successful order quote validation
      * @throws LocalizedException
      */
-    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, DtoOrder $orderDto): bool
+    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): bool
     {
         foreach ($this->orderValidators as $orderValidator) {
-            $orderValidator->validate($quote, $inPostPayQuote, $orderDto);
+            $orderValidator->validate($quote, $inPostPayQuote, $inPostOrder);
         }
 
         return true;

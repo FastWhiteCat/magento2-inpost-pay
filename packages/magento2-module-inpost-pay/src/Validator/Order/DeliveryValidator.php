@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Validator\Order;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
-use InPost\InPostPay\Model\Dto\Order as DtoOrder;
-use InPost\InPostPay\Model\Dto\Order\Delivery;
-use InPost\InPostPay\Model\Dto\Order\DeliveryAddress;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
-use Magento\Quote\Model\Quote;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
+use Magento\Quote\Model\Quote;
 
 class DeliveryValidator implements OrderValidatorInterface
 {
@@ -27,18 +27,18 @@ class DeliveryValidator implements OrderValidatorInterface
     ) {
     }
 
-    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, DtoOrder $orderDto): void
+    public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
-        $this->validateDeliveryAddress($orderDto->getDelivery()->getDeliveryAddress());
-        $this->validateDeliveryMethod($orderDto->getDelivery(), $quote);
+        $this->validateDeliveryAddress($inPostOrder->getDelivery()->getDeliveryAddress());
+        $this->validateDeliveryMethod($inPostOrder->getDelivery(), $quote);
     }
 
     /**
-     * @param DeliveryAddress $deliveryAddress
+     * @param DeliveryAddressInterface $deliveryAddress
      * @return void
      * @throws LocalizedException
      */
-    private function validateDeliveryAddress(DeliveryAddress $deliveryAddress): void
+    private function validateDeliveryAddress(DeliveryAddressInterface $deliveryAddress): void
     {
         $addressDetails = $deliveryAddress->getAddressDetails();
         if (empty($deliveryAddress->getCity())
@@ -52,12 +52,12 @@ class DeliveryValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param Delivery $delivery
+     * @param DeliveryInterface $delivery
      * @param Quote $quote
      * @return void
      * @throws LocalizedException
      */
-    private function validateDeliveryMethod(Delivery $delivery, Quote $quote): void
+    private function validateDeliveryMethod(DeliveryInterface $delivery, Quote $quote): void
     {
         $deliveryType = $delivery->getDeliveryType();
         if (empty($delivery->getDeliveryCodes())) {
@@ -85,9 +85,7 @@ class DeliveryValidator implements OrderValidatorInterface
             );
         }
 
-        if ($deliveryType === BasketFieldInterface::DELIVERY_TYPE_PICKUP
-            && empty($delivery->getDeliveryPoint())
-        ) {
+        if ($deliveryType === InPostDeliveryType::APM->name && empty($delivery->getDeliveryPoint())) {
             throw new LocalizedException(__('Delivery method %1 requires chosen point.', $deliveryType));
         }
     }

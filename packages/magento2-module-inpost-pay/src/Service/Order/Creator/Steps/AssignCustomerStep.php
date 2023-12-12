@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -21,11 +21,11 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
         parent::__construct($logger);
     }
 
-    public function process(Quote $quote, OrderDto $orderDto): void
+    public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
         // @phpstan-ignore-next-line
         $quoteCustomerId = (int)$quote->getCustomer()->getId();
-        $email = $orderDto->getAccountInfo()->getMail();
+        $email = $inPostOrder->getAccountInfo()->getMail();
         $websiteId = (int)$quote->getStore()->getWebsiteId();
         try {
             $customer = $this->customerRepository->get($email, $websiteId);

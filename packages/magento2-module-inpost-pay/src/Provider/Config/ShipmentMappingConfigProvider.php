@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
+use InPost\InPostPay\Enum\InPostDeliveryOption;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
@@ -12,11 +14,6 @@ class ShipmentMappingConfigProvider
     public const DEFAULT_DELIVERY_DEADLINE = 7;
 
     public const OPTION_STANDARD = 'STANDARD';
-    public const OPTION_WEEKEND_DELIVERY = 'PWW';
-    public const OPTION_CASH_ON_DELIVERY = 'COD';
-    public const OPTION_CASH_ON_DELIVERY_WEEKEND = 'CODPWW';
-    public const DELIVERY_TYPE_APM = 'APM';
-    public const DELIVERY_TYPE_COURIER = 'COURIER';
     private const XML_PATH_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
     private const XML_PATH_DELIVERY_DEADLINE_IN_DAYS = 'payment/inpost_pay/delivery_deadline_in_days';
     private const XML_PATH_FREE_SHIPPING_ENABLED_PATTERN = 'carriers/%s/free_shipping_enable';
@@ -53,12 +50,16 @@ class ShipmentMappingConfigProvider
 
     public function getAllDeliveryTypes(): array
     {
-        return [self::DELIVERY_TYPE_APM, self::DELIVERY_TYPE_COURIER];
+        return [InPostDeliveryType::APM->name, InPostDeliveryType::COURIER->name];
     }
 
     public function getNonStandardDeliveryOptions(): array
     {
-        return [self::OPTION_WEEKEND_DELIVERY, self::OPTION_CASH_ON_DELIVERY, self::OPTION_CASH_ON_DELIVERY_WEEKEND];
+        return [
+            InPostDeliveryOption::COD->name,
+            InPostDeliveryOption::PWW->name,
+            InPostDeliveryOption::CODPWW->name
+        ];
     }
 
     public function isFreeShippingEnabledForCarrier(string $code, string $method = ''): bool

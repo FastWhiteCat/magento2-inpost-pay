@@ -8,7 +8,6 @@ use Exception;
 use InPost\InPostPay\Service\Converter\InPostBasketToArrayConverter;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
@@ -47,9 +46,9 @@ class CreateOrUpdateBasket
         /** @var BasketInterface $basket */
         $basket = $this->basketFactory->create();
         $basket->setBrowserId($browserId);
+        $basket->setBasketId($basketId);
         $this->quoteToBasketDataTransfer->transfer($quote, $basket);
         $basketData = $this->inPostBasketToArrayConverter->convert($basket);
-        $basketData[Basket::BASKET_ID] = $basketId;
 
         $request->setParams($basketData);
 

@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Service\Cart\CartService;
@@ -26,15 +26,15 @@ class DeliveryMethodStep extends OrderProcessingStep implements OrderProcessingS
 
     /**
      * @param Quote $quote
-     * @param OrderDto $orderDto
+     * @param OrderInterface $inPostOrder
      * @return void
      * @throws InPostPayInvalidConfigurationException
      */
-    public function process(Quote $quote, OrderDto $orderDto): void
+    public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
-        $deliveryType = $orderDto->getDelivery()->getDeliveryType();
-        if ($orderDto->getDelivery()->getDeliveryCodes()) {
-            $deliveryOption = implode('', $orderDto->getDelivery()->getDeliveryCodes());
+        $deliveryType = $inPostOrder->getDelivery()->getDeliveryType();
+        if ($inPostOrder->getDelivery()->getDeliveryCodes()) {
+            $deliveryOption = implode('', $inPostOrder->getDelivery()->getDeliveryCodes());
         } else {
             $deliveryOption = ShipmentMappingConfigProvider::OPTION_STANDARD;
         }

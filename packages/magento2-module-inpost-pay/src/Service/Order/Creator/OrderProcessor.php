@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Creator;
 
-use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
+use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
-use InPost\InPostPay\Model\Dto\Order as OrderDto;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartManagementInterface;
@@ -43,21 +43,21 @@ class OrderProcessor implements OrderProcessorInterface
 
     /**
      * @param Quote $quote
-     * @param OrderDto $orderDto
+     * @param OrderInterface $inPostOrder
      * @return Order
      * @throws LocalizedException
      */
-    public function execute(Quote $quote, OrderDto $orderDto): Order
+    public function execute(Quote $quote, OrderInterface $inPostOrder): Order
     {
         try {
             foreach ($this->orderProcessingSteps as $orderProcessingStep) {
-                $orderProcessingStep->process($quote, $orderDto);
+                $orderProcessingStep->process($quote, $inPostOrder);
             }
 
             $order = $this->createOrderFromQuote($quote);
 
             foreach ($this->orderPostProcessingSteps as $orderPostProcessingStep) {
-                $orderPostProcessingStep->process($order, $orderDto);
+                $orderPostProcessingStep->process($order, $inPostOrder);
             }
 
             $this->logger->info(
