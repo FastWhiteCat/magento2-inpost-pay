@@ -43,8 +43,10 @@ class UpdateOrder
         $status = null;
         if (!$inPostPayOrder->getOrderStatus()) {
             $status = $this->getInPostPayOrderStatus($order->getStatus());
-            $inPostPayOrder->setOrderStatus($status);
-            $this->inPostPayOrderRepository->save($inPostPayOrder);
+            if ($status) {
+                $inPostPayOrder->setOrderStatus($status);
+                $this->inPostPayOrderRepository->save($inPostPayOrder);
+            }
         }
 
         $request->setParams([
@@ -84,7 +86,7 @@ class UpdateOrder
         return $trackNumbers;
     }
 
-    private function getInPostPayOrderStatus($status): ?string
+    private function getInPostPayOrderStatus(string $status): ?string
     {
         switch ($status) {
             case Order::STATE_CANCELED:
