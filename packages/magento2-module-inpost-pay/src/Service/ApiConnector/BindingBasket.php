@@ -106,21 +106,20 @@ class BindingBasket
     public function deleteBinding(
         string $basketId,
         bool $ifBasketRealized = false
-    ) {
+    ):void {
         /** @var BasketBindingDeleteRequest $request */
         $request = $this->basketBindingDeleteRequestFactory->create();
 
         $params = [];
         $params['basket_id'] = $basketId;
-        if ($ifBasketRealized)
-        {
+        if ($ifBasketRealized) {
             $params['if_basket_realized'] = $ifBasketRealized;
         }
 
         $request->setParams($params);
 
         try {
-            return $this->connector->sendRequest($request);
+            $this->connector->sendRequest($request);
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
