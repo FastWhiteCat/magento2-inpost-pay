@@ -7,6 +7,8 @@ namespace InPost\InPostPay\Service\ApiConnector;
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
+use InPost\InPostPay\Model\IziApi\Request\BasketBindingDeleteRequest;
+use InPost\InPostPay\Model\IziApi\Request\BasketBindingDeleteRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequest;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
@@ -23,6 +25,7 @@ class BindingBasket
         private readonly BasketBindingRequestFactory $basketBindingRequestFactory,
         private readonly BasketBindingVerifyRequestFactory $basketBindingVerifyRequest,
         private readonly BasketInformationResponseFactory $basketInformationResponseFactory,
+        private readonly BasketBindingDeleteRequestFactory $basketBindingDeleteRequestFactory,
         private readonly GetBasketId $getBasketId,
         private readonly LoggerInterface $logger
     ) {
@@ -94,6 +97,32 @@ class BindingBasket
             return $this->handle($result);
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with binding basket. Details: %1', $e->getMessage());
+            $this->logger->critical($errorMsg->render());
+
+            throw new LocalizedException($errorMsg);
+        }
+    }
+
+    public function deleteBinding(
+        string $basketId,
+        bool $ifBasketRealized = false
+    ) {
+        /** @var BasketBindingDeleteRequest $request */
+        $request = $this->basketBindingDeleteRequestFactory->create();
+
+        $params = [];
+        $params['basket_id'] = $basketId;
+        if ($ifBasketRealized)
+        {
+            $params['if_basket_realized'] = $ifBasketRealized;
+        }
+
+        $request->setParams($params);
+
+        try {
+            return $this->connector->sendRequest($request);
+        } catch (Exception $e) {
+            $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
 
             throw new LocalizedException($errorMsg);
