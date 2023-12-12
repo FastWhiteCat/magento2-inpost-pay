@@ -28,8 +28,10 @@ class TermsAndConditionsMappingConfigProvider
      */
     public function getTermsAndConditionsMapping(): array
     {
-        $value = $this->scopeConfig->getValue(self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING,
-            ScopeInterface::SCOPE_STORE);
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING,
+            ScopeInterface::SCOPE_STORE
+        );
 
         $termsAndConditions = null;
         if (is_scalar($value)) {

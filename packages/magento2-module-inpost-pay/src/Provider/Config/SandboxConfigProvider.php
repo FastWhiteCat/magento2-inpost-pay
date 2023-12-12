@@ -25,7 +25,9 @@ class SandboxConfigProvider
      */
     public function isSandboxEnabled(): bool
     {
-        return $this->scopeConfig->isSetFlag(self::XML_PATH_SANDBOX_ENABLED,
-            ScopeInterface::SCOPE_WEBSITE);
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_SANDBOX_ENABLED,
+            ScopeInterface::SCOPE_WEBSITE
+        );
     }
 }

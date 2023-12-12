@@ -34,8 +34,10 @@ class ShipmentMappingConfigProvider
      */
     public function getCarrierMethodCodeForInPostCourier(): string
     {
-        $carrier = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER,
-            ScopeInterface::SCOPE_WEBSITE);
+        $carrier = $this->scopeConfig->getValue(
+            self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER,
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInvalidConfigurationException(__('InPost Courier not mapped'));
@@ -52,8 +54,10 @@ class ShipmentMappingConfigProvider
      */
     public function getCarrierMethodCodeForInPostPickup(): string
     {
-        $carrier = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP,
-            ScopeInterface::SCOPE_WEBSITE);
+        $carrier = $this->scopeConfig->getValue(
+            self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP,
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInvalidConfigurationException(__('InPost Paczkomat 24/7 not mapped'));
@@ -83,8 +87,10 @@ class ShipmentMappingConfigProvider
             $methodCode = sprintf('%s', $code);
         }
 
-        $subtotalValue = $this->scopeConfig->getValue(sprintf($configPattern, $methodCode),
-            ScopeInterface::SCOPE_WEBSITE);
+        $subtotalValue = $this->scopeConfig->getValue(
+            sprintf($configPattern, $methodCode),
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         return is_scalar($subtotalValue) ? round((float)$subtotalValue, 2) : null;
     }
