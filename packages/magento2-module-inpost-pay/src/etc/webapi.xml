@@ -28,7 +28,7 @@
     <route url="/v1/izi/order/:orderId/event" method="POST">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface" method="execute"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
 
