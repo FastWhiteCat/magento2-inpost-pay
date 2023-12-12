@@ -14,22 +14,18 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
-use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BasketConfirmation implements BasketConfirmationInterface
 {
     private const REQUEST_PREFIX = 'BASKET_CONFIRMATION_REQUEST';
-    private const RESPONSE_PREFIX = 'BASKET_CONFIRMATION_RESPONSE';
 
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
-        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
@@ -63,11 +59,7 @@ class BasketConfirmation implements BasketConfirmationInterface
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-            $payload = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
-            $payload = is_array($payload) ? $payload : [];
-
-            $logMessage = sprintf('Confirmation for Basket ID: %s', $basketId);
-            $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage, $payload);
+            $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
 
             $inPostPayQuote->setStatus($status);
             $inPostPayQuote->setInpostBasketId($inpostBasketId);
@@ -79,8 +71,6 @@ class BasketConfirmation implements BasketConfirmationInterface
             $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
-
-            $this->logger->info(sprintf('Basket ID %s has been confirmed.', $inPostPayQuote->getBasketId()));
         } catch (LocalizedException $e) {
             $errorMsg = __('Cannot confirm basket. Reason: %1', $e->getMessage());
             $this->logger->error($errorMsg->render());
@@ -89,7 +79,13 @@ class BasketConfirmation implements BasketConfirmationInterface
         }
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($quote, $basket);
-        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basket->getData());
+        $this->createRequestDebugLog(
+            sprintf(
+                'Basket ID %s has been confirmed with status: %s',
+                $inPostPayQuote->getBasketId(),
+                $status
+            )
+        );
 
         return $basket;
     }
@@ -132,10 +128,8 @@ class BasketConfirmation implements BasketConfirmationInterface
         }
     }
 
-    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    private function createRequestDebugLog(string $message): void
     {
-        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
-        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
-        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
+        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

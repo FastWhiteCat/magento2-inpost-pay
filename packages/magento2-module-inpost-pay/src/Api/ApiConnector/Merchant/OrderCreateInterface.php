@@ -10,6 +10,10 @@ use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface as OrderDataInterface;
 
+/**
+ * InPost Pay Order service that allows to create order from bound basket and passed parameters.
+ * @api
+ */
 interface OrderCreateInterface
 {
     /**

@@ -35,6 +35,7 @@ interface AcceptedConsentInterface
 
     /**
      * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getIsAccepted(): bool;
 

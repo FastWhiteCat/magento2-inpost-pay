@@ -18,26 +18,22 @@ use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDataTransfer;
 use InPost\InPostPay\Validator\OrderValidator;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OrderCreate implements OrderCreateInterface
 {
-    private const REQUEST_PREFIX = 'ORDER_REQUEST';
-    private const RESPONSE_PREFIX = 'ORDER_RESPONSE';
+    private const REQUEST_PREFIX = 'ORDER_CREATE_REQUEST';
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
-        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly OrderValidator $orderValidator,
@@ -63,11 +59,9 @@ class OrderCreate implements OrderCreateInterface
         DeliveryInterface $delivery,
         array $consents,
         ?InvoiceDetailsInterface $invoiceDetails = null
-    ): OrderInterface
-    {
+    ): OrderInterface {
         try {
-            $requestParams = (array)$this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
-            $this->createRequestDebugLog(self::REQUEST_PREFIX,  'Order creating...', $requestParams);
+            $this->createRequestDebugLog('Creating order...');
             $basketId = $orderDetails->getBasketId();
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($basketId);
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
@@ -122,17 +116,14 @@ class OrderCreate implements OrderCreateInterface
     private function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         $this->orderValidator->validate($quote, $inPostPayQuote, $inPostOrder);
-        $this->createRequestDebugLog(self::REQUEST_PREFIX,  'Order data valid.');
+        $this->createRequestDebugLog('Order data valid.');
     }
 
     private function createOrderFromQuote(Quote $quote, OrderInterface $inPostOrder): Order
     {
         $order = $this->orderProcessor->execute($quote, $inPostOrder);
 
-        $this->createRequestDebugLog(
-            self::REQUEST_PREFIX,
-            sprintf('Order Created: #%s', (string)$order->getIncrementId())
-        );
+        $this->createRequestDebugLog(sprintf('Order Created: #%s', (string)$order->getIncrementId()));
 
         return $order;
     }
@@ -142,19 +133,12 @@ class OrderCreate implements OrderCreateInterface
         /** @var OrderInterface $inPostOrder */
         $inPostOrder = $this->orderFactory->create();
         $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
-        $this->createRequestDebugLog(
-            self::RESPONSE_PREFIX,
-            sprintf('InPost Order prepared for Basket ID: %s', $inPostOrder->getOrderDetails()->getBasketId()),
-            $inPostOrder->getData()
-        );
 
         return $inPostOrder;
     }
 
-    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    private function createRequestDebugLog(string $message): void
     {
-        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
-        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
-        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
+        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

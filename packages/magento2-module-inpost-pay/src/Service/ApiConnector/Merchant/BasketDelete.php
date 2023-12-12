@@ -7,16 +7,13 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
 use Psr\Log\LoggerInterface;
 
 class BasketDelete implements BasketDeleteInterface
 {
     private const REQUEST_PREFIX = 'BASKET_DELETE_REQUEST';
-    private const RESPONSE_PREFIX = 'BASKET_DELETE_RESPONSE';
 
     public function __construct(
-        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly LoggerInterface $logger
     ) {
@@ -27,8 +24,7 @@ class BasketDelete implements BasketDeleteInterface
      */
     public function execute(string $basketId): void
     {
-        $logMessage = sprintf('Delete Basket ID: %s', $basketId);
-        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage);
+        $this->createRequestDebugLog(sprintf('Deleting Basket ID: %s', $basketId));
 
         try {
             $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
@@ -37,13 +33,11 @@ class BasketDelete implements BasketDeleteInterface
             throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
         }
 
-        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage);
+        $this->createRequestDebugLog(sprintf('Deleted Basket ID: %s', $basketId));
     }
 
-    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    private function createRequestDebugLog(string $message): void
     {
-        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
-        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
-        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
+        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

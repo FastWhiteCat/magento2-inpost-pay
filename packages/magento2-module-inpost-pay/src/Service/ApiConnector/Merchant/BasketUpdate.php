@@ -14,22 +14,18 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magento\Framework\Serialize\Serializer\Base64Json as Base64JsonSerializer;
-use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BasketUpdate implements BasketUpdateInterface
 {
     private const REQUEST_PREFIX = 'BASKET_UPDATE_REQUEST';
-    private const RESPONSE_PREFIX = 'BASKET_UPDATE_RESPONSE';
 
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
-        private readonly Base64JsonSerializer $base64JsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartService $cartService,
@@ -59,17 +55,15 @@ class BasketUpdate implements BasketUpdateInterface
     ): BasketInterface {
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-        $requestParams = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
-        $requestParams = is_array($requestParams) ? $requestParams : [];
-
-        $logMessage = sprintf(
-            'Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
-            $basketId,
-            $eventId,
-            $eventDataTime,
-            $eventType
+        $this->createRequestDebugLog(
+            sprintf(
+                'Updating basket. Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
+                $basketId,
+                $eventId,
+                $eventDataTime,
+                $eventType
+            )
         );
-        $this->createRequestDebugLog(self::REQUEST_PREFIX, $logMessage, $requestParams);
 
         if (!empty($quantityEventData)) {
             foreach ($quantityEventData as $productQuantity) {
@@ -88,8 +82,7 @@ class BasketUpdate implements BasketUpdateInterface
         $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
-
-        $this->createRequestDebugLog(self::RESPONSE_PREFIX, $logMessage, $basket->getData());
+        $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 
         return $basket;
     }
@@ -143,10 +136,8 @@ class BasketUpdate implements BasketUpdateInterface
         return (isset($quote) && $quote instanceof Quote) ? $quote : null;
     }
 
-    private function createRequestDebugLog(string $logPrefix, string $message, array $data = []): void
+    private function createRequestDebugLog(string $message): void
     {
-        $serializedData = ($data) ? $this->base64JsonSerializer->serialize($data) : '';
-        $dataLabel = ($logPrefix === self::REQUEST_PREFIX) ? 'Payload' : 'Response';
-        $this->logger->debug(sprintf('%s: %s %s: %s', $logPrefix, $message, $dataLabel, $serializedData));
+        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

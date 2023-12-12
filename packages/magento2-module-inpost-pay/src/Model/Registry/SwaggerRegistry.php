@@ -20,7 +20,7 @@ class SwaggerRegistry
     /**
      * @return bool
      */
-    public function getIsAllowed(): bool
+    public function isAllowed(): bool
     {
         return $this->isAllowed;
     }

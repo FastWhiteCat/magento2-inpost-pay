@@ -9,8 +9,17 @@ use Magento\Sales\Model\Order;
 
 class OrderToInPostOrderDataTransfer
 {
+    /**
+     * @param Order $order
+     * @param InPostOrderInterface $inPostOrder
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function transfer(Order $order, InPostOrderInterface $inPostOrder): void
     {
         $orderDetails = $inPostOrder->getOrderDetails();
+        $orderDetails->setOrderComments(
+            'TODO in INPAY-18::transfer data from Magento Order into InPostOrder'
+        );
     }
 }

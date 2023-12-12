@@ -164,7 +164,6 @@ class BasketPriceValidator implements OrderValidatorInterface
         $quoteAvailableShippingMethods = $this->getQuoteAvailableShippingMethods($quote, $inPostOrder);
         $deliveryType = $inPostOrder->getDelivery()->getDeliveryType();
         $deliveryOption = $this->getSelectedDeliveryOption($inPostOrder);
-        $mappedShippingMethod = null;
         try {
             $mappedMethodCode = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
                 $deliveryType,
@@ -181,9 +180,10 @@ class BasketPriceValidator implements OrderValidatorInterface
                 }
             }
         } catch (InPostPayInvalidConfigurationException $e) {
+            $mappedShippingMethod = null;
         }
 
-        if ($mappedShippingMethod === null) {
+        if (empty($mappedShippingMethod)) {
             throw new LocalizedException(
                 __(
                     'Selected shipping method is not available [%s %s].',
@@ -215,6 +215,7 @@ class BasketPriceValidator implements OrderValidatorInterface
         $shippingAddress = $quote->getShippingAddress();
         $shippingAddress->setCountryId($countryId);
 
+        // @phpstan-ignore-next-line
         return $this->shippingManager->estimateByExtendedAddress($quoteId, $shippingAddress);
     }
 }

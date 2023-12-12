@@ -9,7 +9,6 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
-use InPost\InPostPay\Model\Data\Merchant\Order\AcceptedConsent;
 use InPost\InPostPay\Provider\ConsentsProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
@@ -43,7 +42,7 @@ class ConsentsValidator implements OrderValidatorInterface
     }
 
     /**
-     * @param AcceptedConsent[] $orderConsents
+     * @param AcceptedConsentInterface[] $orderConsents
      * @param string $consentId
      * @param string $version
      * @return void

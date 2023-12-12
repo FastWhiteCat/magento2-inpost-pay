@@ -25,7 +25,6 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Browser"/>
-
     <preference for="InPost\InPostPay\Api\Data\Merchant\OrderInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface"
@@ -44,16 +43,10 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Order\InvoiceDetails"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails"/>
-
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\QuantityChange"/>
-
-
-
-
-
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"

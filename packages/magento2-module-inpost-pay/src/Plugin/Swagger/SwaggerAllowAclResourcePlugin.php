@@ -27,7 +27,7 @@ class SwaggerAllowAclResourcePlugin
      */
     public function afterIsAllowed(Authorization $subject, bool $result, array $aclResources): bool
     {
-        if ($result === false && $this->swaggerRegistry->getIsAllowed()) {
+        if ($result === false && $this->swaggerRegistry->isAllowed()) {
             if (in_array(SignatureValidationPolicyPlugin::INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE, $aclResources)) {
                 $result = true;
             }

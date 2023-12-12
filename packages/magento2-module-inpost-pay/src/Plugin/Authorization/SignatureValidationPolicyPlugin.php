@@ -46,7 +46,7 @@ class SignatureValidationPolicyPlugin
         ?string $privilege
     ): bool {
         if ($resourceId === self::INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE
-            && !$this->swaggerRegistry->getIsAllowed()
+            && !$this->swaggerRegistry->isAllowed()
             && $this->isSignatureValid()
         ) {
             $result = true;
@@ -61,7 +61,6 @@ class SignatureValidationPolicyPlugin
      */
     protected function isSignatureValid(): bool
     {
-        return true;
         $endpoint = $this->restRequest->getRequestUri();
         $requestSignature = (string)$this->restRequest->getHeader(self::X_SIGNATURE_HEADER, '');
         $requestSignatureTimestamp = (string)$this->restRequest->getHeader(self::X_SIGNATURE_TIMESTAMP_HEADER, '');

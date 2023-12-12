@@ -11,6 +11,7 @@ interface BrowserInterface
 
     /**
      * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getBrowserTrusted(): bool;
 

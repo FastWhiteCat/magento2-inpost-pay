@@ -11,6 +11,7 @@ class Browser extends DataObject implements BrowserInterface
 {
     /**
      * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getBrowserTrusted(): bool
     {

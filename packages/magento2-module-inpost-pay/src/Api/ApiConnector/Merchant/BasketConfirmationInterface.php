@@ -8,6 +8,10 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
 
+/**
+ * InPost Pay Basket service for confirming bound basket.
+ * @api
+ */
 interface BasketConfirmationInterface
 {
     /**

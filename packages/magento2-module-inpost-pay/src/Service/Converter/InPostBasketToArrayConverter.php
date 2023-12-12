@@ -20,6 +20,7 @@ class InPostBasketToArrayConverter
     public function convert(BasketInterface $basket): array
     {
         try {
+            // @phpstan-ignore-next-line
             $data = $this->extensibleDataObjectConverter->toNestedArray($basket, [], BasketInterface::class);
         } catch (Exception $e) {
             $this->logger->error(sprintf('Could not convert Basket to array. Reason: %s', $e->getMessage()));

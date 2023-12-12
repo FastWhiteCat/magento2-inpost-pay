@@ -43,7 +43,7 @@ interface DeliveryInterface
     public function getDeliveryOptions(): array;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface[] $deliveryDate
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface[] $deliveryOptions
      * @return void
      */
     public function setDeliveryOptions(array $deliveryOptions): void;
