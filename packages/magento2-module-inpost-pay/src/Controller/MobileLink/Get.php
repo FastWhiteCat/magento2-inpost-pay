@@ -21,6 +21,8 @@ use Psr\Log\LoggerInterface;
 
 class Get implements HttpGetActionInterface
 {
+    private const MOBILE_LINK = 'inpost://izilink?basket_id=';
+    private const SANDBOX_MOBILE_LINK = 'inpost://izilinksandbox?basket_id=';
     private readonly ManagerInterface $messageManager;
     private readonly RedirectFactory $resultRedirectFactory;
     private readonly RequestInterface $request;
@@ -61,9 +63,9 @@ class Get implements HttpGetActionInterface
 
                 if (isset($result['inpost_basket_id'])) {
                     if ($this->sandboxConfigProvider->isSandboxEnabled()) {
-                        $link = 'inpost://izilinksandbox?basket_id=' . $result['inpost_basket_id'];
+                        $link = self::SANDBOX_MOBILE_LINK . $result['inpost_basket_id'];
                     } else {
-                        $link = 'inpost://izilink?basket_id=' . $result['inpost_basket_id'];
+                        $link = self::MOBILE_LINK . $result['inpost_basket_id'];
                     }
 
                     $data = ['link' => $link];

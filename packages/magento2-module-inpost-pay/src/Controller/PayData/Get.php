@@ -63,22 +63,12 @@ class Get implements HttpPostActionInterface
 
                 if (isset($params['browser']) && isset($params['binding_place'])) {
                     $browser = $this->base64serializer->unserialize($params['browser']);
-
-                    $browserArray = [
-                        "user_agent" => $browser['user_agent'] ?? '',
-                        "description" => $browser['description'] ?? '',
-                        "platform" => $browser['platform'] ?? '',
-                        "architecture" => $browser['architecture'] ?? '',
-                        "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
-                        "location" => "-",
-                        "customer_ip" => $this->request->getClientIp(),
-                        "port" => $this->request->getServer('SERVER_PORT')
-                    ];
+                    $browserData = $this->prepareBrowserData($browser);
 
                     $result = $this->bindingBasket->bindBasket(
                         (int)$quote->getId(),
                         $params['binding_place'],
-                        $browserArray,
+                        $browserData,
                         $params['prefix'] ?? null,
                         $params['number'] ?? null
                     );
@@ -92,5 +82,18 @@ class Get implements HttpPostActionInterface
 
 
         return $this->response->representJson($this->serializer->serialize($data));
+    }
+
+    private function prepareBrowserData(array $browser): array{
+        return  [
+            "user_agent" => $browser['user_agent'] ?? '',
+            "description" => $browser['description'] ?? '',
+            "platform" => $browser['platform'] ?? '',
+            "architecture" => $browser['architecture'] ?? '',
+            "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
+            "location" => "-",
+            "customer_ip" => $this->request->getClientIp(),
+            "port" => $this->request->getServer('SERVER_PORT')
+        ];
     }
 }

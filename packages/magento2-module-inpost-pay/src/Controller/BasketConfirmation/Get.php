@@ -46,13 +46,11 @@ class Get implements HttpGetActionInterface
 
             return $this->response->representJson($this->serializer->serialize($data));
         }
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('test');
         $data = [];
 
         try {
             $quote = $this->checkoutSession->getQuote();
-            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('$quote');
-            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug($quote->getId());
+
             if ($quote->getId()) {
                 $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$quote->getId());
 
@@ -69,14 +67,10 @@ class Get implements HttpGetActionInterface
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             $data = [
-                'errorMessage' => __('Basket not found!')->render()
-            ];
-
-            $data = [
                 'action' => 'retry'
             ];
         }
-        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug(print_r($data, true));
+
         return $this->response->representJson($this->serializer->serialize($data));
     }
 
