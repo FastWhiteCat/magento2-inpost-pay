@@ -42,7 +42,8 @@ class UpdateOrder
 
         $status = null;
         if (!$inPostPayOrder->getOrderStatus()) {
-            $status = $this->getInPostPayOrderStatus($order->getStatus());
+            $orderStatus = is_scalar($order->getStatus()) ? (string)$order->getStatus() : '';
+            $status = $this->getInPostPayOrderStatus($orderStatus);
             if ($status) {
                 $inPostPayOrder->setOrderStatus($status);
                 $this->inPostPayOrderRepository->save($inPostPayOrder);
