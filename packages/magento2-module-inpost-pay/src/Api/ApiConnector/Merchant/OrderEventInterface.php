@@ -14,7 +14,7 @@ interface OrderEventInterface
      * @param string $orderId
      * @param string $eventId
      * @param string $eventDataTime
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface $phoneNumber
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface|null $phoneNumber
      * @param \InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface $eventData
      * @return \InPost\InPostPay\Api\Data\UpdateOrderResponseInterface
      */
@@ -22,7 +22,7 @@ interface OrderEventInterface
         string $orderId,
         string $eventId,
         string $eventDataTime,
-        PhoneNumberInterface $phoneNumber,
-        EventDataInterface $eventData
+        EventDataInterface $eventData,
+        ?PhoneNumberInterface $phoneNumber = null
     ): UpdateOrderResponseInterface;
 }
