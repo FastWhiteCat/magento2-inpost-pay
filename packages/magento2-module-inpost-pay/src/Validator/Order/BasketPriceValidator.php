@@ -169,29 +169,28 @@ class BasketPriceValidator implements OrderValidatorInterface
                 $deliveryType,
                 $deliveryOption
             );
-            foreach ($quoteAvailableShippingMethods as $shippingMethod) {
-                $allowedMethodCode = sprintf(
-                    '%s_%s',
-                    $shippingMethod->getCarrierCode(),
-                    $shippingMethod->getMethodCode()
-                );
-                if ($shippingMethod instanceof ShippingMethodInterface && $allowedMethodCode === $mappedMethodCode) {
-                    return $shippingMethod;
-                }
-            }
         } catch (InPostPayInvalidConfigurationException $e) {
-            $mappedShippingMethod = null;
+            $mappedMethodCode = null;
         }
 
-        if (empty($mappedShippingMethod)) {
-            throw new LocalizedException(
-                __(
-                    'Selected shipping method is not available [%s %s].',
-                    $deliveryType,
-                    $deliveryOption
-                )
+        foreach ($quoteAvailableShippingMethods as $shippingMethod) {
+            $allowedMethodCode = sprintf(
+                '%s_%s',
+                $shippingMethod->getCarrierCode(),
+                $shippingMethod->getMethodCode()
             );
+            if ($shippingMethod instanceof ShippingMethodInterface && $allowedMethodCode === $mappedMethodCode) {
+                return $shippingMethod;
+            }
         }
+
+        throw new LocalizedException(
+            __(
+                'Selected shipping method is not available [%s %s].',
+                $deliveryType,
+                $deliveryOption
+            )
+        );
     }
 
     private function getSelectedDeliveryOption(OrderInterface $inPostOrder): string

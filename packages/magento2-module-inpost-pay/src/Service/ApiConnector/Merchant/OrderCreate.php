@@ -95,7 +95,7 @@ class OrderCreate implements OrderCreateInterface
         array $consents,
         ?InvoiceDetailsInterface $invoiceDetails = null
     ): OrderInterface {
-        /** @var OrderInterface $preValidatedInPostOrder */
+        /** @var OrderInterface $inPostOrder */
         $inPostOrder = $this->orderFactory->create();
         $inPostOrder->setOrderDetails($orderDetails);
         $inPostOrder->setAccountInfo($accountInfo);
