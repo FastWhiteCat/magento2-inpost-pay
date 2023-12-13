@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Provider\Config;
 
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class AuthConfigProvider
 {
@@ -35,7 +36,8 @@ class AuthConfigProvider
             sprintf(
                 self::XML_PATH_CLIENT_ID,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
-            )
+            ),
+            ScopeInterface::SCOPE_WEBSITE
         );
 
         if (empty($clientId) || !is_scalar($clientId)) {
@@ -57,7 +59,8 @@ class AuthConfigProvider
             sprintf(
                 self::XML_PATH_CLIENT_SECRET,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
-            )
+            ),
+            ScopeInterface::SCOPE_WEBSITE
         );
 
         if (empty($clientSecret) || !is_scalar($clientSecret)) {
@@ -79,7 +82,8 @@ class AuthConfigProvider
             sprintf(
                 self::XML_PATH_AUTH_TOKEN_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
-            )
+            ),
+            ScopeInterface::SCOPE_WEBSITE
         );
 
         if (empty($authTokenUrl) || !is_scalar($authTokenUrl)) {

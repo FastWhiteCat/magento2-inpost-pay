@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Provider\Config;
 
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class IziApiConfigProvider
 {
@@ -36,7 +37,8 @@ class IziApiConfigProvider
             sprintf(
                 self::XML_PATH_IZI_API_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
-            )
+            ),
+            ScopeInterface::SCOPE_WEBSITE
         );
 
         if (empty($iziApiUrl) || !is_scalar($iziApiUrl)) {
