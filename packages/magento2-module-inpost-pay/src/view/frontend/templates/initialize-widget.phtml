@@ -15,11 +15,14 @@ $bindingPlace = $block->getBindingPlace();
 $isInPostCartPaired = false;
 $clientName = "John";
 $clientPhoneNumber = "123123123";
-$name = $isInPostCartPaired ? $clientName : "";
-$maskedPhoneNumber = $isInPostCartPaired ? $clientPhoneNumber : "";
-$isProductPage = $widgetViewModel->isEnabledOnProductCart() && $bindingPlace === DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME;
-$isCartPage = $widgetViewModel->isEnabledOnCart() && $bindingPlace === DisplayConfigProvider::BASKET_SUMMARY_BINDING_PLACE_NAME;
+$name = "";
+$maskedPhoneNumber = "";
+$isProductPage = $widgetViewModel->isEnabledOnProductCart() &&
+    $bindingPlace === DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME;
+$isCartPage = $widgetViewModel->isEnabledOnCart() &&
+    $bindingPlace === DisplayConfigProvider::BASKET_SUMMARY_BINDING_PLACE_NAME;
 $productId = $isProductPage ? $block->getRequest()->getParam('id') : "";
+$productId = is_scalar($productId) ? (string)$productId : "";
 $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
@@ -30,22 +33,22 @@ $cartId = $block->getQuoteId();
     <inpost-thank-you/>
 <?php else: ?>
     <inpost-izi-button
-        name="<?= $name ?>"
-        masked_phone_number="<?= $maskedPhoneNumber ?>"
-        data-product-id="<?= $productId ?>"
-        language="<?= $language ?>"
-        variant="<?= $layoutConfig['variant'] ?>"
-        basket="<?= $isCartPage ? 'true' : 'false' ?>"
-        dark_mode="<?= $layoutConfig['darkMode'] ?>"
-        count="<?= $cartItemsCount ?>"
-        binding_place="<?= $bindingPlace ?>">
+        name="<?= /* @noEscape */ $name ?>"
+        masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
+        data-product-id="<?= /* @noEscape */ $productId ?>"
+        language="<?= /* @noEscape */ $language ?>"
+        variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
+        basket="<?= /* @noEscape */ $isCartPage ? 'true' : 'false' ?>"
+        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ?>"
+        count="<?= /* @noEscape */ $cartItemsCount ?>"
+        binding_place="<?= /* @noEscape */ $bindingPlace ?>">
     </inpost-izi-button>
 
     <script type="text/x-magento-init">
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "cartId": "<?= $cartId ?>"
+                    "cartId": "<?= /* @noEscape */ $cartId ?>"
                 }
             }
         }

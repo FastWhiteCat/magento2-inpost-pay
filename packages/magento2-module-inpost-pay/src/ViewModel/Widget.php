@@ -16,9 +16,6 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 
 class Widget implements ArgumentInterface
 {
-    private ResolverInterface $localeResolver;
-    private CheckoutSession $checkoutSession;
-
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
 
@@ -33,12 +30,9 @@ class Widget implements ArgumentInterface
         private readonly LayoutConfigProvider $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
         private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
-        ResolverInterface                      $localeResolver,
-        CheckoutSession                        $checkoutSession
-    )
-    {
-        $this->localeResolver = $localeResolver;
-        $this->checkoutSession = $checkoutSession;
+        private readonly ResolverInterface $localeResolver,
+        private readonly CheckoutSession $checkoutSession
+    ) {
     }
 
     /**
@@ -47,8 +41,9 @@ class Widget implements ArgumentInterface
     public function getCurrentLanguageCode(): string
     {
         $currentCode = $this->localeResolver->getLocale();
+        $currentCode = explode('_', $currentCode);
 
-        return strstr($currentCode, '_', true);
+        return is_array($currentCode) && isset($currentCode[0]) ? $currentCode[0] : '';
     }
 
     /**
@@ -87,9 +82,7 @@ class Widget implements ArgumentInterface
     public function getCartItemsCount(): float|int
     {
         try {
-            $quote = $this->checkoutSession->getQuote();
-
-            return $quote->getItemsSummaryQty();
+            return $this->checkoutSession->getQuote()->getItemsSummaryQty();
         } catch (NoSuchEntityException|LocalizedException $e) {
             return 0;
         }
@@ -102,12 +95,13 @@ class Widget implements ArgumentInterface
     {
         try {
             $quote = $this->checkoutSession->getQuote();
-            if ($quote->getId()) {
+            $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : null;
+            if ($quoteId) {
                 if ($quote->getCustomerIsGuest()) {
-                    return $this->quoteIdToMaskedQuoteId->execute((int)$quote->getId());
+                    return $this->quoteIdToMaskedQuoteId->execute($quoteId);
                 }
 
-                return $quote->getId();
+                return (string)$quoteId;
             }
 
             return "";

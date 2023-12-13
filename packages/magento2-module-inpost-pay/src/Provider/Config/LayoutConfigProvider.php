@@ -15,9 +15,7 @@ class LayoutConfigProvider
     /**
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig
-    )
+    public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
     }
 
@@ -26,7 +24,12 @@ class LayoutConfigProvider
      */
     public function getColorVariant(): string
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_COLOR_VARIANT);
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_COLOR_VARIANT,
+            ScopeInterface::SCOPE_STORE
+        );
+
+        return is_scalar($value) ? (string)$value : '';
     }
 
     /**
