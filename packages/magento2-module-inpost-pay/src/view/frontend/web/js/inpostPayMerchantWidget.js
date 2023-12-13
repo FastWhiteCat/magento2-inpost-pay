@@ -21,9 +21,8 @@ define([
     return Component.extend({
         initialize: function (config) {
             this._super();
-            var isWidgetInitialized = window.iziGetPayData && window.iziGetPayData && window.iziGetBrowserData && window.iziMobileLink;
 
-            if (isWidgetInitialized) return;
+            if (this.isWidgetInitialized()) return;
 
             window.iziCanBeBound = this.iziCanBeBound;
             window.iziGetPayData = this.iziGetPayData;
@@ -43,6 +42,10 @@ define([
             }
 
             this.bindEvents();
+        },
+
+        isWidgetInitialized: function () {
+            return window.iziGetPayData && window.iziGetPayData && window.iziGetBrowserData && window.iziMobileLink;
         },
 
         iziCanBeBound: function (productId) {
