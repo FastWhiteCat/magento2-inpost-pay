@@ -22,6 +22,7 @@ $isProductPage = $widgetViewModel->isEnabledOnProductCart() &&
 $isCartPage = $widgetViewModel->isEnabledOnCart() &&
     $bindingPlace === DisplayConfigProvider::BASKET_SUMMARY_BINDING_PLACE_NAME;
 $productId = $isProductPage ? $block->getRequest()->getParam('id') : "";
+$productId = is_scalar($productId) ? (string)$productId : "";
 $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
@@ -47,7 +48,7 @@ $cartId = $block->getQuoteId();
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "cartId": "<?= $cartId ?>"
+                    "cartId": "<?= /* @noEscape */ $cartId ?>"
                 }
             }
         }

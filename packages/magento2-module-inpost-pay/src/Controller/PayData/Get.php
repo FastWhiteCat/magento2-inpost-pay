@@ -45,11 +45,11 @@ class Get implements HttpPostActionInterface
     {
         if (!$this->formKeyValidator->validate($this->request)) {
             $this->messageManager->addErrorMessage(
-                __('Your session has expired')
+                __('Your session has expired')->render()
             );
             $data = ['errorMessage' => __('Your session has expired')];
 
-            return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
+            return $this->jsonFactory->create()->setData($data);
         }
 
         $data = [];
@@ -62,7 +62,10 @@ class Get implements HttpPostActionInterface
 
                 if (isset($params['browser']) && isset($params['binding_place'])) {
                     $browser = $this->base64serializer->unserialize($params['browser']);
-                    $browserData = $this->prepareBrowserData($browser);
+                    $browserData = [];
+                    if (is_array($browser)) {
+                        $browserData = $this->prepareBrowserData($browser);
+                    }
 
                     $result = $this->bindingBasket->bindBasket(
                         (int)$quote->getId(),
@@ -79,7 +82,7 @@ class Get implements HttpPostActionInterface
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
 
-        return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
+        return $this->jsonFactory->create()->setData($data);
     }
 
     private function prepareBrowserData(array $browser): array

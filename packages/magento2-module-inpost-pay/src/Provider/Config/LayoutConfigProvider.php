@@ -15,15 +15,18 @@ class LayoutConfigProvider
     /**
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(private readonly ScopeConfigInterface $scopeConfig) {
-    }
+    public function __construct(private readonly ScopeConfigInterface $scopeConfig)
+    {}
 
     /**
      * @return string
      */
     public function getColorVariant(): string
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_COLOR_VARIANT);
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_COLOR_VARIANT,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**

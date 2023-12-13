@@ -13,7 +13,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
 
 class Get implements HttpGetActionInterface
@@ -29,7 +28,6 @@ class Get implements HttpGetActionInterface
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly CheckoutSession $checkoutSession,
         private readonly Validator $formKeyValidator,
-        private readonly SerializerInterface $serializer,
         private readonly JsonFactory $jsonFactory,
         private readonly LoggerInterface $logger
     ) {
@@ -45,7 +43,7 @@ class Get implements HttpGetActionInterface
             );
             $data = ['errorMessage' => __('Your session has expired')];
 
-            return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
+            return $this->jsonFactory->create()->setData($data);
         }
 
         $data = [];
