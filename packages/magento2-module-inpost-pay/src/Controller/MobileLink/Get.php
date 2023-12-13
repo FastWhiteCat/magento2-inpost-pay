@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Controller\MobileLink;
 
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
-use InPost\InPostPay\Service\ApiConnector\BindingBasket;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -24,7 +24,7 @@ class Get implements HttpGetActionInterface
 
     public function __construct(
         Context $context,
-        private readonly BindingBasket $bindingBasket,
+        private readonly BasketBindingCheck $basketBindingCheck,
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly CheckoutSession $checkoutSession,
         private readonly Validator $formKeyValidator,
@@ -52,7 +52,7 @@ class Get implements HttpGetActionInterface
 
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
-                $result = $this->bindingBasket->checkBinding($quoteId);
+                $result = $this->basketBindingCheck->execute($quoteId);
 
                 if (isset($result['inpost_basket_id'])) {
                     if ($this->sandboxConfigProvider->isSandboxEnabled()) {

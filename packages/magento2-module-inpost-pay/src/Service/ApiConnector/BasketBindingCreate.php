@@ -6,62 +6,26 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
-use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
-use InPost\InPostPay\Model\IziApi\Request\BasketBindingDeleteRequest;
-use InPost\InPostPay\Model\IziApi\Request\BasketBindingDeleteRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequest;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequestFactory;
-use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Model\IziApi\Response\BasketInformationResponse;
 use InPost\InPostPay\Model\IziApi\Response\BasketInformationResponseFactory;
 use InPost\InPostPay\Service\GetBasketId;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
-class BindingBasket
+class BasketBindingCreate
 {
     public function __construct(
         private readonly ConnectorInterface $connector,
         private readonly BasketBindingRequestFactory $basketBindingRequestFactory,
-        private readonly BasketBindingVerifyRequestFactory $basketBindingVerifyRequest,
         private readonly BasketInformationResponseFactory $basketInformationResponseFactory,
-        private readonly BasketBindingDeleteRequestFactory $basketBindingDeleteRequestFactory,
         private readonly GetBasketId $getBasketId,
         private readonly LoggerInterface $logger
     ) {
     }
 
-    /**
-     * @param int $quoteId
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function checkBinding(int $quoteId): array
-    {
-        $basketId = $this->getBasketId->get($quoteId);
-
-        if (!$basketId) {
-            return ['browser_trusted' => false, 'basket_linked' => false];
-        }
-
-        /** @var PublicKeyRequest $request */
-        $request = $this->basketBindingVerifyRequest->create();
-
-        $request->setParams([
-            'basket_id' => $basketId,
-        ]);
-
-        try {
-            return $this->connector->sendRequest($request);
-        } catch (Exception $e) {
-            $errorMsg = __('There was a problem with binding checking. Details: %1', $e->getMessage());
-            $this->logger->critical($errorMsg->render());
-
-            throw new LocalizedException($errorMsg);
-        }
-    }
-
-    public function bindBasket(
+    public function execute(
         int $quoteId,
         string $bindingPlace,
         array $browser,
@@ -82,7 +46,7 @@ class BindingBasket
             $params['phone_number'] = [
                 'country_prefix' => $prefix,
                 'phone' => $phoneNumber,
-                ];
+            ];
             $params['binding_method'] = 'PHONE';
         } else {
             $params['binding_method'] = 'DEEP_LINK';
@@ -97,31 +61,6 @@ class BindingBasket
             return $this->handle($result);
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with binding basket. Details: %1', $e->getMessage());
-            $this->logger->critical($errorMsg->render());
-
-            throw new LocalizedException($errorMsg);
-        }
-    }
-
-    public function deleteBinding(
-        string $basketId,
-        bool $ifBasketRealized = false
-    ):void {
-        /** @var BasketBindingDeleteRequest $request */
-        $request = $this->basketBindingDeleteRequestFactory->create();
-
-        $params = [];
-        $params['basket_id'] = $basketId;
-        if ($ifBasketRealized) {
-            $params['if_basket_realized'] = $ifBasketRealized;
-        }
-
-        $request->setParams($params);
-
-        try {
-            $this->connector->sendRequest($request);
-        } catch (Exception $e) {
-            $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
 
             throw new LocalizedException($errorMsg);
