@@ -18,6 +18,9 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get implements HttpPostActionInterface
 {
     public const DEFAULT_DATE_FORMAT = "Y-m-d\TH:i:s.000\Z";
@@ -25,6 +28,9 @@ class Get implements HttpPostActionInterface
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         Context $context,
         private readonly BindingBasket $bindingBasket,
@@ -56,8 +62,10 @@ class Get implements HttpPostActionInterface
         try {
             $quote = $this->checkoutSession->getQuote();
             if ($quote->getId()) {
-                $this->quoteRepository->getActive((int)$quote->getId());
+                $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+                $this->quoteRepository->getActive($quoteId);
 
+                // @phpstan-ignore-next-line
                 $params = $this->serializer->unserialize($this->request->getContent());
 
                 if (isset($params['browser']) && isset($params['binding_place'])) {
@@ -94,7 +102,9 @@ class Get implements HttpPostActionInterface
             "architecture" => $browser['architecture'] ?? '',
             "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             "location" => "-",
+            // @phpstan-ignore-next-line
             "customer_ip" => $this->request->getClientIp(),
+            // @phpstan-ignore-next-line
             "port" => $this->request->getServer('SERVER_PORT')
         ];
     }
