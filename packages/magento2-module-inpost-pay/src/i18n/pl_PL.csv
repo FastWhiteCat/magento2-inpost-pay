@@ -10,6 +10,9 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
+"Network problem: ","Problem z siecią: ",module,InPost_InPostPay
+"Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
+"Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
 "New Order Status","Status Nowego Zamówienia",module,InPost_InPostPay
 "Payment from Applicable Countries","Akceptacja Płatności z Krajów",module,InPost_InPostPay
 "Payment from Specific Countries","Akceptacja Płatności z Wymienionych Krajów",module,InPost_InPostPay
@@ -69,6 +72,14 @@
 "No Coupon is required.","Kod Rabatowy nie jest wymagany.",module,InPost_InPostPay
 "There was a problem with basket request. Details: %1","Wystąpił problem z żądaniem synchronizacji koszyka InPost Pay. Szczegóły: %1",module,InPost_InPostPay
 "No delivery method is allowed for this basket.","Brak metod dostawy dostępnych dla tego koszyka InPost Pay",module,InPost_InPostPay
+"Display Settings","Ustawienia wyświetlania",module,InPost_InPostPay
+"Show on product cart","Pokaż na karcie produktu",module,InPost_InPostPay
+"Show on cart","Pokaż na koszyku",module,InPost_InPostPay
+"Show in minicart","Pokaż w minikoszyku",module,InPost_InPostPay
+"Show on thank you page","Pokaż na stronie z podziękowaniami",module,InPost_InPostPay
+"Button Layout Settings","Ustawienia układu przycisków",module,InPost_InPostPay
+"Default value of the button color variant","Domyślna wartość wariantu kolorystycznego przycisku",module,InPost_InPostPay
+"Widget dark mode enabled by default","Domyślnie włączony tryb ciemny widgetu",module,InPost_InPostPay
 "Signature validation failed!","Weryfikacja sygnatury nie przebiegła pomyślnie!",module,InPost_InPostPay
 "Basket status has not been confirmed. Expected: %1 Received: %2","Status koszyka nie został potwierdzony. Oczekiwany: %1 Otrzymany: %2",module,InPost_InPostPay
 "Masked phone number: %1 is not same as in merchant quote ID: %2.","Maska numeru telefonu: %1 różni się od tej zapisanej w koszyku sklepu o ID: %2.",module,InPost_InPostPay
