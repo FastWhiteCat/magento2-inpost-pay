@@ -76,7 +76,7 @@ class Get implements HttpPostActionInterface
                     }
 
                     $result = $this->bindingBasket->bindBasket(
-                        (int)$quote->getId(),
+                        $quoteId,
                         $params['binding_place'],
                         $browserData,
                         $params['prefix'] ?? null,

@@ -49,7 +49,8 @@ class Get implements HttpGetActionInterface
             $quote = $this->checkoutSession->getQuote();
 
             if ($quote->getId()) {
-                $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$quote->getId());
+                $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+                $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
 
                 $data = [
                     'message' => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
