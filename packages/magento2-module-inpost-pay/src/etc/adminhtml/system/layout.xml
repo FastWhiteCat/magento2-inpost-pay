@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_layout" translate="label" type="text" sortOrder="20"
+           showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Button Layout Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="widget_color_variant" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Default value of the button color variant</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ColorVariant</source_model>
+            <config_path>payment/inpost_pay/widget_color_variant</config_path>
+        </field>
+        <field id="widget_dark_mode" translate="label" type="select" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Widget dark mode enabled by default</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/widget_dark_mode</config_path>
+        </field>
+    </group>
+</include>
