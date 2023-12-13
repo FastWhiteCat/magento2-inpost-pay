@@ -26,7 +26,7 @@ class GeneralConfigProvider
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_INPOST_PAY_ENABLED,
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_WEBSITE
         );
     }
 }

@@ -8,6 +8,7 @@ use InPost\InPostPay\Enum\InPostDeliveryOption;
 use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class ShipmentMappingConfigProvider
 {
@@ -37,7 +38,7 @@ class ShipmentMappingConfigProvider
     {
         $carrierConfigPattern = self::XML_PATH_DELIVERY_MAPPING_PATTERN;
         $carrierConfigPath = sprintf($carrierConfigPattern, strtolower($deliveryType), strtolower($option));
-        $carrier = $this->scopeConfig->getValue($carrierConfigPath);
+        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_WEBSITE);
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInvalidConfigurationException(
@@ -83,7 +84,10 @@ class ShipmentMappingConfigProvider
             $methodCode = sprintf('%s', $code);
         }
 
-        $subtotalValue = $this->scopeConfig->getValue(sprintf($configPattern, $methodCode));
+        $subtotalValue = $this->scopeConfig->getValue(
+            sprintf($configPattern, $methodCode),
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         return is_scalar($subtotalValue) ? round((float)$subtotalValue, 2) : null;
     }
