@@ -15,8 +15,8 @@ $bindingPlace = $block->getBindingPlace();
 $isInPostCartPaired = false;
 $clientName = "John";
 $clientPhoneNumber = "123123123";
-$name = $isInPostCartPaired ? $clientName : "";
-$maskedPhoneNumber = $isInPostCartPaired ? $clientPhoneNumber : "";
+$name = "";
+$maskedPhoneNumber = "";
 $isProductPage = $widgetViewModel->isEnabledOnProductCart() &&
     $bindingPlace === DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME;
 $isCartPage = $widgetViewModel->isEnabledOnCart() &&
