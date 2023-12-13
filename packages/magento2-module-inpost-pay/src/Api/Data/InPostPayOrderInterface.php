@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Api\Data;
 
 use Magento\Framework\Exception\LocalizedException;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;;
 
 interface InPostPayOrderInterface
 {
@@ -14,8 +15,8 @@ interface InPostPayOrderInterface
     public const ORDER_ID = 'order_id';
     public const LOCKER_ID = 'locker_id';
     public const ORDER_STATUS = 'order_status';
-    public const PREFIX = 'prefix';
-    public const PHONE_NUMBER = 'phone_number';
+    public const COUNTRY_PREFIX = 'country_prefix';
+    public const PHONE = 'phone';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -32,10 +33,11 @@ interface InPostPayOrderInterface
     public function setLockerId(string $lockerId): InPostPayOrderInterface;
     public function getOrderStatus(): ?string;
     public function setOrderStatus(string $orderStatus): InPostPayOrderInterface;
-    public function getPhoneNumber(): ?string;
-    public function setPhoneNumber(string $phoneNumber): InPostPayOrderInterface;
-    public function getPrefix(): ?string;
-    public function setPrefix(string $prefix): InPostPayOrderInterface;
+    public function getPhone(): ?string;
+    public function setPhone(string $phone): InPostPayOrderInterface;
+    public function getCountryPrefix(): ?string;
+    public function setCountryPrefix(string $countryPrefix): InPostPayOrderInterface;
+    public function getPhoneNumber(): PhoneNumberInterface;
 
     /**
      * @return string

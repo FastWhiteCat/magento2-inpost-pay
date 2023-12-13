@@ -5,13 +5,32 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
     protected $_eventPrefix = InPostPayOrderInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayOrderInterface::ENTITY_NAME;
+
+    private ?PhoneNumberInterface $phoneNumber;
+
+    public function __construct(
+        Context $context,
+        Registry $registry,
+        private readonly PhoneNumberInterfaceFactory $phoneNumberInterfaceFactory,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
 
     public function _construct(): void
     {
@@ -70,28 +89,40 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::ORDER_STATUS, $orderStatus);
     }
 
-    public function getPhoneNumber(): ?string
+    public function getPhone(): ?string
     {
-        $phoneNumber = ($this->hasData(self::PHONE_NUMBER)) ? $this->getData(self::PHONE_NUMBER) : null;
+        $phone = ($this->hasData(self::PHONE)) ? $this->getData(self::PHONE) : null;
 
-        return ($phoneNumber && is_scalar($phoneNumber)) ? (string)$phoneNumber : null;
+        return ($phone && is_scalar($phone)) ? (string)$phone : null;
     }
 
-    public function setPhoneNumber(string $phoneNumber): InPostPayOrderInterface
+    public function setPhone(string $phone): InPostPayOrderInterface
     {
-        return $this->setData(self::PHONE_NUMBER, $phoneNumber);
+        return $this->setData(self::PHONE, $phone);
     }
 
-    public function getPrefix(): ?string
+    public function getCountryPrefix(): ?string
     {
-        $prefix = ($this->hasData(self::PREFIX)) ? $this->getData(self::PREFIX) : null;
+        $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
 
-        return ($prefix && is_scalar($prefix)) ? (string)$prefix : null;
+        return ($countryPrefix && is_scalar($countryPrefix)) ? (string)$countryPrefix : null;
     }
 
-    public function setPrefix(string $prefix): InPostPayOrderInterface
+    public function setCountryPrefix(string $countryPrefix): InPostPayOrderInterface
     {
-        return $this->setData(self::PREFIX, $prefix);
+        return $this->setData(self::COUNTRY_PREFIX, $countryPrefix);
+    }
+
+    public function getPhoneNumber(): PhoneNumberInterface
+    {
+        if (!$this->phoneNumber) {
+            $this->phoneNumber = $this->phoneNumberInterfaceFactory->create();
+        }
+
+        $this->phoneNumber->setPhone($this->getPhone());
+        $this->phoneNumber->setCountryPrefix($this->getCountryPrefix());
+
+        return $this->phoneNumber;
     }
 
     public function getCreatedAt(): string

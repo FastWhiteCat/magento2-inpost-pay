@@ -41,6 +41,6 @@ class GeneralConfigProvider
             ScopeInterface::SCOPE_WEBSITE
         );
 
-        return is_scalar($orderStatus) ? (string)$orderStatus : '';
+        return is_scalar($orderStatus) ? (string)$orderStatus : 'pending';
     }
 }
