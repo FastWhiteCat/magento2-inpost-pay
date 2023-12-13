@@ -3,20 +3,26 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="after.body.start">
-            <block class="InPost\InPostPay\Block\Script" name="inpost.init.script.minicart"
+            <block name="inpost.init.script.minicart"
                    template="InPost_InPostPay::initialize-script.phtml"
                    ifconfig="payment/inpost_pay/show_in_minicart">
                 <arguments>
-                    <argument name="binding_place" xsi:type="string">BASKET_POPUP</argument>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="script_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Script</argument>
                 </arguments>
             </block>
         </referenceBlock>
         <referenceBlock name="minicart.addons">
-            <block class="InPost\InPostPay\Block\Widget" name="inpost.init.widget.minicart"
+            <block name="inpost.init.widget.minicart"
                    template="InPost_InPostPay::initialize-widget.phtml" after="-"
                    ifconfig="payment/inpost_pay/show_in_minicart">
                 <arguments>
-                    <argument name="binding_place" xsi:type="string">BASKET_POPUP</argument>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
                 </arguments>
             </block>
         </referenceBlock>

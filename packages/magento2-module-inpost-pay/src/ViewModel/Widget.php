@@ -2,36 +2,37 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Block;
+namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
-use Magento\Backend\Block\Template;
-use Magento\Backend\Block\Template\Context;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 
-class Widget extends Template
+class Widget implements ArgumentInterface
 {
+    private ResolverInterface $localeResolver;
+    private CheckoutSession $checkoutSession;
+
+    private const VARIANT = 'variant';
+    private const DARK_MODE = 'darkMode';
+
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
-     * @param Context $context
-     * @param array $data
      */
     public function __construct(
-        private readonly LayoutConfigProvider $layoutConfigProvider,
+        private readonly LayoutConfigProvider  $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
-        ResolverInterface $localeResolver,
-        CheckoutSession $checkoutSession,
-        Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
+        ResolverInterface                      $localeResolver,
+        CheckoutSession                        $checkoutSession,
+    )
+    {
         $this->localeResolver = $localeResolver;
         $this->checkoutSession = $checkoutSession;
     }
@@ -55,8 +56,8 @@ class Widget extends Template
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
 
         return [
-            'variant' => $variant,
-            'darkMode' => $darkMode
+            self::VARIANT => $variant,
+            self::DARK_MODE => $darkMode
         ];
     }
 
@@ -89,8 +90,12 @@ class Widget extends Template
             return 0;
         }
     }
+
+    /**
+     * @return int
+     */
     public function getProductId(): int
     {
-       return (int)$this->getRequest()->getParam('id');
+        return (int)$this->getRequest()->getParam('id');
     }
 }
