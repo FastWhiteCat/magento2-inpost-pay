@@ -10,6 +10,8 @@ use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
+use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
+
 use Magento\Checkout\Model\Session as CheckoutSession;
 
 class Widget implements ArgumentInterface
@@ -25,12 +27,14 @@ class Widget implements ArgumentInterface
      * @param DisplayConfigProvider $displayConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
+     * @param QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
      */
     public function __construct(
-        private readonly LayoutConfigProvider  $layoutConfigProvider,
+        private readonly LayoutConfigProvider $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
+        private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
         ResolverInterface                      $localeResolver,
-        CheckoutSession                        $checkoutSession,
+        CheckoutSession                        $checkoutSession
     )
     {
         $this->localeResolver = $localeResolver;
@@ -92,10 +96,23 @@ class Widget implements ArgumentInterface
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getProductId(): int
+    public function getQuoteId(): string
     {
-        return (int)$this->getRequest()->getParam('id');
+        try {
+            $quote = $this->checkoutSession->getQuote();
+            if ($quote->getId()) {
+                if ($quote->getCustomerIsGuest()) {
+                    return $this->quoteIdToMaskedQuoteId->execute((int)$quote->getId());
+                }
+
+                return $quote->getId();
+            }
+
+            return "";
+        } catch (NoSuchEntityException|LocalizedException $e) {
+            return "";
+        }
     }
 }

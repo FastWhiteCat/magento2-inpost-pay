@@ -23,6 +23,7 @@ $productId = $isProductPage ? $block->getRequest()->getParam('id') : "";
 $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
+$cartId = $block->getQuoteId();
 ?>
 
 <?php if ($bindingPlace === DisplayConfigProvider::THANK_YOU_PAGE_BINDING_PLACE_NAME): ?>
@@ -39,4 +40,14 @@ $layoutConfig = $widgetViewModel->getLayoutConfig();
         count="<?= $cartItemsCount ?>"
         binding_place="<?= $bindingPlace ?>">
     </inpost-izi-button>
+
+    <script type="text/x-magento-init">
+        {
+            "*" : {
+                "InpostPayMerchantWidget" : {
+                    "cartId": "<?= $cartId ?>"
+                }
+            }
+        }
+    </script>
 <?php endif;

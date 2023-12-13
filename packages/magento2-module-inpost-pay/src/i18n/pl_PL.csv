@@ -10,6 +10,9 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
+"Network problem: ","Problem z siecią: ",module,InPost_InPostPay
+"Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
+"Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
 "New Order Status","Status Nowego Zamówienia",module,InPost_InPostPay
 "Payment from Applicable Countries","Akceptacja Płatności z Krajów",module,InPost_InPostPay
 "Payment from Specific Countries","Akceptacja Płatności z Wymienionych Krajów",module,InPost_InPostPay
