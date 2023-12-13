@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Provider\Config;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class SandboxConfigProvider
 {
@@ -24,6 +25,9 @@ class SandboxConfigProvider
      */
     public function isSandboxEnabled(): bool
     {
-        return $this->scopeConfig->isSetFlag(self::XML_PATH_SANDBOX_ENABLED);
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_SANDBOX_ENABLED,
+            ScopeInterface::SCOPE_WEBSITE
+        );
     }
 }

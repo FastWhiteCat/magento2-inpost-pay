@@ -23,22 +23,6 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestPayData" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestMobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetMobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\MobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
-    <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
     <preference for="InPost\InPostPay\Api\Data\UpdateOrderResponseInterface"
@@ -211,22 +195,17 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
+    <type name="InPost\InPostPay\Controller\MobileLink\Get">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation">
+    <type name="InPost\InPostPay\Controller\PayData\Get">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Model\Widget\Basket\GetMobileLink">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent">
+    <type name="InPost\InPostPay\Controller\BasketConfirmation\Get">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

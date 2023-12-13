@@ -45,8 +45,8 @@ class OrderEvent implements OrderEventInterface
         string $orderId,
         string $eventId,
         string $eventDataTime,
-        PhoneNumberInterface $phoneNumber,
-        EventDataInterface $eventData
+        EventDataInterface $eventData,
+        ?PhoneNumberInterface $phoneNumber = null
     ): UpdateOrderResponseInterface {
         try {
             /**
@@ -75,12 +75,17 @@ class OrderEvent implements OrderEventInterface
         return $this->updateOrderResponseFactory->create(['data' => $data]);
     }
 
-    private function checkIfCanProcess(Order $order, PhoneNumberInterface $phoneNumber): void
+    private function checkIfCanProcess(Order $order, ?PhoneNumberInterface $phoneNumber): void
     {
-        $phone = $phoneNumber->getCountryPrefix() . $phoneNumber->getPhone();
-        if (($order->getShippingAddress() && $phone !== $order->getShippingAddress()->getTelephone()) ||
-            ($order->getPayment() && $order->getPayment()->getMethod() !== self::INPOST_PAY_METHOD_CODE)
-        ) {
+        if ($phoneNumber) {
+            $phone = $phoneNumber->getCountryPrefix() . $phoneNumber->getPhone();
+
+            if ($order->getShippingAddress() && $phone !== $order->getShippingAddress()->getTelephone()) {
+                throw new NoSuchEntityException(__('Order not found.'));
+            }
+        }
+
+        if ($order->getPayment() && $order->getPayment()->getMethod() !== self::INPOST_PAY_METHOD_CODE) {
             throw new NoSuchEntityException(__('Order not found.'));
         }
     }
