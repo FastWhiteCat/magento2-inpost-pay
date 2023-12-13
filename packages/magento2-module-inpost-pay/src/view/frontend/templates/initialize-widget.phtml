@@ -3,9 +3,11 @@
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 
 /**
- * @var InPost\InPostPay\Block\Widget $block
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
  */
 
+$widgetViewModel = $block->getData('widget_view_model');
 $bindingPlace = $block->getBindingPlace();
 
 //TODO - INPAY-11(FE) - Provide a parameter e.g. isInPostCartPaired, if carts (magento and inpay) are paired
@@ -15,15 +17,15 @@ $clientName = "John";
 $clientPhoneNumber = "123123123";
 $name = $isInPostCartPaired ? $clientName : "";
 $maskedPhoneNumber = $isInPostCartPaired ? $clientPhoneNumber : "";
-$isProductPage = $block->isEnabledOnProductCart() && $bindingPlace === DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME;
-$isCartPage = $block->isEnabledOnCart() && $bindingPlace === DisplayConfigProvider::BASKET_SUMMARY_BINDING_PLACE_NAME;
-$productId = $isProductPage ? $block->getProductId() : "";
-$language = $block->getCurrentLanguageCode();
-$cartItemsCount = $block->getCartItemsCount();
+$isProductPage = $widgetViewModel->isEnabledOnProductCart() && $bindingPlace === DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME;
+$isCartPage = $widgetViewModel->isEnabledOnCart() && $bindingPlace === DisplayConfigProvider::BASKET_SUMMARY_BINDING_PLACE_NAME;
+$productId = $isProductPage ? $block->getRequest()->getParam('id') : "";
+$language = $widgetViewModel->getCurrentLanguageCode();
+$cartItemsCount = $widgetViewModel->getCartItemsCount();
+$layoutConfig = $widgetViewModel->getLayoutConfig();
 $cartId = $block->getQuoteId();
 $layoutConfig = $block->getLayoutConfig();
 ?>
-<?= $block->getBlockHtml('formkey') ?>
 
 <?php if ($bindingPlace === DisplayConfigProvider::THANK_YOU_PAGE_BINDING_PLACE_NAME): ?>
     <inpost-thank-you/>

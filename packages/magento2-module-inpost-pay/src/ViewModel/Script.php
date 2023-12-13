@@ -2,28 +2,23 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Block;
+namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
-use Magento\Backend\Block\Template;
-use Magento\Backend\Block\Template\Context;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
 
-class Script extends Template
+class Script implements ArgumentInterface
 {
     /**
      * @param SandboxConfigProvider $sandboxConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
-     * @param Context $context
-     * @param array $data
      */
     public function __construct(
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
-        Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
+    )
+    {
     }
 
     /**

@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Block;
+namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
-use Magento\Backend\Block\Template;
-use Magento\Backend\Block\Template\Context;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
@@ -16,8 +15,14 @@ use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 
-class Widget extends Template
+class Widget implements ArgumentInterface
 {
+    private ResolverInterface $localeResolver;
+    private CheckoutSession $checkoutSession;
+
+    private const VARIANT = 'variant';
+    private const DARK_MODE = 'darkMode';
+
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
@@ -25,19 +30,17 @@ class Widget extends Template
      * @param CheckoutSession $checkoutSession
      * @param CartRepositoryInterface $quoteRepository
      * @param QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
-     * @param Context $context
-     * @param array $data
      */
     public function __construct(
         private readonly LayoutConfigProvider $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
         private readonly ResolverInterface $localeResolver,
         private readonly CheckoutSession $checkoutSession,
-        private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
-        Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
+        private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
+    )
+    {
+        $this->localeResolver = $localeResolver;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -59,8 +62,8 @@ class Widget extends Template
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
 
         return [
-            'variant' => $variant,
-            'darkMode' => $darkMode
+            self::VARIANT => $variant,
+            self::DARK_MODE => $darkMode
         ];
     }
 
@@ -93,6 +96,7 @@ class Widget extends Template
             return 0;
         }
     }
+
     /**
      * @return string
      */
@@ -113,8 +117,12 @@ class Widget extends Template
             return "";
         }
     }
+
+    /**
+     * @return int
+     */
     public function getProductId(): int
     {
-       return (int)$this->getRequest()->getParam('id');
+        return (int)$this->getRequest()->getParam('id');
     }
 }

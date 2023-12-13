@@ -3,20 +3,26 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="after.body.start">
-            <block class="InPost\InPostPay\Block\Script" name="inpost.init.script.product"
+            <block name="inpost.init.script.product"
                    template="InPost_InPostPay::initialize-script.phtml"
                    ifconfig="payment/inpost_pay/show_on_product_cart">
                 <arguments>
-                    <argument name="binding_place" xsi:type="string">PRODUCT_CARD</argument>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="script_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Script</argument>
                 </arguments>
             </block>
         </referenceBlock>
         <referenceBlock name="product.info.form.content">
-            <block class="InPost\InPostPay\Block\Widget" name="inpost.init.widget.product"
+            <block name="inpost.init.widget.product"
                    template="InPost_InPostPay::initialize-widget.phtml" after="product.info.addtocart"
                    ifconfig="payment/inpost_pay/show_on_product_cart">
                 <arguments>
-                    <argument name="binding_place" xsi:type="string">PRODUCT_CARD</argument>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
                 </arguments>
             </block>
         </referenceBlock>
