@@ -17,8 +17,7 @@ class Script implements ArgumentInterface
     public function __construct(
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
-    )
-    {
+    ) {
     }
 
     /**

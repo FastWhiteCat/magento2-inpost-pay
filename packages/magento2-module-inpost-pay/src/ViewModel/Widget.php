@@ -16,9 +16,6 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 
 class Widget implements ArgumentInterface
 {
-    private ResolverInterface $localeResolver;
-    private CheckoutSession $checkoutSession;
-
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
 
@@ -33,12 +30,9 @@ class Widget implements ArgumentInterface
         private readonly LayoutConfigProvider $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
         private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
-        ResolverInterface                      $localeResolver,
-        CheckoutSession                        $checkoutSession
-    )
-    {
-        $this->localeResolver = $localeResolver;
-        $this->checkoutSession = $checkoutSession;
+        private readonly ResolverInterface $localeResolver,
+        private readonly CheckoutSession $checkoutSession
+    ) {
     }
 
     /**

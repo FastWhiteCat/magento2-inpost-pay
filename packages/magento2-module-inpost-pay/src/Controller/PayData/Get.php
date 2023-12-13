@@ -7,8 +7,8 @@ use InPost\InPostPay\Service\ApiConnector\BindingBasket;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
@@ -24,7 +24,6 @@ class Get implements HttpPostActionInterface
 
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
-    private readonly ResponseInterface $response;
 
     public function __construct(
         Context $context,
@@ -35,14 +34,14 @@ class Get implements HttpPostActionInterface
         private readonly Base64Json $base64serializer,
         private readonly CartRepositoryInterface $quoteRepository,
         private readonly TimezoneInterface $localeDate,
+        private readonly JsonFactory $jsonFactory,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
         $this->request = $context->getRequest();
-        $this->response = $context->getResponse();
     }
 
-    public function execute(): ResponseInterface
+    public function execute(): \Magento\Framework\Controller\Result\Json
     {
         if (!$this->formKeyValidator->validate($this->request)) {
             $this->messageManager->addErrorMessage(
@@ -50,7 +49,7 @@ class Get implements HttpPostActionInterface
             );
             $data = ['errorMessage' => __('Your session has expired')];
 
-            return $this->response->representJson($this->serializer->serialize($data));
+            return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
         }
 
         $data = [];
@@ -80,12 +79,12 @@ class Get implements HttpPostActionInterface
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
 
-
-        return $this->response->representJson($this->serializer->serialize($data));
+        return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
     }
 
-    private function prepareBrowserData(array $browser): array{
-        return  [
+    private function prepareBrowserData(array $browser): array
+    {
+        return [
             "user_agent" => $browser['user_agent'] ?? '',
             "description" => $browser['description'] ?? '',
             "platform" => $browser['platform'] ?? '',

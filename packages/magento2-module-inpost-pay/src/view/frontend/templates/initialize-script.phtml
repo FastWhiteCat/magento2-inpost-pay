@@ -10,11 +10,12 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 $scriptViewModel = $block->getData('script_view_model');
 $sandboxMode = $scriptViewModel->isSandboxEnabled();
 $bindingPlace = $block->getBindingPlace();
-$shouldInitializeScript = $scriptViewModel->isEnabledInMiniCart() && $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME
+$shouldInitializeScript = $scriptViewModel->isEnabledInMiniCart() &&
+    $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME;
 ?>
 
 <?php if ($shouldInitializeScript): ?>
-    <?php if ($sandboxMode) : ?>
+    <?php if ($sandboxMode): ?>
         <script src="https://izi-sandbox.inpost.pl/inpostizi.js"></script>
     <?php else: ?>
         <script src="https://izi.inpost.pl/inpostizi.js"></script>

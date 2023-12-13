@@ -8,8 +8,8 @@ use InPost\InPostPay\Enum\InPostBasketStatus;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
@@ -21,7 +21,6 @@ class Get implements HttpGetActionInterface
 {
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
-    private readonly ResponseInterface $response;
 
     public function __construct(
         Context $context,
@@ -29,22 +28,22 @@ class Get implements HttpGetActionInterface
         private readonly Validator $formKeyValidator,
         private readonly SerializerInterface $serializer,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly JsonFactory $jsonFactory,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
         $this->request = $context->getRequest();
-        $this->response = $context->getResponse();
     }
 
-    public function execute(): ResponseInterface
+    public function execute(): \Magento\Framework\Controller\Result\Json
     {
         if (!$this->formKeyValidator->validate($this->request)) {
             $this->messageManager->addErrorMessage(
-                __('Your session has expired')
+                __('Your session has expired')->render()
             );
             $data = ['errorMessage' => __('Your session has expired')->render()];
 
-            return $this->response->representJson($this->serializer->serialize($data));
+            return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
         }
         $data = [];
 
@@ -71,7 +70,7 @@ class Get implements HttpGetActionInterface
             ];
         }
 
-        return $this->response->representJson($this->serializer->serialize($data));
+        return $this->jsonFactory->create()->setData($this->serializer->serialize($data));
     }
 
     /**
