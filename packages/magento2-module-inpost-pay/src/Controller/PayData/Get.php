@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Controller\PayData;
 
-use InPost\InPostPay\Service\ApiConnector\BindingBasket;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingCreate;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -33,7 +33,7 @@ class Get implements HttpPostActionInterface
      */
     public function __construct(
         Context $context,
-        private readonly BindingBasket $bindingBasket,
+        private readonly BasketBindingCreate $basketBindingCreate,
         private readonly CheckoutSession $checkoutSession,
         private readonly Validator $formKeyValidator,
         private readonly SerializerInterface $serializer,
@@ -75,7 +75,7 @@ class Get implements HttpPostActionInterface
                         $browserData = $this->prepareBrowserData($browser);
                     }
 
-                    $result = $this->bindingBasket->bindBasket(
+                    $result = $this->basketBindingCreate->execute(
                         $quoteId,
                         $params['binding_place'],
                         $browserData,
