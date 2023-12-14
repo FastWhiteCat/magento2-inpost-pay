@@ -228,12 +228,12 @@ define([
 
             if (isProductAdded) return;
 
-            return ajaxSubmit($productForm).then().catch(function(err) {
+            return ajaxSubmit($productForm).then().catch(function (err) {
                 console.error(err);
             })
 
             function ajaxSubmit($form) {
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     $.ajax({
                         url: $form.attr('action'),
                         data: new FormData($form[0]),
@@ -242,11 +242,9 @@ define([
                         cache: false,
                         contentType: false,
                         processData: false,
-
                         success: function () {
                             resolve()
                         },
-
                         error: function () {
                             reject()
                         }
@@ -313,6 +311,8 @@ define([
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
+            if (!cartData.items) return false;
+
             if (cartData.items
                 && cartData.items.some((item) => item.product_id === id && item.product_type === PRODUCT_TYPES.SIMPLE))
                 return true;
