@@ -48,6 +48,30 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::ORDER_ID, $orderId);
     }
 
+    public function getBasketId(): ?string
+    {
+        $basketId = $this->getData(self::BASKET_ID);
+
+        return (is_scalar($basketId)) ? (string)$basketId : null;
+    }
+
+    public function setBasketId(?string $basketId): InPostPayOrderInterface
+    {
+        return $this->setData(self::BASKET_ID, $basketId);
+    }
+
+    public function getPaymentType(): ?string
+    {
+        $paymentType = $this->getData(self::PAYMENT_TYPE);
+
+        return (is_scalar($paymentType)) ? (string)$paymentType : null;
+    }
+
+    public function setPaymentType(?string $paymentType): InPostPayOrderInterface
+    {
+        return $this->setData(self::PAYMENT_TYPE, $paymentType);
+    }
+
     public function getLockerId(): ?string
     {
         $lockerId = ($this->hasData(self::LOCKER_ID)) ? $this->getData(self::LOCKER_ID) : null;

@@ -31,4 +31,10 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
+    <route url="/v1/izi/order/:orderId" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
 </routes>

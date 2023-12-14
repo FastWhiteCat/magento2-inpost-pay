@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Model\AuthApi\Request\OAuthTokenRequest as TokenRequest;
 use InPost\InPostPay\Model\AuthApi\Response\OAuthTokenResponse as TokenResponse;
 use InPost\InPostPay\Model\AuthApi\Request\OAuthTokenRequestFactory as TokenRequestFactory;
@@ -37,7 +37,7 @@ class TokenGenerator
 
     /**
      * @return TokenResponse
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      * @throws LocalizedException
      */
     public function generate(): TokenResponse
@@ -55,7 +55,7 @@ class TokenGenerator
                 );
                 $result = $this->connector->sendRequest($request);
                 $this->tokenResponse = $this->handle($result);
-            } catch (InPostPayInvalidConfigurationException $e) {
+            } catch (InPostPayInternalException $e) {
                 $errorPhrase = __(
                     'Could not generate token due to invalid configuration. Details: %1',
                     $e->getMessage()

@@ -5,40 +5,55 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use Throwable;
-use InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface;
-use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\OrderNotFoundException;
+use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer;
+use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
-class BasketDelete implements BasketDeleteInterface
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class OrderGet implements OrderGetInterface
 {
-    private const REQUEST_PREFIX = 'BASKET_DELETE_REQUEST';
+    private const REQUEST_PREFIX = 'ORDER_GET_REQUEST';
 
     public function __construct(
-        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly GetOrderByIncrementId $getOrderByIncrementId,
+        private readonly OrderToInPostOrderDataTransfer $orderToInPostOrderDataTransfer,
+        private readonly OrderInterfaceFactory $orderFactory,
         private readonly LoggerInterface $logger
     ) {
     }
 
     /**
-     * @param string $basketId
-     * @return void
+     * @param string $orderId
+     * @return OrderInterface
      * @throws InPostPayBadRequestException
      * @throws InPostPayAuthorizationException
      * @throws OrderNotFoundException
      * @throws InPostPayInternalException
      */
-    public function execute(string $basketId): void
+    public function execute(string $orderId): OrderInterface
     {
-        $this->createRequestDebugLog(sprintf('Deleting Basket ID: %s', $basketId));
-
+        $this->createRequestDebugLog(sprintf('Retrieving order data for Order ID: %s', $orderId));
         try {
-            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
+            $order = $this->getOrderByIncrementId->get($orderId);
+            if ($order instanceof Order) {
+                /** @var OrderInterface $inPostOrder */
+                $inPostOrder = $this->orderFactory->create();
+                $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
+            } else {
+                throw new NoSuchEntityException(__('Order %1 not found.', $orderId));
+            }
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -57,7 +72,9 @@ class BasketDelete implements BasketDeleteInterface
             throw new InPostPayInternalException();
         }
 
-        $this->createRequestDebugLog(sprintf('Deleted Basket ID: %s', $basketId));
+        $this->createRequestDebugLog(sprintf('Order data for Order ID: %s has been retrieved.', $orderId));
+
+        return $inPostOrder;
     }
 
     private function createRequestDebugLog(string $message): void

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
@@ -28,7 +28,7 @@ class DeliveryMethodStep extends OrderProcessingStep implements OrderProcessingS
      * @param Quote $quote
      * @param OrderInterface $inPostOrder
      * @return void
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     public function process(Quote $quote, OrderInterface $inPostOrder): void
     {

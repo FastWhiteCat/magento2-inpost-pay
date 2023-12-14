@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -13,6 +13,7 @@ class AuthConfigProvider
     private const XML_PATH_CLIENT_ID = 'payment/inpost_pay/%sclient_id';
     private const XML_PATH_CLIENT_SECRET = 'payment/inpost_pay/%sclient_secret';
     private const XML_PATH_AUTH_TOKEN_URL = 'payment/inpost_pay/%sauth_token_url';
+    private const XML_PATH_POS_ID = 'payment/inpost_pay/%spos_id';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -28,7 +29,7 @@ class AuthConfigProvider
      * Returns production or sandbox Client ID
      *
      * @return string
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     public function getClientId(): string
     {
@@ -41,7 +42,7 @@ class AuthConfigProvider
         );
 
         if (empty($clientId) || !is_scalar($clientId)) {
-            throw new InPostPayInvalidConfigurationException(__('Empty Client ID'));
+            throw new InPostPayInternalException(__('Empty Client ID'));
         }
 
         return (string)$clientId;
@@ -51,7 +52,7 @@ class AuthConfigProvider
      * Returns production or sandbox Client Secret
      *
      * @return string
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     public function getClientSecret(): string
     {
@@ -64,7 +65,7 @@ class AuthConfigProvider
         );
 
         if (empty($clientSecret) || !is_scalar($clientSecret)) {
-            throw new InPostPayInvalidConfigurationException(__('Empty Client Secret'));
+            throw new InPostPayInternalException(__('Empty Client Secret'));
         }
 
         return (string)$clientSecret;
@@ -74,7 +75,7 @@ class AuthConfigProvider
      * Returns production or sandbox Token providing API URL
      *
      * @return string
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     public function getAuthTokenUrl(): string
     {
@@ -87,9 +88,32 @@ class AuthConfigProvider
         );
 
         if (empty($authTokenUrl) || !is_scalar($authTokenUrl)) {
-            throw new InPostPayInvalidConfigurationException(__('Empty Auth Token URL'));
+            throw new InPostPayInternalException(__('Empty Auth Token URL'));
         }
 
         return (string)$authTokenUrl;
+    }
+
+    /**
+     * Returns production or sandbox POS ID
+     *
+     * @return string
+     * @throws InPostPayInternalException
+     */
+    public function getPosId(): string
+    {
+        $posId = $this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_POS_ID,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            ),
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        if (empty($posId) || !is_scalar($posId)) {
+            throw new InPostPayInternalException(__('Empty POS ID'));
+        }
+
+        return (string)$posId;
     }
 }

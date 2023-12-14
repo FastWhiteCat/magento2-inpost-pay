@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -29,7 +29,7 @@ class IziApiConfigProvider
      * Returns production or sandbox Izi API URL
      *
      * @return string
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     public function getIziApiUrl(): string
     {
@@ -42,7 +42,7 @@ class IziApiConfigProvider
         );
 
         if (empty($iziApiUrl) || !is_scalar($iziApiUrl)) {
-            throw new InPostPayInvalidConfigurationException(__('Empty IZI API URL'));
+            throw new InPostPayInternalException(__('Empty IZI API URL'));
         }
 
         return (string)$iziApiUrl;

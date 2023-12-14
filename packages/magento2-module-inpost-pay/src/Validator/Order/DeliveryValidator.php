@@ -10,7 +10,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
@@ -71,7 +71,7 @@ class DeliveryValidator implements OrderValidatorInterface
                 $deliveryType,
                 $deliveryOption
             );
-        } catch (InPostPayInvalidConfigurationException $e) {
+        } catch (InPostPayInternalException $e) {
             throw new LocalizedException(__('Selected delivery method %1 is not available.', $deliveryType));
         }
 

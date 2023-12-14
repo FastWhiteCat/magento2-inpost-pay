@@ -10,7 +10,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFa
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
@@ -133,7 +133,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
                     break;
                 }
             }
-        } catch (InPostPayInvalidConfigurationException $e) {
+        } catch (InPostPayInternalException $e) {
             $mappedShippingMethod = null;
         }
 

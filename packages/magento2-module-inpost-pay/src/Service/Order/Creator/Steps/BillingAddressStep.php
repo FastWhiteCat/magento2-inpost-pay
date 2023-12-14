@@ -79,7 +79,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $addressLine = $invoiceDetails->getStreet();
         $addressNumber = implode('/', [$invoiceDetails->getBuilding(), $invoiceDetails->getFlat()]);
 
-        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
+        return sprintf('%s%s%s', $addressLine, PHP_EOL, trim($addressNumber, '/'));
     }
 
     private function combinePhoneNumber(PhoneNumberInterface $phoneNumber): string

@@ -69,6 +69,8 @@
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
@@ -148,7 +150,7 @@
     </virtualType>
     <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <arguments>
-            <argument name="converters" xsi:type="array">
+            <argument name="dataTransfer" xsi:type="array">
                 <item name="summary" xsi:type="object">
                     InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer
                 </item>
@@ -166,6 +168,30 @@
                 </item>
                 <item name="consents" xsi:type="object">
                     InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="order_details" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer
+                </item>
+                <item name="invoice_details" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderInvoiceDetailsDataTransfer
+                </item>
+                <item name="account_info" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderAccountInfoDataTransfer
+                </item>
+                <item name="delivery" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDeliveryDataTransfer
+                </item>
+                <item name="products" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderProductsDataTransfer
+                </item>
+                <item name="consents" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderConsentsDataTransfer
                 </item>
             </argument>
         </arguments>
@@ -336,6 +362,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

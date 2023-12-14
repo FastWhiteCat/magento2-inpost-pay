@@ -12,6 +12,8 @@ interface InPostPayOrderInterface
     public const ENTITY_NAME = 'inpost_pay_order';
     public const INPOST_PAY_ORDER_ID = 'inpost_pay_order_id';
     public const ORDER_ID = 'order_id';
+    public const BASKET_ID = 'basket_id';
+    public const PAYMENT_TYPE = 'payment_type';
     public const LOCKER_ID = 'locker_id';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const CREATED_AT = 'created_at';
@@ -26,6 +28,10 @@ interface InPostPayOrderInterface
      */
     public function getOrderId(): int;
     public function setOrderId(int $orderId): InPostPayOrderInterface;
+    public function getBasketId(): ?string;
+    public function setBasketId(?string $basketId): InPostPayOrderInterface;
+    public function getPaymentType(): ?string;
+    public function setPaymentType(?string $paymentType): InPostPayOrderInterface;
     public function getLockerId(): ?string;
     public function setLockerId(string $lockerId): InPostPayOrderInterface;
     public function getDeliveryOptions(): array;

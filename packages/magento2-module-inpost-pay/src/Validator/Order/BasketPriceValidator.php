@@ -8,7 +8,7 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Framework\Exception\LocalizedException;
@@ -169,7 +169,7 @@ class BasketPriceValidator implements OrderValidatorInterface
                 $deliveryType,
                 $deliveryOption
             );
-        } catch (InPostPayInvalidConfigurationException $e) {
+        } catch (InPostPayInternalException $e) {
             $mappedMethodCode = null;
         }
 

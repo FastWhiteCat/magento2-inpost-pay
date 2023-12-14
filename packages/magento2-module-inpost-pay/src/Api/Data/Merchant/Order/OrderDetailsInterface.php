@@ -14,6 +14,13 @@ interface OrderDetailsInterface
     public const PAYMENT_TYPE = 'payment_type';
     public const ORDER_COMMENTS = 'order_comments';
     public const COMMENTS = 'comments';
+    public const ORDER_ID = 'order_id';
+    public const POS_ID = 'pos_id';
+    public const ORDER_CREATION_DATE = 'order_creation_date';
+    public const ORDER_MERCHANT_STATUS_DESCRIPTION = 'order_merchant_status_description';
+    public const ORDER_BASE_PRICE = 'order_base_price';
+    public const ORDER_FINAL_PRICE = 'order_final_price';
+    public const DELIVERY_REFERENCE_LIST = 'delivery_references_list';
 
     /**
      * @return string
@@ -69,4 +76,70 @@ interface OrderDetailsInterface
      * @return void
      */
     public function setPaymentType(string $paymentType): void;
+
+    /**
+     * @return string
+     */
+    public function getPosId(): string;
+
+    /**
+     * @param string $posId
+     * @return void
+     */
+    public function setPosId(string $posId): void;
+
+    /**
+     * @return string
+     */
+    public function getOrderCreationDate(): string;
+
+    /**
+     * @param string $orderCreationDate
+     * @return void
+     */
+    public function setOrderCreationDate(string $orderCreationDate): void;
+
+    /**
+     * @return string
+     */
+    public function getOrderMerchantStatusDescription(): string;
+
+    /**
+     * @param string $orderMerchantStatusDescription
+     * @return void
+     */
+    public function setOrderMerchantStatusDescription(string $orderMerchantStatusDescription): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
+     */
+    public function getOrderBasePrice(): PriceInterface;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $orderBasePrice
+     * @return void
+     */
+    public function setOrderBasePrice(PriceInterface $orderBasePrice): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
+     */
+    public function getOrderFinalPrice(): PriceInterface;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $orderFinalPrice
+     * @return void
+     */
+    public function setOrderFinalPrice(PriceInterface $orderFinalPrice): void;
+
+    /**
+     * @return string[]
+     */
+    public function getDeliveryReferencesList(): array;
+
+    /**
+     * @param string[] $deliveryReferencesList
+     * @return void
+     */
+    public function setDeliveryReferencesList(array $deliveryReferencesList): void;
 }

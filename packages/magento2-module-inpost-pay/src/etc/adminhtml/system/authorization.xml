@@ -19,5 +19,10 @@
             <label>Auth Token URL</label>
             <config_path>payment/inpost_pay/auth_token_url</config_path>
         </field>
+        <field id="pos_id" translate="label" type="text" sortOrder="26"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>POS ID</label>
+            <config_path>payment/inpost_pay/pos_id</config_path>
+        </field>
     </group>
 </include>

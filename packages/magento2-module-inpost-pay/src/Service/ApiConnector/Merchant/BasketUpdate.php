@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
@@ -11,9 +12,14 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
+use InPost\InPostPay\Exception\InPostPayBadRequestException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
@@ -43,7 +49,10 @@ class BasketUpdate implements BasketUpdateInterface
      * @param QuantityUpdateInterface[]|null $quantityEventData
      * @param PromoCodeInterface[]|null $promoCodesEventData
      * @return BasketInterface
-     * @throws LocalizedException
+     * @throws InPostPayBadRequestException
+     * @throws InPostPayAuthorizationException
+     * @throws OrderNotFoundException
+     * @throws InPostPayInternalException
      */
     public function execute(
         string $basketId,
@@ -53,36 +62,52 @@ class BasketUpdate implements BasketUpdateInterface
         ?array $quantityEventData = null,
         ?array $promoCodesEventData = null,
     ): BasketInterface {
-        $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
-        $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-        $this->createRequestDebugLog(
-            sprintf(
-                'Updating basket. Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
-                $basketId,
-                $eventId,
-                $eventDataTime,
-                $eventType
-            )
-        );
 
-        if (!empty($quantityEventData)) {
-            foreach ($quantityEventData as $productQuantity) {
-                $productId = (int)$productQuantity->getProductId();
-                $qty = (float)$productQuantity->getQuantity()->getQuantity();
-                $this->cartService->addToCart($quote, $productId, $qty);
+        try {
+            $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
+            $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+            $this->createRequestDebugLog(
+                sprintf(
+                    'Updating basket. Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
+                    $basketId,
+                    $eventId,
+                    $eventDataTime,
+                    $eventType
+                )
+            );
+            if (!empty($quantityEventData)) {
+                foreach ($quantityEventData as $productQuantity) {
+                    $productId = (int)$productQuantity->getProductId();
+                    $qty = (float)$productQuantity->getQuantity()->getQuantity();
+                    $this->cartService->addToCart($quote, $productId, $qty);
+                }
             }
-        }
-
-        if ($promoCodesEventData) {
-            foreach ($promoCodesEventData as $promoCode) {
-                $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
+            if ($promoCodesEventData) {
+                foreach ($promoCodesEventData as $promoCode) {
+                    $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
+                }
             }
-        }
+            $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
+            $basket = $this->basketFactory->create();
+            $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
+            $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
 
-        $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
-        $basket = $this->basketFactory->create();
-        $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
-        $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
+            throw new OrderNotFoundException();
+        } catch (InPostPayAuthorizationException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw $e;
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new InPostPayBadRequestException();
+        } catch (Throwable $e) {
+            $this->logger->critical($e->getMessage());
+
+            throw new InPostPayInternalException();
+        }
 
         return $basket;
     }
