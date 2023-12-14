@@ -13,6 +13,7 @@ use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponseFactory;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -37,6 +38,7 @@ class OrderEvent implements OrderEventInterface
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly UpdateOrderResponseFactory $updateOrderResponseFactory,
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -49,12 +51,26 @@ class OrderEvent implements OrderEventInterface
         ?PhoneNumberInterface $phoneNumber = null
     ): UpdateOrderResponseInterface {
         try {
+            $this->eventManager->dispatch('izi_order_update_before',
+                [
+                    'orderId' => $orderId,
+                    'eventId' => $eventId,
+                    'eventDataTime' => $eventDataTime,
+                    'eventData' => $eventData,
+                    'phoneNumber' => $phoneNumber,
+                ]);
             /**
              * @var Order $order
              */
             $order = $this->getOrderByIncrementId->get($orderId);
             $this->checkIfCanProcess($order, $phoneNumber);
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
+
+            $this->eventManager->dispatch('izi_order_update_after',
+                [
+                    'order' => $order,
+                    'inPostPayOrderStatus' => $inPostPayOrderStatus,
+                ]);
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');
             $this->logger->error($e->getMessage());

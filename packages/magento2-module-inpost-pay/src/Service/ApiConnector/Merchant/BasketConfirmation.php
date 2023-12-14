@@ -12,6 +12,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -30,6 +31,7 @@ class BasketConfirmation implements BasketConfirmationInterface
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -59,6 +61,20 @@ class BasketConfirmation implements BasketConfirmationInterface
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+
+            $this->eventManager->dispatch('izi_basket_confirmation_before',
+                [
+                    'quote' => $quote,
+                    'inPostPayQuote' => $inPostPayQuote,
+                    'basketId' => $basketId,
+                    'status' => $status,
+                    'inpostBasketId' => $inpostBasketId,
+                    'phoneNumber' => $phoneNumber,
+                    'browser' => $browser,
+                    'maskedPhoneNumber' => $maskedPhoneNumber,
+                    'name' => $name,
+                    'surname' => $surname
+                ]);
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
 
             $inPostPayQuote->setStatus($status);
@@ -80,6 +96,19 @@ class BasketConfirmation implements BasketConfirmationInterface
         }
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+
+        $this->eventManager->dispatch('izi_basket_confirmation_before',
+            [
+                'basketId' => $basketId,
+                'status' => $status,
+                'inpostBasketId' => $inpostBasketId,
+                'phoneNumber' => $phoneNumber,
+                'browser' => $browser,
+                'maskedPhoneNumber' => $maskedPhoneNumber,
+                'name' => $name,
+                'surname' => $surname
+            ]);
+
         $this->createRequestDebugLog(
             sprintf(
                 'Basket ID %s has been confirmed with status: %s',
@@ -87,6 +116,8 @@ class BasketConfirmation implements BasketConfirmationInterface
                 $status
             )
         );
+
+        $this->eventManager->dispatch('izi_basket_confirmation_after', ['basket' => $basket]);
 
         return $basket;
     }

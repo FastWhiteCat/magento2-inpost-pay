@@ -10,6 +10,7 @@ use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -24,6 +25,7 @@ class BasketGet implements BasketGetInterface
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -35,12 +37,16 @@ class BasketGet implements BasketGetInterface
      */
     public function execute(string $basketId): BasketDataInterface
     {
+        $this->eventManager->dispatch('izi_basket_get_before', ['basketId' => $basketId]);
+
         $this->createRequestDebugLog(sprintf('Retrieving quote data for Basket ID: %s', $basketId));
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($quote, $basket);
         $this->createRequestDebugLog(sprintf('Quote data for Basket ID: %s has been retrieved.', $basketId));
+
+        $this->eventManager->dispatch('izi_basket_get_after', ['basket' => $basket]);
 
         return $basket;
     }

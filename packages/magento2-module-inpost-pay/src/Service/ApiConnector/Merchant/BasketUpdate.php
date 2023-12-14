@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -31,6 +32,7 @@ class BasketUpdate implements BasketUpdateInterface
         private readonly CartService $cartService,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -55,6 +57,19 @@ class BasketUpdate implements BasketUpdateInterface
     ): BasketInterface {
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+
+        $this->eventManager->dispatch('izi_basket_update_before',
+            [
+                'quote' => $quote,
+                'inPostPayQuote' => $inPostPayQuote,
+                'basketId' => $basketId,
+                'eventId' => $eventId,
+                'eventDataTime' => $eventDataTime,
+                'eventType' => $eventType,
+                'quantityEventData' => $quantityEventData,
+                'promoCodesEventData' => $promoCodesEventData
+            ]);
+
         $this->createRequestDebugLog(
             sprintf(
                 'Updating basket. Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
@@ -83,6 +98,8 @@ class BasketUpdate implements BasketUpdateInterface
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
         $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
+
+        $this->eventManager->dispatch('izi_basket_update_after', ['basket' => $basket]);
 
         return $basket;
     }

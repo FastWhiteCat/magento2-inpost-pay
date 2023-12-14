@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
@@ -15,6 +16,7 @@ class BasketDelete implements BasketDeleteInterface
 
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -24,6 +26,7 @@ class BasketDelete implements BasketDeleteInterface
      */
     public function execute(string $basketId): void
     {
+        $this->eventManager->dispatch('izi_basket_binding_delete_before', ['basketId' => $basketId]);
         $this->createRequestDebugLog(sprintf('Deleting Basket ID: %s', $basketId));
 
         try {
@@ -33,6 +36,7 @@ class BasketDelete implements BasketDeleteInterface
             throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
         }
 
+        $this->eventManager->dispatch('izi_basket_binding_delete_after', ['basketId' => $basketId]);
         $this->createRequestDebugLog(sprintf('Deleted Basket ID: %s', $basketId));
     }
 
