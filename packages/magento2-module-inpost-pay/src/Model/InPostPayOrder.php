@@ -136,8 +136,8 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
             $this->phoneNumber = $this->phoneNumberInterfaceFactory->create();
         }
 
-        $this->phoneNumber->setPhone($this->getPhone());
-        $this->phoneNumber->setCountryPrefix($this->getCountryPrefix());
+        $this->phoneNumber->setPhone((string)$this->getPhone());
+        $this->phoneNumber->setCountryPrefix((string)$this->getCountryPrefix());
 
         return $this->phoneNumber;
     }

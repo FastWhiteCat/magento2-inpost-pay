@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Api\Data;
 
 use Magento\Framework\Exception\LocalizedException;
-use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 
 interface InPostPayOrderInterface
 {
