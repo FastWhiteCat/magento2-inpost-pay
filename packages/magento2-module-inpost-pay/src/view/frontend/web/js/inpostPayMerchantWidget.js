@@ -275,7 +275,7 @@ define([
             function checkCartWidget(cartData = "") {
                 var wrapperClass = getConfig().wrapperClass || "inpost-widget-wrapper";
                 var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
-                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace+"");
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
                 var counter = cartData ? cartData.summary_count : getConfig().count;
 
                 if ($inpayWrapperOnBasket.length) {
