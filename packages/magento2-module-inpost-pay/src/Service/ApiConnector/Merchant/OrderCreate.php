@@ -73,9 +73,8 @@ class OrderCreate implements OrderCreateInterface
                 'accountInfo' => $accountInfo,
                 'delivery' => $delivery,
                 'consents' => $consents,
-                'invoiceDetails' => $invoiceDetails,
-                ]
-            );
+                'invoiceDetails' => $invoiceDetails
+            ]);
 
             if ($quote instanceof Quote && $quote->getId()) {
                 $inPostOrder = $this->combineInPostOrder(

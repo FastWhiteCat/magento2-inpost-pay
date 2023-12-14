@@ -67,8 +67,7 @@ class BasketUpdate implements BasketUpdateInterface
             'eventType' => $eventType,
             'quantityEventData' => $quantityEventData,
             'promoCodesEventData' => $promoCodesEventData
-            ]
-        );
+        ]);
 
         $this->createRequestDebugLog(
             sprintf(

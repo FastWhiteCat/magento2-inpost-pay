@@ -56,9 +56,8 @@ class OrderEvent implements OrderEventInterface
                 'eventId' => $eventId,
                 'eventDataTime' => $eventDataTime,
                 'eventData' => $eventData,
-                'phoneNumber' => $phoneNumber,
-                ]
-            );
+                'phoneNumber' => $phoneNumber
+            ]);
             /**
              * @var Order $order
              */
@@ -66,11 +65,10 @@ class OrderEvent implements OrderEventInterface
             $this->checkIfCanProcess($order, $phoneNumber);
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
 
-            $this->eventManager->dispatch('izi_order_update_after',
-                [
-                    'order' => $order,
-                    'inPostPayOrderStatus' => $inPostPayOrderStatus,
-                ]);
+            $this->eventManager->dispatch('izi_order_update_after', [
+                'order' => $order,
+                'inPostPayOrderStatus' => $inPostPayOrderStatus
+            ]);
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');
             $this->logger->error($e->getMessage());
