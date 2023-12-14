@@ -7,7 +7,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class TermsAndConditionsRequirements implements OptionSourceInterface
 {
-    public const ALWAYES = 'REQUIRED_ALWAYS';
+    public const ALWAYS = 'REQUIRED_ALWAYS';
     public const ONLY_IN_NEW_VERSION = 'REQUIRED_ONCE';
     public const OPTIONAL = 'OPTIONAL';
 
@@ -17,7 +17,7 @@ class TermsAndConditionsRequirements implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['label' => self::ALWAYES, 'value' => self::ALWAYES],
+            ['label' => self::ALWAYS, 'value' => self::ALWAYS],
             ['label' => self::ONLY_IN_NEW_VERSION, 'value' => self::ONLY_IN_NEW_VERSION],
             ['label' => self::OPTIONAL, 'value' => self::OPTIONAL]
         ];

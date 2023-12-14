@@ -1,0 +1,109 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Api\Data\Merchant;
+
+use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
+
+use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
+
+interface BasketInterface
+{
+    public const BASKET_ID = 'browser_id';
+    public const BROWSER_ID = 'browser_id';
+    public const SUMMARY = 'summary';
+    public const DELIVERY = 'delivery';
+    public const PROMO_CODES = 'promo_codes';
+    public const PRODUCTS = 'products';
+    public const RELATED_PRODUCTS = 'related_products';
+    public const CONSENTS = 'consents';
+
+    /**
+     * @return string|null
+     */
+    public function getBrowserId(): ?string;
+
+    /**
+     * @param string|null $browserId
+     * @return void
+     */
+    public function setBrowserId(string|null $browserId): void;
+
+    /**
+     * @return string|null
+     */
+    public function getBasketId(): ?string;
+
+    /**
+     * @param string|null $basketId
+     * @return void
+     */
+    public function setBasketId(string|null $basketId): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface
+     */
+    public function getSummary(): SummaryInterface;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface $summary
+     * @return void
+     */
+    public function setSummary(SummaryInterface $summary): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface[]
+     */
+    public function getDelivery(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface[] $deliveries
+     * @return void
+     */
+    public function setDelivery(array $deliveries): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[]
+     */
+    public function getPromoCodes(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[] $promoCodes
+     * @return void
+     */
+    public function setPromoCodes(array $promoCodes): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[]
+     */
+    public function getProducts(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[] $products
+     * @return void
+     */
+    public function setProducts(array $products): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[]
+     */
+    public function getRelatedProducts(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[] $relatedProducts
+     * @return void
+     */
+    public function setRelatedProducts(array $relatedProducts): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface[]
+     */
+    public function getConsents(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface[] $consents
+     * @return void
+     */
+    public function setConsents(array $consents): void;
+}

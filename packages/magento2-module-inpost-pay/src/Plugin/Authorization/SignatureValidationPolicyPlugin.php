@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Plugin\Authorization;
 
+use InPost\InPostPay\Model\Registry\SwaggerRegistry;
 use Magento\Framework\Authorization\PolicyInterface;
 use InPost\InPostPay\Api\Validator\SignatureValidatorInterface;
 use Magento\Framework\Exception\AuthorizationException;
@@ -12,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class SignatureValidationPolicyPlugin
 {
-    private const INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE = 'inpost_pay_signature_validated_resource';
+    public const INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE = 'inpost_pay_signature_validated_resource';
     public const X_SIGNATURE_HEADER = 'x-signature';
     public const X_SIGNATURE_TIMESTAMP_HEADER = 'x-signature-timestamp';
     public const X_SIGNATURE_PUBLIC_KEY_VERSION_HEADER = 'x-public-key-ver';
@@ -20,9 +21,10 @@ class SignatureValidationPolicyPlugin
     public const REQUEST_BODY = 'request_body';
 
     public function __construct(
-        protected readonly RestRequest $restRequest,
-        protected readonly SignatureValidatorInterface $signatureValidator,
-        protected readonly LoggerInterface $logger
+        private readonly SwaggerRegistry $swaggerRegistry,
+        private readonly RestRequest $restRequest,
+        private readonly SignatureValidatorInterface $signatureValidator,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -43,7 +45,10 @@ class SignatureValidationPolicyPlugin
         ?string $resourceId,
         ?string $privilege
     ): bool {
-        if ($resourceId === self::INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE && $this->isSignatureValid()) {
+        if ($resourceId === self::INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE
+            && !$this->swaggerRegistry->isAllowed()
+            && $this->isSignatureValid()
+        ) {
             $result = true;
         }
 

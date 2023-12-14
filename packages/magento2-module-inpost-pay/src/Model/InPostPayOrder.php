@@ -16,6 +16,8 @@ use Magento\Framework\Registry;
 
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
+    private const DELIVERY_OPTIONS_SEPARATOR = ',';
+
     protected $_eventPrefix = InPostPayOrderInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayOrderInterface::ENTITY_NAME;
 
@@ -62,7 +64,7 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 
     public function setOrderId(int $orderId): InPostPayOrderInterface
     {
-        return $this->setData(self::INPOST_PAY_ORDER_ID, $orderId);
+        return $this->setData(self::ORDER_ID, $orderId);
     }
 
     public function getLockerId(): ?string
@@ -75,6 +77,21 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     public function setLockerId(string $lockerId): InPostPayOrderInterface
     {
         return $this->setData(self::LOCKER_ID, $lockerId);
+    }
+
+    public function getDeliveryOptions(): array
+    {
+        $deliveryOptions = $this->getData(self::DELIVERY_OPTIONS);
+        if (!empty($deliveryOptions) && is_scalar($deliveryOptions)) {
+            return explode(self::DELIVERY_OPTIONS_SEPARATOR, (string)$deliveryOptions);
+        }
+
+        return [];
+    }
+
+    public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface
+    {
+        return $this->setData(self::DELIVERY_OPTIONS, implode(self::DELIVERY_OPTIONS_SEPARATOR, $deliveryOptions));
     }
 
     public function getOrderStatus(): ?string
@@ -119,8 +136,8 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
             $this->phoneNumber = $this->phoneNumberInterfaceFactory->create();
         }
 
-        $this->phoneNumber->setPhone($this->getPhone());
-        $this->phoneNumber->setCountryPrefix($this->getCountryPrefix());
+        $this->phoneNumber->setPhone((string)$this->getPhone());
+        $this->phoneNumber->setCountryPrefix((string)$this->getCountryPrefix());
 
         return $this->phoneNumber;
     }
