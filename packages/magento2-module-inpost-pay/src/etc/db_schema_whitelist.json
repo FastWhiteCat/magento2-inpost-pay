@@ -5,7 +5,10 @@
             "order_id": true,
             "locker_id": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "order_status": true,
+            "prefix": true,
+            "phone_number": true
         },
         "constraint": {
             "PRIMARY": true,

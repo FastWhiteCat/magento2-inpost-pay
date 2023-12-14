@@ -95,6 +95,14 @@
                 type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
     <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface"
                 type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
+    <preference for="InPost\InPostPay\Api\Data\UpdateOrderResponseInterface"
+                type="InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponse"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\EventData"/>
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
@@ -375,11 +383,12 @@
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
-    </type><type name="InPost\InPostPay\Controller\MobileLink\Get">
-    <arguments>
-        <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-    </arguments>
-</type>
+    </type>
+    <type name="InPost\InPostPay\Controller\MobileLink\Get">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Controller\PayData\Get">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>

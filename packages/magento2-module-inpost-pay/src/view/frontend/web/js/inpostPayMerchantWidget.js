@@ -228,15 +228,36 @@ define([
 
             if (isProductAdded) return;
 
-            $productForm.submit();
+            return ajaxSubmit($productForm).then().catch(function (err) {
+                console.error(err);
+            })
 
-            var cartSubscriber = customerData.get('cart').subscribe(function () {
-                cartSubscriber.dispose();
-            });
+            function ajaxSubmit($form) {
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        url: $form.attr('action'),
+                        data: new FormData($form[0]),
+                        type: 'post',
+                        dataType: 'json',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function () {
+                            resolve()
+                        },
+                        error: function () {
+                            reject()
+                        }
+                    });
+                });
+            }
         },
 
         bindEvents: function () {
+            checkCartWidget();
             customerData.get('cart').subscribe(function (cartData) {
+                checkCartWidget(cartData);
+
                 var $iziButtons = $("inpost-izi-button");
                 if (!$iziButtons.length) return;
 
@@ -250,6 +271,21 @@ define([
             document.addEventListener('iziModalEventClose', function () {
                 abortRequest(xhrForBasketConfirmation)
             })
+
+            function checkCartWidget(cartData = "") {
+                var wrapperClass = getConfig().wrapperClass || "inpost-widget-wrapper";
+                var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
+                var counter = cartData ? cartData.summary_count : getConfig().count;
+
+                if ($inpayWrapperOnBasket.length) {
+                    if (counter === 0) {
+                        $inpayWrapperOnBasket.hide()
+                    } else {
+                        $inpayWrapperOnBasket.show()
+                    }
+                }
+            }
         },
 
         getBrowserDescription: function () {
@@ -293,6 +329,8 @@ define([
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
+            if (!cartData.items) return false;
+
             if (cartData.items
                 && cartData.items.some((item) => item.product_id === id && item.product_type === PRODUCT_TYPES.SIMPLE))
                 return true;

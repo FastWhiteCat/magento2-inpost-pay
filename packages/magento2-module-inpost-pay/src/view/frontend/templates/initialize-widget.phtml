@@ -10,11 +10,6 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 $widgetViewModel = $block->getData('widget_view_model');
 $bindingPlace = $block->getBindingPlace();
 
-//TODO - INPAY-11(FE) - Provide a parameter e.g. isInPostCartPaired, if carts (magento and inpay) are paired
-// MOCK
-$isInPostCartPaired = false;
-$clientName = "John";
-$clientPhoneNumber = "123123123";
 $name = "";
 $maskedPhoneNumber = "";
 $isProductPage = $widgetViewModel->isEnabledOnProductCart() &&
@@ -27,11 +22,13 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $cartId = $block->getQuoteId();
+$widgetWrapperClass = "inpost-widget-wrapper";
 ?>
 
 <?php if ($bindingPlace === DisplayConfigProvider::THANK_YOU_PAGE_BINDING_PLACE_NAME): ?>
     <inpost-thank-you/>
 <?php else: ?>
+<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
         name="<?= /* @noEscape */ $name ?>"
         masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
@@ -48,9 +45,14 @@ $cartId = $block->getQuoteId();
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "cartId": "<?= /* @noEscape */ $cartId ?>"
+                    "cartId": "<?= /* @noEscape */ $cartId ?>",
+                    "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
+                    "popupBindingPlace": "<?= /* @noEscape */
+                    DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                    "count": <?= /* @noEscape */ $cartItemsCount ?>
                 }
             }
         }
     </script>
+</div>
 <?php endif;
