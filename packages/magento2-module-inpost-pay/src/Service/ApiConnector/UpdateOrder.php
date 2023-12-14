@@ -39,14 +39,18 @@ class UpdateOrder
     {
         /** @var PublicKeyRequest $request */
         $request = $this->updateOrderRequestFactory->create();
+        $eventData = [
+            'order_merchant_status_description' => $order->getStatusLabel(),
+            'delivery_references_list' => $this->getTrackingNumbers($order),
+        ];
 
-        $status = null;
         if (!$inPostPayOrder->getOrderStatus()) {
             $orderStatus = is_scalar($order->getStatus()) ? (string)$order->getStatus() : '';
             $status = $this->getInPostPayOrderStatus($orderStatus);
             if ($status) {
                 $inPostPayOrder->setOrderStatus($status);
                 $this->inPostPayOrderRepository->save($inPostPayOrder);
+                $eventData['order_status'] = $status;
             }
         }
 
@@ -55,14 +59,10 @@ class UpdateOrder
             'event_id' => uniqid(),
             'event_data_time' => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             'phone_number' => [
-                'country_prefix' => $inPostPayOrder->getPrefix(),
-                'phone' => $inPostPayOrder->getPhoneNumber(),
+                'country_prefix' => $inPostPayOrder->getCountryPrefix()(),
+                'phone' => $inPostPayOrder->getPhone(),
             ],
-            'event_data' => [
-                'order_status' => $status,
-                'order_merchant_status_description' => $order->getStatusLabel(),
-                'delivery_references_list' => $this->getTrackingNumbers($order),
-            ]
+            'event_data' => $eventData
         ]);
 
         try {
