@@ -1,6 +1,52 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BasketInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Summary"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Price"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Delivery"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Delivery\DeliveryOption"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromoCode"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\ProductAttribute"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Browser"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\OrderInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AcceptedConsent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AccountInfo"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AddressDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\ClientAddress"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\DeliveryAddress"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\Delivery"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\InvoiceDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\QuantityChange"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
@@ -15,14 +61,38 @@
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
                 type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
-    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface"
-                type="InPost\InPostPay\Service\ApiConnector\Merchant\Basket"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketGet"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketDelete"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
+                type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestPayData" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestMobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetMobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\MobileLink" />
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
+    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
+    <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface"
+                type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
     <preference for="InPost\InPostPay\Api\Data\UpdateOrderResponseInterface"
@@ -42,6 +112,14 @@
     <type name="Magento\Quote\Api\ChangeQuoteControlInterface">
         <plugin name="InPost_InPostPay::allowRemoteQuoteChangeByInPostPayPlugin"
                 type="InPost\InPostPay\Plugin\Quote\AllowRemoteQuoteChangeByInPostPayPlugin" />
+    </type>
+    <type name="Magento\Webapi\Model\Rest\Swagger\Generator">
+        <plugin name="InPost_InPostPay::swaggerGetListOfServicesPlugin"
+                type="InPost\InPostPay\Plugin\Swagger\SwaggerGetListOfServicesPlugin" />
+    </type>
+    <type name="\Magento\Framework\Webapi\Authorization">
+        <plugin name="InPost_InPostPay::swaggerAllowAclResourcePlugin"
+                type="InPost\InPostPay\Plugin\Swagger\SwaggerAllowAclResourcePlugin" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
@@ -76,15 +154,55 @@
             </argument>
         </arguments>
     </virtualType>
-    <type name="InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter">
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <arguments>
             <argument name="converters" xsi:type="array">
-                <item name="summary" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketSummaryDataConverter</item>
-                <item name="delivery" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketDeliveryDataConverter</item>
-                <item name="promo_codes" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter</item>
-                <item name="products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketProductsDataConverter</item>
-                <item name="related_products" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketRelatedProductsDataConverter</item>
-                <item name="consents" xsi:type="object">InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketConsentsDataConverter</item>
+                <item name="summary" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer
+                </item>
+                <item name="delivery" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryDataTransfer
+                </item>
+                <item name="promo_codes" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer
+                </item>
+                <item name="products" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer
+                </item>
+                <item name="related_products" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer
+                </item>
+                <item name="consents" xsi:type="object">
+                    InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\OrderValidator">
+        <arguments>
+            <argument name="orderValidators" xsi:type="array">
+                <item name="basket_price" xsi:type="object">InPost\InPostPay\Validator\Order\BasketPriceValidator</item>
+                <item name="payment_type" xsi:type="object">InPost\InPostPay\Validator\Order\PaymentTypeValidator</item>
+                <item name="delivery" xsi:type="object">InPost\InPostPay\Validator\Order\DeliveryValidator</item>
+                <item name="consents" xsi:type="object">InPost\InPostPay\Validator\Order\ConsentsValidator</item>
+                <item name="billing_information" xsi:type="object">InPost\InPostPay\Validator\Order\BillingInformationValidator</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+        <arguments>
+            <argument name="orderProcessingSteps" xsi:type="array">
+                <item name="assign_customer" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\AssignCustomerStep</item>
+                <item name="billing_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\BillingAddressStep</item>
+                <item name="shipping_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ShippingAddressStep</item>
+                <item name="delivery_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\DeliveryMethodStep</item>
+                <item name="payment_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\PaymentMethodStep</item>
+                <item name="reload_quote" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ReloadQuoteStep</item>
+            </argument>
+            <argument name="orderPostProcessingSteps" xsi:type="array">
+                <item name="init_inpost_pay_order" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\InitInPostPayOrderStep</item>
+                <item name="save_pickup_point" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SavePickupPointStep</item>
+                <item name="save_delivery_options" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveDeliveryOptionsStep</item>
             </argument>
         </arguments>
     </type>
@@ -141,7 +259,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter">
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -160,7 +278,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Basket">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketGet">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -170,7 +288,12 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\Basket">
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketDelete">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -190,7 +313,42 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketPromoCodesDataConverter">
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetMobileLink">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\InPostBasketToArrayConverter">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

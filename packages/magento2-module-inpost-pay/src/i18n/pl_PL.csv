@@ -92,4 +92,26 @@
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
 "Unable to serialize basket data.","Nie udana próba serializacji danych koszyka.",module,InPost_InPostPay
-"An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi"
+"Order currency is incorrect. Expected: %1 Received: %2","Niezgodność waluty zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Order final Gross value is incorrect. Expected: %1 Received: %2","Niezgodność finalnej kwoty Brutto zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Order final Net value is incorrect. Expected: %1 Received: %2","Niezgodność finalnej kwoty Netto zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Order final Tax value is incorrect. Expected: %1 Received: %2","Niezgodność finalnej kwoty VAT zamówienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Payment type %1 is not acceptable by merchant.","Typ płatności %1 nie jest akceptowany przez sklep sprzedawcy.",module,InPost_InPostPay
+"Invalid name. Expected: %1 Received: %2","Niezgodność imienia. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Invalid surname. Expected: %1 Received: %2","Niezgodność nazwiska. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Invalid phone number. Expected: %1 Received: %2","Niezgodność numeru telefonu. Oczekiwana: %1 Otrzymana: %2",module,InPost_InPostPay
+"Invalid mail format in: ""%1""","Niepoprawny format adresu mailoweg    o: ""%1""",module,InPost_InPostPay
+"Incomplete delivery address data.","Niekompletne dane adresu dostawy.",module,InPost_InPostPay
+"Incomplete billing address data.","Niekompletne dane adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete invoice address data.","Niekompletne dane adresu do faktury.",module,InPost_InPostPay
+"Consents validation failed. Reason: %1","Weryfikacja zgód nie przebiegła pomyślnie. Powód: %1",module,InPost_InPostPay
+"Consent %1 version is not up to date. Expected: %2 Received: %3","Wersja zgody %1 jest nieaktualna. Oczekiwana: %2 Otrzymana: %3",module,InPost_InPostPay
+"Consent %1 has not been accepted.","Zgoda %1 nie została zaakceptowana.",module,InPost_InPostPay
+"Quote not found.","Nie znaleziono sesji koszyka.",module,InPost_InPostPay
+"Invalid invoice legal form.","Niepoprawna forma prawna faktury.",module,InPost_InPostPay
+"Empty Tax ID.","Pusty numer VAT.",module,InPost_InPostPay
+"Empty Empty Company Name.","Pusta Nazwa Firmy.",module,InPost_InPostPay
+"Delivery method %1 requires chosen point.","Metoda dostawy %1 wymaga wybranego punktu",module,InPost_InPostPay
+"An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi",module,InPost_InPostPay
+"Shipment Mapping Settings for Courier Delivery","Ustawienia mapowania opcji dostawy kurierem",module,InPost_InPostPay
+"Shipment Mapping Settings for Pickup Delivery","Ustawienia mapowania opcji dostawy przez Paczkomat 24/7",module,InPost_InPostPay

@@ -117,14 +117,31 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     /**
      * @param string $carrierMethodCode
      * @return bool
-     * @throws InPostPayInvalidConfigurationException
      */
     private function isInPostPickupDeliveryMethod(string $carrierMethodCode): bool
     {
-        $inPostPickupCarrierCodes = [
-            self::INPOST_PICKUP_CARRIER_CODE,
-            $this->shipmentMappingConfigProvider->getCarrierMethodCodeForInPostPickup()
-        ];
+        $inPostPickupCarrierCodes = [];
+        foreach ($this->shipmentMappingConfigProvider->getAllDeliveryTypes() as $deliveryType) {
+            try {
+                $inPostPickupCarrierCodes[] = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
+                    $deliveryType,
+                    ShipmentMappingConfigProvider::OPTION_STANDARD
+                );
+            } catch (InPostPayInvalidConfigurationException $e) {
+                continue;
+            }
+
+            foreach ($this->shipmentMappingConfigProvider->getNonStandardDeliveryOptions() as $option) {
+                try {
+                    $inPostPickupCarrierCodes[] = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
+                        $deliveryType,
+                        $option
+                    );
+                } catch (InPostPayInvalidConfigurationException $e) {
+                    continue;
+                }
+            }
+        }
 
         return in_array($carrierMethodCode, $inPostPickupCarrierCodes);
     }

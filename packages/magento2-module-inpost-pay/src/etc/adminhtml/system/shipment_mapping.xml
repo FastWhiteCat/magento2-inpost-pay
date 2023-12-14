@@ -4,18 +4,8 @@
            showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Shipment Mapping Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
-        <field id="inpost_courier_mapping" translate="label" type="select" sortOrder="10"
-               showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Mapping for InPost Courier delivery method</label>
-            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
-            <config_path>payment/inpost_pay/inpost_courier_mapping</config_path>
-        </field>
-        <field id="inpost_pickup_mapping" translate="label" type="select" sortOrder="15"
-               showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Mapping for InPost Paczkomat 24/7 delivery method</label>
-            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
-            <config_path>payment/inpost_pay/inpost_pickup_mapping</config_path>
-        </field>
+        <include path="InPost_InPostPay::system/courier/delivery_options_mapping.xml"/>
+        <include path="InPost_InPostPay::system/apm/delivery_options_mapping.xml"/>
         <field id="delivery_deadline_in_days" translate="label comment" type="text" sortOrder="30" showInDefault="1">
             <label>Delivery Deadline in Days</label>
             <validate>validate-number validate-zero-or-greater</validate>

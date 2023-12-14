@@ -17,6 +17,7 @@ interface InPostPayOrderInterface
     public const ORDER_STATUS = 'order_status';
     public const COUNTRY_PREFIX = 'country_prefix';
     public const PHONE = 'phone';
+    public const DELIVERY_OPTIONS = 'delivery_options';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -38,6 +39,8 @@ interface InPostPayOrderInterface
     public function getCountryPrefix(): ?string;
     public function setCountryPrefix(string $countryPrefix): InPostPayOrderInterface;
     public function getPhoneNumber(): PhoneNumberInterface;
+    public function getDeliveryOptions(): array;
+    public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface;
 
     /**
      * @return string

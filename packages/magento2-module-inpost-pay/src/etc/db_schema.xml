@@ -8,6 +8,7 @@
         <column xsi:type="varchar" name="order_status" length="255" nullable="true"/>
         <column xsi:type="varchar" name="country_prefix" length="4" nullable="true"/>
         <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

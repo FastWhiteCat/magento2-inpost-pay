@@ -8,7 +8,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
-use InPost\InPostPay\Service\Converter\QuoteToBasket\QuoteToBasketSummaryDataConverter;
+use InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
@@ -27,20 +27,19 @@ class DeliveryDateProvider
      * This method should be modified with afterPlugin in case of customized delivery date calculations.
      * If not, configuration timestamp increment will be used.
      *
-     * Parameters $shippingMethod and $quote exist only to allow easier delivery date customized calculation
+     * Parameters $shippingMethod exist only to allow easier delivery date customized calculation
      *
      * @param ShippingMethodInterface $shippingMethod
-     * @param Quote $quote
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculateDeliveryDate(ShippingMethodInterface $shippingMethod, Quote $quote): string
+    public function calculateDeliveryDate(ShippingMethodInterface $shippingMethod): string
     {
         try {
             $deadlineInDays = $this->shipmentMappingConfigProvider->getDeliveryDateDeadlineInDays();
             $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
             $currentTimestamp = strtotime(
-                $currentDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT)
+                $currentDateTime->format(QuoteToBasketSummaryDataTransfer::INPOST_DATE_FORMAT)
             );
 
             return $this->formatInPostDate($currentTimestamp + ($deadlineInDays * self::SECONDS_IN_DAY));
@@ -58,6 +57,6 @@ class DeliveryDateProvider
         $deliveryDateTime = new DateTime();
         $deliveryDateTime->setTimestamp($deliveryTimestamp);
 
-        return $deliveryDateTime->format(QuoteToBasketSummaryDataConverter::INPOST_DATE_FORMAT);
+        return $deliveryDateTime->format(QuoteToBasketSummaryDataTransfer::INPOST_DATE_FORMAT);
     }
 }
