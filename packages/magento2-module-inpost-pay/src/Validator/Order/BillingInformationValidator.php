@@ -86,7 +86,7 @@ class BillingInformationValidator implements OrderValidatorInterface
             throw new LocalizedException(
                 __(
                     'Invalid phone number. Expected: %1 Received: %2',
-                    trim($inPostPayQuote->getCountryPrefix()) . trim($inPostPayQuote->getPhone()),
+                    trim((string)$inPostPayQuote->getCountryPrefix()) . trim((string)$inPostPayQuote->getPhone()),
                     trim($phoneNumber->getCountryPrefix()) . trim($phoneNumber->getPhone())
                 )
             );
