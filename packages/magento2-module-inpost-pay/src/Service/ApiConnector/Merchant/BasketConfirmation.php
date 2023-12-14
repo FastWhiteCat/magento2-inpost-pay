@@ -62,19 +62,20 @@ class BasketConfirmation implements BasketConfirmationInterface
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
-            $this->eventManager->dispatch('izi_basket_confirmation_before',
-                [
-                    'quote' => $quote,
-                    'inPostPayQuote' => $inPostPayQuote,
-                    'basketId' => $basketId,
-                    'status' => $status,
-                    'inpostBasketId' => $inpostBasketId,
-                    'phoneNumber' => $phoneNumber,
-                    'browser' => $browser,
-                    'maskedPhoneNumber' => $maskedPhoneNumber,
-                    'name' => $name,
-                    'surname' => $surname
-                ]);
+            $this->eventManager->dispatch('izi_basket_confirmation_before', [
+                'quote' => $quote,
+                'inPostPayQuote' => $inPostPayQuote,
+                'basketId' => $basketId,
+                'status' => $status,
+                'inpostBasketId' => $inpostBasketId,
+                'phoneNumber' => $phoneNumber,
+                'browser' => $browser,
+                'maskedPhoneNumber' => $maskedPhoneNumber,
+                'name' => $name,
+                'surname' => $surname
+                ]
+            );
+
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
 
             $inPostPayQuote->setStatus($status);

@@ -68,14 +68,14 @@ class OrderCreate implements OrderCreateInterface
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($basketId);
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
 
-            $this->eventManager->dispatch('izi_order_create_before',
-                [
-                    'orderDetails' => $orderDetails,
-                    'accountInfo' => $accountInfo,
-                    'delivery' => $delivery,
-                    'consents' => $consents,
-                    'invoiceDetails' => $invoiceDetails,
-                ]);
+            $this->eventManager->dispatch('izi_order_create_before', [
+                'orderDetails' => $orderDetails,
+                'accountInfo' => $accountInfo,
+                'delivery' => $delivery,
+                'consents' => $consents,
+                'invoiceDetails' => $invoiceDetails,
+                ]
+            );
 
             if ($quote instanceof Quote && $quote->getId()) {
                 $inPostOrder = $this->combineInPostOrder(

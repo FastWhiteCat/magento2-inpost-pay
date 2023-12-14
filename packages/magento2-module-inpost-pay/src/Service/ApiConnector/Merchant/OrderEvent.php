@@ -51,14 +51,14 @@ class OrderEvent implements OrderEventInterface
         ?PhoneNumberInterface $phoneNumber = null
     ): UpdateOrderResponseInterface {
         try {
-            $this->eventManager->dispatch('izi_order_update_before',
-                [
-                    'orderId' => $orderId,
-                    'eventId' => $eventId,
-                    'eventDataTime' => $eventDataTime,
-                    'eventData' => $eventData,
-                    'phoneNumber' => $phoneNumber,
-                ]);
+            $this->eventManager->dispatch('izi_order_update_before', [
+                'orderId' => $orderId,
+                'eventId' => $eventId,
+                'eventDataTime' => $eventDataTime,
+                'eventData' => $eventData,
+                'phoneNumber' => $phoneNumber,
+                ]
+            );
             /**
              * @var Order $order
              */

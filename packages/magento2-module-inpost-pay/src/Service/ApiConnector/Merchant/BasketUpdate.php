@@ -58,17 +58,17 @@ class BasketUpdate implements BasketUpdateInterface
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
         $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
-        $this->eventManager->dispatch('izi_basket_update_before',
-            [
-                'quote' => $quote,
-                'inPostPayQuote' => $inPostPayQuote,
-                'basketId' => $basketId,
-                'eventId' => $eventId,
-                'eventDataTime' => $eventDataTime,
-                'eventType' => $eventType,
-                'quantityEventData' => $quantityEventData,
-                'promoCodesEventData' => $promoCodesEventData
-            ]);
+        $this->eventManager->dispatch('izi_basket_update_before', [
+            'quote' => $quote,
+            'inPostPayQuote' => $inPostPayQuote,
+            'basketId' => $basketId,
+            'eventId' => $eventId,
+            'eventDataTime' => $eventDataTime,
+            'eventType' => $eventType,
+            'quantityEventData' => $quantityEventData,
+            'promoCodesEventData' => $promoCodesEventData
+            ]
+        );
 
         $this->createRequestDebugLog(
             sprintf(
