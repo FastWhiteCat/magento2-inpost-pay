@@ -27,7 +27,8 @@
         <column xsi:type="varchar" name="basket_id" length="255" nullable="false"/>
         <column xsi:type="varchar" name="inpost_basket_id" length="255" nullable="true"/>
         <column xsi:type="varchar" name="status" length="32" nullable="false" default="PENDING"/>
-        <column xsi:type="varchar" name="phone_number" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="country_prefix" length="12" nullable="true"/>
         <column xsi:type="varchar" name="masked_phone_number" length="12" nullable="true"/>
         <column xsi:type="tinyint" name="browser_trusted" nullable="false" default="0"/>
         <column xsi:type="varchar" name="browser_id" length="255" nullable="true"/>
