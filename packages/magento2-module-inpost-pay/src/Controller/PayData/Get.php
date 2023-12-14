@@ -111,8 +111,6 @@ class Get implements HttpPostActionInterface
     private function getCustomerIPAddress(): string
     {
         // @phpstan-ignore-next-line
-        $requestIPAddresses = explode(',', str_replace(' ', '', $this->request->getClientIp()));
-
-        return (!empty($requestIPAddresses)) ? current($requestIPAddresses) : '';
+        return current(explode(',', str_replace(' ', '', $this->request->getClientIp())));
     }
 }
