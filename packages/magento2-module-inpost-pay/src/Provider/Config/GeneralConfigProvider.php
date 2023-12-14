@@ -9,7 +9,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class GeneralConfigProvider
 {
-    private const XML_PATH_INPOST_PAY_ENABLED = 'payment/inpost_pay/enabled';
+    private const XML_PATH_INPOST_PAY_ENABLED = 'payment/inpost_pay/active';
     private const XML_PATH_INPOST_PAY_NEW_ORDER_STATUS = 'payment/inpost_pay/order_status';
 
     /**
