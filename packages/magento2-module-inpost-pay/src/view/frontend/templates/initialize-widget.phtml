@@ -27,11 +27,13 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $cartId = $block->getQuoteId();
+$widgetWrapperClass = "inpost-widget-wrapper";
 ?>
 
 <?php if ($bindingPlace === DisplayConfigProvider::THANK_YOU_PAGE_BINDING_PLACE_NAME): ?>
     <inpost-thank-you/>
 <?php else: ?>
+<div class="<?= $widgetWrapperClass . ' ' . $bindingPlace?>">
     <inpost-izi-button
         name="<?= /* @noEscape */ $name ?>"
         masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
@@ -48,9 +50,13 @@ $cartId = $block->getQuoteId();
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "cartId": "<?= /* @noEscape */ $cartId ?>"
+                    "cartId": "<?= /* @noEscape */ $cartId ?>",
+                    "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
+                    "popupBindingPlace": "<?= /* @noEscape */ DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                    "count": <?= /* @noEscape */ $cartItemsCount ?>
                 }
             }
         }
     </script>
+</div>
 <?php endif;

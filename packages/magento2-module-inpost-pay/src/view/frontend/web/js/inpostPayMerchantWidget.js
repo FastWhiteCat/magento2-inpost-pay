@@ -254,13 +254,16 @@ define([
         },
 
         bindEvents: function () {
+            checkCartWidget();
             customerData.get('cart').subscribe(function (cartData) {
+                checkCartWidget(cartData);
+
                 var $iziButtons = $("inpost-izi-button");
                 if (!$iziButtons.length) return;
 
                 var event = new CustomEvent("inpost-update-count", {detail: cartData.summary_count});
 
-                $iziButtons.each(function () {
+                $iziButtons.each(function (item) {
                     this.dispatchEvent(event)
                 });
             });
@@ -268,6 +271,21 @@ define([
             document.addEventListener('iziModalEventClose', function () {
                 abortRequest(xhrForBasketConfirmation)
             })
+
+            function checkCartWidget(cartData = "") {
+                var wrapperClass = getConfig().wrapperClass || "inpost-widget-wrapper";
+                var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace+"");
+                var counter = cartData ? cartData.summary_count : getConfig().count;
+
+                if ($inpayWrapperOnBasket.length) {
+                    if (counter === 0) {
+                        $inpayWrapperOnBasket.hide()
+                    } else {
+                        $inpayWrapperOnBasket.show()
+                    }
+                }
+            }
         },
 
         getBrowserDescription: function () {
