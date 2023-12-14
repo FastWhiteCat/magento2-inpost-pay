@@ -102,7 +102,6 @@ class Get implements HttpPostActionInterface
             "architecture" => $browser['architecture'] ?? '',
             "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             "location" => "-",
-            // @phpstan-ignore-next-line
             "customer_ip" => $this->getCustomerIPAddress(),
             // @phpstan-ignore-next-line
             "port" => $this->request->getServer('SERVER_PORT')
@@ -111,8 +110,9 @@ class Get implements HttpPostActionInterface
 
     private function getCustomerIPAddress(): string
     {
+        // @phpstan-ignore-next-line
         $requestIPAddresses = explode(',', str_replace(' ', '', $this->request->getClientIp()));
 
-        return (is_array($requestIPAddresses) && !empty($requestIPAddresses)) ? current($requestIPAddresses) : '';
+        return (!empty($requestIPAddresses)) ? current($requestIPAddresses) : '';
     }
 }
