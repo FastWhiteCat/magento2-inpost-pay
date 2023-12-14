@@ -375,5 +375,19 @@
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
+    </type><type name="InPost\InPostPay\Controller\MobileLink\Get">
+    <arguments>
+        <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+    </arguments>
+</type>
+    <type name="InPost\InPostPay\Controller\PayData\Get">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Controller\BasketConfirmation\Get">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
     </type>
 </config>
