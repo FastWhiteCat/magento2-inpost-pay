@@ -263,7 +263,7 @@ define([
 
                 var event = new CustomEvent("inpost-update-count", {detail: cartData.summary_count});
 
-                $iziButtons.each(function (item) {
+                $iziButtons.each(function () {
                     this.dispatchEvent(event)
                 });
             });
