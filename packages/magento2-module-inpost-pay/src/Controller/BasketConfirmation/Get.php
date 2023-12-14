@@ -53,10 +53,16 @@ class Get implements HttpGetActionInterface
                 $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
 
                 $data = [
-                    'message' => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
                     'status' => $inpostPayQuote->getStatus(),
-                    'browser_id' => $inpostPayQuote->getBrowserId(),
-                    'browser_trusted' => $inpostPayQuote->getBrowserTrusted(),
+                    'message' => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
+                    'phone_number' => [
+                        'country_prefix' => (string)$inpostPayQuote->getCountryPrefix(),
+                        'phone' => (string)$inpostPayQuote->getPhone()
+                    ],
+                    'browser' => [
+                        'browser_id' => $inpostPayQuote->getBrowserId(),
+                        'browser_trusted' => $inpostPayQuote->getBrowserTrusted(),
+                    ],
                     'name' => $inpostPayQuote->getName(),
                     'surname' => $inpostPayQuote->getSurname(),
                     'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
