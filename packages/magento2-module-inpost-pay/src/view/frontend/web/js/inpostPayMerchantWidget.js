@@ -148,13 +148,13 @@ define([
                     .done(function (data) {
                         if (data.phone_number) {
                             resolve(data);
-                        } else if (data.status) {
+                        } else if (data.action) {
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 abortRequest(xhrForBasketConfirmation)
                             }
 
-                            switch (data.status) {
+                            switch (data.action) {
                                 case 'REJECT':
                                     reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
                                     break;
