@@ -228,11 +228,29 @@ define([
 
             if (isProductAdded) return;
 
-            $productForm.submit();
+            return ajaxSubmit($productForm).then().catch(function (err) {
+                console.error(err);
+            })
 
-            var cartSubscriber = customerData.get('cart').subscribe(function () {
-                cartSubscriber.dispose();
-            });
+            function ajaxSubmit($form) {
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        url: $form.attr('action'),
+                        data: new FormData($form[0]),
+                        type: 'post',
+                        dataType: 'json',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function () {
+                            resolve()
+                        },
+                        error: function () {
+                            reject()
+                        }
+                    });
+                });
+            }
         },
 
         bindEvents: function () {
@@ -293,6 +311,8 @@ define([
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
+            if (!cartData.items) return false;
+
             if (cartData.items
                 && cartData.items.some((item) => item.product_id === id && item.product_type === PRODUCT_TYPES.SIMPLE))
                 return true;
