@@ -59,7 +59,7 @@ class UpdateOrder
             'event_id' => uniqid(),
             'event_data_time' => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             'phone_number' => [
-                'country_prefix' => $inPostPayOrder->getCountryPrefix()(),
+                'country_prefix' => $inPostPayOrder->getCountryPrefix(),
                 'phone' => $inPostPayOrder->getPhone(),
             ],
             'event_data' => $eventData
