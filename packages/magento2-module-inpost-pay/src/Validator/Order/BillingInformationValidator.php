@@ -80,13 +80,13 @@ class BillingInformationValidator implements OrderValidatorInterface
         PhoneNumberInterface $phoneNumber,
         InPostPayQuoteInterface $inPostPayQuote
     ): void {
-        if ($phoneNumber->getCountryPrefix() !== $inPostPayQuote->getCountryPrefix()
-            || $phoneNumber->getPhone() !== $inPostPayQuote->getPhone()
+        if ($inPostPayQuote->getPhone() !== $phoneNumber->getPhone()
+            || $inPostPayQuote->getCountryPrefix() !== $phoneNumber->getCountryPrefix()
         ) {
             throw new LocalizedException(
                 __(
                     'Invalid phone number. Expected: %1 Received: %2',
-                    trim($inPostPayQuote->getCountryPrefix()) . trim($inPostPayQuote->getPhone()),
+                    trim((string)$inPostPayQuote->getCountryPrefix()) . trim((string)$inPostPayQuote->getPhone()),
                     trim($phoneNumber->getCountryPrefix()) . trim($phoneNumber->getPhone())
                 )
             );

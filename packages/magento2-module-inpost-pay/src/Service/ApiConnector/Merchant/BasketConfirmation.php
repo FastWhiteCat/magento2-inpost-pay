@@ -72,7 +72,8 @@ class BasketConfirmation implements BasketConfirmationInterface
             $inPostPayQuote->setStatus($status);
             $inPostPayQuote->setInpostBasketId($inpostBasketId);
             $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber);
-            $inPostPayQuote->setPhoneNumber(trim($phoneNumber->getCountryPrefix()) . trim($phoneNumber->getPhone()));
+            $inPostPayQuote->setPhone($phoneNumber->getPhone());
+            $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
             $inPostPayQuote->setName($name);
             $inPostPayQuote->setSurname($surname);
             $inPostPayQuote->setBrowserId($browser->getBrowserId());
