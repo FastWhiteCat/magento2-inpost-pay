@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\Data;
 
+use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 
@@ -20,6 +21,7 @@ interface InPostPayOrderInterface
     public const COUNTRY_PREFIX = 'country_prefix';
     public const PHONE = 'phone';
     public const DELIVERY_OPTIONS = 'delivery_options';
+    public const ACCEPTED_CONSENTS = 'accepted_consents';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -47,6 +49,17 @@ interface InPostPayOrderInterface
     public function getPhoneNumber(): PhoneNumberInterface;
     public function getDeliveryOptions(): array;
     public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface;
+
+    /**
+     * @return AcceptedConsentInterface[]
+     */
+    public function getAcceptedConsents(): array;
+
+    /**
+     * @param AcceptedConsentInterface[] $acceptedConsents
+     * @return InPostPayOrderInterface
+     */
+    public function setAcceptedConsents(array $acceptedConsents): InPostPayOrderInterface;
 
     /**
      * @return string

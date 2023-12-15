@@ -7,16 +7,19 @@ namespace InPost\InPostPay\Model;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
-    private const DELIVERY_OPTIONS_SEPARATOR = ',';
+    private const SEPARATOR = ',';
 
     protected $_eventPrefix = InPostPayOrderInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayOrderInterface::ENTITY_NAME;
@@ -27,6 +30,8 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         Context $context,
         Registry $registry,
         private readonly PhoneNumberInterfaceFactory $phoneNumberInterfaceFactory,
+        private readonly AcceptedConsentInterfaceFactory $acceptedConsentFactory,
+        private readonly SerializerInterface $serializer,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -107,7 +112,7 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     {
         $deliveryOptions = $this->getData(self::DELIVERY_OPTIONS);
         if (!empty($deliveryOptions) && is_scalar($deliveryOptions)) {
-            return explode(self::DELIVERY_OPTIONS_SEPARATOR, (string)$deliveryOptions);
+            return explode(self::SEPARATOR, (string)$deliveryOptions);
         }
 
         return [];
@@ -115,7 +120,54 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 
     public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface
     {
-        return $this->setData(self::DELIVERY_OPTIONS, implode(self::DELIVERY_OPTIONS_SEPARATOR, $deliveryOptions));
+        return $this->setData(self::DELIVERY_OPTIONS, implode(self::SEPARATOR, $deliveryOptions));
+    }
+
+    /**
+     * @return AcceptedConsentInterface[]
+     */
+    public function getAcceptedConsents(): array
+    {
+        $acceptedConsents = [];
+        $acceptedContentsValue = $this->getData(self::ACCEPTED_CONSENTS);
+        if (!empty($acceptedContentsValue) && is_scalar($acceptedContentsValue)) {
+            $acceptedConsentsData = $this->serializer->unserialize((string)$acceptedContentsValue);
+            if (is_array($acceptedConsentsData)) {
+                foreach ($acceptedConsentsData as $acceptedConsentData) {
+                    $consentId = (string)($acceptedConsentData[AcceptedConsentInterface::CONSENT_ID] ?? '');
+                    $consentVersion = (string)($acceptedConsentData[AcceptedConsentInterface::CONSENT_VERSION] ?? '');
+                    $isAccepted = (bool)($acceptedConsentData[AcceptedConsentInterface::IS_ACCEPTED] ?? false);
+
+                    /** @var AcceptedConsentInterface $acceptedContent */
+                    $acceptedContent = $this->acceptedConsentFactory->create();
+                    $acceptedContent->setConsentId($consentId);
+                    $acceptedContent->setConsentVersion($consentVersion);
+                    $acceptedContent->setIsAccepted($isAccepted);
+                    $acceptedConsents[] = $acceptedContent;
+                }
+            }
+        }
+
+        return $acceptedConsents;
+    }
+
+    /**
+     * @param AcceptedConsentInterface[] $acceptedConsents
+     * @return InPostPayOrderInterface
+     */
+    public function setAcceptedConsents(array $acceptedConsents): InPostPayOrderInterface
+    {
+        $acceptedConsentsData = [];
+        foreach ($acceptedConsents as $acceptedConsent) {
+            if ($acceptedConsent instanceof AcceptedConsentInterface) {
+                $acceptedConsentsData[] = [
+                    AcceptedConsentInterface::CONSENT_ID => $acceptedConsent->getConsentId(),
+                    AcceptedConsentInterface::CONSENT_VERSION => $acceptedConsent->getConsentVersion(),
+                    AcceptedConsentInterface::IS_ACCEPTED => $acceptedConsent->getIsAccepted()
+                ];
+            }
+        }
+        return $this->setData(self::ACCEPTED_CONSENTS, $this->serializer->serialize($acceptedConsentsData));
     }
 
     public function getOrderStatus(): ?string
