@@ -42,6 +42,25 @@ class QuantityUpdate extends DataObject implements QuantityUpdateInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getEan(): ?string
+    {
+        $ean = $this->getData(self::EAN);
+
+        return (is_scalar($ean)) ? (string)$ean : null;
+    }
+
+    /**
+     * @param string|null $ean
+     * @return void
+     */
+    public function setEan(?string $ean): void
+    {
+        $this->setData(self::EAN, $ean);
+    }
+
+    /**
      * @return QuantityChangeInterface
      */
     public function getQuantity(): QuantityChangeInterface
