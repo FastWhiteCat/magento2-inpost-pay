@@ -146,9 +146,7 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        if (data.phone_number) {
-                            resolve(data);
-                        } else if (data.status) {
+                        if (data.status) {
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 abortRequest(xhrForBasketConfirmation)
@@ -160,6 +158,9 @@ define([
                                     break;
                                 case 'PENDING':
                                     setTimerAndRunCallback(checkIsBound);
+                                    break;
+                                case 'SUCCESS':
+                                    resolve(data)
                                     break;
                                 default:
                                     break;
