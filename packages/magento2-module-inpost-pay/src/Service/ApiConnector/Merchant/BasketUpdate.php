@@ -71,7 +71,11 @@ class BasketUpdate implements BasketUpdateInterface
             foreach ($quantityEventData as $productQuantity) {
                 $productId = (int)$productQuantity->getProductId();
                 $qty = (float)$productQuantity->getQuantity()->getQuantity();
-                $this->cartService->addToCart($quote, $productId, $qty);
+                if ($qty) {
+                    $this->cartService->addToCart($quote, $productId, $qty);
+                } else {
+                    $this->cartService->removeFromCart($quote, $productId);
+                }
             }
         }
 
@@ -79,7 +83,11 @@ class BasketUpdate implements BasketUpdateInterface
             foreach ($relatedProductsEventData as $productQuantity) {
                 $productId = (int)$productQuantity->getProductId();
                 $qty = (float)$productQuantity->getQuantity()->getQuantity();
-                $this->cartService->addToCart($quote, $productId, $qty);
+                if ($qty) {
+                    $this->cartService->addToCart($quote, $productId, $qty);
+                } else {
+                    $this->cartService->removeFromCart($quote, $productId);
+                }
             }
         }
 
