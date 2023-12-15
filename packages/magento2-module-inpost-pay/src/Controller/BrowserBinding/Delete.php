@@ -49,7 +49,8 @@ class Delete implements HttpGetActionInterface
             $quote = $this->checkoutSession->getQuote();
 
             if ($quote->getId()) {
-                $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId((int)$quote->getId());
+                $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+                $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
                 if ($inPostPayQuote->getQuoteId() && $inPostPayQuote->getBrowserId()) {
                     $response = $this->browserBinding->delete($inPostPayQuote->getBrowserId());
                     if (empty($response)) {
