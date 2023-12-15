@@ -82,7 +82,7 @@ define([
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
             var data = {
-                prefix: prefix && prefix.toString() || "",
+                prefix: prefix && "+" + prefix || "",
                 number: phoneNumber || "",
                 browser: browserData,
                 binding_place: bindingPlace
