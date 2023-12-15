@@ -99,6 +99,7 @@ class SignatureValidator implements SignatureValidatorInterface
             $requestBody
         );
 
+        $this->logger->debug(sprintf('Expected Signature: %s', $expectedSignature));
         $validationResult = (int)openssl_verify(
             $expectedSignature,
             $decodedRequestSignature,
@@ -109,18 +110,25 @@ class SignatureValidator implements SignatureValidatorInterface
         switch ($validationResult) {
             case self::SIGNATURE_CORRECT:
                 $validationErrorMsg = null;
+                $this->logger->debug('Valid signature');
                 break;
             case self::SIGNATURE_INCORRECT:
-                $validationErrorMsg = __('Invalid signature');
+                $invalidSignatureMsg = 'Invalid signature';
+                $validationErrorMsg = __($invalidSignatureMsg);
+                $this->logger->debug($invalidSignatureMsg);
                 break;
             case self::SIGNATURE_VALIDATION_ERROR:
+                $signatureValidationError = (string) openssl_error_string();
                 $validationErrorMsg = __(
                     'There has been an error during signature validation: "%1"',
-                    (string) openssl_error_string()
+                    $signatureValidationError
                 );
+                $this->logger->debug(sprintf('Signature validation error: %s', $signatureValidationError));
                 break;
             default:
-                $validationErrorMsg = __('Signature validation failed for unknown reasons');
+                $unknownValidationReasons = 'Signature validation failed for unknown reasons';
+                $validationErrorMsg = __($unknownValidationReasons);
+                $this->logger->debug($unknownValidationReasons);
         }
 
         if ($validationErrorMsg) {
@@ -150,7 +158,7 @@ class SignatureValidator implements SignatureValidatorInterface
         string $requestPublicKeyVersion,
         string $requestBody
     ): string {
-        $digest = base64_encode(hash('sha256', $requestBody));
+        $digest = base64_encode(hash('sha256', $requestBody, true));
         try {
             $externalMerchantId = $this->publicKeyProvider->getMerchantExternalId($requestPublicKeyVersion);
         } catch (LocalizedException $e) {
