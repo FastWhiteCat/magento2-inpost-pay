@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 class BasketUpdate implements BasketUpdateInterface
 {
     private const REQUEST_PREFIX = 'BASKET_UPDATE_REQUEST';
+    private const PROMO_CODES_EVENT = 'PROMO_CODES';
 
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
@@ -69,17 +70,13 @@ class BasketUpdate implements BasketUpdateInterface
 
         if (!empty($quantityEventData)) {
             foreach ($quantityEventData as $productQuantity) {
-                $productId = (int)$productQuantity->getProductId();
-                $qty = (float)$productQuantity->getQuantity()->getQuantity();
-                $this->cartService->addToCart($quote, $productId, $qty);
+                $this->handleProductQuantities($quote, $productQuantity);
             }
         }
 
         if (!empty($relatedProductsEventData)) {
             foreach ($relatedProductsEventData as $productQuantity) {
-                $productId = (int)$productQuantity->getProductId();
-                $qty = (float)$productQuantity->getQuantity()->getQuantity();
-                $this->cartService->addToCart($quote, $productId, $qty);
+                $this->handleProductQuantities($quote, $productQuantity);
             }
         }
 
@@ -87,6 +84,8 @@ class BasketUpdate implements BasketUpdateInterface
             foreach ($promoCodesEventData as $promoCode) {
                 $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
             }
+        } elseif ($eventType === self::PROMO_CODES_EVENT) {
+            $this->cartService->removePromosFromQuote($quote);
         }
 
         $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
@@ -95,6 +94,17 @@ class BasketUpdate implements BasketUpdateInterface
         $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 
         return $basket;
+    }
+
+    private function handleProductQuantities(Quote $quote, QuantityUpdateInterface $productQuantity): void
+    {
+        $productId = (int)$productQuantity->getProductId();
+        $qty = (float)$productQuantity->getQuantity()->getQuantity();
+        if ($qty) {
+            $this->cartService->addToCart($quote, $productId, $qty);
+        } else {
+            $this->cartService->removeFromCart($quote, $productId);
+        }
     }
 
     /**
