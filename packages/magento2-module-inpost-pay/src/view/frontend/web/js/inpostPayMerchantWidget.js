@@ -146,9 +146,7 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        if (data.phone_number) {
-                            resolve(data);
-                        } else if (data.status) {
+                        if (data.status) {
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 abortRequest(xhrForBasketConfirmation)
@@ -160,6 +158,9 @@ define([
                                     break;
                                 case 'PENDING':
                                     setTimerAndRunCallback(checkIsBound);
+                                    break;
+                                case 'SUCCESS':
+                                    resolve(data)
                                     break;
                                 default:
                                     break;
@@ -207,7 +208,7 @@ define([
             //TODO change url when endpoint will be changed to controller
             return new Promise(function (resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/basket/binding'),
+                    url: urlBuilder.build('inpostizi/BrowserBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
                     method: 'GET',
                 })
                     .done(function () {
