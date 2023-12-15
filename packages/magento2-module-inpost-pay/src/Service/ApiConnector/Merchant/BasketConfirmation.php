@@ -97,15 +97,8 @@ class BasketConfirmation implements BasketConfirmationInterface
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($quote, $basket);
 
-        $this->eventManager->dispatch('izi_basket_confirmation_before', [
-            'basketId' => $basketId,
-            'status' => $status,
-            'inpostBasketId' => $inpostBasketId,
-            'phoneNumber' => $phoneNumber,
-            'browser' => $browser,
-            'maskedPhoneNumber' => $maskedPhoneNumber,
-            'name' => $name,
-            'surname' => $surname
+        $this->eventManager->dispatch('izi_basket_confirmation_after', [
+            'basket' => $basket,
         ]);
 
         $this->createRequestDebugLog(
