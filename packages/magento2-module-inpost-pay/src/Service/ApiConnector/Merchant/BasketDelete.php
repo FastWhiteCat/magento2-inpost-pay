@@ -27,7 +27,7 @@ class BasketDelete implements BasketDeleteInterface
         $this->createRequestDebugLog(sprintf('Deleting Basket ID: %s', $basketId));
 
         try {
-            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
+            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByBasketId($basketId));
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             throw new LocalizedException(__('An error occurred during delete process. Check error logs'));
