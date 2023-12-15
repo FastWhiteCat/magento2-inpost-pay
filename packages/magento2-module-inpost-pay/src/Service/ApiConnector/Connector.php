@@ -44,7 +44,7 @@ class Connector implements ConnectorInterface
                     $requestParams = !empty($params) ? ['multipart' => $params] : [];
                     break;
                 default:
-                    $requestParams = ['json' => $params];
+                    $requestParams = (!empty($params)) ? ['json' => $params]: [];
             }
             $this->createRequestLog($url, $headers, $requestParams);
             $response = $client->{$request->getMethod()}($url, $requestParams);
