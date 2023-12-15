@@ -12,7 +12,8 @@ interface InPostPayQuoteInterface
     public const BASKET_ID = 'basket_id';
     public const INPOST_BASKET_ID = 'inpost_basket_id';
     public const STATUS = 'status';
-    public const PHONE_NUMBER = 'phone_number';
+    public const PHONE = 'phone';
+    public const COUNTRY_PREFIX = 'country_prefix';
     public const MASKED_PHONE_NUMBER = 'masked_phone_number';
     public const BROWSER_TRUSTED = 'browser_trusted';
     public const BROWSER_ID = 'browser_id';
@@ -36,8 +37,11 @@ interface InPostPayQuoteInterface
     public function getStatus(): string;
     public function setStatus(string $status): InPostPayQuoteInterface;
 
-    public function getPhoneNumber(): ?string;
-    public function setPhoneNumber(string $phoneNumber): InPostPayQuoteInterface;
+    public function getPhone(): ?string;
+    public function setPhone(string $phone): InPostPayQuoteInterface;
+
+    public function getCountryPrefix(): ?string;
+    public function setCountryPrefix(string $countryPrefix): InPostPayQuoteInterface;
 
     public function getMaskedPhoneNumber(): ?string;
     public function setMaskedPhoneNumber(string $maskedPhoneNumber): InPostPayQuoteInterface;

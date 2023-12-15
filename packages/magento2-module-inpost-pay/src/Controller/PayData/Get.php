@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Controller\PayData;
 
-use InPost\InPostPay\Service\ApiConnector\BindingBasket;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingCreate;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -33,7 +33,7 @@ class Get implements HttpPostActionInterface
      */
     public function __construct(
         Context $context,
-        private readonly BindingBasket $bindingBasket,
+        private readonly BasketBindingCreate $basketBindingCreate,
         private readonly CheckoutSession $checkoutSession,
         private readonly Validator $formKeyValidator,
         private readonly SerializerInterface $serializer,
@@ -75,7 +75,7 @@ class Get implements HttpPostActionInterface
                         $browserData = $this->prepareBrowserData($browser);
                     }
 
-                    $result = $this->bindingBasket->bindBasket(
+                    $result = $this->basketBindingCreate->execute(
                         $quoteId,
                         $params['binding_place'],
                         $browserData,
@@ -102,10 +102,15 @@ class Get implements HttpPostActionInterface
             "architecture" => $browser['architecture'] ?? '',
             "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             "location" => "-",
-            // @phpstan-ignore-next-line
-            "customer_ip" => $this->request->getClientIp(),
+            "customer_ip" => $this->getCustomerIPAddress(),
             // @phpstan-ignore-next-line
             "port" => $this->request->getServer('SERVER_PORT')
         ];
+    }
+
+    private function getCustomerIPAddress(): string
+    {
+        // @phpstan-ignore-next-line
+        return current(explode(',', str_replace(' ', '', $this->request->getClientIp())));
     }
 }

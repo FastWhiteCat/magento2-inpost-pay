@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
-use InPost\InPostPay\Api\ApiConnector\IziApi\Basket\BasketFieldInterface as Basket;
-use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
+use InPost\InPostPay\Service\Converter\InPostBasketToArrayConverter;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use InPost\InPostPay\Model\IziApi\Request\BasketRequestFactory;
@@ -22,7 +24,9 @@ class CreateOrUpdateBasket
         private readonly ConnectorInterface $connector,
         private readonly BasketRequestFactory $basketRequestFactory,
         private readonly BasketResponseFactory $basketResponseFactory,
-        private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
+        private readonly BasketInterfaceFactory $basketFactory,
+        private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
+        private readonly InPostBasketToArrayConverter $inPostBasketToArrayConverter,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -39,10 +43,12 @@ class CreateOrUpdateBasket
         /** @var BasketRequest $request */
         $request = $this->basketRequestFactory->create();
 
-        $basketData = array_merge(
-            [Basket::BROWSER_ID => $browserId, Basket::BASKET_ID => $basketId],
-            $this->quoteToBasketDataConverter->convert($quote)
-        );
+        /** @var BasketInterface $basket */
+        $basket = $this->basketFactory->create();
+        $basket->setBrowserId($browserId);
+        $basket->setBasketId($basketId);
+        $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+        $basketData = $this->inPostBasketToArrayConverter->convert($basket);
 
         $request->setParams($basketData);
 

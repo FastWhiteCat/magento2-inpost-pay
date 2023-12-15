@@ -9,7 +9,8 @@ use Magento\Store\Model\ScopeInterface;
 
 class GeneralConfigProvider
 {
-    private const XML_PATH_INPOST_PAY_ENABLED = 'payment/inpost_pay/enabled';
+    private const XML_PATH_INPOST_PAY_ENABLED = 'payment/inpost_pay/active';
+    private const XML_PATH_INPOST_PAY_NEW_ORDER_STATUS = 'payment/inpost_pay/order_status';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -26,7 +27,20 @@ class GeneralConfigProvider
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_INPOST_PAY_ENABLED,
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_WEBSITE
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewOrderStatus(): string
+    {
+        $orderStatus = $this->scopeConfig->getValue(
+            self::XML_PATH_INPOST_PAY_NEW_ORDER_STATUS,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        return is_scalar($orderStatus) ? (string)$orderStatus : 'pending';
     }
 }

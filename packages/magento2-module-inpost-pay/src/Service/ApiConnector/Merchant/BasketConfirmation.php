@@ -5,74 +5,90 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Service\Converter\QuoteToBasketDataConverter;
+use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BasketConfirmation implements BasketConfirmationInterface
 {
-    private const BASKET_BIND_STATUS_PARAM = 'status';
-    private const INPOST_BASKET_ID_PARAM = 'inpost_basket_id';
-    private const PHONE_NUMBER_PARAM = 'phone_number';
-    private const PHONE_PARAM = 'phone';
-    private const COUNTRY_PREFIX_PARAM = 'country_prefix';
-    private const BROWSER_PARAM = 'browser';
-    private const BROWSER_TRUSTED_PARAM = 'browser_trusted';
-    private const BROWSER_ID_PARAM = 'browser_id';
-    private const MASKED_PHONE_NUMBER_PARAM = 'masked_phone_number';
-    private const NAME_PARAM = 'name';
-    private const SURNAME_PARAM = 'surname';
+    private const REQUEST_PREFIX = 'BASKET_CONFIRMATION_REQUEST';
 
     public function __construct(
-        private readonly RestRequest $restRequest,
-        private readonly JsonSerializer $jsonSerializer,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly QuoteToBasketDataConverter $quoteToBasketDataConverter,
+        private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
+        private readonly BasketInterfaceFactory $basketFactory,
         private readonly LoggerInterface $logger
     ) {
     }
 
     /**
      * @param string $basketId
-     * @return array
+     * @param string $status
+     * @param string $inpostBasketId
+     * @param PhoneNumberInterface $phoneNumber
+     * @param BrowserInterface $browser
+     * @param string $maskedPhoneNumber
+     * @param string $name
+     * @param string $surname
+     * @return BasketDataInterface
      * @throws LocalizedException
      */
-    public function execute(string $basketId): array
-    {
+    public function execute(
+        string $basketId,
+        string $status,
+        string $inpostBasketId,
+        PhoneNumberInterface $phoneNumber,
+        BrowserInterface $browser,
+        string $maskedPhoneNumber,
+        string $name,
+        string $surname
+    ): BasketDataInterface {
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-            $payload = $this->jsonSerializer->unserialize((string)$this->restRequest->getContent());
-            $payload = is_array($payload) ? $payload : [];
+            $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
 
-            $inPostPayQuote->setStatus($this->extractStatus($payload));
-            $inPostPayQuote->setInpostBasketId($this->extractInPostBasketId($payload));
-            $inPostPayQuote->setMaskedPhoneNumber($this->extractMaskedPhoneNumber($payload));
-            $inPostPayQuote->setPhoneNumber($this->extractPhoneNumber($payload));
-            $inPostPayQuote->setName($this->extractName($payload));
-            $inPostPayQuote->setSurname($this->extractSurname($payload));
-            $inPostPayQuote->setBrowserId($this->extractBrowserId($payload));
-            $inPostPayQuote->setBrowserTrusted($this->extractBrowserTrusted($payload));
+            $inPostPayQuote->setStatus($status);
+            $inPostPayQuote->setInpostBasketId($inpostBasketId);
+            $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber);
+            $inPostPayQuote->setPhone($phoneNumber->getPhone());
+            $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
+            $inPostPayQuote->setName($name);
+            $inPostPayQuote->setSurname($surname);
+            $inPostPayQuote->setBrowserId($browser->getBrowserId());
+            $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
-
-            $this->logger->info(sprintf('Basket ID %s has been confirmed.', $inPostPayQuote->getBasketId()));
         } catch (LocalizedException $e) {
             $errorMsg = __('Cannot confirm basket. Reason: %1', $e->getMessage());
             $this->logger->error($errorMsg->render());
 
             throw new LocalizedException($errorMsg);
         }
+        $basket = $this->basketFactory->create();
+        $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+        $this->createRequestDebugLog(
+            sprintf(
+                'Basket ID %s has been confirmed with status: %s',
+                $inPostPayQuote->getBasketId(),
+                $status
+            )
+        );
 
-        return $this->quoteToBasketDataConverter->convert($quote);
+        return $basket;
     }
 
     /**
@@ -113,109 +129,8 @@ class BasketConfirmation implements BasketConfirmationInterface
         }
     }
 
-    /**
-     * @param array $payload
-     * @return string
-     */
-    private function extractStatus(array $payload): string
+    private function createRequestDebugLog(string $message): void
     {
-        $status = '';
-        if (isset($payload[self::BASKET_BIND_STATUS_PARAM])
-            && is_scalar($payload[self::BASKET_BIND_STATUS_PARAM])
-        ) {
-            $status = (string)$payload[self::BASKET_BIND_STATUS_PARAM];
-        }
-
-        return $status;
-    }
-
-    /**
-     * @param array $payload
-     * @return string
-     */
-    private function extractInPostBasketId(array $payload): string
-    {
-        $inPostBasketId = '';
-        if (isset($payload[self::INPOST_BASKET_ID_PARAM]) && is_scalar($payload[self::INPOST_BASKET_ID_PARAM])) {
-            $inPostBasketId = (string)$payload[self::INPOST_BASKET_ID_PARAM];
-        }
-
-        return $inPostBasketId;
-    }
-
-    private function extractMaskedPhoneNumber(array $payload): string
-    {
-        $maskedPhoneNumber = '';
-        if (isset($payload[self::MASKED_PHONE_NUMBER_PARAM]) && is_scalar($payload[self::MASKED_PHONE_NUMBER_PARAM])) {
-            $maskedPhoneNumber = (string)$payload[self::MASKED_PHONE_NUMBER_PARAM];
-        }
-
-        return $maskedPhoneNumber;
-    }
-
-    private function extractPhoneNumber(array $payload): string
-    {
-        $countryPrefix = '';
-        $phoneNumber = '';
-        if (isset($payload[self::PHONE_NUMBER_PARAM]) && is_array($payload[self::PHONE_NUMBER_PARAM])) {
-            $phoneNumberData = $payload[self::PHONE_NUMBER_PARAM];
-            if (isset($phoneNumberData[self::PHONE_PARAM]) && is_string($phoneNumberData[self::PHONE_PARAM])) {
-                $phoneNumber = trim((string)$phoneNumberData[self::PHONE_PARAM]);
-            }
-
-            if (isset($phoneNumberData[self::COUNTRY_PREFIX_PARAM])
-                && is_string($phoneNumberData[self::COUNTRY_PREFIX_PARAM])
-            ) {
-                $countryPrefix = trim((string)$phoneNumberData[self::COUNTRY_PREFIX_PARAM]);
-            }
-        }
-
-        return $countryPrefix . $phoneNumber;
-    }
-
-    private function extractName(array $payload): string
-    {
-        $name = '';
-        if (isset($payload[self::NAME_PARAM]) && is_scalar($payload[self::NAME_PARAM])) {
-            $name = (string)$payload[self::NAME_PARAM];
-        }
-
-        return $name;
-    }
-
-    private function extractSurname(array $payload): string
-    {
-        $surname = '';
-        if (isset($payload[self::SURNAME_PARAM]) && is_scalar($payload[self::SURNAME_PARAM])) {
-            $surname = (string)$payload[self::SURNAME_PARAM];
-        }
-
-        return $surname;
-    }
-
-    private function extractBrowserId(array $payload): string
-    {
-        $browserId = '';
-        if (isset($payload[self::BROWSER_PARAM]) && is_array($payload[self::BROWSER_PARAM])) {
-            $browser = $payload[self::BROWSER_PARAM];
-            if (isset($browser[self::BROWSER_ID_PARAM]) && is_string($browser[self::BROWSER_ID_PARAM])) {
-                $browserId = (string)$browser[self::BROWSER_ID_PARAM];
-            }
-        }
-
-        return $browserId;
-    }
-
-    private function extractBrowserTrusted(array $payload): bool
-    {
-        $browserTrusted = false;
-        if (isset($payload[self::BROWSER_PARAM]) && is_array($payload[self::BROWSER_PARAM])) {
-            $browser = $payload[self::BROWSER_PARAM];
-            if (isset($browser[self::BROWSER_TRUSTED_PARAM]) && is_bool($browser[self::BROWSER_TRUSTED_PARAM])) {
-                $browserTrusted = (bool)$browser[self::BROWSER_TRUSTED_PARAM];
-            }
-        }
-
-        return $browserTrusted;
+        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }
