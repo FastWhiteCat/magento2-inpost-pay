@@ -39,11 +39,13 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
             $storeId = (int)$quote->getStoreId();
             $promoCodesData = $this->collectSalesRulesData($appliedRuleIds, (string)$quote->getCouponCode(), $storeId);
             foreach ($promoCodesData as $promoCodeData) {
-                /** @var PromoCodeInterface $promoCode */
-                $promoCode = $this->promoCodeFactory->create();
-                $promoCode->setPromoCodeValue($promoCodeData[PromoCodeInterface::PROMO_CODE_VALUE]);
-                $promoCode->setName($promoCodeData[PromoCodeInterface::NAME]);
-                $promoCodes[] = $promoCode;
+                if ($promoCodeData[PromoCodeInterface::PROMO_CODE_VALUE]) {
+                    /** @var PromoCodeInterface $promoCode */
+                    $promoCode = $this->promoCodeFactory->create();
+                    $promoCode->setPromoCodeValue($promoCodeData[PromoCodeInterface::PROMO_CODE_VALUE]);
+                    $promoCode->setName($promoCodeData[PromoCodeInterface::NAME]);
+                    $promoCodes[] = $promoCode;
+                }
             }
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
@@ -85,11 +87,10 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
         $query->where('s.rule_id IN (?)', $ruleIds);
 
         $salesRuleData = [];
-        $noCode = __('No Coupon is required.')->render();
         foreach ($this->getConnection()->fetchAll($query) as $row) {
             $salesRuleData[] = [
                 'name' => (string)($row['rule_label'] ?? ''),
-                'promo_code_value' => !empty($row['rule_coupon']) ? (string)$row['rule_coupon'] : $noCode
+                'promo_code_value' => !empty($row['rule_coupon']) ? (string)$row['rule_coupon'] : ''
             ];
         }
 

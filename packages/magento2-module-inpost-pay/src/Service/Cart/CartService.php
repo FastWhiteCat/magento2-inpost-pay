@@ -113,6 +113,21 @@ class CartService
         }
     }
 
+    /**
+     * @throws LocalizedException
+     */
+    public function removePromosFromQuote(Quote $quote): void
+    {
+        if (is_scalar($quote->getId())) {
+            $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
+            $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
+            $this->couponManagement->remove((int)$quote->getId());
+            $this->logger->debug(
+                sprintf('Coupon codes have been removed from quote ID %s', (int)$quote->getId())
+            );
+        }
+    }
+
     private function applyQuoteChanges(Quote $quote): void
     {
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
