@@ -146,20 +146,21 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        if (data.phone_number) {
-                            resolve(data);
-                        } else if (data.action) {
+                        if (data.status) {
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 abortRequest(xhrForBasketConfirmation)
                             }
 
-                            switch (data.action) {
+                            switch (data.status) {
                                 case 'REJECT':
                                     reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
                                     break;
                                 case 'PENDING':
                                     setTimerAndRunCallback(checkIsBound);
+                                    break;
+                                case 'SUCCESS':
+                                    resolve(data)
                                     break;
                                 default:
                                     break;
