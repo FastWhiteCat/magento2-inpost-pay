@@ -87,16 +87,28 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return $this->setData(self::STATUS, $status);
     }
 
-    public function getPhoneNumber(): ?string
+    public function getPhone(): ?string
     {
-        $phoneNumber = ($this->hasData(self::PHONE_NUMBER)) ? $this->getData(self::PHONE_NUMBER) : null;
+        $phone = ($this->hasData(self::PHONE)) ? $this->getData(self::PHONE) : null;
 
-        return ($phoneNumber && is_scalar($phoneNumber)) ? (string)$phoneNumber : null;
+        return ($phone && is_scalar($phone)) ? (string)$phone : null;
     }
 
-    public function setPhoneNumber(string $phoneNumber): InPostPayQuoteInterface
+    public function setPhone(string $phone): InPostPayQuoteInterface
     {
-        return $this->setData(self::PHONE_NUMBER, $phoneNumber);
+        return $this->setData(self::PHONE, $phone);
+    }
+
+    public function getCountryPrefix(): ?string
+    {
+        $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
+
+        return ($countryPrefix && is_scalar($countryPrefix)) ? (string)$countryPrefix : null;
+    }
+
+    public function setCountryPrefix(string $countryPrefix): InPostPayQuoteInterface
+    {
+        return $this->setData(self::COUNTRY_PREFIX, $countryPrefix);
     }
 
     public function getMaskedPhoneNumber(): ?string

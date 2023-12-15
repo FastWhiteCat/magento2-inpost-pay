@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
+use InPost\InPostPay\Enum\InPostDeliveryOption;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class ShipmentMappingConfigProvider
 {
     public const DEFAULT_DELIVERY_DEADLINE = 7;
 
-    private const XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER = 'payment/inpost_pay/inpost_courier_mapping';
-    private const XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP = 'payment/inpost_pay/inpost_pickup_mapping';
+    public const OPTION_STANDARD = 'STANDARD';
+    private const XML_PATH_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
     private const XML_PATH_DELIVERY_DEADLINE_IN_DAYS = 'payment/inpost_pay/delivery_deadline_in_days';
     private const XML_PATH_FREE_SHIPPING_ENABLED_PATTERN = 'carriers/%s/free_shipping_enable';
     private const XML_PATH_FREE_SHIPPING_SUBTOTAL_PATTERN = 'carriers/%s/free_shipping_subtotal';
@@ -26,37 +29,38 @@ class ShipmentMappingConfigProvider
     }
 
     /**
-     * Returns carrier method code mapped to InPost Courier
-     *
+     * @param string $deliveryType
+     * @param string $option
      * @return string
      * @throws InPostPayInvalidConfigurationException
      */
-    public function getCarrierMethodCodeForInPostCourier(): string
+    public function getCarrierMethodCodeForOptions(string $deliveryType, string $option): string
     {
-        $carrier = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_COURIER);
+        $carrierConfigPattern = self::XML_PATH_DELIVERY_MAPPING_PATTERN;
+        $carrierConfigPath = sprintf($carrierConfigPattern, strtolower($deliveryType), strtolower($option));
+        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_WEBSITE);
 
         if (empty($carrier) || !is_scalar($carrier)) {
-            throw new InPostPayInvalidConfigurationException(__('InPost Courier not mapped'));
+            throw new InPostPayInvalidConfigurationException(
+                __('InPost Courier not mapped for delivery type: %1 with option: %2', $deliveryType, $option)
+            );
         }
 
         return (string)$carrier;
     }
 
-    /**
-     * Returns carrier method code mapped to InPost Pickup
-     *
-     * @return string
-     * @throws InPostPayInvalidConfigurationException
-     */
-    public function getCarrierMethodCodeForInPostPickup(): string
+    public function getAllDeliveryTypes(): array
     {
-        $carrier = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_MAPPING_FOR_INPOST_PICKUP);
+        return [InPostDeliveryType::APM->name, InPostDeliveryType::COURIER->name];
+    }
 
-        if (empty($carrier) || !is_scalar($carrier)) {
-            throw new InPostPayInvalidConfigurationException(__('InPost Paczkomat 24/7 not mapped'));
-        }
-
-        return (string)$carrier;
+    public function getNonStandardDeliveryOptions(): array
+    {
+        return [
+            InPostDeliveryOption::COD->name,
+            InPostDeliveryOption::PWW->name,
+            InPostDeliveryOption::CODPWW->name
+        ];
     }
 
     public function isFreeShippingEnabledForCarrier(string $code, string $method = ''): bool
@@ -80,7 +84,10 @@ class ShipmentMappingConfigProvider
             $methodCode = sprintf('%s', $code);
         }
 
-        $subtotalValue = $this->scopeConfig->getValue(sprintf($configPattern, $methodCode));
+        $subtotalValue = $this->scopeConfig->getValue(
+            sprintf($configPattern, $methodCode),
+            ScopeInterface::SCOPE_WEBSITE
+        );
 
         return is_scalar($subtotalValue) ? round((float)$subtotalValue, 2) : null;
     }

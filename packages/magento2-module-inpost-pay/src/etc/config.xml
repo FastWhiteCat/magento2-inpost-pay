@@ -3,7 +3,8 @@
     <default>
         <payment>
             <inpost_pay>
-                <enabled>0</enabled>
+                <active>0</active>
+                <can_use_checkout>1</can_use_checkout>
                 <model>InPostPayPaymentFacade</model>
                 <title>InPost Pay</title>
                 <order_status>pending</order_status>
@@ -15,6 +16,11 @@
                 <client_id></client_id>
                 <client_secret></client_secret>
                 <auth_token_url>https://login.inpost.pl/</auth_token_url>
+                <product_cart_enabled>1</product_cart_enabled>
+                <cart_enabled>1</cart_enabled>
+                <success_page_enabled>1</success_page_enabled>
+                <widget_color_variant>primary</widget_color_variant>
+                <widget_dark_mode>0</widget_dark_mode>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
                 <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
                 <async_basket_export>0</async_basket_export>

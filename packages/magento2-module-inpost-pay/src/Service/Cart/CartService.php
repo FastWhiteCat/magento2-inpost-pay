@@ -67,6 +67,9 @@ class CartService
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
             $this->couponManagement->set((int)$quote->getId(), $couponCode);
+            $this->logger->debug(
+                sprintf('Coupon code: %s has been applied to quote ID %s', $couponCode, (int)$quote->getId())
+            );
         }
     }
 }
