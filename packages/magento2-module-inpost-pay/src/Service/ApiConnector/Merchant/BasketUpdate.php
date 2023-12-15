@@ -41,6 +41,7 @@ class BasketUpdate implements BasketUpdateInterface
      * @param string $eventDataTime
      * @param string $eventType
      * @param QuantityUpdateInterface[]|null $quantityEventData
+     * @param QuantityUpdateInterface[]|null $relatedProductsEventData
      * @param PromoCodeInterface[]|null $promoCodesEventData
      * @return BasketInterface
      * @throws LocalizedException
@@ -51,6 +52,7 @@ class BasketUpdate implements BasketUpdateInterface
         string $eventDataTime,
         string $eventType,
         ?array $quantityEventData = null,
+        ?array $relatedProductsEventData = null,
         ?array $promoCodesEventData = null,
     ): BasketInterface {
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
@@ -67,6 +69,14 @@ class BasketUpdate implements BasketUpdateInterface
 
         if (!empty($quantityEventData)) {
             foreach ($quantityEventData as $productQuantity) {
+                $productId = (int)$productQuantity->getProductId();
+                $qty = (float)$productQuantity->getQuantity()->getQuantity();
+                $this->cartService->addToCart($quote, $productId, $qty);
+            }
+        }
+
+        if (!empty($relatedProductsEventData)) {
+            foreach ($relatedProductsEventData as $productQuantity) {
                 $productId = (int)$productQuantity->getProductId();
                 $qty = (float)$productQuantity->getQuantity()->getQuantity();
                 $this->cartService->addToCart($quote, $productId, $qty);
