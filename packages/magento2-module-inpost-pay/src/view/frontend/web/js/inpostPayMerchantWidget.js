@@ -82,7 +82,7 @@ define([
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
             var data = {
-                prefix: prefix && prefix.toString() || "",
+                prefix: prefix && "+" + prefix || "",
                 number: phoneNumber || "",
                 browser: browserData,
                 binding_place: bindingPlace
@@ -97,7 +97,11 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        resolve(Object.keys(data).length === 1 && data.basketId ? [] : data)
+                        resolve(Object.keys(data).length === 1 && data.basket_id ? [] : {
+                            qr_code: data.qr_code,
+                            deep_link: data.deep_link,
+                            deep_link_hms: data.deep_link_hms,
+                        })
                     })
                     .fail(function (xhr, textStatus) {
                         reject(new Error($.mage.__('Network problem: ') + textStatus));

@@ -38,7 +38,7 @@ class BasketDelete implements BasketDeleteInterface
         $this->createRequestDebugLog(sprintf('Deleting Basket ID: %s', $basketId));
 
         try {
-            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByInPostBasketId($basketId));
+            $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByBasketId($basketId));
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 

@@ -20,6 +20,7 @@ interface BasketUpdateInterface
      * @param string $eventDataTime
      * @param string $eventType
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface[]|null $quantityEventData
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface[]|null $relatedProductsEventData
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[]|null $promoCodesEventData
      * @return \InPost\InPostPay\Api\Data\Merchant\BasketInterface
      * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
@@ -33,6 +34,7 @@ interface BasketUpdateInterface
         string $eventDataTime,
         string $eventType,
         ?array $quantityEventData = null,
+        ?array $relatedProductsEventData = null,
         ?array $promoCodesEventData = null,
     ): BasketInterface;
 }

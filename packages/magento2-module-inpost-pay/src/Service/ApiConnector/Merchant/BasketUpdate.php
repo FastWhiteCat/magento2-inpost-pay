@@ -30,6 +30,7 @@ use Psr\Log\LoggerInterface;
 class BasketUpdate implements BasketUpdateInterface
 {
     private const REQUEST_PREFIX = 'BASKET_UPDATE_REQUEST';
+    private const PROMO_CODES_EVENT = 'PROMO_CODES';
 
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
@@ -47,6 +48,7 @@ class BasketUpdate implements BasketUpdateInterface
      * @param string $eventDataTime
      * @param string $eventType
      * @param QuantityUpdateInterface[]|null $quantityEventData
+     * @param QuantityUpdateInterface[]|null $relatedProductsEventData
      * @param PromoCodeInterface[]|null $promoCodesEventData
      * @return BasketInterface
      * @throws InPostPayBadRequestException
@@ -60,9 +62,9 @@ class BasketUpdate implements BasketUpdateInterface
         string $eventDataTime,
         string $eventType,
         ?array $quantityEventData = null,
+        ?array $relatedProductsEventData = null,
         ?array $promoCodesEventData = null,
     ): BasketInterface {
-
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
@@ -75,22 +77,32 @@ class BasketUpdate implements BasketUpdateInterface
                     $eventType
                 )
             );
+
             if (!empty($quantityEventData)) {
                 foreach ($quantityEventData as $productQuantity) {
-                    $productId = (int)$productQuantity->getProductId();
-                    $qty = (float)$productQuantity->getQuantity()->getQuantity();
-                    $this->cartService->addToCart($quote, $productId, $qty);
+                    $this->handleProductQuantities($quote, $productQuantity);
                 }
             }
+
+            if (!empty($relatedProductsEventData)) {
+                foreach ($relatedProductsEventData as $productQuantity) {
+                    $this->handleProductQuantities($quote, $productQuantity);
+                }
+            }
+
             if ($promoCodesEventData) {
                 foreach ($promoCodesEventData as $promoCode) {
                     $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
                 }
+            } elseif ($eventType === self::PROMO_CODES_EVENT) {
+                $this->cartService->removePromosFromQuote($quote);
             }
+
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
             $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
+
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -108,8 +120,18 @@ class BasketUpdate implements BasketUpdateInterface
 
             throw new InPostPayInternalException();
         }
-
         return $basket;
+    }
+
+    private function handleProductQuantities(Quote $quote, QuantityUpdateInterface $productQuantity): void
+    {
+        $productId = (int)$productQuantity->getProductId();
+        $qty = (float)$productQuantity->getQuantity()->getQuantity();
+        if ($qty) {
+            $this->cartService->addToCart($quote, $productId, $qty);
+        } else {
+            $this->cartService->removeFromCart($quote, $productId);
+        }
     }
 
     /**
