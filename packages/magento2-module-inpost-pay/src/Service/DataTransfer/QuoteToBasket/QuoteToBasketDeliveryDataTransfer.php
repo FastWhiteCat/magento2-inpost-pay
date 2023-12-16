@@ -112,7 +112,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         ShippingMethodInterface $optionShippingMethod,
         PriceInterface $standardDeliveryPrice,
         string $optionCode
-    ): ?DeliveryOptionInterface {
+    ): DeliveryOptionInterface {
         /** @var DeliveryOptionInterface $deliveryOption */
         $deliveryOption = $this->deliveryOptionFactory->create();
         $deliveryOption->setDeliveryName((string)$optionShippingMethod->getMethodTitle());
