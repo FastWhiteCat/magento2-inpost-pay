@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
@@ -19,6 +20,9 @@ use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
     private const DEFAULT_COUNTRY_ID = 'PL';
@@ -93,15 +97,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
                     continue;
                 }
 
-                /** @var DeliveryOptionInterface $deliveryOption */
-                $deliveryOption = $this->deliveryOptionFactory->create();
-                $deliveryOption->setDeliveryName((string)$optionShippingMethod->getMethodTitle());
-                $deliveryOption->setDeliveryCodeValue($optionCode);
-                $optionPrice = $deliveryOption->getDeliveryOptionPrice();
-                $optionPrice->setNet(DecimalCalculator::round((float)$optionShippingMethod->getPriceExclTax()));
-                $optionPrice->setGross(DecimalCalculator::round((float)$optionShippingMethod->getPriceInclTax()));
-                $optionPrice->setVat(DecimalCalculator::sub($optionPrice->getGross(), $optionPrice->getNet()));
-                $deliveryOption->setDeliveryOptionPrice($optionPrice);
+                $deliveryOption = $this->getDeliveryOption($optionShippingMethod, $deliverPrice, $optionCode);
                 $optionsData[] = $deliveryOption;
             }
 
@@ -110,6 +106,34 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         return $deliveryData;
+    }
+
+    private function getDeliveryOption(
+        ShippingMethodInterface $optionShippingMethod,
+        PriceInterface $standardDeliveryPrice,
+        string $optionCode
+    ): ?DeliveryOptionInterface {
+        /** @var DeliveryOptionInterface $deliveryOption */
+        $deliveryOption = $this->deliveryOptionFactory->create();
+        $deliveryOption->setDeliveryName((string)$optionShippingMethod->getMethodTitle());
+        $deliveryOption->setDeliveryCodeValue($optionCode);
+        $optionPrice = $deliveryOption->getDeliveryOptionPrice();
+
+        $optionPriceNet = DecimalCalculator::round((float)$optionShippingMethod->getPriceExclTax());
+        $optionPriceGross = DecimalCalculator::round((float)$optionShippingMethod->getPriceInclTax());
+        $optionPriceVat = DecimalCalculator::sub($optionPrice->getGross(), $optionPrice->getNet());
+
+        $optionPriceNetDiff = DecimalCalculator::sub($optionPriceNet, $standardDeliveryPrice->getNet());
+        $optionPriceGrossDiff = DecimalCalculator::sub($optionPriceGross, $standardDeliveryPrice->getGross());
+        $optionPriceVatDiff = DecimalCalculator::sub($optionPriceVat, $standardDeliveryPrice->getVat());
+
+        $optionPrice->setNet(max($optionPriceNetDiff, 0));
+        $optionPrice->setGross(max($optionPriceGrossDiff, 0));
+        $optionPrice->setVat(max($optionPriceVatDiff, 0));
+
+        $deliveryOption->setDeliveryOptionPrice($optionPrice);
+
+        return $deliveryOption;
     }
 
     private function getDeliveryByTypeAndOption(
