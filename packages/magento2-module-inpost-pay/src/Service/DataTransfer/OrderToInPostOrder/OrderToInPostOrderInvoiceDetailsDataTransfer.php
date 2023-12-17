@@ -60,7 +60,7 @@ class OrderToInPostOrderInvoiceDetailsDataTransfer implements OrderToInPostOrder
     ): void {
         $streetData = $address->getStreet() ?? [];
 
-        $street = (isset($streetData[0]) && is_string($streetData[0])) ? (string)$streetData[1] : '';
+        $street = (isset($streetData[0]) && is_string($streetData[0])) ? (string)$streetData[0] : '';
         $building = (isset($streetData[1]) && is_string($streetData[1])) ? (string)$streetData[1] : '';
         $flat = (isset($streetData[2]) && is_string($streetData[2])) ? (string)$streetData[2] : '';
 

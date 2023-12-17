@@ -24,8 +24,6 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     protected $_eventPrefix = InPostPayOrderInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayOrderInterface::ENTITY_NAME;
 
-    private ?PhoneNumberInterface $phoneNumber;
-
     public function __construct(
         Context $context,
         Registry $registry,
@@ -194,6 +192,18 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::PHONE, $phone);
     }
 
+    public function getCourierNote(): ?string
+    {
+        $courierNote = ($this->hasData(self::COURIER_NOTE)) ? $this->getData(self::COURIER_NOTE) : null;
+
+        return ($courierNote && is_scalar($courierNote)) ? (string)$courierNote : null;
+    }
+
+    public function setCourierNote(?string $courierNote): InPostPayOrderInterface
+    {
+        return $this->setData(self::COURIER_NOTE, $courierNote);
+    }
+
     public function getCountryPrefix(): ?string
     {
         $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
@@ -208,14 +218,15 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 
     public function getPhoneNumber(): PhoneNumberInterface
     {
-        if (!$this->phoneNumber) {
-            $this->phoneNumber = $this->phoneNumberInterfaceFactory->create();
+        $phoneNumber = $this->getData(self::PHONE_NUMBER);
+        if (!$phoneNumber instanceof PhoneNumberInterface) {
+            $phoneNumber = $this->phoneNumberInterfaceFactory->create();
         }
 
-        $this->phoneNumber->setPhone((string)$this->getPhone());
-        $this->phoneNumber->setCountryPrefix((string)$this->getCountryPrefix());
+        $phoneNumber->setPhone((string)$this->getPhone());
+        $phoneNumber->setCountryPrefix((string)$this->getCountryPrefix());
 
-        return $this->phoneNumber;
+        return $phoneNumber;
     }
 
     public function getCreatedAt(): string

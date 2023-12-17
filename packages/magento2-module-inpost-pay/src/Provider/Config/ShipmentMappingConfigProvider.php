@@ -49,11 +49,17 @@ class ShipmentMappingConfigProvider
         return (string)$carrier;
     }
 
+    /**
+     * @return string[]
+     */
     public function getAllDeliveryTypes(): array
     {
         return [InPostDeliveryType::APM->name, InPostDeliveryType::COURIER->name];
     }
 
+    /**
+     * @return string[]
+     */
     public function getNonStandardDeliveryOptions(): array
     {
         return [

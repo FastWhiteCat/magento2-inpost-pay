@@ -36,6 +36,17 @@ interface OrderDetailsInterface
     /**
      * @return string
      */
+    public function getOrderId(): string;
+
+    /**
+     * @param string $orderId
+     * @return void
+     */
+    public function setOrderId(string $orderId): void;
+
+    /**
+     * @return string
+     */
     public function getOrderComments(): string;
 
     /**

@@ -16,6 +16,9 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
     public function transfer(Order $order, OrderInterface $inPostOrder): void
     {
         $accountInfo = $inPostOrder->getAccountInfo();
+        $accountInfo->setMail((string)$order->getCustomerEmail());
+        $accountInfo->setName((string)$order->getCustomerFirstname());
+        $accountInfo->setSurname((string)$order->getCustomerLastname());
         $billingAddress = $order->getBillingAddress();
         if ($billingAddress) {
             $this->transferPhoneNumber($billingAddress, $accountInfo);
@@ -56,7 +59,7 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
         $addressLine = implode(PHP_EOL, $streetData);
         $clientAddress->setAddress($addressLine);
 
-        $street = (isset($streetData[0]) && is_string($streetData[0])) ? (string)$streetData[1] : '';
+        $street = (isset($streetData[0]) && is_string($streetData[0])) ? (string)$streetData[0] : '';
         $building = (isset($streetData[1]) && is_string($streetData[1])) ? (string)$streetData[1] : '';
         $flat = (isset($streetData[2]) && is_string($streetData[2])) ? (string)$streetData[2] : '';
 

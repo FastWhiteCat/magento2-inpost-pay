@@ -46,6 +46,25 @@ class OrderDetails extends DataObject implements OrderDetailsInterface
     /**
      * @return string
      */
+    public function getOrderId(): string
+    {
+        $orderId = $this->getData(self::ORDER_ID);
+
+        return (is_scalar($orderId)) ? (string)$orderId : '';
+    }
+
+    /**
+     * @param string $orderId
+     * @return void
+     */
+    public function setOrderId(string $orderId): void
+    {
+        $this->setData(self::ORDER_ID, $orderId);
+    }
+
+    /**
+     * @return string
+     */
     public function getOrderComments(): string
     {
         $orderComments = $this->getData(self::ORDER_COMMENTS);

@@ -36,6 +36,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setEmail($inPostOrder->getAccountInfo()->getMail());
         if ($invoiceDetails) {
+            //TODO::if PERSON than get name anf surename from account info
             $billingAddress->setFirstname($invoiceDetails->getName());
             $billingAddress->setLastname($invoiceDetails->getSurname());
             $billingAddress->setCompany($invoiceDetails->getCompanyName());

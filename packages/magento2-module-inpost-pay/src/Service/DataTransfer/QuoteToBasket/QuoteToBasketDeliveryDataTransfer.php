@@ -121,7 +121,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         $optionPriceNet = DecimalCalculator::round((float)$optionShippingMethod->getPriceExclTax());
         $optionPriceGross = DecimalCalculator::round((float)$optionShippingMethod->getPriceInclTax());
-        $optionPriceVat = DecimalCalculator::sub($optionPrice->getGross(), $optionPrice->getNet());
+        $optionPriceVat = DecimalCalculator::sub($optionPriceGross, $optionPriceNet);
 
         $optionPriceNetDiff = DecimalCalculator::sub($optionPriceNet, $standardDeliveryPrice->getNet());
         $optionPriceGrossDiff = DecimalCalculator::sub($optionPriceGross, $standardDeliveryPrice->getGross());

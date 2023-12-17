@@ -20,6 +20,8 @@ interface InPostPayOrderInterface
     public const ORDER_STATUS = 'order_status';
     public const COUNTRY_PREFIX = 'country_prefix';
     public const PHONE = 'phone';
+    public const PHONE_NUMBER = 'phone';
+    public const COURIER_NOTE = 'courier_note';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const ACCEPTED_CONSENTS = 'accepted_consents';
     public const CREATED_AT = 'created_at';
@@ -49,6 +51,8 @@ interface InPostPayOrderInterface
     public function getPhoneNumber(): PhoneNumberInterface;
     public function getDeliveryOptions(): array;
     public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface;
+    public function getCourierNote(): ?string;
+    public function setCourierNote(?string $courierNote): InPostPayOrderInterface;
 
     /**
      * @return AcceptedConsentInterface[]

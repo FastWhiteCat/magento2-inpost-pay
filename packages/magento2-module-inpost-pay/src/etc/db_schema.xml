@@ -10,6 +10,7 @@
         <column xsi:type="varchar" name="order_status" length="255" nullable="true"/>
         <column xsi:type="varchar" name="country_prefix" length="4" nullable="true"/>
         <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="courier_note" length="255" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
         <column xsi:type="varchar" length="500" name="accepted_consents" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
