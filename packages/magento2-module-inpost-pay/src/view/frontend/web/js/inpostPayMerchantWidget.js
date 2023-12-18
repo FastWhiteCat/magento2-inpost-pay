@@ -163,7 +163,6 @@ define([
                                         setTimerAndRunCallback(checkIsBound);
                                         break;
                                     case 'SUCCESS':
-                                        console.log(data)
                                         resolve(data)
                                         break;
                                     default:
@@ -271,7 +270,7 @@ define([
                 abortRequest(xhrForBasketConfirmation)
             })
 
-            document.addEventListener("inpost-update-count", (e) => {
+            document.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail.count);
             });
 
