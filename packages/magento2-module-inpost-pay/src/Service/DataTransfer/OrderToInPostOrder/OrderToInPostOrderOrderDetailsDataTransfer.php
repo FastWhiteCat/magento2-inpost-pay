@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
 use DateTime;
 use DateTimeZone;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface;
@@ -13,7 +14,6 @@ use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
-use InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\ShipmentTrackInterface;
 use Magento\Sales\Model\Order;
@@ -51,7 +51,7 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
         }
         $createdAtDateTime = new DateTime((string)$order->getCreatedAt(), new DateTimeZone('UTC'));
         $orderDetails->setOrderCreationDate(
-            $createdAtDateTime->format(QuoteToBasketSummaryDataTransfer::INPOST_DATE_FORMAT)
+            $createdAtDateTime->format(BasketInterface::INPOST_DATE_FORMAT)
         );
         $orderDetails->setOrderComments((string)$order->getCustomerNote());
         $orderDetails->setOrderMerchantStatusDescription($order->getStatusLabel());

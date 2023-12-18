@@ -15,8 +15,6 @@ use Magento\Quote\Model\Quote;
 
 class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInterface
 {
-    public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
-
     public function __construct(
         private readonly IziApiConfigProvider $iziApiConfigProvider
     ) {
@@ -84,12 +82,12 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         $basketLifetime = $this->iziApiConfigProvider->getBasketLifetime();
         if ($basketLifetime) {
             $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
-            $currentTimestamp = strtotime($currentDateTime->format(self::INPOST_DATE_FORMAT));
+            $currentTimestamp = strtotime($currentDateTime->format(BasketInterface::INPOST_DATE_FORMAT));
 
             $expirationDateTime = new DateTime();
             $expirationDateTime->setTimestamp($currentTimestamp + $basketLifetime);
 
-            $basketExpirationDate = $expirationDateTime->format(self::INPOST_DATE_FORMAT);
+            $basketExpirationDate = $expirationDateTime->format(BasketInterface::INPOST_DATE_FORMAT);
         }
 
         return $basketExpirationDate;
