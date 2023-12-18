@@ -13,7 +13,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Phrase;
 use Psr\Log\LoggerInterface;
 
 class Get implements HttpGetActionInterface

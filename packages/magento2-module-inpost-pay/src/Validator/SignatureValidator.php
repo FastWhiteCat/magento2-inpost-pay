@@ -92,14 +92,12 @@ class SignatureValidator implements SignatureValidatorInterface
     ): void {
         // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $decodedRequestSignature = base64_decode($requestSignature);
-        $this->logger->debug(sprintf('Decoded Request Signature: %s', $decodedRequestSignature));
         $expectedSignature = $this->calculateSignature(
             $requestSignatureTimestamp,
             $requestPublicKeyVersion,
             $requestBody
         );
 
-        $this->logger->debug(sprintf('Expected Signature: %s', $expectedSignature));
         $validationResult = (int)openssl_verify(
             $expectedSignature,
             $decodedRequestSignature,
@@ -172,10 +170,7 @@ class SignatureValidator implements SignatureValidatorInterface
             $requestSignatureTimestamp
         ];
 
-        $result = base64_encode(implode(',', $dataToHash));
-        $this->logger->debug(sprintf('Created signature: %s', $result), $dataToHash);
-
-        return $result;
+        return base64_encode(implode(',', $dataToHash));
     }
 
     /**
@@ -191,8 +186,6 @@ class SignatureValidator implements SignatureValidatorInterface
         if ($key === false) {
             throw new AuthorizationException(__('Could not obtain public key.'));
         }
-
-        $this->logger->debug(sprintf('Public Key Generated: %s%s%s', PHP_EOL, $keyContent, PHP_EOL));
 
         return $key;
     }

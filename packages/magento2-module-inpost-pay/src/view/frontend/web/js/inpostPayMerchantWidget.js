@@ -136,80 +136,83 @@ define([
         },
 
         iziGetIsBound: function () {
-            return new Promise((resolve, reject) => {
-                checkIsBound(resolve, reject);
-            });
+            return checkIsBound();
 
-            function checkIsBound(resolve, reject) {
+            function checkIsBound() {
                 abortRequest(xhrForBasketConfirmation)
-                xhrForBasketConfirmation = $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
-                        + '/form_key/'
-                        + $.mage.cookies.get('form_key')
-                    ),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (data.status) {
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                                abortRequest(xhrForBasketConfirmation)
-                            }
 
-                            switch (data.status) {
-                                case 'REJECT':
-                                    reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
-                                    break;
-                                case 'PENDING':
-                                    setTimerAndRunCallback(checkIsBound);
-                                    break;
-                                case 'SUCCESS':
-                                    resolve(data)
-                                    break;
-                                default:
-                                    break;
-                            }
-                        } else if (data.error_code) {
-                            reject(new Error(data.error_code));
-                        } else {
-                            setTimerAndRunCallback(checkIsBound)
-                        }
+                return new Promise((resolve, reject) => {
+                    xhrForBasketConfirmation = $.ajax({
+                        url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                            + '/form_key/'
+                            + $.mage.cookies.get('form_key')
+                        ),
+                        method: 'GET',
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
-                    });
+                        .done(function (data) {
+                            if (data.status) {
+                                if (timeoutId) {
+                                    clearTimeout(timeoutId);
+                                    abortRequest(xhrForBasketConfirmation)
+                                }
+
+                                switch (data.status) {
+                                    case 'REJECT':
+                                        reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
+                                        break;
+                                    case 'PENDING':
+                                        setTimerAndRunCallback(checkIsBound);
+                                        break;
+                                    case 'SUCCESS':
+                                        localStorage.setItem('browser_id', data.browser.browser_id);
+                                        resolve(data)
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else if (data.error_code) {
+                                reject(new Error(data.error_code));
+                            } else {
+                                setTimerAndRunCallback(checkIsBound)
+                            }
+                        })
+                        .fail(function (xhr, textStatus) {
+                            reject(new Error($.mage.__('Network problem: ') + textStatus));
+                        });
+                });
+
             }
         },
 
         iziGetOrderComplete: function () {
             //TODO check statuses from BE, change url when endpoint will be changed to controller
-            return new Promise((resolve, reject) => {
-                checkOrderStatus(resolve, reject);
-            });
+            return checkOrderStatus();
 
-            function checkOrderStatus(resolve, reject) {
+            function checkOrderStatus() {
                 abortRequest(xhrForOrderConfirmation)
-                xhrForOrderConfirmation = $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (data.action && data.action === 'refresh') {
-                            setTimerAndRunCallback(checkOrderStatus);
-                        } else if (data.action && data.action === 'redirect') {
-                            resolve(data)
-                        }
 
-                        reject(new Error($.mage.__('Unhandled status')));
+                return new Promise((resolve, reject) => {
+                    xhrForOrderConfirmation = $.ajax({
+                        url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
+                        method: 'GET',
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
-                    });
+                        .done(function (data) {
+                            if (data.action && data.action === 'refresh') {
+                                setTimerAndRunCallback(checkOrderStatus);
+                            } else if (data.action && data.action === 'redirect') {
+                                resolve(data)
+                            }
+
+                            reject(new Error($.mage.__('Unhandled status')));
+                        })
+                        .fail(function (xhr, textStatus) {
+                            reject(new Error($.mage.__('Network problem: ') + textStatus));
+                        });
+                });
             }
         },
 
         iziBindingDelete: function () {
-            //TODO change url when endpoint will be changed to controller
             return new Promise(function (resolve, reject) {
                 $.ajax({
                     url: urlBuilder.build('inpostizi/BrowserBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
@@ -260,22 +263,19 @@ define([
 
         bindEvents: function () {
             checkCartWidget();
+
             customerData.get('cart').subscribe(function (cartData) {
                 checkCartWidget(cartData);
-
-                var $iziButtons = $("inpost-izi-button");
-                if (!$iziButtons.length) return;
-
-                var event = new CustomEvent("inpost-update-count", {detail: cartData.summary_count});
-
-                $iziButtons.each(function () {
-                    this.dispatchEvent(event)
-                });
+                updateCounter(cartData.summary_count);
             });
 
             document.addEventListener('iziModalEventClose', function () {
                 abortRequest(xhrForBasketConfirmation)
             })
+
+            window.addEventListener("inpost-update-count", function (e){
+                updateCounter(e.detail);
+            });
 
             function checkCartWidget(cartData = "") {
                 var wrapperClass = getConfig().wrapperClass || "inpost-widget-wrapper";
@@ -290,6 +290,17 @@ define([
                         $inpayWrapperOnBasket.show()
                     }
                 }
+            }
+
+            function updateCounter(count) {
+                var $iziButtons = $("inpost-izi-button");
+                if (!$iziButtons.length) return;
+
+                var event = new CustomEvent("inpost-update-count", {detail: count});
+
+                $iziButtons.each(function () {
+                    this.dispatchEvent(event)
+                });
             }
         },
 
