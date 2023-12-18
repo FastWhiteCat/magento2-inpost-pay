@@ -10,6 +10,8 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -18,6 +20,9 @@ use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Model\Product;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
@@ -48,7 +53,11 @@ class ProductToInPostProductDataTransfer
         }
         $description = ($product->getData('short_description') ?? $product->getData('description'));
         $canCastQtyToInt = $this->canCastToInteger($quantity);
-        $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
+        try {
+            $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
+        } catch (InputException | LocalizedException $e) {
+            $stockQuantity = $quantity;
+        }
         $stockQuantity = $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
         $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
         $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;

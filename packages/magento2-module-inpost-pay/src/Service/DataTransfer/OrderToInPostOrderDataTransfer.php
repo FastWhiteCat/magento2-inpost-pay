@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer;
 
-use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
-use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface as InPostOrderInterface;
+use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
 use InvalidArgumentException;
-use Magento\Quote\Model\Quote;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
-class QuoteToBasketDataTransfer
+class OrderToInPostOrderDataTransfer
 {
     /**
-     * @var QuoteToBasketDataTransferInterface[]
+     * @var OrderToInPostOrderDataTransferInterface[]
      */
     private array $dataTransfers = [];
 
@@ -24,10 +25,17 @@ class QuoteToBasketDataTransfer
         $this->initDataTransfers($dataTransfer);
     }
 
-    public function transfer(Quote $quote, BasketInterface $basket): void
+    /**
+     * @param Order $order
+     * @param InPostOrderInterface $inPostOrder
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws LocalizedException
+     */
+    public function transfer(Order $order, InPostOrderInterface $inPostOrder): void
     {
         foreach ($this->dataTransfers as $dataTransfer) {
-            $dataTransfer->transfer($quote, $basket);
+            $dataTransfer->transfer($order, $inPostOrder);
         }
     }
 
@@ -39,10 +47,10 @@ class QuoteToBasketDataTransfer
     private function initDataTransfers(array $dataTransfers): void
     {
         foreach ($dataTransfers as $dataTransferKey => $dataTransfer) {
-            if ($dataTransfer instanceof QuoteToBasketDataTransferInterface) {
+            if ($dataTransfer instanceof OrderToInPostOrderDataTransferInterface) {
                 $this->dataTransfers[$dataTransferKey] = $dataTransfer;
             } else {
-                $errorMsg = sprintf('Quote to Basket data transfer: %s is not valid.', $dataTransferKey);
+                $errorMsg = sprintf('Order to InPost Order data transfer: %s is not valid.', $dataTransferKey);
                 $this->logger->critical($errorMsg);
 
                 throw new InvalidArgumentException($errorMsg);

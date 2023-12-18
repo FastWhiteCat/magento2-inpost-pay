@@ -7,21 +7,21 @@ namespace InPost\InPostPay\Exception;
 use Magento\Framework\Webapi\Exception;
 use Magento\Framework\Phrase;
 
-class OrderNotUpdateException extends Exception
+class InPostPayAuthorizationException extends Exception
 {
-    public const HTTP_CONFLICT = 409;
-    private const ORDER_NOT_UPDATE_ERROR_MSG = 'Order not update.';
+    public const HTTP_UNAUTHORIZED = 401;
+    private const AUTH_ERROR_MSG = 'Given user is not authorized to access the resource.';
 
     public function __construct(Phrase $phrase = null, $code = 0)
     {
         if ($phrase === null) {
-            $msg = self::ORDER_NOT_UPDATE_ERROR_MSG;
+            $msg = self::AUTH_ERROR_MSG;
             $phrase = new Phrase($msg);
         }
         parent::__construct(
             $phrase,
             $code,
-            self::HTTP_CONFLICT
+            self::HTTP_UNAUTHORIZED
         );
     }
 }
