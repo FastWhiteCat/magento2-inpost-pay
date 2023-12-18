@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
+use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
+use \Magento\Quote\Api\Data\ShippingMethodInterfaceFactory;
+use \Magento\Quote\Api\Data\ShippingMethodInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
@@ -17,13 +20,17 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Framework\DataObject;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
-use phpseclib3\Math\PrimeField;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTransferInterface
 {
     public function __construct(
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
+        private readonly ShippingMethodInterfaceFactory $shippingMethodInterfaceFactory,
+        private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory
     ) {
     }
@@ -46,6 +53,11 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
 
                 if ($orderShippingMethodCode === $configMethodCode) {
                     $this->appendDeliveryData($order, $delivery, $deliveryType, $deliveryOptionCode);
+                    /** @var ShippingMethodInterface $shippingMethod */
+                    $shippingMethod = $this->shippingMethodInterfaceFactory->create();
+                    $shippingMethod->setMethodCode($configMethodCode);
+                    $delivery->setDeliveryDate($this->deliveryDateProvider->calculateDeliveryDate($shippingMethod));
+
                     break 2;
                 }
             }
