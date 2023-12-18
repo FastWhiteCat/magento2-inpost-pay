@@ -137,6 +137,7 @@ define([
 
         iziGetIsBound: function () {
             return checkIsBound();
+
             function checkIsBound() {
                 abortRequest(xhrForBasketConfirmation)
 
@@ -185,6 +186,7 @@ define([
         iziGetOrderComplete: function () {
             //TODO check statuses from BE, change url when endpoint will be changed to controller
             return checkOrderStatus();
+
             function checkOrderStatus() {
                 abortRequest(xhrForOrderConfirmation)
 
