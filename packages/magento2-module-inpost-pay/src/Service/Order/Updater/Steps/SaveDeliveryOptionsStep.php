@@ -24,7 +24,10 @@ class SaveDeliveryOptionsStep extends OrderProcessingStep implements OrderPostPr
     {
         $orderId = (int)(is_scalar($order->getEntityId()) ? $order->getEntityId() : null);
         $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
+        $inPostPayOrder->setPhone($inPostOrder->getDelivery()->getPhoneNumber()->getPhone());
+        $inPostPayOrder->setCountryPrefix($inPostOrder->getDelivery()->getPhoneNumber()->getCountryPrefix());
         $inPostPayOrder->setDeliveryOptions($inPostOrder->getDelivery()->getDeliveryCodes());
+        $inPostPayOrder->setCourierNote($inPostOrder->getDelivery()->getCourierNote());
         $this->inPostPayOrderRepository->save($inPostPayOrder);
 
         $this->createLog(

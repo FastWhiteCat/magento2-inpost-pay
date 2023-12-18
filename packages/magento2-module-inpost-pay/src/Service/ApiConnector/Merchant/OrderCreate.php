@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
@@ -11,14 +12,19 @@ use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface;
-use InPost\InPostPay\Api\Data\Merchant\OrderInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterfaceFactory;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
-use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDataTransfer;
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
+use InPost\InPostPay\Exception\InPostPayBadRequestException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Exception\OrderNotFoundException;
+use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer;
 use InPost\InPostPay\Validator\OrderValidator;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -53,7 +59,10 @@ class OrderCreate implements OrderCreateInterface
      * @param AcceptedConsentInterface[] $consents
      * @param InvoiceDetailsInterface|null $invoiceDetails
      * @return OrderInterface
-     * @throws LocalizedException
+     * @throws InPostPayBadRequestException
+     * @throws InPostPayAuthorizationException
+     * @throws OrderNotFoundException
+     * @throws InPostPayInternalException
      */
     public function execute(
         OrderDetailsInterface $orderDetails,
@@ -69,11 +78,11 @@ class OrderCreate implements OrderCreateInterface
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
 
             $this->eventManager->dispatch('izi_order_create_before', [
-                'orderDetails' => $orderDetails,
-                'accountInfo' => $accountInfo,
+                'order_details' => $orderDetails,
+                'account_info' => $accountInfo,
                 'delivery' => $delivery,
                 'consents' => $consents,
-                'invoiceDetails' => $invoiceDetails
+                'invoice_details' => $invoiceDetails
             ]);
 
             if ($quote instanceof Quote && $quote->getId()) {
@@ -90,16 +99,28 @@ class OrderCreate implements OrderCreateInterface
 
                 $inPostOrder = $this->prepareInPostOrderFromMagentoOrder($order);
 
-                $this->eventManager->dispatch('izi_order_create_after', ['inPostOrder' => $inPostOrder]);
+                $this->eventManager->dispatch('izi_order_create_after', ['inpost_order' => $inPostOrder]);
 
                 return  $inPostOrder;
             } else {
-                throw new LocalizedException(__('Quote not found.'));
+                throw new NoSuchEntityException(__('Quote not found.'));
             }
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new OrderNotFoundException();
+        } catch (InPostPayAuthorizationException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw $e;
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
-            throw new LocalizedException(__('Order could not be created. Reason: %1', $e->getMessage()));
+            throw new InPostPayBadRequestException();
+        } catch (Throwable $e) {
+            $this->logger->critical($e->getMessage());
+
+            throw new InPostPayInternalException();
         }
     }
 

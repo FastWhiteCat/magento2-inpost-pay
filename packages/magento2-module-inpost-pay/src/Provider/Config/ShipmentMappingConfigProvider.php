@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Provider\Config;
 
 use InPost\InPostPay\Enum\InPostDeliveryOption;
 use InPost\InPostPay\Enum\InPostDeliveryType;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -32,7 +32,7 @@ class ShipmentMappingConfigProvider
      * @param string $deliveryType
      * @param string $option
      * @return string
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     public function getCarrierMethodCodeForOptions(string $deliveryType, string $option): string
     {
@@ -41,7 +41,7 @@ class ShipmentMappingConfigProvider
         $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_WEBSITE);
 
         if (empty($carrier) || !is_scalar($carrier)) {
-            throw new InPostPayInvalidConfigurationException(
+            throw new InPostPayInternalException(
                 __('InPost Courier not mapped for delivery type: %1 with option: %2', $deliveryType, $option)
             );
         }
@@ -49,11 +49,17 @@ class ShipmentMappingConfigProvider
         return (string)$carrier;
     }
 
+    /**
+     * @return string[]
+     */
     public function getAllDeliveryTypes(): array
     {
         return [InPostDeliveryType::APM->name, InPostDeliveryType::COURIER->name];
     }
 
+    /**
+     * @return string[]
+     */
     public function getNonStandardDeliveryOptions(): array
     {
         return [

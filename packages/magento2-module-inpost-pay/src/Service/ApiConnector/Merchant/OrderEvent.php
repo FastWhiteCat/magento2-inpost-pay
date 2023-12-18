@@ -52,11 +52,11 @@ class OrderEvent implements OrderEventInterface
     ): UpdateOrderResponseInterface {
         try {
             $this->eventManager->dispatch('izi_order_update_before', [
-                'orderId' => $orderId,
-                'eventId' => $eventId,
-                'eventDataTime' => $eventDataTime,
-                'eventData' => $eventData,
-                'phoneNumber' => $phoneNumber
+                'order_id' => $orderId,
+                'event_id' => $eventId,
+                'event_data_time' => $eventDataTime,
+                'event_data' => $eventData,
+                'phone_number' => $phoneNumber
             ]);
             /**
              * @var Order $order
@@ -67,7 +67,7 @@ class OrderEvent implements OrderEventInterface
 
             $this->eventManager->dispatch('izi_order_update_after', [
                 'order' => $order,
-                'inPostPayOrderStatus' => $inPostPayOrderStatus
+                'inpost_pay_order_status' => $inPostPayOrderStatus
             ]);
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');

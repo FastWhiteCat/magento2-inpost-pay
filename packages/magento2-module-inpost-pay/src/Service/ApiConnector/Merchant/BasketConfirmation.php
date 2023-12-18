@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Exception\BasketNotFoundException;
+use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
+use InPost\InPostPay\Exception\InPostPayBadRequestException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
@@ -45,8 +50,11 @@ class BasketConfirmation implements BasketConfirmationInterface
      * @param string $maskedPhoneNumber
      * @param string $name
      * @param string $surname
-     * @return BasketDataInterface
-     * @throws LocalizedException
+     * @return BasketInterface
+     * @throws InPostPayBadRequestException
+     * @throws InPostPayAuthorizationException
+     * @throws BasketNotFoundException
+     * @throws InPostPayInternalException
      */
     public function execute(
         string $basketId,
@@ -57,20 +65,20 @@ class BasketConfirmation implements BasketConfirmationInterface
         string $maskedPhoneNumber,
         string $name,
         string $surname
-    ): BasketDataInterface {
+    ): BasketInterface {
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
             $this->eventManager->dispatch('izi_basket_confirmation_before', [
                 'quote' => $quote,
-                'inPostPayQuote' => $inPostPayQuote,
-                'basketId' => $basketId,
+                'inpost_pay_quote' => $inPostPayQuote,
+                'basket_id' => $basketId,
                 'status' => $status,
-                'inpostBasketId' => $inpostBasketId,
-                'phoneNumber' => $phoneNumber,
+                'inpost_basket_id' => $inpostBasketId,
+                'phone_number' => $phoneNumber,
                 'browser' => $browser,
-                'maskedPhoneNumber' => $maskedPhoneNumber,
+                'masked_phone_number' => $maskedPhoneNumber,
                 'name' => $name,
                 'surname' => $surname
             ]);
@@ -88,28 +96,34 @@ class BasketConfirmation implements BasketConfirmationInterface
             $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
+
+            $basket = $this->basketFactory->create();
+            $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+            $this->eventManager->dispatch('izi_basket_confirmation_after', ['basket' => $basket]);
+            $this->createRequestDebugLog(
+                sprintf(
+                    'Basket ID %s has been confirmed with status: %s',
+                    $inPostPayQuote->getBasketId(),
+                    $status
+                )
+            );
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new BasketNotFoundException();
+        } catch (InPostPayAuthorizationException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw $e;
         } catch (LocalizedException $e) {
-            $errorMsg = __('Cannot confirm basket. Reason: %1', $e->getMessage());
-            $this->logger->error($errorMsg->render());
+            $this->logger->error($e->getMessage());
 
-            throw new LocalizedException($errorMsg);
+            throw new InPostPayBadRequestException();
+        } catch (Throwable $e) {
+            $this->logger->critical($e->getMessage());
+
+            throw new InPostPayInternalException();
         }
-        $basket = $this->basketFactory->create();
-        $this->quoteToBasketDataTransfer->transfer($quote, $basket);
-
-        $this->eventManager->dispatch('izi_basket_confirmation_after', [
-            'basket' => $basket,
-        ]);
-
-        $this->createRequestDebugLog(
-            sprintf(
-                'Basket ID %s has been confirmed with status: %s',
-                $inPostPayQuote->getBasketId(),
-                $status
-            )
-        );
-
-        $this->eventManager->dispatch('izi_basket_confirmation_after', ['basket' => $basket]);
 
         return $basket;
     }
@@ -133,7 +147,7 @@ class BasketConfirmation implements BasketConfirmationInterface
     /**
      * @param int $quoteId
      * @return Quote
-     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     private function getQuoteById(int $quoteId): Quote
     {
@@ -143,9 +157,9 @@ class BasketConfirmation implements BasketConfirmationInterface
             if ($quote instanceof Quote) {
                 return $quote;
             } else {
-                throw new LocalizedException(__('Quote with ID %1 is invalid.', $quoteId));
+                throw new NoSuchEntityException(__('Quote with ID %1 is invalid.', $quoteId));
             }
-        } catch (NoSuchEntityException | LocalizedException $e) {
+        } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
             throw $e;

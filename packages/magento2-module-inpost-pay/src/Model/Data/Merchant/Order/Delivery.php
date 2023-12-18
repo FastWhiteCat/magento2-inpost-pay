@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Model\Data\Merchant\Order;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface;
@@ -17,11 +20,13 @@ class Delivery extends DataObject implements DeliveryInterface
     /**
      * @param PhoneNumberInterfaceFactory $phoneNumberFactory
      * @param DeliveryAddressInterfaceFactory $deliveryAddressFactory
+     * @param PriceInterfaceFactory $priceFactory
      * @param array $data
      */
     public function __construct(
         private readonly PhoneNumberInterfaceFactory $phoneNumberFactory,
         private readonly DeliveryAddressInterfaceFactory $deliveryAddressFactory,
+        private readonly PriceInterfaceFactory $priceFactory,
         array $data = []
     ) {
         parent::__construct($data);
@@ -69,6 +74,52 @@ class Delivery extends DataObject implements DeliveryInterface
     public function setDeliveryCodes(array $deliveryCodes): void
     {
         $this->setData(self::DELIVERY_CODES, $deliveryCodes);
+    }
+
+    /**
+     * @return DeliveryOptionInterface[]|null
+     */
+    public function getDeliveryOptions(): ?array
+    {
+        $deliveryOptions = $this->getData(self::DELIVERY_OPTIONS);
+
+        if (is_array($deliveryOptions)) {
+            return $deliveryOptions;
+        }
+
+        return [];
+    }
+
+    /**
+     * @param DeliveryOptionInterface[]|null $deliveryOptions
+     * @return void
+     */
+    public function setDeliveryOptions(?array $deliveryOptions): void
+    {
+        $this->setData(self::DELIVERY_OPTIONS, $deliveryOptions);
+    }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null
+     */
+    public function getDeliveryPrice(): ?PriceInterface
+    {
+        $deliveryPrice = $this->getData(self::DELIVERY_PRICE);
+
+        if ($deliveryPrice instanceof PriceInterface) {
+            return $deliveryPrice;
+        }
+
+        return $this->priceFactory->create();
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null $deliveryPrice
+     * @return void
+     */
+    public function setDeliveryPrice(?PriceInterface $deliveryPrice): void
+    {
+        $this->setData(self::DELIVERY_PRICE, $deliveryPrice);
     }
 
     /**

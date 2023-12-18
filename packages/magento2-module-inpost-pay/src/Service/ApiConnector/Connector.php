@@ -11,7 +11,7 @@ use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Psr7\Response as GuzzleHttpResponse;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use Laminas\Http\Response;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Base64Json;
@@ -44,7 +44,7 @@ class Connector implements ConnectorInterface
                     $requestParams = !empty($params) ? ['multipart' => $params] : [];
                     break;
                 default:
-                    $requestParams = ['json' => $params];
+                    $requestParams = (!empty($params)) ? ['json' => $params]: [];
             }
             $this->createRequestLog($url, $headers, $requestParams);
             $response = $client->{$request->getMethod()}($url, $requestParams);
@@ -79,7 +79,7 @@ class Connector implements ConnectorInterface
      * @param RequestInterface $request
      * @param array $additionalHeaders
      * @return array
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      */
     private function getHeaders(RequestInterface $request, array $additionalHeaders): array
     {

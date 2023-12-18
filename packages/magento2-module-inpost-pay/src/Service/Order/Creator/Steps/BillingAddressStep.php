@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Enum\InPostInvoiceLegalForm;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Api\BillingAddressManagementInterface;
@@ -36,9 +37,14 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setEmail($inPostOrder->getAccountInfo()->getMail());
         if ($invoiceDetails) {
-            $billingAddress->setFirstname($invoiceDetails->getName());
-            $billingAddress->setLastname($invoiceDetails->getSurname());
-            $billingAddress->setCompany($invoiceDetails->getCompanyName());
+            if ($invoiceDetails->getLegalForm() === InPostInvoiceLegalForm::PERSON->name) {
+                $billingAddress->setFirstname($invoiceDetails->getName());
+                $billingAddress->setLastname($invoiceDetails->getSurname());
+            } else {
+                $billingAddress->setCompany($invoiceDetails->getCompanyName());
+                $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
+                $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
+            }
             $billingAddress->setStreet(
                 $this->combineInvoiceAddressToOneLine($invoiceDetails)
             );
@@ -79,7 +85,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $addressLine = $invoiceDetails->getStreet();
         $addressNumber = implode('/', [$invoiceDetails->getBuilding(), $invoiceDetails->getFlat()]);
 
-        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
+        return sprintf('%s%s%s', $addressLine, PHP_EOL, trim($addressNumber, '/'));
     }
 
     private function combinePhoneNumber(PhoneNumberInterface $phoneNumber): string

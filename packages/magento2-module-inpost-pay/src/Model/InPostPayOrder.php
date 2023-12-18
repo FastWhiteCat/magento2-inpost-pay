@@ -7,26 +7,29 @@ namespace InPost\InPostPay\Model;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
-    private const DELIVERY_OPTIONS_SEPARATOR = ',';
+    private const SEPARATOR = ',';
 
     protected $_eventPrefix = InPostPayOrderInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayOrderInterface::ENTITY_NAME;
-
-    private ?PhoneNumberInterface $phoneNumber;
 
     public function __construct(
         Context $context,
         Registry $registry,
         private readonly PhoneNumberInterfaceFactory $phoneNumberInterfaceFactory,
+        private readonly AcceptedConsentInterfaceFactory $acceptedConsentFactory,
+        private readonly SerializerInterface $serializer,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -67,6 +70,30 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::ORDER_ID, $orderId);
     }
 
+    public function getBasketId(): ?string
+    {
+        $basketId = $this->getData(self::BASKET_ID);
+
+        return (is_scalar($basketId)) ? (string)$basketId : null;
+    }
+
+    public function setBasketId(?string $basketId): InPostPayOrderInterface
+    {
+        return $this->setData(self::BASKET_ID, $basketId);
+    }
+
+    public function getPaymentType(): ?string
+    {
+        $paymentType = $this->getData(self::PAYMENT_TYPE);
+
+        return (is_scalar($paymentType)) ? (string)$paymentType : null;
+    }
+
+    public function setPaymentType(?string $paymentType): InPostPayOrderInterface
+    {
+        return $this->setData(self::PAYMENT_TYPE, $paymentType);
+    }
+
     public function getLockerId(): ?string
     {
         $lockerId = ($this->hasData(self::LOCKER_ID)) ? $this->getData(self::LOCKER_ID) : null;
@@ -83,7 +110,7 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     {
         $deliveryOptions = $this->getData(self::DELIVERY_OPTIONS);
         if (!empty($deliveryOptions) && is_scalar($deliveryOptions)) {
-            return explode(self::DELIVERY_OPTIONS_SEPARATOR, (string)$deliveryOptions);
+            return explode(self::SEPARATOR, (string)$deliveryOptions);
         }
 
         return [];
@@ -91,7 +118,54 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 
     public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface
     {
-        return $this->setData(self::DELIVERY_OPTIONS, implode(self::DELIVERY_OPTIONS_SEPARATOR, $deliveryOptions));
+        return $this->setData(self::DELIVERY_OPTIONS, implode(self::SEPARATOR, $deliveryOptions));
+    }
+
+    /**
+     * @return AcceptedConsentInterface[]
+     */
+    public function getAcceptedConsents(): array
+    {
+        $acceptedConsents = [];
+        $acceptedContentsValue = $this->getData(self::ACCEPTED_CONSENTS);
+        if (!empty($acceptedContentsValue) && is_scalar($acceptedContentsValue)) {
+            $acceptedConsentsData = $this->serializer->unserialize((string)$acceptedContentsValue);
+            if (is_array($acceptedConsentsData)) {
+                foreach ($acceptedConsentsData as $acceptedConsentData) {
+                    $consentId = (string)($acceptedConsentData[AcceptedConsentInterface::CONSENT_ID] ?? '');
+                    $consentVersion = (string)($acceptedConsentData[AcceptedConsentInterface::CONSENT_VERSION] ?? '');
+                    $isAccepted = (bool)($acceptedConsentData[AcceptedConsentInterface::IS_ACCEPTED] ?? false);
+
+                    /** @var AcceptedConsentInterface $acceptedContent */
+                    $acceptedContent = $this->acceptedConsentFactory->create();
+                    $acceptedContent->setConsentId($consentId);
+                    $acceptedContent->setConsentVersion($consentVersion);
+                    $acceptedContent->setIsAccepted($isAccepted);
+                    $acceptedConsents[] = $acceptedContent;
+                }
+            }
+        }
+
+        return $acceptedConsents;
+    }
+
+    /**
+     * @param AcceptedConsentInterface[] $acceptedConsents
+     * @return InPostPayOrderInterface
+     */
+    public function setAcceptedConsents(array $acceptedConsents): InPostPayOrderInterface
+    {
+        $acceptedConsentsData = [];
+        foreach ($acceptedConsents as $acceptedConsent) {
+            if ($acceptedConsent instanceof AcceptedConsentInterface) {
+                $acceptedConsentsData[] = [
+                    AcceptedConsentInterface::CONSENT_ID => $acceptedConsent->getConsentId(),
+                    AcceptedConsentInterface::CONSENT_VERSION => $acceptedConsent->getConsentVersion(),
+                    AcceptedConsentInterface::IS_ACCEPTED => $acceptedConsent->getIsAccepted()
+                ];
+            }
+        }
+        return $this->setData(self::ACCEPTED_CONSENTS, $this->serializer->serialize($acceptedConsentsData));
     }
 
     public function getOrderStatus(): ?string
@@ -118,6 +192,18 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::PHONE, $phone);
     }
 
+    public function getCourierNote(): ?string
+    {
+        $courierNote = ($this->hasData(self::COURIER_NOTE)) ? $this->getData(self::COURIER_NOTE) : null;
+
+        return ($courierNote && is_scalar($courierNote)) ? (string)$courierNote : null;
+    }
+
+    public function setCourierNote(?string $courierNote): InPostPayOrderInterface
+    {
+        return $this->setData(self::COURIER_NOTE, $courierNote);
+    }
+
     public function getCountryPrefix(): ?string
     {
         $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
@@ -132,14 +218,15 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 
     public function getPhoneNumber(): PhoneNumberInterface
     {
-        if (!$this->phoneNumber) {
-            $this->phoneNumber = $this->phoneNumberInterfaceFactory->create();
+        $phoneNumber = $this->getData(self::PHONE_NUMBER);
+        if (!$phoneNumber instanceof PhoneNumberInterface) {
+            $phoneNumber = $this->phoneNumberInterfaceFactory->create();
         }
 
-        $this->phoneNumber->setPhone((string)$this->getPhone());
-        $this->phoneNumber->setCountryPrefix((string)$this->getCountryPrefix());
+        $phoneNumber->setPhone((string)$this->getPhone());
+        $phoneNumber->setCountryPrefix((string)$this->getCountryPrefix());
 
-        return $this->phoneNumber;
+        return $phoneNumber;
     }
 
     public function getCreatedAt(): string
