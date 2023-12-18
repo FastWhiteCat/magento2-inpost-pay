@@ -184,7 +184,7 @@ define([
 
         iziGetOrderComplete: function () {
             //TODO check statuses from BE, change url when endpoint will be changed to controller
-            checkOrderStatus();
+            return checkOrderStatus();
             function checkOrderStatus() {
                 abortRequest(xhrForOrderConfirmation)
 
