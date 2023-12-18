@@ -164,6 +164,7 @@ define([
                                         setTimerAndRunCallback(checkIsBound);
                                         break;
                                     case 'SUCCESS':
+                                        localStorage.setItem('browser_id', data.browser.browser_id);
                                         resolve(data)
                                         break;
                                     default:
