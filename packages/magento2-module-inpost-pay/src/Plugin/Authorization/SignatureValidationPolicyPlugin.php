@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Plugin\Authorization;
 
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Model\Registry\SwaggerRegistry;
 use Magento\Framework\Authorization\PolicyInterface;
 use InPost\InPostPay\Api\Validator\SignatureValidatorInterface;
@@ -35,7 +36,7 @@ class SignatureValidationPolicyPlugin
      * @param string|null $resourceId
      * @param string|null $privilege
      * @return bool
-     * @throws AuthorizationException
+     * @throws InPostPayAuthorizationException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterIsAllowed(
@@ -57,7 +58,7 @@ class SignatureValidationPolicyPlugin
 
     /**
      * @return bool
-     * @throws AuthorizationException
+     * @throws InPostPayAuthorizationException
      */
     protected function isSignatureValid(): bool
     {
@@ -92,7 +93,7 @@ class SignatureValidationPolicyPlugin
         } catch (AuthorizationException $e) {
             $this->logRequest($endpoint, $requestData, $e->getMessage());
 
-            throw new AuthorizationException(__('Signature validation failed!'));
+            throw new InPostPayAuthorizationException();
         }
 
         return true;

@@ -23,6 +23,10 @@ interface OrderCreateInterface
      * @param \InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface[] $consents
      * @param \InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface|null $invoiceDetails
      * @return \InPost\InPostPay\Api\Data\Merchant\OrderInterface
+     * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
+     * @throws \InPost\InPostPay\Exception\InPostPayAuthorizationException
+     * @throws \InPost\InPostPay\Exception\OrderNotFoundException
+     * @throws \InPost\InPostPay\Exception\InPostPayInternalException
      */
     public function execute(
         OrderDetailsInterface $orderDetails,

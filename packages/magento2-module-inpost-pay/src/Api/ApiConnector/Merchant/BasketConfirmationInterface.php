@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Api\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
-use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 
 /**
  * InPost Pay Basket service for confirming bound basket.
@@ -24,6 +24,10 @@ interface BasketConfirmationInterface
      * @param string $name
      * @param string $surname
      * @return \InPost\InPostPay\Api\Data\Merchant\BasketInterface
+     * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
+     * @throws \InPost\InPostPay\Exception\InPostPayAuthorizationException
+     * @throws \InPost\InPostPay\Exception\BasketNotFoundException
+     * @throws \InPost\InPostPay\Exception\InPostPayInternalException
      */
     public function execute(
         string $basketId,
@@ -34,5 +38,5 @@ interface BasketConfirmationInterface
         string $maskedPhoneNumber,
         string $name,
         string $surname
-    ): BasketDataInterface;
+    ): BasketInterface;
 }

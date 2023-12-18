@@ -18,6 +18,7 @@ interface BasketInterface
     public const PRODUCTS = 'products';
     public const RELATED_PRODUCTS = 'related_products';
     public const CONSENTS = 'consents';
+    public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
     /**
      * @return string|null

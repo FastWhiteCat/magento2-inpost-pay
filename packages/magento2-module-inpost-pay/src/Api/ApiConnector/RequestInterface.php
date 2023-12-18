@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\ApiConnector;
 
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use Magento\Framework\Exception\LocalizedException;
 
 interface RequestInterface
@@ -27,7 +27,7 @@ interface RequestInterface
 
     /**
      * @return string|null
-     * @throws InPostPayInvalidConfigurationException
+     * @throws InPostPayInternalException
      * @throws LocalizedException
      */
     public function getBearerToken(): ?string;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Controller\PayData;
 
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCreate;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
@@ -23,8 +24,6 @@ use Psr\Log\LoggerInterface;
  */
 class Get implements HttpPostActionInterface
 {
-    public const DEFAULT_DATE_FORMAT = "Y-m-d\TH:i:s.000\Z";
-
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
 
@@ -100,7 +99,7 @@ class Get implements HttpPostActionInterface
             "description" => $browser['description'] ?? '',
             "platform" => $browser['platform'] ?? '',
             "architecture" => $browser['architecture'] ?? '',
-            "data_time" => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
+            "data_time" => $this->localeDate->date()->format(BasketInterface::INPOST_DATE_FORMAT),
             "location" => "-",
             "customer_ip" => $this->getCustomerIPAddress(),
             // @phpstan-ignore-next-line

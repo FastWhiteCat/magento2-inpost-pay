@@ -17,6 +17,7 @@ interface OrderInterface
     public const ACCOUNT_INFO = 'account_info';
     public const DELIVERY = 'delivery';
     public const CONSENTS = 'consents';
+    public const PRODUCTS = 'products';
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface
@@ -72,4 +73,15 @@ interface OrderInterface
      * @return void
      */
     public function setConsents(array $consents): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[]
+     */
+    public function getProducts(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface[] $products
+     * @return void
+     */
+    public function setProducts(array $products): void;
 }

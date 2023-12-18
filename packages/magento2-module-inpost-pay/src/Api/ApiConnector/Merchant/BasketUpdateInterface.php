@@ -23,6 +23,10 @@ interface BasketUpdateInterface
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface[]|null $relatedProductsEventData
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface[]|null $promoCodesEventData
      * @return \InPost\InPostPay\Api\Data\Merchant\BasketInterface
+     * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
+     * @throws \InPost\InPostPay\Exception\InPostPayAuthorizationException
+     * @throws \InPost\InPostPay\Exception\BasketNotFoundException
+     * @throws \InPost\InPostPay\Exception\InPostPayInternalException
      */
     public function execute(
         string $basketId,

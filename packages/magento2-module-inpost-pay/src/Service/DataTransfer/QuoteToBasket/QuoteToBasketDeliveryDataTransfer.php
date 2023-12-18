@@ -11,7 +11,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFa
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
@@ -121,7 +121,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         $optionPriceNet = DecimalCalculator::round((float)$optionShippingMethod->getPriceExclTax());
         $optionPriceGross = DecimalCalculator::round((float)$optionShippingMethod->getPriceInclTax());
-        $optionPriceVat = DecimalCalculator::sub($optionPrice->getGross(), $optionPrice->getNet());
+        $optionPriceVat = DecimalCalculator::sub($optionPriceGross, $optionPriceNet);
 
         $optionPriceNetDiff = DecimalCalculator::sub($optionPriceNet, $standardDeliveryPrice->getNet());
         $optionPriceGrossDiff = DecimalCalculator::sub($optionPriceGross, $standardDeliveryPrice->getGross());
@@ -157,7 +157,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
                     break;
                 }
             }
-        } catch (InPostPayInvalidConfigurationException $e) {
+        } catch (InPostPayInternalException $e) {
             $mappedShippingMethod = null;
         }
 

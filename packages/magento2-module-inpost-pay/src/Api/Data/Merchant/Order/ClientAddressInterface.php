@@ -10,7 +10,7 @@ interface ClientAddressInterface
     public const ADDRESS = 'address';
     public const ADDRESS_DETAILS = 'address_details';
     public const CITY = 'city';
-    public const POSTAL_CODE = 'city';
+    public const POSTAL_CODE = 'postal_code';
 
     /**
      * @return string

@@ -6,13 +6,13 @@ namespace InPost\InPostPay\Provider;
 
 use InPost\InPostPay\Api\InPostPayLockerIdProviderInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
-use InPost\InPostPay\Exception\InPostPayInvalidConfigurationException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
+use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Psr\Log\LoggerInterface;
 
 class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
@@ -20,7 +20,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     public function __construct(
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        private readonly GetOrderByIncrementId $getOrderByIncrementId,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly LoggerInterface $logger
     ) {
@@ -46,7 +46,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     public function getFromOrderByIncrementId(string $orderIncrementId): string
     {
         try {
-            return $this->getFromOrder($this->getOrderByIncrementId($orderIncrementId));
+            return $this->getFromOrder($this->getOrderByIncrementId->get($orderIncrementId));
         } catch (NoSuchEntityException $e) {
             $this->logger->error(
                 __('InPost Locker ID cannot be obtained because order does not exist: %1', $e->getMessage())->render()
@@ -90,31 +90,6 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     }
 
     /**
-     * @param string $incrementId
-     * @return OrderInterface
-     * @throws NoSuchEntityException
-     */
-    private function getOrderByIncrementId(string $incrementId): OrderInterface
-    {
-        $criteria = $this->searchCriteriaBuilder
-            ->addFilter(OrderInterface::INCREMENT_ID, $incrementId)
-            ->create();
-        $orders = $this->orderRepository->getList($criteria)->getItems();
-
-        if (count($orders)) {
-            if (current($orders) instanceof OrderInterface) {
-                $order = current($orders);
-            }
-        }
-
-        if (!isset($order)) {
-            throw new NoSuchEntityException(__('Order #%1 not found.'));
-        }
-
-        return $order;
-    }
-
-    /**
      * @param string $carrierMethodCode
      * @return bool
      */
@@ -127,7 +102,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
                     $deliveryType,
                     ShipmentMappingConfigProvider::OPTION_STANDARD
                 );
-            } catch (InPostPayInvalidConfigurationException $e) {
+            } catch (InPostPayInternalException $e) {
                 continue;
             }
 
@@ -137,7 +112,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
                         $deliveryType,
                         $option
                     );
-                } catch (InPostPayInvalidConfigurationException $e) {
+                } catch (InPostPayInternalException $e) {
                     continue;
                 }
             }

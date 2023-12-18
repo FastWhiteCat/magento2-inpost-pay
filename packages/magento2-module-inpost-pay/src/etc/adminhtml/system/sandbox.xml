@@ -35,6 +35,14 @@
                 <field id="enabled">1</field>
             </depends>
         </field>
+        <field id="sandbox_pos_id" translate="label" type="text" sortOrder="26"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox POS ID</label>
+            <config_path>payment/inpost_pay/sandbox_pos_id</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
         <field id="sandbox_izi_api_url" translate="label" type="text" sortOrder="30"
                showInDefault="1" showInWebsite="1" canRestore="1">
             <label>Sandbox IZI API URL</label>
