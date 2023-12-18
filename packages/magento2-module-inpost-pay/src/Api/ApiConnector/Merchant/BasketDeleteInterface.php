@@ -15,7 +15,7 @@ interface BasketDeleteInterface
      * @return void
      * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
      * @throws \InPost\InPostPay\Exception\InPostPayAuthorizationException
-     * @throws \InPost\InPostPay\Exception\OrderNotFoundException
+     * @throws \InPost\InPostPay\Exception\BasketNotFoundException
      * @throws \InPost\InPostPay\Exception\InPostPayInternalException
      */
     public function execute(string $basketId): void;

@@ -10,7 +10,7 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Exception\OrderNotFoundException;
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
@@ -30,7 +30,7 @@ class BasketDelete implements BasketDeleteInterface
      * @return void
      * @throws InPostPayBadRequestException
      * @throws InPostPayAuthorizationException
-     * @throws OrderNotFoundException
+     * @throws BasketNotFoundException
      * @throws InPostPayInternalException
      */
     public function execute(string $basketId): void
@@ -42,7 +42,7 @@ class BasketDelete implements BasketDeleteInterface
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
-            throw new OrderNotFoundException();
+            throw new BasketNotFoundException();
         } catch (InPostPayAuthorizationException $e) {
             $this->logger->error($e->getMessage());
 

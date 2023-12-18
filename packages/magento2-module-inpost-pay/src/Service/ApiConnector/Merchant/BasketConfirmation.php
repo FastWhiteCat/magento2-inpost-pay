@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
@@ -15,7 +16,6 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -51,7 +51,7 @@ class BasketConfirmation implements BasketConfirmationInterface
      * @return BasketInterface
      * @throws InPostPayBadRequestException
      * @throws InPostPayAuthorizationException
-     * @throws OrderNotFoundException
+     * @throws BasketNotFoundException
      * @throws InPostPayInternalException
      */
     public function execute(
@@ -93,7 +93,7 @@ class BasketConfirmation implements BasketConfirmationInterface
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
-            throw new OrderNotFoundException();
+            throw new BasketNotFoundException();
         } catch (InPostPayAuthorizationException $e) {
             $this->logger->error($e->getMessage());
 
@@ -107,7 +107,6 @@ class BasketConfirmation implements BasketConfirmationInterface
 
             throw new InPostPayInternalException();
         }
-
 
         return $basket;
     }

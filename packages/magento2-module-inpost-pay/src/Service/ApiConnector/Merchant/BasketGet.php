@@ -13,7 +13,7 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Exception\OrderNotFoundException;
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -42,7 +42,7 @@ class BasketGet implements BasketGetInterface
      * @return BasketDataInterface
      * @throws InPostPayBadRequestException
      * @throws InPostPayAuthorizationException
-     * @throws OrderNotFoundException
+     * @throws BasketNotFoundException
      * @throws InPostPayInternalException
      */
     public function execute(string $basketId): BasketDataInterface
@@ -57,7 +57,7 @@ class BasketGet implements BasketGetInterface
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
-            throw new OrderNotFoundException();
+            throw new BasketNotFoundException();
         } catch (InPostPayAuthorizationException $e) {
             $this->logger->error($e->getMessage());
 

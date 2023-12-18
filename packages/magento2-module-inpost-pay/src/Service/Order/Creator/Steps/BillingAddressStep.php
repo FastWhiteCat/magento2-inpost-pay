@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Enum\InPostInvoiceLegalForm;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Api\BillingAddressManagementInterface;
@@ -36,10 +37,14 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setEmail($inPostOrder->getAccountInfo()->getMail());
         if ($invoiceDetails) {
-            //TODO::if PERSON than get name anf surename from account info
-            $billingAddress->setFirstname($invoiceDetails->getName());
-            $billingAddress->setLastname($invoiceDetails->getSurname());
-            $billingAddress->setCompany($invoiceDetails->getCompanyName());
+            if ($inPostOrder->getInvoiceDetails()->getLegalForm() === InPostInvoiceLegalForm::COMPANY->name) {
+                $billingAddress->setFirstname($invoiceDetails->getName());
+                $billingAddress->setLastname($invoiceDetails->getSurname());
+                $billingAddress->setCompany($invoiceDetails->getCompanyName());
+            } else {
+                $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
+                $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
+            }
             $billingAddress->setStreet(
                 $this->combineInvoiceAddressToOneLine($invoiceDetails)
             );

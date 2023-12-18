@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
@@ -50,7 +51,6 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
             }
         }
 
-
         $inPostOrder->setDelivery($delivery);
     }
 
@@ -70,21 +70,24 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         DeliveryInterface $delivery,
         string $deliveryType,
         string $deliveryOptionCode
-    ) {
+    ): void {
         $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
         $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
         $orderShippingAddress = $order->getShippingAddress();
         $shippingPriceInclTax = DecimalCalculator::round((float)$order->getShippingInclTax());
         $shippingPriceTax = DecimalCalculator::round((float)$order->getShippingTaxAmount());
         $shippingPriceExclTax = DecimalCalculator::sub($shippingPriceInclTax, $shippingPriceTax);
-        $deliveryPrice = $delivery->getDeliveryPrice();
-
         $delivery->setDeliveryType($deliveryType);
         $delivery->setDeliveryCodes($inPostPayOrder->getDeliveryOptions());
-        $deliveryPrice->setNet($shippingPriceExclTax);
-        $deliveryPrice->setGross($shippingPriceInclTax);
-        $deliveryPrice->setVat($shippingPriceTax);
-        $delivery->setDeliveryPrice($deliveryPrice);
+
+        $deliveryPrice = $delivery->getDeliveryPrice();
+        if ($deliveryPrice instanceof PriceInterface) {
+            $deliveryPrice->setNet($shippingPriceExclTax);
+            $deliveryPrice->setGross($shippingPriceInclTax);
+            $deliveryPrice->setVat($shippingPriceTax);
+            $delivery->setDeliveryPrice($deliveryPrice);
+        }
+
         $delivery->setMail($order->getCustomerEmail());
         $delivery->setPhoneNumber($inPostPayOrder->getPhoneNumber());
 

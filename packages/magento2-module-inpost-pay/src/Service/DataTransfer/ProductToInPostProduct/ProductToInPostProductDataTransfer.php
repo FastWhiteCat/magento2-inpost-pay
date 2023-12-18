@@ -20,6 +20,9 @@ use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Model\Product;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';

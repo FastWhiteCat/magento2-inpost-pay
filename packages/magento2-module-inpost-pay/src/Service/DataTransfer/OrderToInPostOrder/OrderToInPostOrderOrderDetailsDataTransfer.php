@@ -15,6 +15,7 @@ use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Api\Data\ShipmentTrackInterface;
 use Magento\Sales\Model\Order;
 
 class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDataTransferInterface
@@ -36,9 +37,19 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
         $orderDetails->setCurrency((string)$order->getOrderCurrencyCode());
         $orderDetails->setPaymentType((string)$inPostPayOrderEntity->getPaymentType());
         $this->transferOrderPrices($order, $orderDetails);
-        $truckingNumbers = $order->getTrackingNumbers();
-        $orderDetails->setDeliveryReferencesList([]);
-        $createdAtDateTime = new DateTime($order->getCreatedAt(), new DateTimeZone('UTC'));
+        $deliveryReferenceList = [];
+        foreach ($order->getTracksCollection() as $track) {
+            if ($track instanceof ShipmentTrackInterface) {
+                $trackNr = $track->getTrackNumber();
+                if ($trackNr) {
+                    $deliveryReferenceList[] = $trackNr;
+                }
+            }
+        }
+        if ($deliveryReferenceList) {
+            $orderDetails->setDeliveryReferencesList($deliveryReferenceList);
+        }
+        $createdAtDateTime = new DateTime((string)$order->getCreatedAt(), new DateTimeZone('UTC'));
         $orderDetails->setOrderCreationDate(
             $createdAtDateTime->format(QuoteToBasketSummaryDataTransfer::INPOST_DATE_FORMAT)
         );

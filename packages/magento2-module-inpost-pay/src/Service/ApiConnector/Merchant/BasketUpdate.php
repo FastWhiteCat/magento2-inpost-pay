@@ -15,7 +15,7 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Exception\OrderNotFoundException;
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
@@ -53,7 +53,7 @@ class BasketUpdate implements BasketUpdateInterface
      * @return BasketInterface
      * @throws InPostPayBadRequestException
      * @throws InPostPayAuthorizationException
-     * @throws OrderNotFoundException
+     * @throws BasketNotFoundException
      * @throws InPostPayInternalException
      */
     public function execute(
@@ -78,25 +78,13 @@ class BasketUpdate implements BasketUpdateInterface
                 )
             );
 
-            if (!empty($quantityEventData)) {
-                foreach ($quantityEventData as $productQuantity) {
-                    $this->handleProductQuantities($quote, $productQuantity);
-                }
-            }
-
-            if (!empty($relatedProductsEventData)) {
-                foreach ($relatedProductsEventData as $productQuantity) {
-                    $this->handleProductQuantities($quote, $productQuantity);
-                }
-            }
-
-            if ($promoCodesEventData) {
-                foreach ($promoCodesEventData as $promoCode) {
-                    $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
-                }
-            } elseif ($eventType === self::PROMO_CODES_EVENT) {
-                $this->cartService->removePromosFromQuote($quote);
-            }
+            $this->updateQuote(
+                $quote,
+                $eventType,
+                $quantityEventData,
+                $relatedProductsEventData,
+                $promoCodesEventData
+            );
 
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
@@ -106,7 +94,7 @@ class BasketUpdate implements BasketUpdateInterface
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
-            throw new OrderNotFoundException();
+            throw new BasketNotFoundException();
         } catch (InPostPayAuthorizationException $e) {
             $this->logger->error($e->getMessage());
 
@@ -121,6 +109,43 @@ class BasketUpdate implements BasketUpdateInterface
             throw new InPostPayInternalException();
         }
         return $basket;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param string $eventType
+     * @param QuantityUpdateInterface[]|null $quantityEventData
+     * @param QuantityUpdateInterface[]|null $relatedProductsEventData
+     * @param PromoCodeInterface[]|null $promoCodesEventData
+     * @return void
+     * @throws LocalizedException
+     */
+    private function updateQuote(
+        Quote $quote,
+        string $eventType,
+        ?array $quantityEventData = null,
+        ?array $relatedProductsEventData = null,
+        ?array $promoCodesEventData = null,
+    ): void {
+        if (!empty($quantityEventData)) {
+            foreach ($quantityEventData as $productQuantity) {
+                $this->handleProductQuantities($quote, $productQuantity);
+            }
+        }
+
+        if (!empty($relatedProductsEventData)) {
+            foreach ($relatedProductsEventData as $productQuantity) {
+                $this->handleProductQuantities($quote, $productQuantity);
+            }
+        }
+
+        if ($promoCodesEventData) {
+            foreach ($promoCodesEventData as $promoCode) {
+                $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
+            }
+        } elseif ($eventType === self::PROMO_CODES_EVENT) {
+            $this->cartService->removePromosFromQuote($quote);
+        }
     }
 
     private function handleProductQuantities(Quote $quote, QuantityUpdateInterface $productQuantity): void

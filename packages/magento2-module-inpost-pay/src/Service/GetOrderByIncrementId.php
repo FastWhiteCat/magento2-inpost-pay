@@ -1,10 +1,14 @@
 <?php
+
 declare(strict_types=1);
+
 namespace InPost\InPostPay\Service;
+
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+
 class GetOrderByIncrementId
 {
     public function __construct(
