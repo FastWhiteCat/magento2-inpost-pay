@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api;
 
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResults;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -57,6 +58,7 @@ interface InPostPayQuoteRepositoryInterface
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return bool true on success
      * @throws CouldNotDeleteException
+     * @throws InPostPayAuthorizationException
      */
     public function delete(InPostPayQuoteInterface $inPostPayQuote): bool;
 

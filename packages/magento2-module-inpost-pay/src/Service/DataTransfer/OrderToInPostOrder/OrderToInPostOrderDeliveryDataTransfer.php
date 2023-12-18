@@ -111,7 +111,7 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
     private function appendDeliveryAddressData(Address $orderShippingAddress, DeliveryInterface $delivery): void
     {
         $deliveryAddress = $delivery->getDeliveryAddress();
-        $streetData = $orderShippingAddress->getStreet() ?? [];
+        $streetData = $orderShippingAddress->getStreet();
         $addressLine = implode(PHP_EOL, $streetData);
         $deliveryAddress->setName(
             sprintf('%s %s', $orderShippingAddress->getFirstname(), $orderShippingAddress->getLastname())
