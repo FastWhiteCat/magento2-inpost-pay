@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
@@ -52,11 +53,11 @@ class OrderEvent implements OrderEventInterface
     ): UpdateOrderResponseInterface {
         try {
             $this->eventManager->dispatch('izi_order_update_before', [
-                'order_id' => $orderId,
-                'event_id' => $eventId,
-                'event_data_time' => $eventDataTime,
-                'event_data' => $eventData,
-                'phone_number' => $phoneNumber
+                InPostPayOrderInterface::ORDER_ID => $orderId,
+                BasketUpdateInterface::EVENT_ID => $eventId,
+                BasketUpdateInterface::EVENT_DATA_TIME => $eventDataTime,
+                OrderEventInterface::EVENT_DATA => $eventData,
+                InPostPayOrderInterface::PHONE_NUMBER => $phoneNumber
             ]);
             /**
              * @var Order $order
@@ -66,8 +67,8 @@ class OrderEvent implements OrderEventInterface
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
 
             $this->eventManager->dispatch('izi_order_update_after', [
-                'order' => $order,
-                'inpost_pay_order_status' => $inPostPayOrderStatus
+                OrderEventInterface::ORDER => $order,
+                OrderEventInterface::INPOST_PAY_ORDER_STATUS => $inPostPayOrderStatus
             ]);
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');

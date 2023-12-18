@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use Throwable;
+use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
@@ -72,14 +73,14 @@ class BasketUpdate implements BasketUpdateInterface
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
             $this->eventManager->dispatch('izi_basket_update_before', [
-                'quote' => $quote,
-                'inpost_pay_quote' => $inPostPayQuote,
-                'basket_id' => $basketId,
-                'event_id' => $eventId,
-                'event_data_time' => $eventDataTime,
-                'event_type' => $eventType,
-                'quantity_event_data' => $quantityEventData,
-                'promo_codes_event_data' => $promoCodesEventData
+                BasketConfirmationInterface::QUOTE => $quote,
+                InPostPayQuoteInterface::ENTITY_NAME => $inPostPayQuote,
+                InPostPayQuoteInterface::BASKET_ID => $basketId,
+                BasketUpdateInterface::EVENT_ID => $eventId,
+                BasketUpdateInterface::EVENT_DATA_TIME => $eventDataTime,
+                BasketUpdateInterface::EVENT_TYPE => $eventType,
+                BasketUpdateInterface::QUANTITY_EVENT_DATA => $quantityEventData,
+                BasketUpdateInterface::PROMO_CODES_EVENT_DATA => $promoCodesEventData
             ]);
 
             $this->createRequestDebugLog(
@@ -103,7 +104,7 @@ class BasketUpdate implements BasketUpdateInterface
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
-            $this->eventManager->dispatch('izi_basket_update_after', ['basket' => $basket]);
+            $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
             $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 
         } catch (NoSuchEntityException $e) {

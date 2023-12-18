@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
+use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface;
@@ -55,8 +57,8 @@ class OrderGet implements OrderGetInterface
                 $inPostOrder = $this->orderFactory->create();
                 $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
                 $this->eventManager->dispatch('izi_order_get_after', [
-                    'order' => $order,
-                    'inpost_order' => $inPostOrder
+                    OrderEventInterface::ORDER => $order,
+                    OrderCreateInterface::INPOST_ORDER => $inPostOrder
                 ]);
             } else {
                 throw new NoSuchEntityException(__('Order %1 not found.', $orderId));

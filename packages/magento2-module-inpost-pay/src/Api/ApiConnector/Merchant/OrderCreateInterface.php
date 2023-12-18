@@ -16,6 +16,8 @@ use InPost\InPostPay\Api\Data\Merchant\OrderInterface as OrderDataInterface;
  */
 interface OrderCreateInterface
 {
+    public const INPOST_ORDER = 'inpost_order';
+
     /**
      * @param \InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface $orderDetails
      * @param \InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface $accountInfo

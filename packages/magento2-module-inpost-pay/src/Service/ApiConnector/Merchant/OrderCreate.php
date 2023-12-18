@@ -78,11 +78,11 @@ class OrderCreate implements OrderCreateInterface
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
 
             $this->eventManager->dispatch('izi_order_create_before', [
-                'order_details' => $orderDetails,
-                'account_info' => $accountInfo,
-                'delivery' => $delivery,
-                'consents' => $consents,
-                'invoice_details' => $invoiceDetails
+                OrderInterface::ORDER_DETAILS => $orderDetails,
+                OrderInterface::ACCOUNT_INFO => $accountInfo,
+                OrderInterface::DELIVERY => $delivery,
+                OrderInterface::CONSENTS => $consents,
+                OrderInterface::INVOICE_DETAILS => $invoiceDetails
             ]);
 
             if ($quote instanceof Quote && $quote->getId()) {
@@ -99,7 +99,9 @@ class OrderCreate implements OrderCreateInterface
 
                 $inPostOrder = $this->prepareInPostOrderFromMagentoOrder($order);
 
-                $this->eventManager->dispatch('izi_order_create_after', ['inpost_order' => $inPostOrder]);
+                $this->eventManager->dispatch('izi_order_create_after', [
+                    OrderCreateInterface::INPOST_ORDER => $inPostOrder
+                ]);
 
                 return  $inPostOrder;
             } else {

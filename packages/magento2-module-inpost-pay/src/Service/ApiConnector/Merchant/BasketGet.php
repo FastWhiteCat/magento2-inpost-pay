@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use Throwable;
+use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
@@ -50,14 +51,14 @@ class BasketGet implements BasketGetInterface
     public function execute(string $basketId): BasketDataInterface
     {
         try {
-            $this->eventManager->dispatch('izi_basket_get_before', ['basket_id' => $basketId]);
+            $this->eventManager->dispatch('izi_basket_get_before', [InPostPayQuoteInterface::BASKET_ID => $basketId]);
 
             $this->createRequestDebugLog(sprintf('Retrieving quote data for Basket ID: %s', $basketId));
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
-            $this->eventManager->dispatch('izi_basket_get_after', ['basket' => $basket]);
+            $this->eventManager->dispatch('izi_basket_get_after', [BasketConfirmationInterface::BASKET => $basket]);
             $this->createRequestDebugLog(sprintf('Quote data for Basket ID: %s has been retrieved.', $basketId));
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());

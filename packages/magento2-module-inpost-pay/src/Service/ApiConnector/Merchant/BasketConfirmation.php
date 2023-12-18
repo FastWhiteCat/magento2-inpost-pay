@@ -71,16 +71,16 @@ class BasketConfirmation implements BasketConfirmationInterface
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
             $this->eventManager->dispatch('izi_basket_confirmation_before', [
-                'quote' => $quote,
-                'inpost_pay_quote' => $inPostPayQuote,
-                'basket_id' => $basketId,
-                'status' => $status,
-                'inpost_basket_id' => $inpostBasketId,
-                'phone_number' => $phoneNumber,
-                'browser' => $browser,
-                'masked_phone_number' => $maskedPhoneNumber,
-                'name' => $name,
-                'surname' => $surname
+                BasketConfirmationInterface::QUOTE => $quote,
+                InPostPayQuoteInterface::ENTITY_NAME => $inPostPayQuote,
+                InPostPayQuoteInterface::BASKET_ID => $basketId,
+                InPostPayQuoteInterface::STATUS => $status,
+                InPostPayQuoteInterface::INPOST_BASKET_ID => $inpostBasketId,
+                InPostPayQuoteInterface::PHONE => $phoneNumber,
+                BasketConfirmationInterface::BROWSER => $browser,
+                InPostPayQuoteInterface::MASKED_PHONE_NUMBER => $maskedPhoneNumber,
+                InPostPayQuoteInterface::NAME => $name,
+                InPostPayQuoteInterface::SURNAME => $surname
             ]);
 
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
@@ -99,7 +99,9 @@ class BasketConfirmation implements BasketConfirmationInterface
 
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
-            $this->eventManager->dispatch('izi_basket_confirmation_after', ['basket' => $basket]);
+            $this->eventManager->dispatch('izi_basket_confirmation_after', [
+                BasketConfirmationInterface::BASKET => $basket
+            ]);
             $this->createRequestDebugLog(
                 sprintf(
                     'Basket ID %s has been confirmed with status: %s',
