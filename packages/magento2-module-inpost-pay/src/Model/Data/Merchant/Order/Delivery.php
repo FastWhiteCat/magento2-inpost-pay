@@ -77,6 +77,25 @@ class Delivery extends DataObject implements DeliveryInterface
     }
 
     /**
+     * @return string
+     */
+    public function getDeliveryDate(): string
+    {
+        $deliveryDate = $this->getData(self::DELIVERY_DATE);
+
+        return (is_scalar($deliveryDate)) ? (string)$deliveryDate : '';
+    }
+
+    /**
+     * @param string $deliveryDate
+     * @return void
+     */
+    public function setDeliveryDate(string $deliveryDate): void
+    {
+        $this->setData(self::DELIVERY_DATE, $deliveryDate);
+    }
+
+    /**
      * @return DeliveryOptionInterface[]|null
      */
     public function getDeliveryOptions(): ?array
