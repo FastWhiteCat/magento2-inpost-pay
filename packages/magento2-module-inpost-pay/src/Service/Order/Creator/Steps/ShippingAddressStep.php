@@ -39,13 +39,13 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $shippingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getDelivery()->getPhoneNumber()));
         if ($inPostOrder->getDelivery()->getDeliveryType() === InPostDeliveryType::APM->name) {
             $clientAddress = $inPostOrder->getAccountInfo()->getClientAddress();
-            $shippingAddress->setStreet($this->combineAddressToOneLine($clientAddress->getAddressDetails()));
+            $shippingAddress->setStreet($this->combineAddressArray($clientAddress->getAddressDetails()));
             $shippingAddress->setCity($clientAddress->getCity());
             $shippingAddress->setPostcode($clientAddress->getPostalCode());
             $shippingAddress->setCountryId($clientAddress->getCountryCode());
         } else {
             $deliveryAddress = $inPostOrder->getDelivery()->getDeliveryAddress();
-            $shippingAddress->setStreet($this->combineAddressToOneLine($deliveryAddress->getAddressDetails()));
+            $shippingAddress->setStreet($this->combineAddressArray($deliveryAddress->getAddressDetails()));
             $shippingAddress->setCity($deliveryAddress->getCity());
             $shippingAddress->setPostcode($deliveryAddress->getPostalCode());
             $shippingAddress->setCountryId($deliveryAddress->getCountryCode());
@@ -58,12 +58,22 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $this->createLog(sprintf('Shipping address has been applied to quote ID: %s', $quoteId));
     }
 
-    private function combineAddressToOneLine(AddressDetailsInterface $addressDetails): string
+    private function combineAddressArray(AddressDetailsInterface $addressDetails): array
     {
-        $addressLine = $addressDetails->getStreet();
-        $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
+        $addressArray = [];
+        if ($addressDetails->getStreet()) {
+            $addressArray[] = $addressDetails->getStreet();
+        }
 
-        return sprintf('%s%s%s', $addressLine, PHP_EOL, trim($addressNumber, '/'));
+        if ($addressDetails->getBuilding()) {
+            $addressArray[] = $addressDetails->getBuilding();
+        }
+
+        if ($addressDetails->getFlat()) {
+            $addressArray[] = $addressDetails->getFlat();
+        }
+
+        return $addressArray;
     }
 
     private function combinePhoneNumber(PhoneNumberInterface $phoneNumber): string
