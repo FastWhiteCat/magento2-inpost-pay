@@ -136,7 +136,16 @@ define([
         },
 
         iziGetIsBound: function () {
-            return checkIsBound();
+            return new Promise((resolve, reject) => {
+                checkIsBound()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error)
+                        console.error(error);
+                    });
+            });
 
             function checkIsBound() {
                 abortRequest(xhrForBasketConfirmation)
@@ -161,7 +170,7 @@ define([
                                         reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
                                         break;
                                     case 'PENDING':
-                                        setTimerAndRunCallback(checkIsBound);
+                                        setTimerAndRunCallback(checkIsBound, resolve, reject);
                                         break;
                                     case 'SUCCESS':
                                         localStorage.setItem('browser_id', data.browser.browser_id);
@@ -173,21 +182,27 @@ define([
                             } else if (data.error_code) {
                                 reject(new Error(data.error_code));
                             } else {
-                                setTimerAndRunCallback(checkIsBound)
+                                setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
                         .fail(function (xhr, textStatus) {
                             reject(new Error($.mage.__('Network problem: ') + textStatus));
                         });
                 });
-
             }
         },
 
         iziGetOrderComplete: function () {
-            //TODO check statuses from BE, change url when endpoint will be changed to controller
-            return checkOrderStatus();
-
+            return new Promise((resolve, reject) => {
+                checkOrderStatus()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error)
+                        console.error(error);
+                    });
+            });
             function checkOrderStatus() {
                 abortRequest(xhrForOrderConfirmation)
 
@@ -198,7 +213,7 @@ define([
                     })
                         .done(function (data) {
                             if (data.action && data.action === 'refresh') {
-                                setTimerAndRunCallback(checkOrderStatus);
+                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
                             } else if (data.action && data.action === 'redirect') {
                                 resolve(data)
                             }
@@ -338,9 +353,16 @@ define([
             }
         },
 
-        setTimerAndRunCallback: function (callback) {
+        setTimerAndRunCallback: function (callback, resolve, reject) {
             timeoutId = setTimeout(function () {
-                callback();
+                callback()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error);
+                        console.error(error);
+                    });
             }, LONG_POLLING_TIME);
         },
 
