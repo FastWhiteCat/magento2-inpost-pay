@@ -273,8 +273,8 @@ define([
                 abortRequest(xhrForBasketConfirmation)
             })
 
-            document.addEventListener("inpost-update-count", function (e){
-                updateCounter(e.detail.count);
+            window.addEventListener("inpost-update-count", function (e){
+                updateCounter(e.detail);
             });
 
             function checkCartWidget(cartData = "") {
