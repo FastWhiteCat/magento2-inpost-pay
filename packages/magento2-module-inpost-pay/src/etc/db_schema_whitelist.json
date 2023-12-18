@@ -8,7 +8,10 @@
             "updated_at": true,
             "order_status": true,
             "prefix": true,
-            "phone_number": true
+            "phone_number": true,
+            "country_prefix": true,
+            "phone": true,
+            "delivery_options": true
         },
         "constraint": {
             "PRIMARY": true,
@@ -30,7 +33,10 @@
             "name": true,
             "surname": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "phone": true,
+            "country_prefix": true,
+            "refresh_required": true
         },
         "constraint": {
             "PRIMARY": true,

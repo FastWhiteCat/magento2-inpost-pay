@@ -11,6 +11,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
@@ -31,6 +32,7 @@ class BasketUpdate implements BasketUpdateInterface
         private readonly CartService $cartService,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
+        private readonly InPostPayQuote $inPostPayQuote,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -82,6 +84,8 @@ class BasketUpdate implements BasketUpdateInterface
         $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
         $basket = $this->basketFactory->create();
         $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
+        $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
+
         $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 
         return $basket;

@@ -70,6 +70,7 @@ class BasketConfirmation implements BasketConfirmationInterface
             $inPostPayQuote->setSurname($surname);
             $inPostPayQuote->setBrowserId($browser->getBrowserId());
             $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
+            $inPostPayQuote->setRefreshRequired(true);
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
         } catch (LocalizedException $e) {
