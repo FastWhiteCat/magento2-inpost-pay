@@ -37,11 +37,11 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setEmail($inPostOrder->getAccountInfo()->getMail());
         if ($invoiceDetails) {
-            if ($invoiceDetails->getLegalForm() === InPostInvoiceLegalForm::COMPANY->name) {
+            if ($invoiceDetails->getLegalForm() === InPostInvoiceLegalForm::PERSON->name) {
                 $billingAddress->setFirstname($invoiceDetails->getName());
                 $billingAddress->setLastname($invoiceDetails->getSurname());
-                $billingAddress->setCompany($invoiceDetails->getCompanyName());
             } else {
+                $billingAddress->setCompany($invoiceDetails->getCompanyName());
                 $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
                 $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
             }

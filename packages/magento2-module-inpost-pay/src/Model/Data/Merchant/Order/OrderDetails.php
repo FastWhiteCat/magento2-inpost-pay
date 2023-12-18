@@ -185,9 +185,9 @@ class OrderDetails extends DataObject implements OrderDetailsInterface
      */
     public function getOrderMerchantStatusDescription(): string
     {
-        $posId = $this->getData(self::POS_ID);
+        $orderMerchantStatusDescription = $this->getData(self::ORDER_MERCHANT_STATUS_DESCRIPTION);
 
-        return (is_scalar($posId)) ? (string)$posId : '';
+        return (is_scalar($orderMerchantStatusDescription)) ? (string)$orderMerchantStatusDescription : '';
     }
 
     /**
