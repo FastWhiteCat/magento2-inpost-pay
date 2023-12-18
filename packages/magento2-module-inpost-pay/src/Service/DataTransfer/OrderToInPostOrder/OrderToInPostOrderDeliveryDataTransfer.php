@@ -115,7 +115,7 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
             sprintf('%s %s', $orderShippingAddress->getFirstname(), $orderShippingAddress->getLastname())
         );
 
-        $streetData = $orderShippingAddress->getStreet() ?? [];
+        $streetData = $orderShippingAddress->getStreet();
         $street = (isset($streetData[0])) ? (string)$streetData[0] : '';
         $building = (isset($streetData[1])) ? (string)$streetData[1] : '';
         $flat = (isset($streetData[2])) ? (string)$streetData[2] : '';
