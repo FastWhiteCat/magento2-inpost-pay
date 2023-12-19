@@ -141,23 +141,20 @@ class CartService
 
     private function getItemIdByProductFromCart(Quote $quote, Product $product): ?int
     {
+        $item = null;
         $typeId = (is_scalar($product->getTypeId())) ? (string)$product->getTypeId() : '';
         if ($typeId === Type::TYPE_SIMPLE) {
             $item = $quote->getItemByProduct($product);
-            if ($item instanceof Item) {
-                return (is_scalar($item->getId()) ? (int)$item->getId() : null);
-            }
         } else {
-            $productId = (is_scalar($product->getId())) ? (int)$product->getId() : 0;
             foreach ($quote->getAllVisibleItems() as $item) {
                 /** @var Item $item */
                 $itemProductId = (is_scalar($item->getData('product_id'))) ? (int)$item->getData('product_id') : 0;
-                if ($itemProductId === $productId) {
-                    return (is_scalar($item->getId()) ? (int)$item->getId() : null);
+                if ($itemProductId === (int)$product->getId()) {
+                    break;
                 }
             }
         }
 
-        return null;
+        return ($item && is_scalar($item->getId()) ? (int)$item->getId() : null);
     }
 }
