@@ -17,6 +17,7 @@ use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -35,6 +36,7 @@ class BasketConfirmation implements BasketConfirmationInterface
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -67,6 +69,20 @@ class BasketConfirmation implements BasketConfirmationInterface
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+
+            $this->eventManager->dispatch('izi_basket_confirmation_before', [
+                BasketConfirmationInterface::QUOTE => $quote,
+                InPostPayQuoteInterface::ENTITY_NAME => $inPostPayQuote,
+                InPostPayQuoteInterface::BASKET_ID => $basketId,
+                InPostPayQuoteInterface::STATUS => $status,
+                InPostPayQuoteInterface::INPOST_BASKET_ID => $inpostBasketId,
+                InPostPayQuoteInterface::PHONE => $phoneNumber,
+                BasketConfirmationInterface::BROWSER => $browser,
+                InPostPayQuoteInterface::MASKED_PHONE_NUMBER => $maskedPhoneNumber,
+                InPostPayQuoteInterface::NAME => $name,
+                InPostPayQuoteInterface::SURNAME => $surname
+            ]);
+
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
 
             $inPostPayQuote->setStatus($status);
@@ -83,6 +99,9 @@ class BasketConfirmation implements BasketConfirmationInterface
 
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+            $this->eventManager->dispatch('izi_basket_confirmation_after', [
+                BasketConfirmationInterface::BASKET => $basket
+            ]);
             $this->createRequestDebugLog(
                 sprintf(
                     'Basket ID %s has been confirmed with status: %s',

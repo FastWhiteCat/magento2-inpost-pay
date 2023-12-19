@@ -22,6 +22,7 @@ use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer;
 use InPost\InPostPay\Validator\OrderValidator;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -46,6 +47,7 @@ class OrderCreate implements OrderCreateInterface
         private readonly OrderProcessorInterface $orderProcessor,
         private readonly OrderToInPostOrderDataTransfer $orderToInPostOrderDataTransfer,
         private readonly OrderInterfaceFactory $orderFactory,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -74,6 +76,15 @@ class OrderCreate implements OrderCreateInterface
             $basketId = $orderDetails->getBasketId();
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($basketId);
             $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
+
+            $this->eventManager->dispatch('izi_order_create_before', [
+                OrderInterface::ORDER_DETAILS => $orderDetails,
+                OrderInterface::ACCOUNT_INFO => $accountInfo,
+                OrderInterface::DELIVERY => $delivery,
+                OrderInterface::CONSENTS => $consents,
+                OrderInterface::INVOICE_DETAILS => $invoiceDetails
+            ]);
+
             if ($quote instanceof Quote && $quote->getId()) {
                 $inPostOrder = $this->combineInPostOrder(
                     $orderDetails,
@@ -86,7 +97,13 @@ class OrderCreate implements OrderCreateInterface
 
                 $order = $this->createOrderFromQuote($quote, $inPostOrder);
 
-                return $this->prepareInPostOrderFromMagentoOrder($order);
+                $inPostOrder = $this->prepareInPostOrderFromMagentoOrder($order);
+
+                $this->eventManager->dispatch('izi_order_create_after', [
+                    OrderCreateInterface::INPOST_ORDER => $inPostOrder
+                ]);
+
+                return  $inPostOrder;
             } else {
                 throw new NoSuchEntityException(__('Quote not found.'));
             }
