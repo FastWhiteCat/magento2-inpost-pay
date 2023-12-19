@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
+use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Escaper;
@@ -27,7 +28,6 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
-    public const QTY_UNIT = 'pcs';
 
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
@@ -81,7 +81,8 @@ class ProductToInPostProductDataTransfer
         $quantityObj = $inPostProduct->getQuantity();
         $quantityObj->setQuantity($canCastQtyToInt ? (int)$quantity : $quantity);
         $quantityObj->setQuantityType($canCastQtyToInt ? self::INT_QTY : self::FLOAT_QTY);
-        $quantityObj->setQuantityUnit(self::QTY_UNIT);
+        $unit = Quantity::DEFAULT_UNIT;
+        $quantityObj->setQuantityUnit(__($unit)->render());
         $quantityObj->setAvailableQuantity($stockQuantity);
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);

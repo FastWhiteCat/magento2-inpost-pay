@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\Cart;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -140,11 +141,20 @@ class CartService
 
     private function getItemIdByProductFromCart(Quote $quote, Product $product): ?int
     {
-        $item = $quote->getItemByProduct($product);
-        if ($item instanceof Item) {
-            return (is_scalar($item->getId()) ? (int)$item->getId() : null);
+        $item = null;
+        $typeId = (is_scalar($product->getTypeId())) ? (string)$product->getTypeId() : '';
+        if ($typeId === Type::TYPE_SIMPLE) {
+            $item = $quote->getItemByProduct($product);
+        } else {
+            foreach ($quote->getAllVisibleItems() as $item) {
+                /** @var Item $item */
+                $itemProductId = (is_scalar($item->getData('product_id'))) ? (int)$item->getData('product_id') : 0;
+                if ($itemProductId === (int)$product->getId()) {
+                    break;
+                }
+            }
         }
 
-        return null;
+        return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
     }
 }
