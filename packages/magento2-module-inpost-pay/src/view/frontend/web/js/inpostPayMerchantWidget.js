@@ -316,6 +316,8 @@ define([
 
         bindEvents: function () {
             checkCartWidget();
+            customerData.invalidate(['cart']);
+            customerData.reload(['cart'], true);
 
             customerData.get('cart').subscribe(function (cartData) {
                 checkCartWidget(cartData);
