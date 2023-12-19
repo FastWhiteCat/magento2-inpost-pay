@@ -37,7 +37,7 @@ class Get implements HttpGetActionInterface
         $data = [];
 
         try {
-            $basketId = $this->request->getParam('basketId');
+            $basketId = is_scalar($this->request->getParam('basketId')) ? $this->request->getParam('basketId') : '';
 
             if ($basketId) {
                 $inPostPayData = $this->inPostPayQuote->getRefreshRequiredAndOrderId($basketId);
@@ -50,6 +50,7 @@ class Get implements HttpGetActionInterface
                         'action' => 'redirect',
                         'redirect' => $this->urlBuilder->getUrl('checkout/onepage/success/')
                     ];
+                    // @phpstan-ignore-next-line
                     $order = $this->orderFactory->create()->load($inPostPayData[InPostPayOrderInterface::ORDER_ID]);
 
                     $this->checkoutSession->setLastQuoteId($order->getQuoteId());

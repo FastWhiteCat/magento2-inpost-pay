@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Model\ResourceModel;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Enum\InPostBasketStatus;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class InPostPayQuote extends AbstractDb
@@ -18,6 +19,11 @@ class InPostPayQuote extends AbstractDb
     public function getRefreshRequiredAndOrderId(string $basketId): array
     {
         $connection = $this->getConnection();
+
+        if (!$connection) {
+            throw new LocalizedException(__('Connection is not defined'));
+        }
+
         $mainTable = $this->getMainTable();
         $inpostOrderTable = $this->getTable('inpost_pay_order');
 
@@ -32,6 +38,11 @@ class InPostPayQuote extends AbstractDb
     public function isBasketConnected(int $quoteId): bool
     {
         $connection = $this->getConnection();
+
+        if (!$connection) {
+            throw new LocalizedException(__('Connection is not defined'));
+        }
+
         $mainTable = $this->getMainTable();
 
         $select = $connection->select()
@@ -45,6 +56,11 @@ class InPostPayQuote extends AbstractDb
     public function updateRefreshRequired(string $basketId, bool $refreshRequired = false): void
     {
         $connection = $this->getConnection();
+
+        if (!$connection) {
+            throw new LocalizedException(__('Connection is not defined'));
+        }
+
         $mainTable = $this->getMainTable();
 
         $connection->update(
