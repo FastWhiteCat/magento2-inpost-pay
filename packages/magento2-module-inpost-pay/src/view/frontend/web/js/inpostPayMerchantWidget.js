@@ -215,8 +215,6 @@ define([
 
                     xhrForOrderConfirmation = $.ajax({
                         url: urlBuilder.build('inpostizi/OrderComplete/Get'
-                            + '/form_key/'
-                            + $.mage.cookies.get('form_key')
                             + '/?basketId='
                             + basketId
                         ),
