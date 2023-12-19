@@ -57,7 +57,7 @@ class Get implements HttpGetActionInterface
 
                     $this->checkoutSession->setLastQuoteId($order->getQuoteId());
                     $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-                    $this->checkoutSession->setLastOrderId($order->getId());
+                    $this->checkoutSession->setLastOrderId($order->getEntityId());
                     $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
                     $this->checkoutSession->setLastOrderStatus($order->getStatus());
                 } elseif (isset($inPostPayData[InPostPayQuoteInterface::REFRESH_REQUIRED]) &&
