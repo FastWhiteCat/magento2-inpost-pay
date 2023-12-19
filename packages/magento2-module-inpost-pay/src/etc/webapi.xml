@@ -2,19 +2,19 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/v1/izi/basket/:basketId" method="GET">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="get"/>
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface" method="execute"/>
         <resources>
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
     <route url="/v1/izi/basket/:basketId/event" method="POST">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="update"/>
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface" method="execute"/>
         <resources>
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
     <route url="/v1/izi/basket/:basketId/binding" method="DELETE">
-        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketInterface" method="delete"/>
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface" method="execute"/>
         <resources>
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
@@ -25,54 +25,16 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
-
-    <route url="/V1/inpost-basket/:cartId/mobile-link" method="GET">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface" method="execute"/>
+    <route url="/v1/izi/order" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface" method="execute"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
-    <route url="/V1/inpost-basket/mine/mobile-link" method="GET">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface" method="execute"/>
+    <route url="/v1/izi/order/:orderId/event" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface" method="execute"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
-    </route>
-    <route url="/V1/inpost-basket/:cartId/get-pay-data" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface" method="execute" />
-        <resources>
-            <resource ref="anonymous" />
-        </resources>
-    </route>
-    <route url="/V1/inpost-basket/mine/get-pay-data" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface" method="execute" />
-        <resources>
-            <resource ref="self" />
-        </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
-    </route>
-
-    <!-- Managing InPost Basket guest confirmation -->
-    <route url="/V1/inpost-basket/:cartId/confirmation" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface" method="execute"/>
-        <resources>
-            <resource ref="anonymous" />
-        </resources>
-    </route>
-
-    <!-- Managing InPost Basket guest confirmation -->
-    <route url="/V1/inpost-basket/mine/confirmation" method="POST">
-        <service class="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface" method="execute"/>
-        <resources>
-            <resource ref="self" />
-        </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
     </route>
 </routes>

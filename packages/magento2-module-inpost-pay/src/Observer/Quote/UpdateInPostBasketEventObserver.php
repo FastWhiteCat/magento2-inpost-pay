@@ -62,6 +62,13 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         if ($quote->getData(self::SKIP_INPOST_PAY_SYNC_FLAG)) {
             return false;
         }
+
+        foreach ($quote->getAllVisibleItems() as $item) {
+            if ($item->getProduct()->getIsVirtual()) {
+                return false;
+            }
+        }
+
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
         if (!$inPostPayQuote) {
