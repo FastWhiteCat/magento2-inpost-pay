@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Controller\BasketConfirmation;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Enum\InPostBasketStatus;
+use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -13,7 +13,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Phrase;
 use Psr\Log\LoggerInterface;
 
 class Get implements HttpGetActionInterface
@@ -27,6 +26,7 @@ class Get implements HttpGetActionInterface
         private readonly Validator $formKeyValidator,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly JsonFactory $jsonFactory,
+        private readonly InPostPayQuote $inPostPayQuote,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -50,22 +50,29 @@ class Get implements HttpGetActionInterface
 
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
-                $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
 
-                $data = [
-                    'status' => $inpostPayQuote->getStatus(),
-                    'phone_number' => [
-                        'country_prefix' => (string)$inpostPayQuote->getCountryPrefix(),
-                        'phone' => (string)$inpostPayQuote->getPhone()
-                    ],
-                    'browser' => [
-                        'browser_id' => $inpostPayQuote->getBrowserId(),
-                        'browser_trusted' => $inpostPayQuote->getBrowserTrusted(),
-                    ],
-                    'name' => $inpostPayQuote->getName(),
-                    'surname' => $inpostPayQuote->getSurname(),
-                    'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
-                ];
+                if ($this->inPostPayQuote->isBasketConnected($quoteId)) {
+                    $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
+
+                    $data = [
+                        'status' => $inpostPayQuote->getStatus(),
+                        'phone_number' => [
+                            'country_prefix' => (string)$inpostPayQuote->getCountryPrefix(),
+                            'phone' => (string)$inpostPayQuote->getPhone()
+                        ],
+                        'browser' => [
+                            'browser_id' => $inpostPayQuote->getBrowserId(),
+                            'browser_trusted' => $inpostPayQuote->getBrowserTrusted(),
+                        ],
+                        'name' => $inpostPayQuote->getName(),
+                        'surname' => $inpostPayQuote->getSurname(),
+                        'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
+                    ];
+                } else {
+                    $data = [
+                        'action' => 'retry'
+                    ];
+                }
             }
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
