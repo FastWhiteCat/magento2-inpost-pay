@@ -47,7 +47,7 @@ class Get implements HttpGetActionInterface
                     $data = [
                         'action' => 'delete',
                     ];
-                } if (isset($inPostPayData[InPostPayOrderInterface::ORDER_ID])) {
+                } elseif (isset($inPostPayData[InPostPayOrderInterface::ORDER_ID])) {
                     $data = [
                         'action' => 'redirect',
                         'redirect' => $this->urlBuilder->getUrl('checkout/onepage/success/')
