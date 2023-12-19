@@ -81,7 +81,8 @@ class ProductToInPostProductDataTransfer
         $quantityObj = $inPostProduct->getQuantity();
         $quantityObj->setQuantity($canCastQtyToInt ? (int)$quantity : $quantity);
         $quantityObj->setQuantityType($canCastQtyToInt ? self::INT_QTY : self::FLOAT_QTY);
-        $quantityObj->setQuantityUnit(__(Quantity::DEFAULT_UNIT)->render());
+        $unit = Quantity::DEFAULT_UNIT;
+        $quantityObj->setQuantityUnit(__($unit)->render());
         $quantityObj->setAvailableQuantity($stockQuantity);
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
