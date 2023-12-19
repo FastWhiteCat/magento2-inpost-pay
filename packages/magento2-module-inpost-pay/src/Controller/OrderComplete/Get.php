@@ -37,7 +37,9 @@ class Get implements HttpGetActionInterface
         $data = [];
 
         try {
-            $basketId = is_scalar($this->request->getParam('basketId')) ? $this->request->getParam('basketId') : '';
+            $basketId = is_scalar($this->request->getParam('basketId')) ?
+                (string)$this->request->getParam('basketId') :
+                '';
 
             if ($basketId) {
                 $inPostPayData = $this->inPostPayQuote->getRefreshRequiredAndOrderId($basketId);

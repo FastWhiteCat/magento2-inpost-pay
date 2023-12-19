@@ -32,7 +32,7 @@ class InPostPayQuote extends AbstractDb
             ->joinLeft(['io' => $inpostOrderTable], 'io.basket_id = main_table.basket_id', 'order_id')
             ->where('main_table.basket_id' . '=?', $basketId);
 
-        return $connection->fetchRow($select);
+        return is_array($connection->fetchRow($select)) ? $connection->fetchRow($select) : [];
     }
 
     public function isBasketConnected(int $quoteId): bool
