@@ -9,6 +9,7 @@ define([
 
     var LONG_POLLING_TIME = 10000;
     var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var RETRY_TYPE = 'retry';
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -97,14 +98,19 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        resolve(Object.keys(data).length === 1 && data.basket_id ? [] : {
+                        if (Object.keys(data).length === 1 && data.basket_id) {
+                            resolve([])
+                        }
+
+                        localStorage.setItem('basketId', data.basket_id);
+                        resolve({
                             qr_code: data.qr_code,
                             deep_link: data.deep_link,
                             deep_link_hms: data.deep_link_hms,
                         })
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
                     });
             });
         },
@@ -129,8 +135,8 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
                     });
             });
         },
@@ -179,14 +185,12 @@ define([
                                     default:
                                         break;
                                 }
-                            } else if (data.error_code) {
-                                reject(new Error(data.error_code));
                             } else {
                                 setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
-                        .fail(function (xhr, textStatus) {
-                            reject(new Error($.mage.__('Network problem: ') + textStatus));
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
                         });
                 });
             }
@@ -207,21 +211,34 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
+                    var basketId = localStorage.getItem('basketId');
+
                     xhrForOrderConfirmation = $.ajax({
-                        url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
+                        url: urlBuilder.build('inpostizi/OrderComplete/Get'
+                            + '/form_key/'
+                            + $.mage.cookies.get('form_key')
+                            + '/?basketId='
+                            + basketId
+                        ),
                         method: 'GET',
                     })
                         .done(function (data) {
-                            if (data.action && data.action === 'refresh') {
-                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                            } else if (data.action && data.action === 'redirect') {
-                                resolve(data)
+                            if (timeoutId) {
+                                clearTimeout(timeoutId);
+                                abortRequest(xhrForBasketConfirmation)
                             }
 
-                            reject(new Error($.mage.__('Unhandled status')));
+                            if (!data.action) {
+                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                            } else if (data.action && data.action === 'delete') {
+                                window.iziBindingDelete();
+                                window.location.reload();
+                            } else {
+                                resolve(data);
+                            }
                         })
-                        .fail(function (xhr, textStatus) {
-                            reject(new Error($.mage.__('Network problem: ') + textStatus));
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
                         });
                 });
             }
@@ -236,8 +253,8 @@ define([
                     .done(function () {
                         resolve()
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
                     });
             });
         },
