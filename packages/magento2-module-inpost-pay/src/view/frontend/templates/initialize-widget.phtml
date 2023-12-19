@@ -10,9 +10,7 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 $widgetViewModel = $block->getData('widget_view_model');
 $bindingPlace = $block->getBindingPlace();
 
-$name = "";
-//TODO Add masked phone number if basket_linked=true
-$maskedPhoneNumber = "";
+
 $isProductPage = $widgetViewModel->isEnabledOnProductCart() &&
     $bindingPlace === DisplayConfigProvider::PRODUCT_CARD_BINDING_PLACE_NAME;
 $isCartPage = $widgetViewModel->isEnabledOnCart() &&
@@ -31,8 +29,8 @@ $widgetWrapperClass = "inpost-widget-wrapper";
 <?php else: ?>
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
-        name="<?= /* @noEscape */ $name ?>"
-        masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
+        name=""
+        masked_phone_number=""
         data-product-id="<?= /* @noEscape */ $productId ?>"
         language="<?= /* @noEscape */ $language ?>"
         variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"

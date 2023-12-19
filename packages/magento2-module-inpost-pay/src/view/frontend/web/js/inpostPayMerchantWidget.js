@@ -43,6 +43,7 @@ define([
             }
 
             this.bindEvents();
+            this.checkIsBinding();
         },
 
         isWidgetInitialized: function () {
@@ -77,6 +78,28 @@ define([
 
             var $bundleProducts = $productForm.find('[name*="bundle_option"]');
             return !$bundleProducts.length;
+        },
+
+        checkIsBinding: function() {
+            $.ajax({
+                url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                    + '/form_key/'
+                    + $.mage.cookies.get('form_key')
+                ),
+                method: 'GET',
+            })
+                .done(function (data) {
+                    if (data.status && data.status === 'SUCCESS') {
+                        var $iziButtons = $("inpost-izi-button");
+                        if (!$iziButtons.length) return;
+
+                        var event = new CustomEvent("izi-binding-complete", {detail: data});
+
+                        $iziButtons.each(function () {
+                            this.dispatchEvent(event)
+                        });
+                    }
+                });
         },
 
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
