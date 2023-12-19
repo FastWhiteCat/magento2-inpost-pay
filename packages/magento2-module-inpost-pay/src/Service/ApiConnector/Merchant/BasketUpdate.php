@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use Throwable;
+use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
@@ -19,6 +20,7 @@ use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -40,6 +42,7 @@ class BasketUpdate implements BasketUpdateInterface
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
         private readonly InPostPayQuote $inPostPayQuote,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -70,6 +73,18 @@ class BasketUpdate implements BasketUpdateInterface
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+
+            $this->eventManager->dispatch('izi_basket_update_before', [
+                BasketConfirmationInterface::QUOTE => $quote,
+                InPostPayQuoteInterface::ENTITY_NAME => $inPostPayQuote,
+                InPostPayQuoteInterface::BASKET_ID => $basketId,
+                BasketUpdateInterface::EVENT_ID => $eventId,
+                BasketUpdateInterface::EVENT_DATA_TIME => $eventDataTime,
+                BasketUpdateInterface::EVENT_TYPE => $eventType,
+                BasketUpdateInterface::QUANTITY_EVENT_DATA => $quantityEventData,
+                BasketUpdateInterface::PROMO_CODES_EVENT_DATA => $promoCodesEventData
+            ]);
+
             $this->createRequestDebugLog(
                 sprintf(
                     'Updating basket. Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
@@ -91,6 +106,7 @@ class BasketUpdate implements BasketUpdateInterface
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
+            $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
             $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
             $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 

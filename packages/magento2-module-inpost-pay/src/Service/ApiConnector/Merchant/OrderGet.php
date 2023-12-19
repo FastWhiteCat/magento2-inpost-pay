@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
+use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterfaceFactory;
@@ -30,6 +33,7 @@ class OrderGet implements OrderGetInterface
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
         private readonly OrderToInPostOrderDataTransfer $orderToInPostOrderDataTransfer,
         private readonly OrderInterfaceFactory $orderFactory,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -44,6 +48,7 @@ class OrderGet implements OrderGetInterface
      */
     public function execute(string $orderId): OrderInterface
     {
+        $this->eventManager->dispatch('izi_order_get_before', ['order_id' => $orderId]);
         $this->createRequestDebugLog(sprintf('Retrieving order data for Order ID: %s', $orderId));
         try {
             $order = $this->getOrderByIncrementId->get($orderId);
@@ -51,6 +56,10 @@ class OrderGet implements OrderGetInterface
                 /** @var OrderInterface $inPostOrder */
                 $inPostOrder = $this->orderFactory->create();
                 $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
+                $this->eventManager->dispatch('izi_order_get_after', [
+                    OrderEventInterface::ORDER => $order,
+                    OrderCreateInterface::INPOST_ORDER => $inPostOrder
+                ]);
             } else {
                 throw new NoSuchEntityException(__('Order %1 not found.', $orderId));
             }

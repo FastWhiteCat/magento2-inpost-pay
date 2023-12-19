@@ -10,6 +10,10 @@ use InPost\InPostPay\Api\Data\UpdateOrderResponseInterface;
 
 interface OrderEventInterface
 {
+    public const EVENT_DATA = 'event_data';
+    public const ORDER = 'order';
+    public const INPOST_PAY_ORDER_STATUS = 'inpost_pay_order_status';
+
     /**
      * @param string $orderId
      * @param string $eventId

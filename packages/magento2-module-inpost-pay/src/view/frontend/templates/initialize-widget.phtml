@@ -37,7 +37,7 @@ $widgetWrapperClass = "inpost-widget-wrapper";
         language="<?= /* @noEscape */ $language ?>"
         variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
         basket="<?= /* @noEscape */ $isCartPage ? 'true' : 'false' ?>"
-        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ?>"
+        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
         count="<?= /* @noEscape */ $cartItemsCount ?>"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">
     </inpost-izi-button>
