@@ -53,10 +53,15 @@ class Get implements HttpGetActionInterface
                 $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
 
                 $data = [
-                    'message' => $this->getProperMessage($inpostPayQuote->getStatus())->render(),
                     'status' => $inpostPayQuote->getStatus(),
-                    'browser_id' => $inpostPayQuote->getBrowserId(),
-                    'browser_trusted' => $inpostPayQuote->getBrowserTrusted(),
+                    'phone_number' => [
+                        'country_prefix' => (string)$inpostPayQuote->getCountryPrefix(),
+                        'phone' => (string)$inpostPayQuote->getPhone()
+                    ],
+                    'browser' => [
+                        'browser_id' => $inpostPayQuote->getBrowserId(),
+                        'browser_trusted' => $inpostPayQuote->getBrowserTrusted(),
+                    ],
                     'name' => $inpostPayQuote->getName(),
                     'surname' => $inpostPayQuote->getSurname(),
                     'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
@@ -70,19 +75,5 @@ class Get implements HttpGetActionInterface
         }
 
         return $this->jsonFactory->create()->setData($data);
-    }
-
-    /**
-     * @param string $status
-     *
-     * @return Phrase
-     */
-    private function getProperMessage(string $status): Phrase
-    {
-        return match ($status) {
-            default => __('Pending'),
-            InPostBasketStatus::SUCCESS->value => __('Success'),
-            InPostBasketStatus::REJECT->value => __('Reject')
-        };
     }
 }

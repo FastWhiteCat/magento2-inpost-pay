@@ -4,11 +4,15 @@
     <table name="inpost_pay_order" resource="default" engine="innodb">
         <column xsi:type="int" name="inpost_pay_order_id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="basket_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="payment_type" length="255" nullable="true"/>
         <column xsi:type="varchar" length="255" name="locker_id" nullable="true"/>
         <column xsi:type="varchar" name="order_status" length="255" nullable="true"/>
         <column xsi:type="varchar" name="country_prefix" length="4" nullable="true"/>
         <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="courier_note" length="255" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
+        <column xsi:type="varchar" length="500" name="accepted_consents" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -28,7 +32,8 @@
         <column xsi:type="varchar" name="basket_id" length="255" nullable="false"/>
         <column xsi:type="varchar" name="inpost_basket_id" length="255" nullable="true"/>
         <column xsi:type="varchar" name="status" length="32" nullable="false" default="PENDING"/>
-        <column xsi:type="varchar" name="phone_number" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="country_prefix" length="12" nullable="true"/>
         <column xsi:type="varchar" name="masked_phone_number" length="12" nullable="true"/>
         <column xsi:type="tinyint" name="browser_trusted" nullable="false" default="0"/>
         <column xsi:type="varchar" name="browser_id" length="255" nullable="true"/>

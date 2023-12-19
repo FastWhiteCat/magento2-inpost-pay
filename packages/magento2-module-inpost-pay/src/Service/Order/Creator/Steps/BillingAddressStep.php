@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Enum\InPostInvoiceLegalForm;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Quote\Api\BillingAddressManagementInterface;
@@ -36,12 +37,15 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setEmail($inPostOrder->getAccountInfo()->getMail());
         if ($invoiceDetails) {
-            $billingAddress->setFirstname($invoiceDetails->getName());
-            $billingAddress->setLastname($invoiceDetails->getSurname());
-            $billingAddress->setCompany($invoiceDetails->getCompanyName());
-            $billingAddress->setStreet(
-                $this->combineInvoiceAddressToOneLine($invoiceDetails)
-            );
+            if ($invoiceDetails->getLegalForm() === InPostInvoiceLegalForm::PERSON->name) {
+                $billingAddress->setFirstname($invoiceDetails->getName());
+                $billingAddress->setLastname($invoiceDetails->getSurname());
+            } else {
+                $billingAddress->setCompany($invoiceDetails->getCompanyName());
+                $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
+                $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
+            }
+            $billingAddress->setStreet($this->combineInvoiceAddressArray($invoiceDetails));
             $billingAddress->setCity($invoiceDetails->getCity());
             $billingAddress->setPostcode($invoiceDetails->getPostalCode());
             $billingAddress->setCountryId($invoiceDetails->getCountryCode());
@@ -50,9 +54,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         } else {
             $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
             $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
-            $billingAddress->setStreet(
-                $this->combineAddressToOneLine($inPostOrder->getAccountInfo()->getClientAddress()->getAddressDetails())
-            );
+            $billingAddress->setStreet($this->combineAddressArray($accountAddress->getAddressDetails()));
             $billingAddress->setCity($accountAddress->getCity());
             $billingAddress->setPostcode($accountAddress->getPostalCode());
             $billingAddress->setCountryId($accountAddress->getCountryCode());
@@ -66,20 +68,40 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $this->createLog(sprintf('Billing address has been applied to quote ID: %s', $quoteId));
     }
 
-    private function combineAddressToOneLine(AddressDetailsInterface $addressDetails): string
+    private function combineAddressArray(AddressDetailsInterface $addressDetails): array
     {
-        $addressLine = $addressDetails->getStreet();
-        $addressNumber = implode('/', [$addressDetails->getBuilding(), $addressDetails->getFlat()]);
+        $addressArray = [];
+        if ($addressDetails->getStreet()) {
+            $addressArray[] = $addressDetails->getStreet();
+        }
 
-        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
+        if ($addressDetails->getBuilding()) {
+            $addressArray[] = $addressDetails->getBuilding();
+        }
+
+        if ($addressDetails->getFlat()) {
+            $addressArray[] = $addressDetails->getFlat();
+        }
+
+        return $addressArray;
     }
 
-    private function combineInvoiceAddressToOneLine(InvoiceDetailsInterface $invoiceDetails): string
+    private function combineInvoiceAddressArray(InvoiceDetailsInterface $invoiceDetails): array
     {
-        $addressLine = $invoiceDetails->getStreet();
-        $addressNumber = implode('/', [$invoiceDetails->getBuilding(), $invoiceDetails->getFlat()]);
+        $addressArray = [];
+        if ($invoiceDetails->getStreet()) {
+            $addressArray[] = $invoiceDetails->getStreet();
+        }
 
-        return sprintf('%s %s', $addressLine, trim($addressNumber, '/'));
+        if ($invoiceDetails->getBuilding()) {
+            $addressArray[] = $invoiceDetails->getBuilding();
+        }
+
+        if ($invoiceDetails->getFlat()) {
+            $addressArray[] = $invoiceDetails->getFlat();
+        }
+
+        return $addressArray;
     }
 
     private function combinePhoneNumber(PhoneNumberInterface $phoneNumber): string

@@ -15,34 +15,34 @@ class QuoteToBasketDataTransfer
     /**
      * @var QuoteToBasketDataTransferInterface[]
      */
-    private array $converters = [];
+    private array $dataTransfers = [];
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        array $converters = []
+        array $dataTransfer = []
     ) {
-        $this->initConverters($converters);
+        $this->initDataTransfers($dataTransfer);
     }
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        foreach ($this->converters as $converter) {
-            $converter->transfer($quote, $basket);
+        foreach ($this->dataTransfers as $dataTransfer) {
+            $dataTransfer->transfer($quote, $basket);
         }
     }
 
     /**
-     * @param array $converters
+     * @param array $dataTransfers
      * @return void
      * @throws InvalidArgumentException
      */
-    private function initConverters(array $converters): void
+    private function initDataTransfers(array $dataTransfers): void
     {
-        foreach ($converters as $converterKey => $converter) {
-            if ($converter instanceof QuoteToBasketDataTransferInterface) {
-                $this->converters[$converterKey] = $converter;
+        foreach ($dataTransfers as $dataTransferKey => $dataTransfer) {
+            if ($dataTransfer instanceof QuoteToBasketDataTransferInterface) {
+                $this->dataTransfers[$dataTransferKey] = $dataTransfer;
             } else {
-                $errorMsg = sprintf('Quote to Basket converter: %s is not valid.', $converterKey);
+                $errorMsg = sprintf('Quote to Basket data transfer: %s is not valid.', $dataTransferKey);
                 $this->logger->critical($errorMsg);
 
                 throw new InvalidArgumentException($errorMsg);

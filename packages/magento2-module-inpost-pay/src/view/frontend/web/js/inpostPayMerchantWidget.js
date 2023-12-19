@@ -82,7 +82,7 @@ define([
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
             var data = {
-                prefix: prefix && prefix.toString() || "",
+                prefix: prefix && "+" + prefix || "",
                 number: phoneNumber || "",
                 browser: browserData,
                 binding_place: bindingPlace
@@ -97,7 +97,11 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        resolve(Object.keys(data).length === 1 && data.basketId ? [] : data)
+                        resolve(Object.keys(data).length === 1 && data.basket_id ? [] : {
+                            qr_code: data.qr_code,
+                            deep_link: data.deep_link,
+                            deep_link_hms: data.deep_link_hms,
+                        })
                     })
                     .fail(function (xhr, textStatus) {
                         reject(new Error($.mage.__('Network problem: ') + textStatus));
@@ -133,81 +137,100 @@ define([
 
         iziGetIsBound: function () {
             return new Promise((resolve, reject) => {
-                checkIsBound(resolve, reject);
+                checkIsBound()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error)
+                        console.error(error);
+                    });
             });
 
-            function checkIsBound(resolve, reject) {
+            function checkIsBound() {
                 abortRequest(xhrForBasketConfirmation)
-                xhrForBasketConfirmation = $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
-                        + '/form_key/'
-                        + $.mage.cookies.get('form_key')
-                    ),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (data.phone_number) {
-                            resolve(data);
-                        } else if (data.status) {
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                                abortRequest(xhrForBasketConfirmation)
-                            }
 
-                            switch (data.status) {
-                                case 'REJECT':
-                                    reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
-                                    break;
-                                case 'PENDING':
-                                    setTimerAndRunCallback(checkIsBound);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        } else if (data.error_code) {
-                            reject(new Error(data.error_code));
-                        } else {
-                            setTimerAndRunCallback(checkIsBound)
-                        }
+                return new Promise((resolve, reject) => {
+                    xhrForBasketConfirmation = $.ajax({
+                        url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                            + '/form_key/'
+                            + $.mage.cookies.get('form_key')
+                        ),
+                        method: 'GET',
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
-                    });
+                        .done(function (data) {
+                            if (data.status) {
+                                if (timeoutId) {
+                                    clearTimeout(timeoutId);
+                                    abortRequest(xhrForBasketConfirmation)
+                                }
+
+                                switch (data.status) {
+                                    case 'REJECT':
+                                        reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
+                                        break;
+                                    case 'PENDING':
+                                        setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                        break;
+                                    case 'SUCCESS':
+                                        localStorage.setItem('browser_id', data.browser.browser_id);
+                                        resolve(data)
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else if (data.error_code) {
+                                reject(new Error(data.error_code));
+                            } else {
+                                setTimerAndRunCallback(checkIsBound, resolve, reject);
+                            }
+                        })
+                        .fail(function (xhr, textStatus) {
+                            reject(new Error($.mage.__('Network problem: ') + textStatus));
+                        });
+                });
             }
         },
 
         iziGetOrderComplete: function () {
-            //TODO check statuses from BE, change url when endpoint will be changed to controller
             return new Promise((resolve, reject) => {
-                checkOrderStatus(resolve, reject);
-            });
-
-            function checkOrderStatus(resolve, reject) {
-                abortRequest(xhrForOrderConfirmation)
-                xhrForOrderConfirmation = $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (data.action && data.action === 'refresh') {
-                            setTimerAndRunCallback(checkOrderStatus);
-                        } else if (data.action && data.action === 'redirect') {
-                            resolve(data)
-                        }
-
-                        reject(new Error($.mage.__('Unhandled status')));
+                checkOrderStatus()
+                    .then((data) => {
+                        resolve(data)
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .catch(function(error) {
+                        reject(error)
+                        console.error(error);
                     });
+            });
+            function checkOrderStatus() {
+                abortRequest(xhrForOrderConfirmation)
+
+                return new Promise((resolve, reject) => {
+                    xhrForOrderConfirmation = $.ajax({
+                        url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
+                        method: 'GET',
+                    })
+                        .done(function (data) {
+                            if (data.action && data.action === 'refresh') {
+                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                            } else if (data.action && data.action === 'redirect') {
+                                resolve(data)
+                            }
+
+                            reject(new Error($.mage.__('Unhandled status')));
+                        })
+                        .fail(function (xhr, textStatus) {
+                            reject(new Error($.mage.__('Network problem: ') + textStatus));
+                        });
+                });
             }
         },
 
         iziBindingDelete: function () {
-            //TODO change url when endpoint will be changed to controller
             return new Promise(function (resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/basket/binding'),
+                    url: urlBuilder.build('inpostizi/BrowserBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
                     method: 'GET',
                 })
                     .done(function () {
@@ -254,20 +277,46 @@ define([
         },
 
         bindEvents: function () {
+            checkCartWidget();
+
             customerData.get('cart').subscribe(function (cartData) {
-                var $iziButtons = $("inpost-izi-button");
-                if (!$iziButtons.length) return;
-
-                var event = new CustomEvent("inpost-update-count", {detail: cartData.summary_count});
-
-                $iziButtons.each(function () {
-                    this.dispatchEvent(event)
-                });
+                checkCartWidget(cartData);
+                updateCounter(cartData.summary_count);
             });
 
             document.addEventListener('iziModalEventClose', function () {
                 abortRequest(xhrForBasketConfirmation)
             })
+
+            window.addEventListener("inpost-update-count", function (e){
+                updateCounter(e.detail);
+            });
+
+            function checkCartWidget(cartData = "") {
+                var wrapperClass = getConfig().wrapperClass || "inpost-widget-wrapper";
+                var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
+                var counter = cartData ? cartData.summary_count : getConfig().count;
+
+                if ($inpayWrapperOnBasket.length) {
+                    if (counter === 0) {
+                        $inpayWrapperOnBasket.hide()
+                    } else {
+                        $inpayWrapperOnBasket.show()
+                    }
+                }
+            }
+
+            function updateCounter(count) {
+                var $iziButtons = $("inpost-izi-button");
+                if (!$iziButtons.length) return;
+
+                var event = new CustomEvent("inpost-update-count", {detail: count});
+
+                $iziButtons.each(function () {
+                    this.dispatchEvent(event)
+                });
+            }
         },
 
         getBrowserDescription: function () {
@@ -304,9 +353,16 @@ define([
             }
         },
 
-        setTimerAndRunCallback: function (callback) {
+        setTimerAndRunCallback: function (callback, resolve, reject) {
             timeoutId = setTimeout(function () {
-                callback();
+                callback()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error);
+                        console.error(error);
+                    });
             }, LONG_POLLING_TIME);
         },
 

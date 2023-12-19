@@ -4,17 +4,26 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface as BasketDataInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
+use InPost\InPostPay\Exception\InPostPayBadRequestException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BasketGet implements BasketGetInterface
 {
     private const REQUEST_PREFIX = 'BASKET_GET_REQUEST';
@@ -31,16 +40,37 @@ class BasketGet implements BasketGetInterface
     /**
      * @param string $basketId
      * @return BasketDataInterface
-     * @throws LocalizedException
+     * @throws InPostPayBadRequestException
+     * @throws InPostPayAuthorizationException
+     * @throws BasketNotFoundException
+     * @throws InPostPayInternalException
      */
     public function execute(string $basketId): BasketDataInterface
     {
-        $this->createRequestDebugLog(sprintf('Retrieving quote data for Basket ID: %s', $basketId));
-        $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
-        $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-        $basket = $this->basketFactory->create();
-        $this->quoteToBasketDataTransfer->transfer($quote, $basket);
-        $this->createRequestDebugLog(sprintf('Quote data for Basket ID: %s has been retrieved.', $basketId));
+        try {
+            $this->createRequestDebugLog(sprintf('Retrieving quote data for Basket ID: %s', $basketId));
+            $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
+            $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+            $basket = $this->basketFactory->create();
+            $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+            $this->createRequestDebugLog(sprintf('Quote data for Basket ID: %s has been retrieved.', $basketId));
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new BasketNotFoundException();
+        } catch (InPostPayAuthorizationException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw $e;
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new InPostPayBadRequestException();
+        } catch (Throwable $e) {
+            $this->logger->critical($e->getMessage());
+
+            throw new InPostPayInternalException();
+        }
 
         return $basket;
     }

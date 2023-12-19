@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\InPostPayLockerIdProviderInterface;
 use InPost\InPostPay\Api\OrderLockerServiceInterface;
 use InPost\InPostPay\Model\InPostPayOrderRepository;
 use InPost\InPostPay\Provider\InPostDeliveryModuleProvider;
+use InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
@@ -56,6 +57,7 @@ class OrderLockerService implements OrderLockerServiceInterface
     private function setLockerIdOnMagentoOrder(Order $order, string $lockerId): void
     {
         $order->setData(InPostPayLockerIdProviderInterface::INPOST_LOCKER_ID_FIELD, $lockerId);
+        $order->setData(OrderEvent::SKIP_INPOST_PAY_SYNC_FLAG, true);
         $this->orderRepository->save($order);
         $this->logger->debug(
             sprintf(

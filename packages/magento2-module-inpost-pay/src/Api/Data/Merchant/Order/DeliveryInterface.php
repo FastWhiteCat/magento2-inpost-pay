@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\Data\Merchant\Order;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 
 interface DeliveryInterface
 {
@@ -13,6 +15,9 @@ interface DeliveryInterface
     public const PHONE_NUMBER = 'phone_number';
     public const DELIVERY_ADDRESS = 'delivery_address';
     public const DELIVERY_CODES = 'delivery_codes';
+    public const DELIVERY_DATE = 'delivery_date';
+    public const DELIVERY_OPTIONS = 'delivery_options';
+    public const DELIVERY_PRICE = 'delivery_price';
     public const DELIVERY_POINT = 'delivery_point';
     public const COURIER_NOTE = 'courier_note';
 
@@ -37,6 +42,39 @@ interface DeliveryInterface
      * @return void
      */
     public function setDeliveryCodes(array $deliveryCodes): void;
+
+    /**
+     * @return string
+     */
+    public function getDeliveryDate(): string;
+
+    /**
+     * @param string $deliveryDate
+     * @return void
+     */
+    public function setDeliveryDate(string $deliveryDate): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface[]|null
+     */
+    public function getDeliveryOptions(): ?array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface[]|null $deliveryOptions
+     * @return void
+     */
+    public function setDeliveryOptions(?array $deliveryOptions): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null
+     */
+    public function getDeliveryPrice(): ?PriceInterface;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null $deliveryPrice
+     * @return void
+     */
+    public function setDeliveryPrice(?PriceInterface $deliveryPrice): void;
 
     /**
      * @return string

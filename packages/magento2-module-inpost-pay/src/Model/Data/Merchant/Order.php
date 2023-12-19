@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Model\Data\Merchant;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterfaceFactory;
@@ -141,5 +142,24 @@ class Order extends DataObject implements OrderInterface
     public function setConsents(array $consents): void
     {
         $this->setData(self::CONSENTS, $consents);
+    }
+
+    /**
+     * @return ProductInterface[]
+     */
+    public function getProducts(): array
+    {
+        $products = $this->getData(self::PRODUCTS);
+
+        return (is_array($products)) ? $products : [];
+    }
+
+    /**
+     * @param ProductInterface[] $products
+     * @return void
+     */
+    public function setProducts(array $products): void
+    {
+        $this->setData(self::PRODUCTS, $products);
     }
 }
