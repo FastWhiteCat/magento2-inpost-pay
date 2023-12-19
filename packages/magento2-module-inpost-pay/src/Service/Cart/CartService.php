@@ -155,6 +155,6 @@ class CartService
             }
         }
 
-        return ($item && is_scalar($item->getId()) ? (int)$item->getId() : null);
+        return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
     }
 }
