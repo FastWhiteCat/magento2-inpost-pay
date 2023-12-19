@@ -15,16 +15,18 @@ class InPostPayQuote extends AbstractDb
         $this->_init(InPostPayQuoteInterface::ENTITY_NAME, InPostPayQuoteInterface::INPOST_PAY_QUOTE_ID);
     }
 
-    public function isRefreshRequired(string $basketId): bool
+    public function getRefreshRequiredAndOrderId(string $basketId): array
     {
         $connection = $this->getConnection();
         $mainTable = $this->getMainTable();
+        $inpostOrderTable = $this->getTable('inpost_pay_order');
 
         $select = $connection->select()
-            ->from($mainTable, ['refresh_required'])
-            ->where('basket_id' . '=?', $basketId);
+            ->from(['main_table' => $mainTable], ['refresh_required'])
+            ->joinLeft(['io' => $inpostOrderTable], 'io.basket_id = main_table.basket_id', 'order_id')
+            ->where('main_table.basket_id' . '=?', $basketId);
 
-        return (bool)$connection->fetchOne($select);
+        return $connection->fetchRow($select);
     }
 
     public function isBasketConnected(int $quoteId): bool
