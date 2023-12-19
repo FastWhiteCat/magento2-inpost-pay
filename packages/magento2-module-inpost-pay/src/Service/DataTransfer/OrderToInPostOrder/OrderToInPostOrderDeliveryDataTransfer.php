@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
+use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
+use \Magento\Quote\Api\Data\ShippingMethodInterfaceFactory;
+use \Magento\Quote\Api\Data\ShippingMethodInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
@@ -17,13 +20,17 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Framework\DataObject;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
-use phpseclib3\Math\PrimeField;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTransferInterface
 {
     public function __construct(
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
+        private readonly ShippingMethodInterfaceFactory $shippingMethodInterfaceFactory,
+        private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory
     ) {
     }
@@ -46,6 +53,11 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
 
                 if ($orderShippingMethodCode === $configMethodCode) {
                     $this->appendDeliveryData($order, $delivery, $deliveryType, $deliveryOptionCode);
+                    /** @var ShippingMethodInterface $shippingMethod */
+                    $shippingMethod = $this->shippingMethodInterfaceFactory->create();
+                    $shippingMethod->setMethodCode($configMethodCode);
+                    $delivery->setDeliveryDate($this->deliveryDateProvider->calculateDeliveryDate($shippingMethod));
+
                     break 2;
                 }
             }
@@ -111,15 +123,35 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
     private function appendDeliveryAddressData(Address $orderShippingAddress, DeliveryInterface $delivery): void
     {
         $deliveryAddress = $delivery->getDeliveryAddress();
-        $streetData = $orderShippingAddress->getStreet();
-        $addressLine = implode(PHP_EOL, $streetData);
         $deliveryAddress->setName(
             sprintf('%s %s', $orderShippingAddress->getFirstname(), $orderShippingAddress->getLastname())
         );
+
+        $streetData = $orderShippingAddress->getStreet();
+        $street = (isset($streetData[0])) ? (string)$streetData[0] : '';
+        $building = (isset($streetData[1])) ? (string)$streetData[1] : '';
+        $flat = (isset($streetData[2])) ? (string)$streetData[2] : '';
+
+        $addressLine = $street;
+        if ($building) {
+            $addressLine = sprintf('%s %s', $addressLine, $building);
+        }
+
+        if ($flat) {
+            $addressLine = sprintf('%s/%s', $addressLine, $flat);
+        }
+
         $deliveryAddress->setAddress($addressLine);
         $deliveryAddress->setCity($orderShippingAddress->getCity());
         $deliveryAddress->setPostalCode($orderShippingAddress->getPostcode());
         $deliveryAddress->setCountryCode($orderShippingAddress->getCountryId());
+
+        $addressDetails = $deliveryAddress->getAddressDetails();
+        $addressDetails->setStreet($street);
+        $addressDetails->setBuilding($building);
+        $addressDetails->setFlat($flat);
+        $deliveryAddress->setAddressDetails($addressDetails);
+
         $delivery->setDeliveryAddress($deliveryAddress);
     }
 

@@ -29,7 +29,9 @@ class DeliveryValidator implements OrderValidatorInterface
 
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
-        $this->validateDeliveryAddress($inPostOrder->getDelivery()->getDeliveryAddress());
+        if ($inPostOrder->getDelivery()->getDeliveryType() !== InPostDeliveryType::APM->name) {
+            $this->validateDeliveryAddress($inPostOrder->getDelivery()->getDeliveryAddress());
+        }
         $this->validateDeliveryMethod($inPostOrder->getDelivery(), $quote);
     }
 

@@ -15,6 +15,7 @@ interface DeliveryInterface
     public const PHONE_NUMBER = 'phone_number';
     public const DELIVERY_ADDRESS = 'delivery_address';
     public const DELIVERY_CODES = 'delivery_codes';
+    public const DELIVERY_DATE = 'delivery_date';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const DELIVERY_PRICE = 'delivery_price';
     public const DELIVERY_POINT = 'delivery_point';
@@ -41,6 +42,17 @@ interface DeliveryInterface
      * @return void
      */
     public function setDeliveryCodes(array $deliveryCodes): void;
+
+    /**
+     * @return string
+     */
+    public function getDeliveryDate(): string;
+
+    /**
+     * @param string $deliveryDate
+     * @return void
+     */
+    public function setDeliveryDate(string $deliveryDate): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface[]|null
