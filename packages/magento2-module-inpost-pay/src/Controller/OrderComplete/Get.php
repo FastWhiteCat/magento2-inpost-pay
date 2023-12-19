@@ -13,7 +13,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\UrlInterface;
-use Magento\Sales\Api\Data\OrderInterfaceFactory;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class Get implements HttpGetActionInterface
@@ -26,7 +26,7 @@ class Get implements HttpGetActionInterface
         private readonly JsonFactory $jsonFactory,
         private readonly UrlInterface $urlBuilder,
         private readonly InPostPayQuote $inPostPayQuote,
-        private readonly OrderInterfaceFactory $orderFactory,
+        private readonly OrderRepositoryInterface $orderRepository,
         private readonly LoggerInterface $logger
     ) {
         $this->request = $context->getRequest();
@@ -52,8 +52,8 @@ class Get implements HttpGetActionInterface
                         'action' => 'redirect',
                         'redirect' => $this->urlBuilder->getUrl('checkout/onepage/success/')
                     ];
-                    // @phpstan-ignore-next-line
-                    $order = $this->orderFactory->create()->load($inPostPayData[InPostPayOrderInterface::ORDER_ID]);
+
+                    $order = $this->orderRepository->get($inPostPayData[InPostPayOrderInterface::ORDER_ID]);
 
                     $this->checkoutSession->setLastQuoteId($order->getQuoteId());
                     $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
