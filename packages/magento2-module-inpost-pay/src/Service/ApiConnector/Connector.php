@@ -129,12 +129,13 @@ class Connector implements ConnectorInterface
         $responseBody = (string)$response->getBody()->getContents();
         $statusCode = (int)$response->getStatusCode();
         if ($statusCode !== Response::STATUS_CODE_200
+            && $statusCode !== Response::STATUS_CODE_201
             && $statusCode !== Response::STATUS_CODE_202
             && $statusCode !== Response::STATUS_CODE_204
         ) {
             $this->createResponseLog($responseBody, $statusCode, true);
 
-            throw new LocalizedException(__('InPost API endpoint "%1" responded with %1 code.', $url, $statusCode));
+            throw new LocalizedException(__('InPost API endpoint "%1" responded with %2 code.', $url, $statusCode));
         } else {
             $this->createResponseLog($responseBody, $statusCode);
         }
