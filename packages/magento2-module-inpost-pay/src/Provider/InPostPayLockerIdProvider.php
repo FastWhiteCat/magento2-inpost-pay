@@ -106,7 +106,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
                 continue;
             }
 
-            foreach ($this->shipmentMappingConfigProvider->getNonStandardDeliveryOptions() as $option) {
+            foreach ($this->shipmentMappingConfigProvider->getNonStandardDeliveryOptions(true) as $option) {
                 try {
                     $inPostPickupCarrierCodes[] = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
                         $deliveryType,
