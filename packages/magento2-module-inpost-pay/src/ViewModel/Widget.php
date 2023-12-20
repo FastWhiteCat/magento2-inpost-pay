@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -31,8 +32,14 @@ class Widget implements ArgumentInterface
         private readonly DisplayConfigProvider $displayConfigProvider,
         private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
         private readonly ResolverInterface $localeResolver,
-        private readonly CheckoutSession $checkoutSession
+        private readonly CheckoutSession $checkoutSession,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->generalConfigProvider->isEnabled();
     }
 
     /**

@@ -79,22 +79,6 @@
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
     <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
                 type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestPayData" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestMobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetMobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\MobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
-    <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
     <preference for="InPost\InPostPay\Api\Data\UpdateOrderResponseInterface"
@@ -122,6 +106,58 @@
     <type name="\Magento\Framework\Webapi\Authorization">
         <plugin name="InPost_InPostPay::swaggerAllowAclResourcePlugin"
                 type="InPost\InPostPay\Plugin\Swagger\SwaggerAllowAclResourcePlugin" />
+    </type>
+    <type name="InPost\InPostPay\Controller\BasketBinding\Delete">
+        <plugin name="InPost_InPostPay::basketBindingDeleteIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Controller\BasketConfirmation\Get">
+        <plugin name="InPost_InPostPay::basketConfirmationIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Controller\BrowserBinding\Delete">
+        <plugin name="InPost_InPostPay::browserBindingIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Controller\MobileLink\Get">
+        <plugin name="InPost_InPostPay::mobileLinkIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Controller\OrderComplete\Get">
+        <plugin name="InPost_InPostPay::orderCompleteIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Controller\PayData\Get">
+        <plugin name="InPost_InPostPay::payDataIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface">
+        <plugin name="InPost_InPostPay::basketGetIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface">
+        <plugin name="InPost_InPostPay::basketUpdateIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface">
+        <plugin name="InPost_InPostPay::basketDeleteIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface">
+        <plugin name="InPost_InPostPay::basketConfirmationIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
+        <plugin name="InPost_InPostPay::orderCreateIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface">
+        <plugin name="InPost_InPostPay::orderGetIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface">
+        <plugin name="InPost_InPostPay::orderEventIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
