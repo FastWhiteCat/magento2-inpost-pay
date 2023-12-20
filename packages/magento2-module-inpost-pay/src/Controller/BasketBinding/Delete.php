@@ -52,7 +52,11 @@ class Delete implements HttpGetActionInterface
                 $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
                 if ($inPostPayQuote->getQuoteId()) {
                     $this->basketBindingDelete->execute($inPostPayQuote->getBasketId());
-                    $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
+                    $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
+                        ? $inPostPayQuote->getInPostPayQuoteId()
+                        : 0;
+                    $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
+
                     return $this->jsonFactory->create()->setData([]);
                 }
             }

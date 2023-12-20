@@ -18,11 +18,17 @@ use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get implements HttpGetActionInterface
 {
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         Context $context,
         private readonly CheckoutSession $checkoutSession,
