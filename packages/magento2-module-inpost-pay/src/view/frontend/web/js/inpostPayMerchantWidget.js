@@ -270,7 +270,7 @@ define([
         iziBindingDelete: function () {
             return new Promise(function (resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('inpostizi/BrowserBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
+                    url: urlBuilder.build('inpostizi/BasketBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
                     method: 'GET',
                 })
                     .done(function () {
