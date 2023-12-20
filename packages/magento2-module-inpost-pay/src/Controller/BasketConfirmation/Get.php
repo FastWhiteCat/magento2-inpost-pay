@@ -16,6 +16,8 @@ use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Stdlib\CookieManagerInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +41,7 @@ class Get implements HttpGetActionInterface
         private readonly CreateOrUpdateBasket $createOrUpdateBasket,
         private readonly CookieManagerInterface $cookieManager,
         private readonly GetBasketId $getBasketId,
+        private readonly CartRepositoryInterface $cartRepository,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -82,7 +85,9 @@ class Get implements HttpGetActionInterface
                     ];
                 } elseif ($browserId = $this->cookieManager->getCookie('BrowserId')) {
                     $basketId = $this->getBasketId->get($quoteId, true);
-                    if ($basketId) {
+                    $quote = $this->cartRepository->get($quoteId);
+
+                    if ($quote instanceof Quote && $basketId) {
                         $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
                     }
                 } else {
