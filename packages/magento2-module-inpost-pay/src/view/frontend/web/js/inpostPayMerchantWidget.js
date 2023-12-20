@@ -252,8 +252,10 @@ define([
                             if (!data.action) {
                                 setTimerAndRunCallback(checkOrderStatus, resolve, reject);
                             } else if (data.action && data.action === 'delete') {
-                                window.iziBindingDelete();
-                                window.location.reload();
+                                window.iziBindingDelete().then(function() {
+                                    window.location.reload();
+                                });
+
                             } else {
                                 resolve(data);
                             }
