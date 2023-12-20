@@ -16,6 +16,7 @@ use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Stdlib\CookieManagerInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +40,7 @@ class Get implements HttpGetActionInterface
         private readonly CreateOrUpdateBasket $createOrUpdateBasket,
         private readonly CookieManagerInterface $cookieManager,
         private readonly GetBasketId $getBasketId,
+        private readonly CartRepositoryInterface $cartRepository,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -80,11 +82,12 @@ class Get implements HttpGetActionInterface
                         'surname' => $inpostPayQuote->getSurname(),
                         'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
                     ];
-//                } elseif ($browserId = $this->cookieManager->getCookie('BrowserId')) {
-//                    $basketId = $this->getBasketId->get($quoteId, true);
-//                    if ($basketId) {
-//                        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
-//                    }
+                } elseif ($browserId = $this->cookieManager->getCookie('BrowserId')) {
+                    $basketId = $this->getBasketId->get($quoteId, true);
+                    if ($basketId) {
+                        $quote = $this->cartRepository->get($quoteId);
+                        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
+                    }
                 } else {
                     $data = [
                         'action' => 'retry'
