@@ -80,11 +80,11 @@ class Get implements HttpGetActionInterface
                         'surname' => $inpostPayQuote->getSurname(),
                         'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
                     ];
-                } elseif ($browserId = $this->cookieManager->getCookie('BrowserId')) {
-                    $basketId = $this->getBasketId->get($quoteId, true);
-                    if ($basketId) {
-                        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
-                    }
+//                } elseif ($browserId = $this->cookieManager->getCookie('BrowserId')) {
+//                    $basketId = $this->getBasketId->get($quoteId, true);
+//                    if ($basketId) {
+//                        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
+//                    }
                 } else {
                     $data = [
                         'action' => 'retry'
