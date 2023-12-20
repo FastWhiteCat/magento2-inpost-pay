@@ -253,7 +253,6 @@ define([
                                 setTimerAndRunCallback(checkOrderStatus, resolve, reject);
                             } else if (data.action && data.action === 'delete') {
                                 window.iziBindingDelete();
-                                window.location.reload();
                             } else {
                                 resolve(data);
                             }
