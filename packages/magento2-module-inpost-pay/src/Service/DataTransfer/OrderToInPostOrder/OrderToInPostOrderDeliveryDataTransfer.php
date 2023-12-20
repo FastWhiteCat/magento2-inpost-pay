@@ -72,7 +72,7 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
     public function getAllDeliveryOptions(): array
     {
         return array_merge(
-            $this->shipmentMappingConfigProvider->getNonStandardDeliveryOptions(),
+            $this->shipmentMappingConfigProvider->getNonStandardDeliveryOptions(true),
             [ShipmentMappingConfigProvider::OPTION_STANDARD]
         );
     }
