@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Controller\BrowserBinding;
+namespace InPost\InPostPay\Controller\BasketBinding;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Service\ApiConnector\BrowserBinding;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -26,7 +26,7 @@ class Delete implements HttpGetActionInterface
         private readonly Validator $formKeyValidator,
         private readonly JsonFactory $jsonFactory,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly BrowserBinding $browserBinding,
+        private readonly BasketBindingDelete $basketBindingDelete,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -50,14 +50,14 @@ class Delete implements HttpGetActionInterface
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
                 $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
-                if ($inPostPayQuote->getQuoteId() && $inPostPayQuote->getBrowserId()) {
-                    $response = $this->browserBinding->delete($inPostPayQuote->getBrowserId());
-                    if (empty($response)) {
-                        $inPostPayQuote->setBrowserId('');
-                        $inPostPayQuote->setBrowserTrusted(false);
-                        $this->inPostPayQuoteRepository->save($inPostPayQuote);
-                    }
-                    return $this->jsonFactory->create()->setData($response);
+                if ($inPostPayQuote->getQuoteId()) {
+                    $this->basketBindingDelete->execute($inPostPayQuote->getBasketId());
+                    $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
+                        ? $inPostPayQuote->getInPostPayQuoteId()
+                        : 0;
+                    $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
+
+                    return $this->jsonFactory->create()->setData([]);
                 }
             }
         } catch (LocalizedException $e) {

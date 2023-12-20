@@ -8,8 +8,8 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class ColorVariant implements OptionSourceInterface
 {
-    public const PRIMARY = 'PRIMARY';
-    public const SECONDARY = 'SECONDARY';
+    public const PRIMARY = 'primary';
+    public const SECONDARY = 'secondary';
 
     public function toOptionArray(): array
     {

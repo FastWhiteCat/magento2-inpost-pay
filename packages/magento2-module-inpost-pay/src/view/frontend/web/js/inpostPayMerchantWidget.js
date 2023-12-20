@@ -9,6 +9,7 @@ define([
 
     var LONG_POLLING_TIME = 10000;
     var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var RETRY_TYPE = 'retry';
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -42,6 +43,7 @@ define([
             }
 
             this.bindEvents();
+            this.checkIsBinding();
         },
 
         isWidgetInitialized: function () {
@@ -78,6 +80,28 @@ define([
             return !$bundleProducts.length;
         },
 
+        checkIsBinding: function() {
+            $.ajax({
+                url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                    + '/form_key/'
+                    + $.mage.cookies.get('form_key')
+                ),
+                method: 'GET',
+            })
+                .done(function (data) {
+                    if (data.status && data.status === 'SUCCESS') {
+                        var $iziButtons = $("inpost-izi-button");
+                        if (!$iziButtons.length) return;
+
+                        var event = new CustomEvent("izi-binding-complete", {detail: data});
+
+                        $iziButtons.each(function () {
+                            this.dispatchEvent(event)
+                        });
+                    }
+                });
+        },
+
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
@@ -97,14 +121,19 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        resolve(Object.keys(data).length === 1 && data.basket_id ? [] : {
+                        if (Object.keys(data).length === 1 && data.basket_id) {
+                            resolve([])
+                        }
+
+                        localStorage.setItem('basketId', data.basket_id);
+                        resolve({
                             qr_code: data.qr_code,
                             deep_link: data.deep_link,
                             deep_link_hms: data.deep_link_hms,
                         })
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
                     });
             });
         },
@@ -129,97 +158,126 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
                     });
             });
         },
 
         iziGetIsBound: function () {
             return new Promise((resolve, reject) => {
-                checkIsBound(resolve, reject);
+                checkIsBound()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error)
+                        console.error(error);
+                    });
             });
 
-            function checkIsBound(resolve, reject) {
+            function checkIsBound() {
                 abortRequest(xhrForBasketConfirmation)
-                xhrForBasketConfirmation = $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
-                        + '/form_key/'
-                        + $.mage.cookies.get('form_key')
-                    ),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (data.status) {
+
+                return new Promise((resolve, reject) => {
+                    xhrForBasketConfirmation = $.ajax({
+                        url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                            + '/form_key/'
+                            + $.mage.cookies.get('form_key')
+                        ),
+                        method: 'GET',
+                    })
+                        .done(function (data) {
+                            if (data.status) {
+                                if (timeoutId) {
+                                    clearTimeout(timeoutId);
+                                    abortRequest(xhrForBasketConfirmation)
+                                }
+
+                                switch (data.status) {
+                                    case 'REJECT':
+                                        reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
+                                        break;
+                                    case 'PENDING':
+                                        setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                        break;
+                                    case 'SUCCESS':
+                                        localStorage.setItem('browser_id', data.browser.browser_id);
+                                        resolve(data)
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else {
+                                setTimerAndRunCallback(checkIsBound, resolve, reject);
+                            }
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                        });
+                });
+            }
+        },
+
+        iziGetOrderComplete: function () {
+            return new Promise((resolve, reject) => {
+                checkOrderStatus()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error)
+                        console.error(error);
+                    });
+            });
+            function checkOrderStatus() {
+                abortRequest(xhrForOrderConfirmation)
+
+                return new Promise((resolve, reject) => {
+                    var basketId = localStorage.getItem('basketId');
+
+                    xhrForOrderConfirmation = $.ajax({
+                        url: urlBuilder.build('inpostizi/OrderComplete/Get'
+                            + '/?basketId='
+                            + basketId
+                        ),
+                        method: 'GET',
+                    })
+                        .done(function (data) {
                             if (timeoutId) {
                                 clearTimeout(timeoutId);
                                 abortRequest(xhrForBasketConfirmation)
                             }
 
-                            switch (data.status) {
-                                case 'REJECT':
-                                    reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
-                                    break;
-                                case 'PENDING':
-                                    setTimerAndRunCallback(checkIsBound);
-                                    break;
-                                case 'SUCCESS':
-                                    resolve(data)
-                                    break;
-                                default:
-                                    break;
+                            if (!data.action) {
+                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                            } else if (data.action && data.action === 'delete') {
+                                window.iziBindingDelete().then(function() {
+                                    window.location.reload();
+                                });
+
+                            } else {
+                                resolve(data);
                             }
-                        } else if (data.error_code) {
-                            reject(new Error(data.error_code));
-                        } else {
-                            setTimerAndRunCallback(checkIsBound)
-                        }
-                    })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
-                    });
-            }
-        },
-
-        iziGetOrderComplete: function () {
-            //TODO check statuses from BE, change url when endpoint will be changed to controller
-            return new Promise((resolve, reject) => {
-                checkOrderStatus(resolve, reject);
-            });
-
-            function checkOrderStatus(resolve, reject) {
-                abortRequest(xhrForOrderConfirmation)
-                xhrForOrderConfirmation = $.ajax({
-                    url: urlBuilder.build('rest/V1/izi/checkOrderStatus/'),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (data.action && data.action === 'refresh') {
-                            setTimerAndRunCallback(checkOrderStatus);
-                        } else if (data.action && data.action === 'redirect') {
-                            resolve(data)
-                        }
-
-                        reject(new Error($.mage.__('Unhandled status')));
-                    })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
-                    });
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                        });
+                });
             }
         },
 
         iziBindingDelete: function () {
-            //TODO change url when endpoint will be changed to controller
             return new Promise(function (resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('inpostizi/BrowserBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
+                    url: urlBuilder.build('inpostizi/BasketBinding/Delete' + '/form_key/' + $.mage.cookies.get('form_key')),
                     method: 'GET',
                 })
                     .done(function () {
                         resolve()
                     })
-                    .fail(function (xhr, textStatus) {
-                        reject(new Error($.mage.__('Network problem: ') + textStatus));
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
                     });
             });
         },
@@ -260,22 +318,21 @@ define([
 
         bindEvents: function () {
             checkCartWidget();
+            customerData.invalidate(['cart']);
+            customerData.reload(['cart'], true);
+
             customerData.get('cart').subscribe(function (cartData) {
                 checkCartWidget(cartData);
-
-                var $iziButtons = $("inpost-izi-button");
-                if (!$iziButtons.length) return;
-
-                var event = new CustomEvent("inpost-update-count", {detail: cartData.summary_count});
-
-                $iziButtons.each(function () {
-                    this.dispatchEvent(event)
-                });
+                updateCounter(cartData.summary_count);
             });
 
             document.addEventListener('iziModalEventClose', function () {
                 abortRequest(xhrForBasketConfirmation)
             })
+
+            window.addEventListener("inpost-update-count", function (e){
+                updateCounter(e.detail);
+            });
 
             function checkCartWidget(cartData = "") {
                 var wrapperClass = getConfig().wrapperClass || "inpost-widget-wrapper";
@@ -290,6 +347,17 @@ define([
                         $inpayWrapperOnBasket.show()
                     }
                 }
+            }
+
+            function updateCounter(count) {
+                var $iziButtons = $("inpost-izi-button");
+                if (!$iziButtons.length) return;
+
+                var event = new CustomEvent("inpost-update-count", {detail: count});
+
+                $iziButtons.each(function () {
+                    this.dispatchEvent(event)
+                });
             }
         },
 
@@ -327,9 +395,16 @@ define([
             }
         },
 
-        setTimerAndRunCallback: function (callback) {
+        setTimerAndRunCallback: function (callback, resolve, reject) {
             timeoutId = setTimeout(function () {
-                callback();
+                callback()
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error);
+                        console.error(error);
+                    });
             }, LONG_POLLING_TIME);
         },
 

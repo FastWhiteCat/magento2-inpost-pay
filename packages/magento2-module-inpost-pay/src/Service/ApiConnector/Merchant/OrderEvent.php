@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
@@ -13,6 +14,7 @@ use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponseFactory;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -37,6 +39,7 @@ class OrderEvent implements OrderEventInterface
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly UpdateOrderResponseFactory $updateOrderResponseFactory,
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -49,12 +52,24 @@ class OrderEvent implements OrderEventInterface
         ?PhoneNumberInterface $phoneNumber = null
     ): UpdateOrderResponseInterface {
         try {
+            $this->eventManager->dispatch('izi_order_update_before', [
+                InPostPayOrderInterface::ORDER_ID => $orderId,
+                BasketUpdateInterface::EVENT_ID => $eventId,
+                BasketUpdateInterface::EVENT_DATA_TIME => $eventDataTime,
+                OrderEventInterface::EVENT_DATA => $eventData,
+                InPostPayOrderInterface::PHONE_NUMBER => $phoneNumber
+            ]);
             /**
              * @var Order $order
              */
             $order = $this->getOrderByIncrementId->get($orderId);
             $this->checkIfCanProcess($order, $phoneNumber);
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
+
+            $this->eventManager->dispatch('izi_order_update_after', [
+                OrderEventInterface::ORDER => $order,
+                OrderEventInterface::INPOST_PAY_ORDER_STATUS => $inPostPayOrderStatus
+            ]);
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');
             $this->logger->error($e->getMessage());

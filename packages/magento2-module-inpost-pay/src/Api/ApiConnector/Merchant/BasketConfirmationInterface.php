@@ -14,6 +14,9 @@ use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
  */
 interface BasketConfirmationInterface
 {
+    public const QUOTE = 'quote';
+    public const BROWSER = 'browser';
+    public const BASKET = 'basket';
     /**
      * @param string $basketId
      * @param string $status

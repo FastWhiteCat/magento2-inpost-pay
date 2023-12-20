@@ -39,7 +39,8 @@
             "created_at": true,
             "updated_at": true,
             "phone": true,
-            "country_prefix": true
+            "country_prefix": true,
+            "refresh_required": true
         },
         "constraint": {
             "PRIMARY": true,
