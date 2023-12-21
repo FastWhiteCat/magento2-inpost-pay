@@ -68,7 +68,7 @@ class Get implements HttpGetActionInterface
                         'surname' => $inpostPayQuote->getSurname(),
                         'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
                     ];
-                }  else {
+                } else {
                     $data = [
                         'action' => 'retry'
                     ];

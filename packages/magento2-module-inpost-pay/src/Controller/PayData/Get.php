@@ -160,28 +160,39 @@ class Get implements HttpPostActionInterface
                     $binding = $this->basketBindingCheck->execute($quoteId);
                     $binding['browser_trusted'] = true;
                     if ($binding && isset($binding['browser_trusted']) && $binding['browser_trusted']) {
-                        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
-                        $binding = $this->basketBindingCheck->execute($quoteId);
-                        if ($binding && isset($binding['client_details'])) {
-                            if (!isset($binding['status']) || !$binding['status']) {
-                                $binding['status'] = InPostBasketStatus::SUCCESS->value;
-                            }
-
-                            $this->UpdateInpostPayQuote($browserId, $basketId, $binding);
-
+                        if ($basketId = $this->createOrUpdateBasket($quote, $browserId, $basketId)) {
                             return $basketId;
                         }
                     }
                 }
             }
         } catch (LocalizedException $e) {
-            $this->logger->error(__('There was a problem pairing basket with browserId'));
+            $this->logger->error('There was a problem pairing basket with browserId');
         }
 
         return null;
     }
 
-    private function UpdateInpostPayQuote(string $browserId, string $basketId, array $binding) {
+    private function createOrUpdateBasket(Quote $quote, string $browserId, string $basketId): ?string
+    {
+        $quoteId = is_scalar($quote->getEntityId()) ? (int)$quote->getEntityId() : 0;
+        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
+        $binding = $this->basketBindingCheck->execute($quoteId);
+        if ($binding && isset($binding['client_details'])) {
+            $this->updateInpostPayQuote($browserId, $basketId, $binding);
+
+            return $basketId;
+        }
+
+        return null;
+    }
+
+    private function updateInpostPayQuote(string $browserId, string $basketId, array $binding): void
+    {
+        if (!isset($binding['status']) || !$binding['status']) {
+            $binding['status'] = InPostBasketStatus::SUCCESS->value;
+        }
+
         $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
 
         $status = $binding['status'];
@@ -191,7 +202,7 @@ class Get implements HttpPostActionInterface
         $countryPrefix = $binding['client_details']['phone_number']['country_prefix'] ?? '';
         $name = $binding['client_details']['name'] ?? '';
         $surname = $binding['client_details']['surname'] ?? '';
-        $browserTrusted = $binding['browser_trusted'] ?? false;
+        $browserTrusted = (bool)$binding['browser_trusted'];
 
         $inPostPayQuote->setStatus($status);
         $inPostPayQuote->setInpostBasketId($inpostBasketId);
