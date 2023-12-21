@@ -158,11 +158,12 @@ class Get implements HttpPostActionInterface
 
                 if ($quote instanceof Quote && $basketId) {
                     $binding = $this->basketBindingCheck->execute($quoteId);
-                    $binding['browser_trusted'] = true;
-                    if ($binding && isset($binding['browser_trusted']) && $binding['browser_trusted']) {
-                        if ($basketId = $this->createOrUpdateBasket($quote, $browserId, $basketId)) {
-                            return $basketId;
-                        }
+                    if ($binding
+                        && isset($binding['browser_trusted'])
+                        && $binding['browser_trusted']
+                        && $basketId = $this->createOrUpdateBasket($quote, $browserId, $basketId)
+                    ) {
+                        return $basketId;
                     }
                 }
             }

@@ -41,13 +41,10 @@ class PlaceOrderEventObserver implements ObserverInterface
 
             try {
                 $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($orderId);
-                if ($inPostPayQuote && $inPostPayQuote->getBasketId() && $inPostPayQuote->getInPostPayQuoteId()) {
-                    $inPostPayQuoteId = $inPostPayQuote->getInPostPayQuoteId();
-                    if ($inPostPayQuoteId === null) {
-                        $this->logger->error('Empty InPost Quote ID.');
-                        return;
-                    }
-
+                if ($inPostPayQuote
+                    && $inPostPayQuote->getBasketId()
+                    && $inPostPayQuoteId = $inPostPayQuote->getInPostPayQuoteId()
+                ) {
                     $this->basketBindingDelete->execute($inPostPayQuote->getBasketId(), true);
                     $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
                 }

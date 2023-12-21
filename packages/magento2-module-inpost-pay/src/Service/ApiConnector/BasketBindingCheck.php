@@ -13,6 +13,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+ */
 class BasketBindingCheck
 {
     public function __construct(

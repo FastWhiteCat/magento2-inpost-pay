@@ -19,6 +19,9 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote as InPostPayQuoteResource;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote\CollectionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
 {
     public function __construct(
