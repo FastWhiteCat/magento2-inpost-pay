@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class PhoneNumber extends DataObject implements PhoneNumberInterface
+class PhoneNumber extends DataObject implements PhoneNumberInterface, ExtensibleDataInterface
 {
     /**
      * @return string

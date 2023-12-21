@@ -6,13 +6,13 @@ namespace InPost\InPostPay\Api\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
-use InPost\InPostPay\Api\Data\UpdateOrderResponseInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
 
 interface OrderEventInterface
 {
     public const EVENT_DATA = 'event_data';
     public const ORDER = 'order';
-    public const INPOST_PAY_ORDER_STATUS = 'inpost_pay_order_status';
+    public const ORDER_UPDATE = 'order_update';
 
     /**
      * @param string $orderId
@@ -20,7 +20,7 @@ interface OrderEventInterface
      * @param string $eventDataTime
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface|null $phoneNumber
      * @param \InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface $eventData
-     * @return \InPost\InPostPay\Api\Data\UpdateOrderResponseInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface
      */
     public function execute(
         string $orderId,
@@ -28,5 +28,5 @@ interface OrderEventInterface
         string $eventDataTime,
         EventDataInterface $eventData,
         ?PhoneNumberInterface $phoneNumber = null
-    ): UpdateOrderResponseInterface;
+    ): OrderUpdateInterface;
 }

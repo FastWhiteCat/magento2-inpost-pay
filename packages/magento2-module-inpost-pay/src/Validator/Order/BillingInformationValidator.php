@@ -41,13 +41,7 @@ class BillingInformationValidator implements OrderValidatorInterface
     private function validateName(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
     {
         if ($accountInfo->getName() !== $inPostPayQuote->getName()) {
-            throw new LocalizedException(
-                __(
-                    'Invalid name. Expected: %1 Received: %2',
-                    $inPostPayQuote->getName(),
-                    $accountInfo->getName()
-                )
-            );
+            throw new LocalizedException(__('Invalid name.'));
         }
     }
 
@@ -60,13 +54,7 @@ class BillingInformationValidator implements OrderValidatorInterface
     private function validateSurname(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
     {
         if ($accountInfo->getSurname() !== $inPostPayQuote->getSurname()) {
-            throw new LocalizedException(
-                __(
-                    'Invalid surname. Expected: %1 Received: %2',
-                    $inPostPayQuote->getSurname(),
-                    $accountInfo->getSurname()
-                )
-            );
+            throw new LocalizedException(__('Invalid surname.'));
         }
     }
 
@@ -83,13 +71,7 @@ class BillingInformationValidator implements OrderValidatorInterface
         if ($inPostPayQuote->getPhone() !== $phoneNumber->getPhone()
             || $inPostPayQuote->getCountryPrefix() !== $phoneNumber->getCountryPrefix()
         ) {
-            throw new LocalizedException(
-                __(
-                    'Invalid phone number. Expected: %1 Received: %2',
-                    trim((string)$inPostPayQuote->getCountryPrefix()) . trim((string)$inPostPayQuote->getPhone()),
-                    trim($phoneNumber->getCountryPrefix()) . trim($phoneNumber->getPhone())
-                )
-            );
+            throw new LocalizedException(__('Invalid phone number.'));
         }
     }
 

@@ -13,9 +13,10 @@ use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Delivery extends DataObject implements DeliveryInterface
+class Delivery extends DataObject implements DeliveryInterface, ExtensibleDataInterface
 {
     /**
      * @param PhoneNumberInterfaceFactory $phoneNumberFactory

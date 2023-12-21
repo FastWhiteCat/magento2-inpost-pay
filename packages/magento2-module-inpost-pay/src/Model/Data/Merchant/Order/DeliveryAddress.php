@@ -7,9 +7,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Order;
 use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class DeliveryAddress extends DataObject implements DeliveryAddressInterface
+class DeliveryAddress extends DataObject implements DeliveryAddressInterface, ExtensibleDataInterface
 {
     private const DEFAULT_COUNTRY_CODE = 'PL';
 

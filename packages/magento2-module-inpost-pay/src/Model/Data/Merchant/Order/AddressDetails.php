@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Order;
 
 use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class AddressDetails extends DataObject implements AddressDetailsInterface
+class AddressDetails extends DataObject implements AddressDetailsInterface, ExtensibleDataInterface
 {
     /**
      * @return string

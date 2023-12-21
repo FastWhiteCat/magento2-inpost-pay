@@ -5,4 +5,54 @@
     <event name="sales_order_save_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
+    <!-- Events triggered when sending requests to IZI API Endpoints -->
+    <event name="izi_api_send_request_before">
+        <observer name="InPost_InPostPay::iziApiEndpointSendBeforeEventObserver" instance="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointSendBeforeEventObserver" />
+    </event>
+    <event name="izi_api_send_request_after">
+        <observer name="InPost_InPostPay::iziApiEndpointSendAfterEventObserver" instance="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointSendAfterEventObserver" />
+    </event>
+    <!-- Events triggered when InPost sends requests to Merchants Endpoints -->
+    <event name="izi_order_get_before">
+        <observer name="InPost_InPostPay::iziOrderGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderGetBeforeEventObserver" />
+    </event>
+    <event name="izi_order_get_after">
+        <observer name="InPost_InPostPay::iziOrderGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderGetAfterEventObserver" />
+    </event>
+    <event name="izi_order_update_before">
+        <observer name="InPost_InPostPay::iziOrderUpdateBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderUpdateBeforeEventObserver" />
+    </event>
+    <event name="izi_order_update_after">
+        <observer name="InPost_InPostPay::iziOrderUpdateAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderUpdateAfterEventObserver" />
+    </event>
+    <event name="izi_order_create_before">
+        <observer name="InPost_InPostPay::iziOrderCreateBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderCreateBeforeEventObserver" />
+    </event>
+    <event name="izi_order_create_after">
+        <observer name="InPost_InPostPay::iziOrderCreateAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderCreateAfterEventObserver" />
+    </event>
+    <event name="izi_basket_update_before">
+        <observer name="InPost_InPostPay::iziBasketUpdateBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketUpdateBeforeEventObserver" />
+    </event>
+    <event name="izi_basket_update_after">
+        <observer name="InPost_InPostPay::iziBasketUpdateAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketUpdateAfterEventObserver" />
+    </event>
+    <event name="izi_basket_get_before">
+        <observer name="InPost_InPostPay::iziBasketGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketGetBeforeEventObserver" />
+    </event>
+    <event name="izi_basket_get_after">
+        <observer name="InPost_InPostPay::iziBasketGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketGetAfterEventObserver" />
+    </event>
+    <event name="izi_basket_binding_delete_before">
+        <observer name="InPost_InPostPay::iziBasketBindingDeleteBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketBindingDeleteBeforeEventObserver" />
+    </event>
+    <event name="izi_basket_binding_delete_after">
+        <observer name="InPost_InPostPay::iziBasketBindingDeleteAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketBindingDeleteAfterEventObserver" />
+    </event>
+    <event name="izi_basket_confirmation_before">
+        <observer name="InPost_InPostPay::iziBasketConfirmationBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationBeforeEventObserver" />
+    </event>
+    <event name="izi_basket_confirmation_after">
+        <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
+    </event>
 </config>

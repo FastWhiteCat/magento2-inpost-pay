@@ -79,26 +79,10 @@
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
     <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
                 type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestPayDataInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestPayData" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetPayDataInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetPayData" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestMobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestMobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetMobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetMobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\MobileLinkInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\MobileLink" />
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetConfirmation"/>
-    <preference for="InPost\InPostPay\Api\Widget\Basket\GetGuestConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation"/>
-    <preference for="InPost\InPostPay\Api\Widget\Basket\ConfirmationInterface"
-                type="InPost\InPostPay\Model\Widget\Basket\Confirmation"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
-    <preference for="InPost\InPostPay\Api\Data\UpdateOrderResponseInterface"
-                type="InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponse"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
@@ -387,6 +371,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\MerchantEndpoint\Debug\MerchantEndpointEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointEventObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

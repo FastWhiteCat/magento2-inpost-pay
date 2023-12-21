@@ -6,9 +6,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Basket\Product;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface;
 use InPost\InPostPay\Enum\InPostQuantityType;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Quantity extends DataObject implements QuantityInterface
+class Quantity extends DataObject implements QuantityInterface, ExtensibleDataInterface
 {
     public const DEFAULT_UNIT = 'pcs';
 

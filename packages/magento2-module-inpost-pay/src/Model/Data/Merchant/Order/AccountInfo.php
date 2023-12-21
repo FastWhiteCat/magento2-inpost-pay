@@ -9,9 +9,10 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterfaceFactory;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class AccountInfo extends DataObject implements AccountInfoInterface
+class AccountInfo extends DataObject implements AccountInfoInterface, ExtensibleDataInterface
 {
     /**
      * @param PhoneNumberInterfaceFactory $phoneNumberFactory
