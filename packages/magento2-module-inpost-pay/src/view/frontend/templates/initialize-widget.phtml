@@ -8,7 +8,9 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
  */
 
 $widgetViewModel = $block->getData('widget_view_model');
-if (!$widgetViewModel->isEnabled()) return;
+if (!$widgetViewModel->isEnabled()) {
+    return;
+}
 
 $bindingPlace = $block->getBindingPlace();
 

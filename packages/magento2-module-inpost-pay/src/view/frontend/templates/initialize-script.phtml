@@ -9,7 +9,9 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 
 $scriptViewModel = $block->getData('script_view_model');
 
-if (!$scriptViewModel->isEnabled()) return;
+if (!$scriptViewModel->isEnabled()) {
+    return;
+}
 
 $sandboxMode = $scriptViewModel->isSandboxEnabled();
 $bindingPlace = $block->getBindingPlace();
