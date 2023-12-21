@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
@@ -43,28 +44,28 @@ class BasketConfirmation implements BasketConfirmationInterface
 
     /**
      * @param string $basketId
-     * @param string $status
-     * @param string $inpostBasketId
-     * @param PhoneNumberInterface $phoneNumber
-     * @param BrowserInterface $browser
-     * @param string $maskedPhoneNumber
-     * @param string $name
-     * @param string $surname
+     * @param string|null $status
+     * @param string|null $inpostBasketId
+     * @param PhoneNumberInterface|null $phoneNumber
+     * @param BrowserInterface|null $browser
+     * @param string|null $maskedPhoneNumber
+     * @param string|null $name
+     * @param string|null $surname
      * @return BasketInterface
-     * @throws InPostPayBadRequestException
-     * @throws InPostPayAuthorizationException
-     * @throws BasketNotFoundException
-     * @throws InPostPayInternalException
+     * @throws \InPost\InPostPay\Exception\BasketNotFoundException
+     * @throws \InPost\InPostPay\Exception\InPostPayAuthorizationException
+     * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
+     * @throws \InPost\InPostPay\Exception\InPostPayInternalException
      */
     public function execute(
         string $basketId,
-        string $status,
-        string $inpostBasketId,
-        PhoneNumberInterface $phoneNumber,
-        BrowserInterface $browser,
-        string $maskedPhoneNumber,
-        string $name,
-        string $surname
+        ?string $status = null,
+        ?string $inpostBasketId = null,
+        ?PhoneNumberInterface $phoneNumber = null,
+        ?BrowserInterface $browser = null,
+        ?string $maskedPhoneNumber = null,
+        ?string $name = null,
+        ?string $surname = null
     ): BasketInterface {
         try {
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
@@ -84,20 +85,31 @@ class BasketConfirmation implements BasketConfirmationInterface
             ]);
 
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
-
             $inPostPayQuote->setStatus($status);
+
+            $basket = $this->basketFactory->create();
+            if ($status === InPostBasketStatus::REJECT->value) {
+                $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
+                $basket->setStatus(InPostBasketStatus::REJECT->value);
+
+                return $basket;
+            }
+
             $inPostPayQuote->setInpostBasketId($inpostBasketId);
             $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber);
-            $inPostPayQuote->setPhone($phoneNumber->getPhone());
-            $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
+            if ($phoneNumber) {
+                $inPostPayQuote->setPhone($phoneNumber->getPhone());
+                $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
+            }
             $inPostPayQuote->setName($name);
             $inPostPayQuote->setSurname($surname);
-            $inPostPayQuote->setBrowserId($browser->getBrowserId());
-            $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
+            if ($browser) {
+                $inPostPayQuote->setBrowserId($browser->getBrowserId());
+                $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
+            }
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
 
-            $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
             $this->eventManager->dispatch('izi_basket_confirmation_after', [
                 BasketConfirmationInterface::BASKET => $basket
