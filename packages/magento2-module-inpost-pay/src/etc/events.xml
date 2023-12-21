@@ -5,6 +5,9 @@
     <event name="sales_order_save_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="InPost_InPostPay::deleteBindingAfterPlaceOrderObserver" instance="InPost\InPostPay\Observer\Order\PlaceOrderEventObserver" />
+    </event>
     <!-- Events triggered when sending requests to IZI API Endpoints -->
     <event name="izi_api_send_request_before">
         <observer name="InPost_InPostPay::iziApiEndpointSendBeforeEventObserver" instance="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointSendBeforeEventObserver" />

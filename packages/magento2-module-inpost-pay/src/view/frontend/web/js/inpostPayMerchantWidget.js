@@ -37,6 +37,7 @@ define([
             window.abortRequest = this.abortRequest;
             window.checkIfProductIsAdded = this.checkIfProductIsAdded;
             window.setTimerAndRunCallback = this.setTimerAndRunCallback;
+            window.checkIsBinding = this.checkIsBinding;
 
             window.getConfig = function (defaultConfig = config) {
                 return defaultConfig;
@@ -122,7 +123,8 @@ define([
                 })
                     .done(function (data) {
                         if (Object.keys(data).length === 1 && data.basket_id) {
-                            resolve([])
+                            window.checkIsBinding();
+                            resolve([]);
                         }
 
                         localStorage.setItem('basketId', data.basket_id);

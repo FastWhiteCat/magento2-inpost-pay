@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
+use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -31,8 +33,15 @@ class Widget implements ArgumentInterface
         private readonly DisplayConfigProvider $displayConfigProvider,
         private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
         private readonly ResolverInterface $localeResolver,
-        private readonly CheckoutSession $checkoutSession
+        private readonly CheckoutSession $checkoutSession,
+        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository
     ) {
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->generalConfigProvider->isEnabled();
     }
 
     /**
@@ -108,5 +117,25 @@ class Widget implements ArgumentInterface
         } catch (NoSuchEntityException|LocalizedException $e) {
             return "";
         }
+    }
+
+    public function isInPostPayOrder(): bool
+    {
+        try {
+            $order = $this->checkoutSession->getLastRealOrder();
+            $orderId = is_scalar($order->getId()) ? (int)$order->getId() : null;
+
+            if (!$orderId) {
+                return false;
+            }
+            $inpostOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
+            if ($inpostOrder->getOrderId()) {
+                return true;
+            }
+        } catch (LocalizedException) {
+            return false;
+        }
+
+        return false;
     }
 }

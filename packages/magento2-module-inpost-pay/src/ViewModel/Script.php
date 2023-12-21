@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -17,7 +18,13 @@ class Script implements ArgumentInterface
     public function __construct(
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->generalConfigProvider->isEnabled();
     }
 
     /**
