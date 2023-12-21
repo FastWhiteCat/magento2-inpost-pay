@@ -10,6 +10,7 @@ use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchResults;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterfaceFactory;
@@ -18,6 +19,9 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote as InPostPayQuoteResource;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote\CollectionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
 {
     public function __construct(
@@ -46,8 +50,12 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
         // @phpstan-ignore-next-line
         $this->resource->load($inPostPayQuote, $inPostPayQuoteId);
-        if (!$inPostPayQuote->getQuoteId()) {
-            throw new NoSuchEntityException(__('InPost Pay Quote with ID "%1" does not exist.', $inPostPayQuoteId));
+        try {
+            $inPostPayQuote->getQuoteId();
+        } catch (LocalizedException $e) {
+            throw new NoSuchEntityException(
+                __('InPost Pay Quote with ID "%1" does not exist.', $inPostPayQuoteId)
+            );
         }
 
         return $inPostPayQuote;
@@ -58,7 +66,9 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
         // @phpstan-ignore-next-line
         $this->resource->load($inPostPayQuote, $quoteId, InPostPayQuoteInterface::QUOTE_ID);
-        if (!$inPostPayQuote->getQuoteId()) {
+        try {
+            $inPostPayQuote->getQuoteId();
+        } catch (LocalizedException $e) {
             throw new NoSuchEntityException(__('InPost Pay Quote with Quote ID "%1" does not exist.', $quoteId));
         }
 
@@ -70,7 +80,9 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
         // @phpstan-ignore-next-line
         $this->resource->load($inPostPayQuote, $basketId, InPostPayQuoteInterface::BASKET_ID);
-        if (!$inPostPayQuote->getQuoteId()) {
+        try {
+            $inPostPayQuote->getQuoteId();
+        } catch (LocalizedException $e) {
             throw new NoSuchEntityException(
                 __('InPost Pay Quote with Basket ID "%1" does not exist.', $basketId)
             );
@@ -84,7 +96,9 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
         // @phpstan-ignore-next-line
         $this->resource->load($inPostPayQuote, $inPostBasketId, InPostPayQuoteInterface::INPOST_BASKET_ID);
-        if (!$inPostPayQuote->getQuoteId()) {
+        try {
+            $inPostPayQuote->getQuoteId();
+        } catch (LocalizedException $e) {
             throw new NoSuchEntityException(
                 __('InPost Pay Quote with InPost Basket ID "%1" does not exist.', $inPostBasketId)
             );
