@@ -119,7 +119,7 @@ class Widget implements ArgumentInterface
         }
     }
 
-    public function isInPostPayOrder():bool
+    public function isInPostPayOrder(): bool
     {
         try {
             $order = $this->checkoutSession->getLastRealOrder();

@@ -85,24 +85,31 @@ class BasketConfirmation implements BasketConfirmationInterface
             ]);
 
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
-            $inPostPayQuote->setStatus($status);
+            $inPostPayQuote->setStatus($status ?? '');
 
             $basket = $this->basketFactory->create();
             if ($status === InPostBasketStatus::REJECT->value) {
-                $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
+                $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
+                    ? $inPostPayQuote->getInPostPayQuoteId()
+                    : null;
+
+                if ($inPostPayQuoteId) {
+                    $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
+                }
+
                 $basket->setStatus(InPostBasketStatus::REJECT->value);
 
                 return $basket;
             }
 
-            $inPostPayQuote->setInpostBasketId($inpostBasketId);
-            $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber);
+            $inPostPayQuote->setInpostBasketId($inpostBasketId ?? '');
+            $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber ?? '');
             if ($phoneNumber) {
                 $inPostPayQuote->setPhone($phoneNumber->getPhone());
                 $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
             }
-            $inPostPayQuote->setName($name);
-            $inPostPayQuote->setSurname($surname);
+            $inPostPayQuote->setName($name ?? '');
+            $inPostPayQuote->setSurname($surname ?? '');
             if ($browser) {
                 $inPostPayQuote->setBrowserId($browser->getBrowserId());
                 $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
