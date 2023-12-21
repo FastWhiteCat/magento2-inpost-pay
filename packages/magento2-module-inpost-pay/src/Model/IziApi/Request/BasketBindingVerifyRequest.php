@@ -11,7 +11,7 @@ use InPost\InPostPay\Service\ApiConnector\TokenGenerator;
 
 class BasketBindingVerifyRequest extends Request implements RequestInterface
 {
-    protected string $uri = '/v1/izi/basket/{basket_id}/binding';
+    protected string $uri = '/v1/izi/basket/{basket_id}/binding{browser_id}';
 
     /**
      * @param IziApiConfigProvider $iziApiConfigProvider

@@ -6,8 +6,6 @@ namespace InPost\InPostPay\Controller\BasketConfirmation;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket;
-use InPost\InPostPay\Service\GetBasketId;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\RequestInterface;
@@ -15,22 +13,13 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Stdlib\CookieManagerInterface;
-use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class Get implements HttpGetActionInterface
 {
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     */
     public function __construct(
         Context $context,
         private readonly CheckoutSession $checkoutSession,
@@ -38,10 +27,6 @@ class Get implements HttpGetActionInterface
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly JsonFactory $jsonFactory,
         private readonly InPostPayQuote $inPostPayQuote,
-        private readonly CreateOrUpdateBasket $createOrUpdateBasket,
-        private readonly CookieManagerInterface $cookieManager,
-        private readonly GetBasketId $getBasketId,
-        private readonly CartRepositoryInterface $cartRepository,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -83,14 +68,7 @@ class Get implements HttpGetActionInterface
                         'surname' => $inpostPayQuote->getSurname(),
                         'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
                     ];
-                } elseif ($browserId = $this->cookieManager->getCookie('BrowserId')) {
-                    $basketId = $this->getBasketId->get($quoteId, true);
-                    $quote = $this->cartRepository->get($quoteId);
-
-                    if ($quote instanceof Quote && $basketId) {
-                        $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
-                    }
-                } else {
+                }  else {
                     $data = [
                         'action' => 'retry'
                     ];

@@ -10,6 +10,7 @@ use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Service\GetBasketId;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class BasketBindingCheck
@@ -18,6 +19,7 @@ class BasketBindingCheck
         private readonly ConnectorInterface $connector,
         private readonly BasketBindingVerifyRequestFactory $basketBindingVerifyRequest,
         private readonly GetBasketId $getBasketId,
+        private readonly CookieManagerInterface $cookieManager,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -38,9 +40,13 @@ class BasketBindingCheck
         /** @var PublicKeyRequest $request */
         $request = $this->basketBindingVerifyRequest->create();
 
-        $request->setParams([
-            'basket_id' => $basketId,
-        ]);
+        $params['basket_id'] = $basketId;
+
+        if ($browserId = $this->cookieManager->getCookie('BrowserId')) {
+            $params['browser_id'] = '?browser_id=' . $browserId;
+        }
+
+        $request->setParams($params);
 
         try {
             return $this->connector->sendRequest($request);
