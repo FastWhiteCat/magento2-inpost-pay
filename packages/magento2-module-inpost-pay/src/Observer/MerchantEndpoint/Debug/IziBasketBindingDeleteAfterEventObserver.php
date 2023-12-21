@@ -11,6 +11,11 @@ class IziBasketBindingDeleteAfterEventObserver extends MerchantEndpointEventObse
 {
     protected string $eventDescription = 'INCOMING: Basket Delete response';
 
+    /**
+     * @param Observer $observer
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function execute(Observer $observer): void
     {
         if ($this->canDebug()) {

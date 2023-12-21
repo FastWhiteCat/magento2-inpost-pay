@@ -21,7 +21,11 @@ class IziOrderUpdateAfterEventObserver extends MerchantEndpointEventObserver imp
             $orderUpdateData = [];
             $orderUpdate = $event->getData(OrderEventInterface::ORDER_UPDATE);
             if ($orderUpdate instanceof ExtensibleDataInterface) {
-                $orderUpdateData = $this->objectConverter->toNestedArray($orderUpdate, [], QuantityUpdateInterface::class);
+                $orderUpdateData = $this->objectConverter->toNestedArray(
+                    $orderUpdate,
+                    [],
+                    QuantityUpdateInterface::class
+                );
             }
 
             $this->createEventDataLog($orderUpdateData);

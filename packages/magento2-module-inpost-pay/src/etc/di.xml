@@ -82,7 +82,7 @@
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface"
-                type="InPost\InPostPay\Model\Data\Merchant\Order"/>
+                type="InPost\InPostPay\Model\Data\Merchant\OrderUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
