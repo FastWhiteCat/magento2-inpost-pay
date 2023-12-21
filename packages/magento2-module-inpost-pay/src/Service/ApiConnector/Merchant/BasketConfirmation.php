@@ -190,7 +190,7 @@ class BasketConfirmation implements BasketConfirmationInterface
             : null;
 
         if ($inPostPayQuoteId) {
-            $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
+            $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
         }
 
         $basket->setStatus(InPostBasketStatus::REJECT->value);
