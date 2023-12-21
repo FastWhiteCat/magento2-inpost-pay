@@ -28,6 +28,9 @@ $widgetWrapperClass = "inpost-widget-wrapper";
 ?>
 
 <?php if ($bindingPlace === DisplayConfigProvider::THANK_YOU_PAGE_BINDING_PLACE_NAME): ?>
+    <?php if (!$widgetViewModel->isInPostPayOrder()) : ?>
+       <?php return; ?>
+    <?php endif; ?>
     <inpost-thank-you/>
 <?php else: ?>
     <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
