@@ -87,19 +87,8 @@ class BasketConfirmation implements BasketConfirmationInterface
             $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
             $inPostPayQuote->setStatus($status ?? '');
 
-            $basket = $this->basketFactory->create();
             if ($status === InPostBasketStatus::REJECT->value) {
-                $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
-                    ? $inPostPayQuote->getInPostPayQuoteId()
-                    : null;
-
-                if ($inPostPayQuoteId) {
-                    $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
-                }
-
-                $basket->setStatus(InPostBasketStatus::REJECT->value);
-
-                return $basket;
+                return $this->rejectBasket($inPostPayQuote);
             }
 
             $inPostPayQuote->setInpostBasketId($inpostBasketId ?? '');
@@ -117,6 +106,7 @@ class BasketConfirmation implements BasketConfirmationInterface
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
 
+            $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
             $this->eventManager->dispatch('izi_basket_confirmation_after', [
                 BasketConfirmationInterface::BASKET => $basket
@@ -190,5 +180,21 @@ class BasketConfirmation implements BasketConfirmationInterface
     private function createRequestDebugLog(string $message): void
     {
         $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
+    }
+
+    private function rejectBasket(InPostPayQuoteInterface $inPostPayQuote): BasketInterface
+    {
+        $basket = $this->basketFactory->create();
+        $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
+            ? (int)$inPostPayQuote->getInPostPayQuoteId()
+            : null;
+
+        if ($inPostPayQuoteId) {
+            $this->inPostPayQuoteRepository->deleteById($inPostPayQuote->getInPostPayQuoteId());
+        }
+
+        $basket->setStatus(InPostBasketStatus::REJECT->value);
+
+        return $basket;
     }
 }
