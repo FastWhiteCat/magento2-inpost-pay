@@ -9,20 +9,18 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 
 $scriptViewModel = $block->getData('script_view_model');
 
-if ($scriptViewModel->isEnabled()) {
-    $sandboxMode = $scriptViewModel->isSandboxEnabled();
-    $bindingPlace = $block->getBindingPlace();
-    $shouldInitializeScript = !$scriptViewModel->isEnabledInMiniCart()
-        || $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME;
-}
+if (!$scriptViewModel->isEnabled()) return;
+
+$sandboxMode = $scriptViewModel->isSandboxEnabled();
+$bindingPlace = $block->getBindingPlace();
+$shouldInitializeScript = !$scriptViewModel->isEnabledInMiniCart()
+    || $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME;
 ?>
 
-<?php if ($scriptViewModel->isEnabled()): ?>
-    <?php if ($shouldInitializeScript): ?>
-        <?php if ($sandboxMode): ?>
-            <script src="https://izi-sandbox.inpost.pl/inpostizi.js"></script>
-        <?php else: ?>
-            <script src="https://izi.inpost.pl/inpostizi.js"></script>
-        <?php endif; ?>
+<?php if ($shouldInitializeScript): ?>
+    <?php if ($sandboxMode): ?>
+        <script src="https://izi-sandbox.inpost.pl/inpostizi.js"></script>
+    <?php else: ?>
+        <script src="https://izi.inpost.pl/inpostizi.js"></script>
     <?php endif; ?>
 <?php endif; ?>
