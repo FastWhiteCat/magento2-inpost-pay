@@ -40,6 +40,7 @@ class Widget implements ArgumentInterface
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         private readonly LayoutConfigProvider $layoutConfigProvider,
@@ -167,9 +168,8 @@ class Widget implements ArgumentInterface
         $product = null;
         $store = $this->storeManager->getStore();
         if ($store instanceof StoreInterface) {
-            $storeId = is_scalar($store->getId()) ? (int)$store->getId() : 0;
             try {
-                $product = $this->productRepository->getById($productId, false, $storeId);
+                $product = $this->productRepository->getById($productId, false, $store->getId());
             } catch (NoSuchEntityException $e) {
                 $this->logger->error($e->getMessage());
             }
