@@ -42,16 +42,17 @@ class Widget implements ArgumentInterface
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        private readonly LayoutConfigProvider $layoutConfigProvider,
-        private readonly DisplayConfigProvider $displayConfigProvider,
-        private readonly ResolverInterface $localeResolver,
-        private readonly CheckoutSession $checkoutSession,
-        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly LayoutConfigProvider              $layoutConfigProvider,
+        private readonly DisplayConfigProvider             $displayConfigProvider,
+        private readonly ResolverInterface                 $localeResolver,
+        private readonly CheckoutSession                   $checkoutSession,
+        private readonly GeneralConfigProvider             $generalConfigProvider,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly StoreManagerInterface $storeManager,
-        private readonly LoggerInterface $logger
-    ) {
+        private readonly ProductRepositoryInterface        $productRepository,
+        private readonly StoreManagerInterface             $storeManager,
+        private readonly LoggerInterface                   $logger
+    )
+    {
     }
 
     public function isEnabled(): bool
@@ -128,7 +129,6 @@ class Widget implements ArgumentInterface
         }
     }
 
-
     public function isInPostPayOrder(): bool
     {
         try {
@@ -177,7 +177,7 @@ class Widget implements ArgumentInterface
             $quote = $this->checkoutSession->getQuote();
 
             foreach ($quote->getAllVisibleItems() as $item) {
-                if (in_array($item->getProduct()->getTypeId(),self::NOT_ALLOWED_PRODUCT_TYPES)) {
+                if (in_array($item->getProduct()->getTypeId(), self::NOT_ALLOWED_PRODUCT_TYPES)) {
                     return true;
                 }
             }
