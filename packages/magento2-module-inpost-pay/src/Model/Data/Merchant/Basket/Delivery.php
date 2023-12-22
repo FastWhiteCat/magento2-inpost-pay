@@ -7,9 +7,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Delivery extends DataObject implements DeliveryInterface
+class Delivery extends DataObject implements DeliveryInterface, ExtensibleDataInterface
 {
     /**
      * @param PriceInterfaceFactory $priceFactory

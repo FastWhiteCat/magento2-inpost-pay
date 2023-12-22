@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Price extends DataObject implements PriceInterface
+class Price extends DataObject implements PriceInterface, ExtensibleDataInterface
 {
     /**
      * @return float

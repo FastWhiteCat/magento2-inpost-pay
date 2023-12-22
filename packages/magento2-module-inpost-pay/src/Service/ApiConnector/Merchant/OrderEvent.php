@@ -8,15 +8,14 @@ use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
-use InPost\InPostPay\Api\Data\UpdateOrderResponseInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
-use InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponseFactory;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Webapi\Rest\Request as RestRequest;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
@@ -33,11 +32,10 @@ class OrderEvent implements OrderEventInterface
     public const ORDER_STATUS_COMPLETED = 'ORDER_COMPLETED';
 
     public function __construct(
-        private readonly RestRequest $restRequest,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly GeneralConfigProvider $generalConfigProvider,
-        private readonly UpdateOrderResponseFactory $updateOrderResponseFactory,
+        private readonly OrderUpdateInterfaceFactory $orderUpdateFactory,
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
         private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
@@ -50,7 +48,7 @@ class OrderEvent implements OrderEventInterface
         string $eventDataTime,
         EventDataInterface $eventData,
         ?PhoneNumberInterface $phoneNumber = null
-    ): UpdateOrderResponseInterface {
+    ): OrderUpdateInterface {
         try {
             $this->eventManager->dispatch('izi_order_update_before', [
                 InPostPayOrderInterface::ORDER_ID => $orderId,
@@ -59,17 +57,27 @@ class OrderEvent implements OrderEventInterface
                 OrderEventInterface::EVENT_DATA => $eventData,
                 InPostPayOrderInterface::PHONE_NUMBER => $phoneNumber
             ]);
-            /**
-             * @var Order $order
-             */
+
+            /** @var Order $order */
             $order = $this->getOrderByIncrementId->get($orderId);
             $this->checkIfCanProcess($order, $phoneNumber);
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
 
-            $this->eventManager->dispatch('izi_order_update_after', [
-                OrderEventInterface::ORDER => $order,
-                OrderEventInterface::INPOST_PAY_ORDER_STATUS => $inPostPayOrderStatus
-            ]);
+            $data = [
+                OrderUpdateInterface::ORDER_STATUS => $inPostPayOrderStatus,
+                OrderUpdateInterface::ORDER_MERCHANT_STATUS_DESCRIPTION => $order->getStatusLabel(),
+                OrderUpdateInterface::DELIVERY_REFERENCES_LIST => $this->getTrackingNumbers($order)
+            ];
+
+            /** @var OrderUpdateInterface $orderUpdate */
+            $orderUpdate = $this->orderUpdateFactory->create(['data' => $data]);
+
+            $this->eventManager->dispatch(
+                'izi_order_update_after',
+                [OrderEventInterface::ORDER_UPDATE => $orderUpdate]
+            );
+
+            return $orderUpdate;
         } catch (NoSuchEntityException $e) {
             $errorMsg = __('Order not found.');
             $this->logger->error($e->getMessage());
@@ -80,14 +88,6 @@ class OrderEvent implements OrderEventInterface
 
             throw new OrderNotUpdateException();
         }
-
-        $data = [
-            UpdateOrderResponseInterface::ORDER_STATUS => $inPostPayOrderStatus,
-            UpdateOrderResponseInterface::ORDER_MERCHANT_STATUS_DESCRIPTION => $order->getStatusLabel(),
-            UpdateOrderResponseInterface::DELIVERY_REFERENCES_LIST => $this->getTrackingNumbers($order)
-        ];
-
-        return $this->updateOrderResponseFactory->create(['data' => $data]);
     }
 
     private function checkIfCanProcess(Order $order, ?PhoneNumberInterface $phoneNumber): void
@@ -125,14 +125,14 @@ class OrderEvent implements OrderEventInterface
 
         if ($paymentStatus === self::PAYMENT_STATUS_AUTHORIZED) {
             $this->updateOrderPayment($order);
-            $this->addOrderCommentAndSave($order);
+            $this->addOrderCommentAndSave($order, $eventData);
             $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_COMPLETED);
             return self::ORDER_STATUS_COMPLETED;
         }
 
         if ($orderStatus === self::ORDER_STATUS_REJECTED) {
             $this->updateOrderStatus($order);
-            $this->addOrderCommentAndSave($order);
+            $this->addOrderCommentAndSave($order, $eventData);
             $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_REJECTED);
             return self::ORDER_STATUS_REJECTED;
         }
@@ -169,11 +169,17 @@ class OrderEvent implements OrderEventInterface
         throw new OrderNotUpdateException();
     }
 
-    private function addOrderCommentAndSave(Order $order): void
+    private function addOrderCommentAndSave(Order $order, EventDataInterface $eventData): void
     {
-        $order->addCommentToStatusHistory('Order updated by InPostPay, full request: '
-            . $this->restRequest->getContent());
+        $paymentCommentData = [
+            __('Order updated by InPost Pay:')->render(),
+            __('Payment Type: %1', $eventData->getPaymentType())->render(),
+            __('Payment Status: %1', $eventData->getPaymentStatus())->render(),
+            __('Payment ID: %1', $eventData->getPaymentId())->render(),
+            __('Payment Reference Nr: %1', $eventData->getPaymentReference())->render()
+        ];
 
+        $order->addCommentToStatusHistory(implode(PHP_EOL, $paymentCommentData));
         $order->setData(self::SKIP_INPOST_PAY_SYNC_FLAG, true);
         $this->orderRepository->save($order);
         $orderEntityId = is_scalar($order->getEntityId()) ? (int)$order->getEntityId() : 0;

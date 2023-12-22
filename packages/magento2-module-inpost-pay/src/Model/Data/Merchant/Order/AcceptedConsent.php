@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Order;
 
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class AcceptedConsent extends DataObject implements AcceptedConsentInterface
+class AcceptedConsent extends DataObject implements AcceptedConsentInterface, ExtensibleDataInterface
 {
     /**
      * @return string

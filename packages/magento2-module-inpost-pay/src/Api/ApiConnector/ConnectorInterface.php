@@ -8,6 +8,10 @@ use Magento\Framework\Exception\LocalizedException;
 
 interface ConnectorInterface
 {
+    public const REQUEST = 'request';
+    public const RESPONSE = 'response';
+    public const HEADERS = 'headers';
+
     /**
      * @param RequestInterface $request
      * @return array

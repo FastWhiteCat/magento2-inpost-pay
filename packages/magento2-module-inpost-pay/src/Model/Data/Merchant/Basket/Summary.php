@@ -7,9 +7,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Summary extends DataObject implements SummaryInterface
+class Summary extends DataObject implements SummaryInterface, ExtensibleDataInterface
 {
     private const DEFAULT_COUNTRY_CODE = 'PL';
 

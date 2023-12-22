@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Model;
 
+use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use Laminas\Http\Request as HttpRequest;
 
 class Request
@@ -26,6 +27,22 @@ class Request
         $this->setParams($params);
 
         return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $this->uri);
+    }
+
+    public function getHeaders(): array
+    {
+        $headers = [];
+
+        if ($this->getContentType()) {
+            $headers[RequestInterface::CONTENT_TYPE] = (string)$this->getContentType();
+        }
+
+        $bearer = $this->getBearerToken();
+        if ($bearer) {
+            $headers[RequestInterface::AUTHORIZATION] = (string)sprintf(RequestInterface::BEARER_PATTERN, $bearer);
+        }
+
+        return $headers;
     }
 
     public function setParams(array $params): void

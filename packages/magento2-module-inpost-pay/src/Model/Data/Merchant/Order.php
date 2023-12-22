@@ -14,9 +14,10 @@ use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Order extends DataObject implements OrderInterface
+class Order extends DataObject implements OrderInterface, ExtensibleDataInterface
 {
     /**
      * @param AccountInfoInterfaceFactory $accountInfoFactory

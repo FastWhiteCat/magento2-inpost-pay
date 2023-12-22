@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Model\IziApi\Response;
+namespace InPost\InPostPay\Model\Data\Merchant;
 
-use InPost\InPostPay\Api\Data\UpdateOrderResponseInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
 use Magento\Framework\DataObject;
 
-class UpdateOrderResponse extends DataObject implements UpdateOrderResponseInterface
+class OrderUpdate extends DataObject implements OrderUpdateInterface
 {
     public function getOrderStatus(): ?string
     {

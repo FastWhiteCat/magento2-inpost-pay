@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
-use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface;
@@ -27,8 +26,6 @@ use Psr\Log\LoggerInterface;
  */
 class OrderGet implements OrderGetInterface
 {
-    private const REQUEST_PREFIX = 'ORDER_GET_REQUEST';
-
     public function __construct(
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
         private readonly OrderToInPostOrderDataTransfer $orderToInPostOrderDataTransfer,
@@ -48,18 +45,21 @@ class OrderGet implements OrderGetInterface
      */
     public function execute(string $orderId): OrderInterface
     {
-        $this->eventManager->dispatch('izi_order_get_before', ['order_id' => $orderId]);
-        $this->createRequestDebugLog(sprintf('Retrieving order data for Order ID: %s', $orderId));
         try {
+            $this->eventManager->dispatch('izi_order_get_before', [OrderGetInterface::ORDER_ID => $orderId]);
+
             $order = $this->getOrderByIncrementId->get($orderId);
             if ($order instanceof Order) {
                 /** @var OrderInterface $inPostOrder */
                 $inPostOrder = $this->orderFactory->create();
                 $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
-                $this->eventManager->dispatch('izi_order_get_after', [
-                    OrderEventInterface::ORDER => $order,
-                    OrderCreateInterface::INPOST_ORDER => $inPostOrder
-                ]);
+
+                $this->eventManager->dispatch(
+                    'izi_order_get_after',
+                    [OrderCreateInterface::INPOST_ORDER => $inPostOrder]
+                );
+
+                return $inPostOrder;
             } else {
                 throw new NoSuchEntityException(__('Order %1 not found.', $orderId));
             }
@@ -80,14 +80,5 @@ class OrderGet implements OrderGetInterface
 
             throw new InPostPayInternalException();
         }
-
-        $this->createRequestDebugLog(sprintf('Order data for Order ID: %s has been retrieved.', $orderId));
-
-        return $inPostOrder;
-    }
-
-    private function createRequestDebugLog(string $message): void
-    {
-        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

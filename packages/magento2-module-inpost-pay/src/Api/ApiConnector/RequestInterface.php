@@ -21,6 +21,8 @@ interface RequestInterface
      */
     public function getApiUrl(): string;
 
+    public function getHeaders(): array;
+
     public function getMethod(): string;
 
     public function getContentType(): ?string;

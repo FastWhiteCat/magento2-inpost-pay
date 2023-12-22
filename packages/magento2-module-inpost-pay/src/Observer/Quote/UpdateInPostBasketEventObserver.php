@@ -9,13 +9,18 @@ use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\Publisher\BasketCreateOrUpdatePublisher;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class UpdateInPostBasketEventObserver implements ObserverInterface
 {
     public const SKIP_INPOST_PAY_SYNC_FLAG = 'skip_inpost_pay_sync';
@@ -64,7 +69,10 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         }
 
         foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getIsVirtual()) {
+            if ($item->getProduct()->getIsVirtual()
+                || $item->getProduct()->getTypeId() === Type::TYPE_BUNDLE
+                || $item->getProduct()->getTypeId() === Grouped::TYPE_CODE
+            ) {
                 return false;
             }
         }

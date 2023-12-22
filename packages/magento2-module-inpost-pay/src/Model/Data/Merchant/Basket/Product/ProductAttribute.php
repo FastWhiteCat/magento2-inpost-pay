@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Basket\Product;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class ProductAttribute extends DataObject implements ProductAttributeInterface
+class ProductAttribute extends DataObject implements ProductAttributeInterface, ExtensibleDataInterface
 {
     /**
      * @return string

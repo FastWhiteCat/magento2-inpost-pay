@@ -81,8 +81,8 @@
                 type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
-    <preference for="InPost\InPostPay\Api\Data\UpdateOrderResponseInterface"
-                type="InPost\InPostPay\Model\IziApi\Response\UpdateOrderResponse"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\OrderUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
@@ -423,6 +423,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\MerchantEndpoint\Debug\MerchantEndpointEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointEventObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
