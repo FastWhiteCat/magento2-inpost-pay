@@ -30,7 +30,7 @@ class UpdateOrderRequest extends Request implements RequestInterface
     ) {
     }
 
-    public function getUri(): string
+    public function getUri(bool $keepParamsIntact = false): string
     {
         $uri = $this->uri;
         $params = $this->getParams();
@@ -39,8 +39,10 @@ class UpdateOrderRequest extends Request implements RequestInterface
         ) {
             $orderId = (string)$params[self::ORDER_ID];
             $uri = str_replace(sprintf('{%s}', self::ORDER_ID), $orderId, $uri);
-            unset($params[self::ORDER_ID]);
-            $this->setParams($params);
+            if (!$keepParamsIntact) {
+                unset($params[self::ORDER_ID]);
+                $this->setParams($params);
+            }
         }
 
         return $uri;

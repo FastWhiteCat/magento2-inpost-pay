@@ -14,13 +14,15 @@ class Request
     protected ?string $contentType = null;
     protected array $params = [];
 
-    public function getUri(): string
+    public function getUri(bool $keepParamsIntact = false): string
     {
         $params = $this->getParams();
         foreach ($params as $key => $value) {
             if (str_contains($this->uri, $key)) {
                 $this->uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $this->uri);
-                unset($params[$key]);
+                if (!$keepParamsIntact) {
+                    unset($params[$key]);
+                }
             }
         }
 
