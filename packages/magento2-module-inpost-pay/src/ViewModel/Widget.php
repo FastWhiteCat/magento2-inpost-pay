@@ -8,14 +8,22 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
-
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Widget implements ArgumentInterface
 {
     private const VARIANT = 'variant';
@@ -24,9 +32,15 @@ class Widget implements ArgumentInterface
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
+     * @param QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
-     * @param QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
+     * @param GeneralConfigProvider $generalConfigProvider
+     * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
+     * @param ProductRepositoryInterface $productRepository
+     * @param StoreManagerInterface $storeManager
+     * @param LoggerInterface $logger
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         private readonly LayoutConfigProvider $layoutConfigProvider,
@@ -35,7 +49,10 @@ class Widget implements ArgumentInterface
         private readonly ResolverInterface $localeResolver,
         private readonly CheckoutSession $checkoutSession,
         private readonly GeneralConfigProvider $generalConfigProvider,
-        private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository
+        private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -137,5 +154,27 @@ class Widget implements ArgumentInterface
         }
 
         return false;
+    }
+
+    public function validateProductIsSaleableById(int $productId): bool
+    {
+        $product = $this->getProductById($productId);
+
+        return $product && $product->isSaleable();
+    }
+
+    private function getProductById(int $productId): ?Product
+    {
+        $product = null;
+        $store = $this->storeManager->getStore();
+        if ($store instanceof StoreInterface) {
+            try {
+                $product = $this->productRepository->getById($productId, false, $store->getId());
+            } catch (NoSuchEntityException $e) {
+                $this->logger->error($e->getMessage());
+            }
+        }
+
+        return ($product instanceof Product) ? $product : null;
     }
 }

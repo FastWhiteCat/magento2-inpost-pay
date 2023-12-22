@@ -13,7 +13,7 @@ interface RequestInterface
     public const AUTHORIZATION = 'Authorization';
     public const BEARER_PATTERN = ' Bearer %s';
 
-    public function getUri(): string;
+    public function getUri(bool $keepParamsIntact = false): string;
 
     /**
      * @return string
