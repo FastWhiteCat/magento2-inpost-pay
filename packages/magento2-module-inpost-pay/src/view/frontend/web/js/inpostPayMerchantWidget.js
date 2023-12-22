@@ -126,8 +126,8 @@ define([
                             deep_link_hms: data.deep_link_hms,
                         })
                     })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                    .fail(function (error) {
+                        reject(new Error($.mage.__('Network problem: ') + error));
                     });
             });
         },
@@ -152,8 +152,8 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                    .fail(function (error) {
+                        reject(new Error($.mage.__('Network problem: ') + error));
                     });
             });
         },
@@ -206,8 +206,8 @@ define([
                                 setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                        .fail(function (error) {
+                            reject(new Error($.mage.__('Network problem: ') + error));
                         });
                 });
             }
@@ -245,17 +245,12 @@ define([
 
                             if (!data.action) {
                                 setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                            } else if (data.action && data.action === 'delete') {
-                                window.iziBindingDelete().then(function() {
-                                    window.location.reload();
-                                });
-
                             } else {
                                 resolve(data);
                             }
                         })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                        .fail(function (error) {
+                            reject(new Error($.mage.__('Network problem: ') + error));
                         });
                 });
             }
@@ -270,8 +265,8 @@ define([
                     .done(function () {
                         resolve()
                     })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                    .fail(function (error) {
+                        reject(new Error($.mage.__('Network problem: ') + error));
                     });
             });
         },
