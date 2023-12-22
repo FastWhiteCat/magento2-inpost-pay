@@ -44,9 +44,7 @@ class Get implements HttpGetActionInterface
             if ($basketId) {
                 $inPostPayData = $this->inPostPayQuote->getRefreshRequiredAndOrderId($basketId);
                 if (empty($inPostPayData)) {
-                    $data = [
-                        'action' => 'delete',
-                    ];
+                    $data = ['action' => 'refresh'];
                 } elseif (isset($inPostPayData[InPostPayOrderInterface::ORDER_ID])) {
                     $data = [
                         'action' => 'redirect',
