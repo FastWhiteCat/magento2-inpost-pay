@@ -1,0 +1,18 @@
+<?php
+/**
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ */
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled()
+    || !$widgetViewModel->isInPostPayOrder()
+    || !$widgetViewModel->isEnabledOnSuccessPage()) {
+    return;
+}
+$widgetWrapperClass = "inpay-widget-wrapper";
+?>
+
+<div class="<?= /* @noEscape */ $widgetWrapperClass ?>">
+    <inpost-thank-you/>
+</div>
