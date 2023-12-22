@@ -18,6 +18,7 @@ interface BasketUpdateInterface
     public const EVENT_DATA_TIME = 'event_data_time';
     public const EVENT_TYPE = 'event_type';
     public const QUANTITY_EVENT_DATA = 'quantity_event_data';
+    public const RELATED_PRODUCTS_EVENT_DATA = 'related_products_event_data';
     public const PROMO_CODES_EVENT_DATA = 'promo_codes_event_data';
 
     /**

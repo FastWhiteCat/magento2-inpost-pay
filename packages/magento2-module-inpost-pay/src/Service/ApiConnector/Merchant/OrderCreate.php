@@ -6,7 +6,6 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
-use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
@@ -35,8 +34,6 @@ use Psr\Log\LoggerInterface;
  */
 class OrderCreate implements OrderCreateInterface
 {
-    private const REQUEST_PREFIX = 'ORDER_CREATE_REQUEST';
-
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -72,11 +69,6 @@ class OrderCreate implements OrderCreateInterface
         ?InvoiceDetailsInterface $invoiceDetails = null
     ): OrderInterface {
         try {
-            $this->createRequestDebugLog('Creating order...');
-            $basketId = $orderDetails->getBasketId();
-            $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($basketId);
-            $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
-
             $this->eventManager->dispatch('izi_order_create_before', [
                 OrderInterface::ORDER_DETAILS => $orderDetails,
                 OrderInterface::ACCOUNT_INFO => $accountInfo,
@@ -84,6 +76,10 @@ class OrderCreate implements OrderCreateInterface
                 OrderInterface::CONSENTS => $consents,
                 OrderInterface::INVOICE_DETAILS => $invoiceDetails
             ]);
+
+            $basketId = $orderDetails->getBasketId();
+            $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($basketId);
+            $quote = $this->cartRepository->get($inPostPayQuote->getQuoteId());
 
             if ($quote instanceof Quote && $quote->getId()) {
                 $inPostOrder = $this->combineInPostOrder(
@@ -93,15 +89,15 @@ class OrderCreate implements OrderCreateInterface
                     $consents,
                     $invoiceDetails
                 );
-                $this->validate($quote, $inPostPayQuote, $inPostOrder);
 
-                $order = $this->createOrderFromQuote($quote, $inPostOrder);
-
+                $this->orderValidator->validate($quote, $inPostPayQuote, $inPostOrder);
+                $order = $this->orderProcessor->execute($quote, $inPostOrder);
                 $inPostOrder = $this->prepareInPostOrderFromMagentoOrder($order);
 
-                $this->eventManager->dispatch('izi_order_create_after', [
-                    OrderCreateInterface::INPOST_ORDER => $inPostOrder
-                ]);
+                $this->eventManager->dispatch(
+                    'izi_order_create_after',
+                    [OrderCreateInterface::INPOST_ORDER => $inPostOrder]
+                );
 
                 return  $inPostOrder;
             } else {
@@ -144,28 +140,6 @@ class OrderCreate implements OrderCreateInterface
         return $inPostOrder;
     }
 
-    /**
-     * @param Quote $quote
-     * @param InPostPayQuoteInterface $inPostPayQuote
-     * @param OrderInterface $inPostOrder
-     * @return void
-     * @throws LocalizedException
-     */
-    private function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
-    {
-        $this->orderValidator->validate($quote, $inPostPayQuote, $inPostOrder);
-        $this->createRequestDebugLog('Order data valid.');
-    }
-
-    private function createOrderFromQuote(Quote $quote, OrderInterface $inPostOrder): Order
-    {
-        $order = $this->orderProcessor->execute($quote, $inPostOrder);
-
-        $this->createRequestDebugLog(sprintf('Order Created: #%s', (string)$order->getIncrementId()));
-
-        return $order;
-    }
-
     private function prepareInPostOrderFromMagentoOrder(Order $order): OrderInterface
     {
         /** @var OrderInterface $inPostOrder */
@@ -173,10 +147,5 @@ class OrderCreate implements OrderCreateInterface
         $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
 
         return $inPostOrder;
-    }
-
-    private function createRequestDebugLog(string $message): void
-    {
-        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

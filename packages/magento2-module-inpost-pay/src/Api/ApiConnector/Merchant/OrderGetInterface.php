@@ -12,6 +12,8 @@ use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
  */
 interface OrderGetInterface
 {
+    public const ORDER_ID = 'order_id';
+
     /**
      * @param string $orderId
      * @return \InPost\InPostPay\Api\Data\Merchant\OrderInterface

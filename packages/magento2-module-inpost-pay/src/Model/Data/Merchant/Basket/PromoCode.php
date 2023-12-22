@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class PromoCode extends DataObject implements PromoCodeInterface
+class PromoCode extends DataObject implements PromoCodeInterface, ExtensibleDataInterface
 {
     /**
      * @return string

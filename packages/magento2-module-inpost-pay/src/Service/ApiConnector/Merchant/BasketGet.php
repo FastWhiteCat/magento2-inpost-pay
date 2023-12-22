@@ -28,8 +28,6 @@ use Psr\Log\LoggerInterface;
  */
 class BasketGet implements BasketGetInterface
 {
-    private const REQUEST_PREFIX = 'BASKET_GET_REQUEST';
-
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
@@ -53,13 +51,14 @@ class BasketGet implements BasketGetInterface
         try {
             $this->eventManager->dispatch('izi_basket_get_before', [InPostPayQuoteInterface::BASKET_ID => $basketId]);
 
-            $this->createRequestDebugLog(sprintf('Retrieving quote data for Basket ID: %s', $basketId));
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
+
             $this->eventManager->dispatch('izi_basket_get_after', [BasketConfirmationInterface::BASKET => $basket]);
-            $this->createRequestDebugLog(sprintf('Quote data for Basket ID: %s has been retrieved.', $basketId));
+
+            return $basket;
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -77,8 +76,6 @@ class BasketGet implements BasketGetInterface
 
             throw new InPostPayInternalException();
         }
-
-        return $basket;
     }
 
     /**
@@ -117,10 +114,5 @@ class BasketGet implements BasketGetInterface
 
             throw $e;
         }
-    }
-
-    private function createRequestDebugLog(string $message): void
-    {
-        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

@@ -10,9 +10,10 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Product extends DataObject implements ProductInterface
+class Product extends DataObject implements ProductInterface, ExtensibleDataInterface
 {
     /**
      * @param QuantityInterfaceFactory $quantityFactory

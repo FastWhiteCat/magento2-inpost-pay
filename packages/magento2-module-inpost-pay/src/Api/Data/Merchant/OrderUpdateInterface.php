@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Api\Data;
+namespace InPost\InPostPay\Api\Data\Merchant;
 
-interface UpdateOrderResponseInterface
+interface OrderUpdateInterface
 {
     public const ORDER_STATUS = 'order_status';
     public const ORDER_MERCHANT_STATUS_DESCRIPTION = 'order_merchant_status_description';

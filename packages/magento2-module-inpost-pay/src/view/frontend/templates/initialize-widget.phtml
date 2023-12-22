@@ -20,6 +20,7 @@ $isCartPage = $widgetViewModel->isEnabledOnCart() &&
     $bindingPlace === DisplayConfigProvider::BASKET_SUMMARY_BINDING_PLACE_NAME;
 $productId = $isProductPage ? $block->getRequest()->getParam('id') : "";
 $productId = is_scalar($productId) ? (string)$productId : "";
+$isProductSaleable = ($isProductPage) ? $widgetViewModel->validateProductIsSaleableById((int)$productId) : true;
 $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
@@ -34,7 +35,7 @@ $widgetWrapperClass = "inpost-widget-wrapper";
     <div>
         <inpost-thank-you><inpost-thank-you/>
     </div>
-<?php else: ?>
+<?php elseif ($isProductSaleable): ?>
     <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
         <inpost-izi-button
             name=""

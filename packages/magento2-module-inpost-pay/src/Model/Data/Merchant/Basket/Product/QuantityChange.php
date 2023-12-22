@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Basket\Product;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class QuantityChange extends DataObject implements QuantityChangeInterface
+class QuantityChange extends DataObject implements QuantityChangeInterface, ExtensibleDataInterface
 {
     /**
      * @return float|int
