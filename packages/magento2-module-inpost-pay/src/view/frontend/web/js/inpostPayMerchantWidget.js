@@ -3,7 +3,8 @@ define([
     'jquery',
     'Magento_Customer/js/customer-data',
     'mage/url',
-    'underscore'
+    'underscore',
+    'mage/validation'
 ], function (Component, $, customerData, urlBuilder, _) {
     'use strict';
 
@@ -68,15 +69,7 @@ define([
                 return true;
             }
 
-            var $configurableProductOptions = $productForm.find('[name*="super_attribute"]')
-            if ($configurableProductOptions.length) {
-                return !$configurableProductOptions.filter(function () {
-                    return this.value === "";
-                }).length
-            }
-
-            var $qtyInput = $productForm.find('[name*="qty"]');
-            return $qtyInput.length && $qtyInput.val() > 0;
+            return $productForm.validation('isValid');
         },
 
         checkIsBinding: function() {
