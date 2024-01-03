@@ -6,9 +6,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Order;
 
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Enum\InPostInvoiceLegalForm;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class InvoiceDetails extends DataObject implements InvoiceDetailsInterface
+class InvoiceDetails extends DataObject implements InvoiceDetailsInterface, ExtensibleDataInterface
 {
     private const DEFAULT_COUNTRY_CODE = 'PL';
 

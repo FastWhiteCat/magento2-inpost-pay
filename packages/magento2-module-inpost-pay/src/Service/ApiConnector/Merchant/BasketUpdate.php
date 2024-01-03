@@ -32,7 +32,6 @@ use Psr\Log\LoggerInterface;
  */
 class BasketUpdate implements BasketUpdateInterface
 {
-    private const REQUEST_PREFIX = 'BASKET_UPDATE_REQUEST';
     private const PROMO_CODES_EVENT = 'PROMO_CODES';
 
     public function __construct(
@@ -71,29 +70,18 @@ class BasketUpdate implements BasketUpdateInterface
         ?array $promoCodesEventData = null,
     ): BasketInterface {
         try {
-            $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
-            $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
-
             $this->eventManager->dispatch('izi_basket_update_before', [
-                BasketConfirmationInterface::QUOTE => $quote,
-                InPostPayQuoteInterface::ENTITY_NAME => $inPostPayQuote,
                 InPostPayQuoteInterface::BASKET_ID => $basketId,
                 BasketUpdateInterface::EVENT_ID => $eventId,
                 BasketUpdateInterface::EVENT_DATA_TIME => $eventDataTime,
                 BasketUpdateInterface::EVENT_TYPE => $eventType,
                 BasketUpdateInterface::QUANTITY_EVENT_DATA => $quantityEventData,
+                BasketUpdateInterface::RELATED_PRODUCTS_EVENT_DATA => $relatedProductsEventData,
                 BasketUpdateInterface::PROMO_CODES_EVENT_DATA => $promoCodesEventData
             ]);
 
-            $this->createRequestDebugLog(
-                sprintf(
-                    'Updating basket. Basket ID: %s, Event ID: %s Event Data Time: %s Event Type: %s',
-                    $basketId,
-                    $eventId,
-                    $eventDataTime,
-                    $eventType
-                )
-            );
+            $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
+            $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
             $this->updateQuote(
                 $quote,
@@ -106,10 +94,11 @@ class BasketUpdate implements BasketUpdateInterface
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
-            $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
             $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
-            $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 
+            $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
+
+            return $basket;
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -127,7 +116,6 @@ class BasketUpdate implements BasketUpdateInterface
 
             throw new InPostPayInternalException();
         }
-        return $basket;
     }
 
     /**
@@ -225,10 +213,5 @@ class BasketUpdate implements BasketUpdateInterface
         }
 
         return (isset($quote) && $quote instanceof Quote) ? $quote : null;
-    }
-
-    private function createRequestDebugLog(string $message): void
-    {
-        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

@@ -30,7 +30,7 @@ class BasketBindingDeleteRequest extends Request implements RequestInterface
     ) {
     }
 
-    public function getUri(): string
+    public function getUri(bool $keepParamsIntact = false): string
     {
         $uri = $this->uri;
         $params = $this->getParams();
@@ -39,8 +39,10 @@ class BasketBindingDeleteRequest extends Request implements RequestInterface
         ) {
             $browserId = (string)$params[self::BASKET_ID_PARAM];
             $uri = str_replace(sprintf('{%s}', self::BASKET_ID_PARAM), $browserId, $uri);
-            unset($params[self::BASKET_ID_PARAM]);
-            $this->setParams($params);
+            if (!$keepParamsIntact) {
+                unset($params[self::BASKET_ID_PARAM]);
+                $this->setParams($params);
+            }
         }
 
         return $uri;

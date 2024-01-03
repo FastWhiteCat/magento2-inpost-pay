@@ -6,9 +6,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface;
 use InPost\InPostPay\Enum\InPostConsentRequirementType;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class Consent extends DataObject implements ConsentInterface
+class Consent extends DataObject implements ConsentInterface, ExtensibleDataInterface
 {
 
     /**

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Order;
 
 use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class EventData extends DataObject implements EventDataInterface
+class EventData extends DataObject implements EventDataInterface, ExtensibleDataInterface
 {
     public function getPaymentStatus(): string
     {

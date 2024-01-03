@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
@@ -29,8 +30,6 @@ use Psr\Log\LoggerInterface;
  */
 class BasketConfirmation implements BasketConfirmationInterface
 {
-    private const REQUEST_PREFIX = 'BASKET_CONFIRMATION_REQUEST';
-
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
@@ -43,72 +42,75 @@ class BasketConfirmation implements BasketConfirmationInterface
 
     /**
      * @param string $basketId
-     * @param string $status
-     * @param string $inpostBasketId
-     * @param PhoneNumberInterface $phoneNumber
-     * @param BrowserInterface $browser
-     * @param string $maskedPhoneNumber
-     * @param string $name
-     * @param string $surname
+     * @param string|null $status
+     * @param string|null $inpostBasketId
+     * @param PhoneNumberInterface|null $phoneNumber
+     * @param BrowserInterface|null $browser
+     * @param string|null $maskedPhoneNumber
+     * @param string|null $name
+     * @param string|null $surname
      * @return BasketInterface
-     * @throws InPostPayBadRequestException
-     * @throws InPostPayAuthorizationException
-     * @throws BasketNotFoundException
-     * @throws InPostPayInternalException
+     * @throws \InPost\InPostPay\Exception\BasketNotFoundException
+     * @throws \InPost\InPostPay\Exception\InPostPayAuthorizationException
+     * @throws \InPost\InPostPay\Exception\InPostPayBadRequestException
+     * @throws \InPost\InPostPay\Exception\InPostPayInternalException
      */
     public function execute(
         string $basketId,
-        string $status,
-        string $inpostBasketId,
-        PhoneNumberInterface $phoneNumber,
-        BrowserInterface $browser,
-        string $maskedPhoneNumber,
-        string $name,
-        string $surname
+        ?string $status = null,
+        ?string $inpostBasketId = null,
+        ?PhoneNumberInterface $phoneNumber = null,
+        ?BrowserInterface $browser = null,
+        ?string $maskedPhoneNumber = null,
+        ?string $name = null,
+        ?string $surname = null
     ): BasketInterface {
         try {
+            $this->eventManager->dispatch(
+                'izi_basket_confirmation_before',
+                [
+                    InPostPayQuoteInterface::BASKET_ID => $basketId,
+                    InPostPayQuoteInterface::STATUS => $status,
+                    InPostPayQuoteInterface::INPOST_BASKET_ID => $inpostBasketId,
+                    InPostPayQuoteInterface::PHONE_NUMBER => $phoneNumber,
+                    BasketConfirmationInterface::BROWSER => $browser,
+                    InPostPayQuoteInterface::MASKED_PHONE_NUMBER => $maskedPhoneNumber,
+                    InPostPayQuoteInterface::NAME => $name,
+                    InPostPayQuoteInterface::SURNAME => $surname
+                ]
+            );
+
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
 
-            $this->eventManager->dispatch('izi_basket_confirmation_before', [
-                BasketConfirmationInterface::QUOTE => $quote,
-                InPostPayQuoteInterface::ENTITY_NAME => $inPostPayQuote,
-                InPostPayQuoteInterface::BASKET_ID => $basketId,
-                InPostPayQuoteInterface::STATUS => $status,
-                InPostPayQuoteInterface::INPOST_BASKET_ID => $inpostBasketId,
-                InPostPayQuoteInterface::PHONE => $phoneNumber,
-                BasketConfirmationInterface::BROWSER => $browser,
-                InPostPayQuoteInterface::MASKED_PHONE_NUMBER => $maskedPhoneNumber,
-                InPostPayQuoteInterface::NAME => $name,
-                InPostPayQuoteInterface::SURNAME => $surname
-            ]);
+            $inPostPayQuote->setStatus($status ?? '');
+            if ($status === InPostBasketStatus::REJECT->value) {
+                return $this->rejectBasket($inPostPayQuote);
+            }
 
-            $this->createRequestDebugLog(sprintf('Confirmation for Basket ID: %s Status: %s', $basketId, $status));
-
-            $inPostPayQuote->setStatus($status);
-            $inPostPayQuote->setInpostBasketId($inpostBasketId);
-            $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber);
-            $inPostPayQuote->setPhone($phoneNumber->getPhone());
-            $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
-            $inPostPayQuote->setName($name);
-            $inPostPayQuote->setSurname($surname);
-            $inPostPayQuote->setBrowserId($browser->getBrowserId());
-            $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
+            $inPostPayQuote->setInpostBasketId($inpostBasketId ?? '');
+            $inPostPayQuote->setMaskedPhoneNumber($maskedPhoneNumber ?? '');
+            if ($phoneNumber) {
+                $inPostPayQuote->setPhone($phoneNumber->getPhone());
+                $inPostPayQuote->setCountryPrefix($phoneNumber->getCountryPrefix());
+            }
+            $inPostPayQuote->setName($name ?? '');
+            $inPostPayQuote->setSurname($surname ?? '');
+            if ($browser) {
+                $inPostPayQuote->setBrowserId($browser->getBrowserId());
+                $inPostPayQuote->setBrowserTrusted($browser->getBrowserTrusted());
+            }
 
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
 
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
-            $this->eventManager->dispatch('izi_basket_confirmation_after', [
-                BasketConfirmationInterface::BASKET => $basket
-            ]);
-            $this->createRequestDebugLog(
-                sprintf(
-                    'Basket ID %s has been confirmed with status: %s',
-                    $inPostPayQuote->getBasketId(),
-                    $status
-                )
+            $this->eventManager->dispatch(
+                'izi_basket_confirmation_after',
+                [BasketConfirmationInterface::BASKET => $basket]
             );
+
+            return $basket;
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -126,8 +128,6 @@ class BasketConfirmation implements BasketConfirmationInterface
 
             throw new InPostPayInternalException();
         }
-
-        return $basket;
     }
 
     /**
@@ -168,8 +168,19 @@ class BasketConfirmation implements BasketConfirmationInterface
         }
     }
 
-    private function createRequestDebugLog(string $message): void
+    private function rejectBasket(InPostPayQuoteInterface $inPostPayQuote): BasketInterface
     {
-        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
+        $basket = $this->basketFactory->create();
+        $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
+            ? (int)$inPostPayQuote->getInPostPayQuoteId()
+            : null;
+
+        if ($inPostPayQuoteId) {
+            $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
+        }
+
+        $basket->setStatus(InPostBasketStatus::REJECT->value);
+
+        return $basket;
     }
 }

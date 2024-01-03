@@ -9,7 +9,6 @@ define([
 
     var LONG_POLLING_TIME = 10000;
     var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
-    var RETRY_TYPE = 'retry';
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -37,6 +36,7 @@ define([
             window.abortRequest = this.abortRequest;
             window.checkIfProductIsAdded = this.checkIfProductIsAdded;
             window.setTimerAndRunCallback = this.setTimerAndRunCallback;
+            window.checkIsBinding = this.checkIsBinding;
 
             window.getConfig = function (defaultConfig = config) {
                 return defaultConfig;
@@ -62,13 +62,6 @@ define([
                 return true;
             }
 
-            var $groupedProductElements = $productForm.find('[name*="super_group"]')
-            if ($groupedProductElements.length) {
-                return !!$groupedProductElements.filter(function () {
-                    return this.value > 0;
-                }).length
-            }
-
             var $configurableProductOptions = $productForm.find('[name*="super_attribute"]')
             if ($configurableProductOptions.length) {
                 return !$configurableProductOptions.filter(function () {
@@ -76,8 +69,8 @@ define([
                 }).length
             }
 
-            var $bundleProducts = $productForm.find('[name*="bundle_option"]');
-            return !$bundleProducts.length;
+            var $qtyInput = $productForm.find('[name*="qty"]');
+            return $qtyInput.length && $qtyInput.val() > 0;
         },
 
         checkIsBinding: function() {
@@ -122,7 +115,8 @@ define([
                 })
                     .done(function (data) {
                         if (Object.keys(data).length === 1 && data.basket_id) {
-                            resolve([])
+                            window.checkIsBinding();
+                            resolve([]);
                         }
 
                         localStorage.setItem('basketId', data.basket_id);
@@ -132,8 +126,8 @@ define([
                             deep_link_hms: data.deep_link_hms,
                         })
                     })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                    .fail(function (error) {
+                        reject(new Error($.mage.__('Network problem: ') + error));
                     });
             });
         },
@@ -158,8 +152,8 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                    .fail(function (error) {
+                        reject(new Error($.mage.__('Network problem: ') + error));
                     });
             });
         },
@@ -212,8 +206,8 @@ define([
                                 setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                        .fail(function (error) {
+                            reject(new Error($.mage.__('Network problem: ') + error));
                         });
                 });
             }
@@ -251,17 +245,12 @@ define([
 
                             if (!data.action) {
                                 setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                            } else if (data.action && data.action === 'delete') {
-                                window.iziBindingDelete().then(function() {
-                                    window.location.reload();
-                                });
-
                             } else {
                                 resolve(data);
                             }
                         })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                        .fail(function (error) {
+                            reject(new Error($.mage.__('Network problem: ') + error));
                         });
                 });
             }
@@ -276,8 +265,8 @@ define([
                     .done(function () {
                         resolve()
                     })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        reject(new Error($.mage.__('Network problem: ') + errorThrown));
+                    .fail(function (error) {
+                        reject(new Error($.mage.__('Network problem: ') + error));
                     });
             });
         },
@@ -435,22 +424,6 @@ define([
 
                     return isAddedProduct
                 })
-            }
-
-            var $groupedProductElements = $productForm.find('[name*="super_group"]')
-            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
-                return this.value > 0;
-            })
-
-            //TODO add more specific validation of grouped product
-            if (simpleProductsInGrouped.length) {
-                var addedSimpleProducts = 0;
-                _.each(simpleProductsInGrouped, function (item) {
-                    if (cartData.items.some(function (cartItem) {
-                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
-                    })) addedSimpleProducts++
-                })
-                return addedSimpleProducts === simpleProductsInGrouped.length;
             }
         }
     });

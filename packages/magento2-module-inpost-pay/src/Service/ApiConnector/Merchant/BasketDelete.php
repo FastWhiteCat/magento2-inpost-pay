@@ -19,8 +19,6 @@ use Psr\Log\LoggerInterface;
 
 class BasketDelete implements BasketDeleteInterface
 {
-    private const REQUEST_PREFIX = 'BASKET_DELETE_REQUEST';
-
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly EventManager $eventManager,
@@ -38,13 +36,18 @@ class BasketDelete implements BasketDeleteInterface
      */
     public function execute(string $basketId): void
     {
-        $this->eventManager->dispatch('izi_basket_binding_delete_before', [
-            InPostPayQuoteInterface::BASKET_ID => $basketId
-        ]);
-        $this->createRequestDebugLog(sprintf('Deleting Basket ID: %s', $basketId));
-
         try {
+            $this->eventManager->dispatch(
+                'izi_basket_binding_delete_before',
+                [InPostPayQuoteInterface::BASKET_ID => $basketId]
+            );
+
             $this->inPostPayQuoteRepository->delete($this->inPostPayQuoteRepository->getByBasketId($basketId));
+
+            $this->eventManager->dispatch(
+                'izi_basket_binding_delete_after',
+                [InPostPayQuoteInterface::BASKET_ID => $basketId]
+            );
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -62,15 +65,5 @@ class BasketDelete implements BasketDeleteInterface
 
             throw new InPostPayInternalException();
         }
-
-        $this->eventManager->dispatch('izi_basket_binding_delete_after', [
-            InPostPayQuoteInterface::BASKET_ID => $basketId
-        ]);
-        $this->createRequestDebugLog(sprintf('Deleted Basket ID: %s', $basketId));
-    }
-
-    private function createRequestDebugLog(string $message): void
-    {
-        $this->logger->debug(sprintf('%s: %s', self::REQUEST_PREFIX, $message));
     }
 }

@@ -10,7 +10,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 
 interface BasketInterface
 {
-    public const BASKET_ID = 'browser_id';
+    public const BASKET_ID = 'basket_id';
     public const BROWSER_ID = 'browser_id';
     public const SUMMARY = 'summary';
     public const DELIVERY = 'delivery';
@@ -19,6 +19,7 @@ interface BasketInterface
     public const RELATED_PRODUCTS = 'related_products';
     public const CONSENTS = 'consents';
     public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
+    public const STATUS = 'status';
 
     /**
      * @return string|null
@@ -107,4 +108,15 @@ interface BasketInterface
      * @return void
      */
     public function setConsents(array $consents): void;
+
+    /**
+     * @return string|null
+     */
+    public function getStatus(): ?string;
+
+    /**
+     * @param string|null $status
+     * @return void
+     */
+    public function setStatus(string|null $status): void;
 }

@@ -7,9 +7,10 @@ namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class QuantityUpdate extends DataObject implements QuantityUpdateInterface
+class QuantityUpdate extends DataObject implements QuantityUpdateInterface, ExtensibleDataInterface
 {
     /**
      * @param QuantityChangeInterfaceFactory $quantityChangeFactory

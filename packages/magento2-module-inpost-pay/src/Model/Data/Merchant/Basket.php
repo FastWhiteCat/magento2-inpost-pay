@@ -182,4 +182,16 @@ class Basket extends DataObject implements BasketInterface, ExtensibleDataInterf
     {
         $this->setData(self::CONSENTS, $consents);
     }
+
+    public function getStatus(): ?string
+    {
+        $status = $this->getData(self::STATUS);
+
+        return is_scalar($status) ? (string)$status : null;
+    }
+
+    public function setStatus(?string $status): void
+    {
+        $this->setData(self::STATUS, $status);
+    }
 }
