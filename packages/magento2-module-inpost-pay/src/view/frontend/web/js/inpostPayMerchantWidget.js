@@ -68,14 +68,17 @@ define([
                 return true;
             }
 
-            var $configurableProductOptions = $productForm.find('[name*="super_attribute"]')
+            var $configurableProductOptions = $productForm.find('[name*="super_attribute"]');
+            var $qtyInput = $productForm.find('[name*="qty"]');
+
+            if (!$qtyInput.length || $qtyInput.val() <= 0) return false
+
             if ($configurableProductOptions.length) {
                 return !$configurableProductOptions.filter(function () {
                     return this.value === "";
                 }).length
             }
 
-            var $qtyInput = $productForm.find('[name*="qty"]');
             return $qtyInput.length && $qtyInput.val() > 0;
         },
 
