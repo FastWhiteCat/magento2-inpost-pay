@@ -1,0 +1,55 @@
+<?php
+
+use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
+
+/**
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ */
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnProductCart()) {
+    return;
+}
+
+$bindingPlace = $block->getBindingPlace();
+$productId = $block->getRequest()->getParam('id');
+$productId = is_scalar($productId) ? (string)$productId : "";
+$isProductSaleable = $widgetViewModel->validateProductIsSaleableById((int)$productId);
+
+if (!$isProductSaleable) {
+    return;
+}
+
+$language = $widgetViewModel->getCurrentLanguageCode();
+$cartItemsCount = $widgetViewModel->getCartItemsCount();
+$layoutConfig = $widgetViewModel->getLayoutConfig();
+$widgetWrapperClass = "inpay-widget-wrapper";
+?>
+
+<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+    <inpost-izi-button
+        name=""
+        masked_phone_number=""
+        data-product-id="<?= /* @noEscape */ $productId ?>"
+        language="<?= /* @noEscape */ $language ?>"
+        variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
+        basket="false"
+        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
+        count="<?= /* @noEscape */ $cartItemsCount ?>"
+        binding_place="<?= /* @noEscape */ $bindingPlace ?>">
+    </inpost-izi-button>
+
+    <script type="text/x-magento-init">
+        {
+            "*" : {
+                "InpostPayMerchantWidget" : {
+                    "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
+                    "popupBindingPlace": "<?= /* @noEscape */
+                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                    "count": <?= /* @noEscape */ $cartItemsCount ?>
+                }
+            }
+        }
+    </script>
+</div>
