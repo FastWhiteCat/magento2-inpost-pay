@@ -28,6 +28,7 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
+    private ?Product $product = null;
 
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
@@ -51,7 +52,7 @@ class ProductToInPostProductDataTransfer
         if ($quantity === null) {
             $quantity = $stockItemConfiguration->getMinSaleQty();
         }
-        $description = ($product->getData('short_description') ?? $product->getData('description'));
+        $description = $this->getDescription($product);
         $canCastQtyToInt = $this->canCastToInteger($quantity);
         try {
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
@@ -61,7 +62,6 @@ class ProductToInPostProductDataTransfer
         $stockQuantity = $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
         $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
         $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
-        $description = (is_scalar($description)) ? (string)$description : '';
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
@@ -104,11 +104,7 @@ class ProductToInPostProductDataTransfer
 
     private function getProductAttributes(Product $product): array
     {
-        try {
-            $product = $this->productRepository->getById((int)$product->getId(), false, (int)$product->getStoreId());
-        } catch (NoSuchEntityException $e) {
-            $product = null;
-        }
+        $product = $this->getProduct($product);
 
         $productAttributesData = [];
         if ($product instanceof Product) {
@@ -134,5 +130,34 @@ class ProductToInPostProductDataTransfer
     private function canCastToInteger(float $value): bool
     {
         return number_format(round($value, 2), 2, '.', '') === number_format((int)$value, 2, '.', '');
+    }
+
+    private function getDescription(Product $product): string
+    {
+        $product = $this->getProduct($product);
+        $description = '';
+
+        if ($product instanceof Product) {
+            $description = $product->getData('short_description') ?? $product->getData('description');
+            $description = is_scalar($description) ? (string)$description : '';
+        }
+
+        return $description;
+    }
+
+    private function getProduct(Product $product): ?Product
+    {
+
+        if ($this->product && $this->product->getId() === $product->getId()) {
+            return $this->product;
+        }
+
+        try {
+            $this->product = $this->productRepository->getById((int)$product->getId(), false, (int)$product->getStoreId());
+        } catch (NoSuchEntityException $e) {
+            $this->product = null;
+        }
+
+        return $this->product;
     }
 }
