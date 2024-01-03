@@ -3,7 +3,8 @@ define([
     'jquery',
     'Magento_Customer/js/customer-data',
     'mage/url',
-    'underscore'
+    'underscore',
+    'mage/validation'
 ], function (Component, $, customerData, urlBuilder, _) {
     'use strict';
 
@@ -68,15 +69,7 @@ define([
                 return true;
             }
 
-            var $configurableProductOptions = $productForm.find('[name*="super_attribute"]')
-            if ($configurableProductOptions.length) {
-                return !$configurableProductOptions.filter(function () {
-                    return this.value === "";
-                }).length
-            }
-
-            var $qtyInput = $productForm.find('[name*="qty"]');
-            return $qtyInput.length && $qtyInput.val() > 0;
+            return $productForm.validation('isValid');
         },
 
         checkIsBinding: function() {
@@ -333,7 +326,7 @@ define([
                 var wrapperClass = getConfig().wrapperClass || "inpay-widget-wrapper";
                 var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
                 var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
-                var counter = cartData ? cartData.summary_count : getConfig().count;
+                var counter = cartData ? cartData.summary_count : getConfig().count || 0;
                 var hasCartNotAllowedProducts = cartData ? cartData.items.some(function(item) {
                     return NOT_ALLOWED_PRODUCT_TYPES.includes(item.product_type)
                 }) : false;
