@@ -333,7 +333,7 @@ define([
                 var wrapperClass = getConfig().wrapperClass || "inpay-widget-wrapper";
                 var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
                 var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
-                var counter = cartData ? cartData.summary_count : getConfig().count;
+                var counter = cartData ? cartData.summary_count : getConfig().count || 0;
                 var hasCartNotAllowedProducts = cartData ? cartData.items.some(function(item) {
                     return NOT_ALLOWED_PRODUCT_TYPES.includes(item.product_type)
                 }) : false;

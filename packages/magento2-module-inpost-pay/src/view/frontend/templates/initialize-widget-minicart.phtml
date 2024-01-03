@@ -14,7 +14,6 @@ if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledInMiniCart()) 
 
 $bindingPlace = $block->getBindingPlace();
 $language = $widgetViewModel->getCurrentLanguageCode();
-$cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 ?>
@@ -28,7 +27,7 @@ $widgetWrapperClass = "inpay-widget-wrapper";
         variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
         basket="false"
         dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
-        count="<?= /* @noEscape */ $cartItemsCount ?>"
+        count="0"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">
     </inpost-izi-button>
 
@@ -38,8 +37,7 @@ $widgetWrapperClass = "inpay-widget-wrapper";
                 "InpostPayMerchantWidget" : {
                     "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
                     "popupBindingPlace": "<?= /* @noEscape */
-                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
-                    "count": <?= /* @noEscape */ $cartItemsCount ?>
+                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>"
                 }
             }
         }
