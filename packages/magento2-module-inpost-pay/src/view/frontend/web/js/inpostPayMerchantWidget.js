@@ -71,7 +71,9 @@ define([
             var $configurableProductOptions = $productForm.find('[name*="super_attribute"]');
             var $qtyInput = $productForm.find('[name*="qty"]');
 
-            if (!$qtyInput.length || $qtyInput.val() <= 0) return false
+            if (!$qtyInput.length || $qtyInput.val() <= 0) {
+                return false;
+            }
 
             if ($configurableProductOptions.length) {
                 return !$configurableProductOptions.filter(function () {
