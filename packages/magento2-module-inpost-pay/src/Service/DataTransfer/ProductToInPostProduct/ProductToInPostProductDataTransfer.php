@@ -19,6 +19,7 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
+use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 
 /**
@@ -28,7 +29,7 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
-    private ?Product $product = null;
+    private ?MagentoProductInterface $product = null;
 
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
@@ -154,7 +155,7 @@ class ProductToInPostProductDataTransfer
         return $description;
     }
 
-    private function getProduct(Product $product): ?Product
+    private function getProduct(Product $product): ?MagentoProductInterface
     {
 
         if ($this->product && $this->product->getId() === $product->getId()) {
@@ -162,7 +163,11 @@ class ProductToInPostProductDataTransfer
         }
 
         try {
-            $this->product = $this->productRepository->getById((int)$product->getId(), false, (int)$product->getStoreId());
+            $this->product = $this->productRepository->getById(
+                (int)$product->getId(),
+                false,
+                (int)$product->getStoreId()
+            );
         } catch (NoSuchEntityException $e) {
             $this->product = null;
         }
