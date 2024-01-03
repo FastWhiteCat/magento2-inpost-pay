@@ -45,7 +45,8 @@ class ProductToInPostProductDataTransfer
         Product $product,
         ProductInterface $inPostProduct,
         int $websiteId,
-        ?float $quantity = null
+        ?float $quantity = null,
+        array $selectedOptions = []
     ): void {
         $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
         $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
@@ -86,7 +87,7 @@ class ProductToInPostProductDataTransfer
         $quantityObj->setAvailableQuantity($stockQuantity);
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
-        $inPostProduct->setProductAttributes($this->getProductAttributes($product));
+        $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
     }
 
     private function getProductImageUrl(Product $product): string
@@ -102,11 +103,19 @@ class ProductToInPostProductDataTransfer
         return $imageUrl;
     }
 
-    private function getProductAttributes(Product $product): array
+    private function getProductAttributes(Product $product, array $selectedOptions = []): array
     {
-        $product = $this->getProduct($product);
-
         $productAttributesData = [];
+
+        foreach ($selectedOptions as $selectedOption) {
+            /** @var ProductAttributeInterface $inPostProductAttribute */
+            $inPostProductAttribute = $this->productAttributeFactory->create();
+            $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($selectedOption['label']));
+            $inPostProductAttribute->setAttributeValue($this->escaper->escapeUrl($selectedOption['value']));
+            $productAttributesData[] = $inPostProductAttribute;
+        }
+
+        $product = $this->getProduct($product);
         if ($product instanceof Product) {
             $attributes = $product->getAttributes();
             foreach ($attributes as $attribute) {

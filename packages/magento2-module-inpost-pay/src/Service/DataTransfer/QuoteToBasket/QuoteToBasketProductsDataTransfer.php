@@ -12,6 +12,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
 
 class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInterface
@@ -32,11 +33,18 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $product = $quoteItem->getProduct();
             $websiteId = (int)$quote->getStore()->getWebsiteId();
             $qty = (float)$quoteItem->getQty();
+            $options = [];
+
+            if ($quoteItem->getProduct()->getTypeId() == Configurable::TYPE_CODE) {
+                $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo($product);
+            }
+
             $this->productToInPostProductDataTransfer->transfer(
                 $product,
                 $inPostProduct,
                 $websiteId,
-                $qty
+                $qty,
+                $options
             );
 
             $priceExclTax = DecimalCalculator::round((float)$quoteItem->getPrice());
