@@ -8,14 +8,12 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
-use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
-use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -29,10 +27,11 @@ class Widget implements ArgumentInterface
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
 
+    private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped', 'downloadable', 'virtual'];
+
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
-     * @param QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
      * @param GeneralConfigProvider $generalConfigProvider
@@ -43,16 +42,15 @@ class Widget implements ArgumentInterface
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        private readonly LayoutConfigProvider $layoutConfigProvider,
-        private readonly DisplayConfigProvider $displayConfigProvider,
-        private readonly QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
-        private readonly ResolverInterface $localeResolver,
-        private readonly CheckoutSession $checkoutSession,
-        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly LayoutConfigProvider              $layoutConfigProvider,
+        private readonly DisplayConfigProvider             $displayConfigProvider,
+        private readonly ResolverInterface                 $localeResolver,
+        private readonly CheckoutSession                   $checkoutSession,
+        private readonly GeneralConfigProvider             $generalConfigProvider,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly StoreManagerInterface $storeManager,
-        private readonly LoggerInterface $logger
+        private readonly ProductRepositoryInterface        $productRepository,
+        private readonly StoreManagerInterface             $storeManager,
+        private readonly LoggerInterface                   $logger
     ) {
     }
 
@@ -103,6 +101,22 @@ class Widget implements ArgumentInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabledInMiniCart(): bool
+    {
+        return $this->displayConfigProvider->isEnabledInMiniCart();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledOnSuccessPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnSuccessPage();
+    }
+
+    /**
      * @return float|int
      */
     public function getCartItemsCount(): float|int
@@ -111,28 +125,6 @@ class Widget implements ArgumentInterface
             return $this->checkoutSession->getQuote()->getItemsSummaryQty();
         } catch (NoSuchEntityException|LocalizedException $e) {
             return 0;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getQuoteId(): string
-    {
-        try {
-            $quote = $this->checkoutSession->getQuote();
-            $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : null;
-            if ($quoteId) {
-                if ($quote->getCustomerIsGuest()) {
-                    return $this->quoteIdToMaskedQuoteId->execute($quoteId);
-                }
-
-                return (string)$quoteId;
-            }
-
-            return "";
-        } catch (NoSuchEntityException|LocalizedException $e) {
-            return "";
         }
     }
 
@@ -176,5 +168,22 @@ class Widget implements ArgumentInterface
         }
 
         return ($product instanceof Product) ? $product : null;
+    }
+
+    public function hasNotAllowedProducts(): bool
+    {
+        try {
+            $quote = $this->checkoutSession->getQuote();
+
+            foreach ($quote->getAllVisibleItems() as $item) {
+                if (in_array($item->getProduct()->getTypeId(), self::NOT_ALLOWED_PRODUCT_TYPES)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (NoSuchEntityException|LocalizedException $e) {
+            return false;
+        }
     }
 }

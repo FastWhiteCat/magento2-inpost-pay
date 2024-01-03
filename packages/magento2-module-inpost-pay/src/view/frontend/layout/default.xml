@@ -16,7 +16,7 @@
         </referenceBlock>
         <referenceBlock name="minicart.addons">
             <block name="inpost.init.widget.minicart"
-                   template="InPost_InPostPay::initialize-widget.phtml" after="-"
+                   template="InPost_InPostPay::initialize-widget-minicart.phtml" after="-"
                    ifconfig="payment/inpost_pay/show_in_minicart">
                 <arguments>
                     <argument name="binding_place" xsi:type="const">
