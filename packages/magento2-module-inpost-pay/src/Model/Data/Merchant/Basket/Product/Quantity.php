@@ -10,7 +10,7 @@ use Magento\Framework\DataObject;
 
 class Quantity extends DataObject implements QuantityInterface
 {
-    private const DEFAULT_UNIT = 'pcs';
+    public const DEFAULT_UNIT = 'pcs';
 
     /**
      * @return float|int

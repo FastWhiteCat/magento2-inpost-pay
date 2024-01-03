@@ -24,7 +24,7 @@
 "Could not obtain public key.","Nie udało się uzyskać klucza publicznego.",module,InPost_InPostPay
 "Empty IZI API URL","Wartość IZI API URL jest pusta",module,InPost_InPostPay
 "InPost API endpoint ""%1"" responded with an error: %2","Procesowane zapytania API InPost ""%1"" zwróciło błąd: %2",module,InPost_InPostPay
-"InPost API endpoint ""%1"" responded with %1 code.","Procesowane zapytania API InPost ""%1"" zwróciło kod: %2",module,InPost_InPostPay
+"InPost API endpoint ""%1"" responded with %2 code.","Procesowane zapytania API InPost ""%1"" zwróciło kod: %2",module,InPost_InPostPay
 "There was a problem with public key generation request. Details: %1","Wystąpił błąd podczas procesowania zapytania generującego klucz publiczny. Szczegóły: %1",module,InPost_InPostPay
 "Could not generate token due to invalid configuration. Details: %1","Nie można wygenerować token autoryzacyjnego ze względu na błędną konfigurację systemu. Szczegóły: %1",module,InPost_InPostPay
 "There was a problem with processing token generation request. Details: %1","Wystąpił błąd podczas generacji tokena. Szczegóły: %1",module,InPost_InPostPay
@@ -115,3 +115,4 @@
 "An error occurred during delete process. Check error logs","Wystąpił błąd podczas próby wykonania akcji usunięcia. Sprawdź logi",module,InPost_InPostPay
 "Shipment Mapping Settings for Courier Delivery","Ustawienia mapowania opcji dostawy kurierem",module,InPost_InPostPay
 "Shipment Mapping Settings for Pickup Delivery","Ustawienia mapowania opcji dostawy przez Paczkomat 24/7",module,InPost_InPostPay
+"pcs","sztuk",module,InPost_InPostPay

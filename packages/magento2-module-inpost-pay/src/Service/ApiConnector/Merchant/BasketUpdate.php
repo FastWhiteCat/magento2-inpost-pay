@@ -17,6 +17,7 @@ use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\BasketNotFoundException;
+use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Framework\Event\ManagerInterface as EventManager;
@@ -40,6 +41,7 @@ class BasketUpdate implements BasketUpdateInterface
         private readonly CartService $cartService,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
+        private readonly InPostPayQuote $inPostPayQuote,
         private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
     ) {
@@ -105,6 +107,7 @@ class BasketUpdate implements BasketUpdateInterface
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
             $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
+            $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
             $this->createRequestDebugLog(sprintf('Basket ID: %s has been updated.', $basketId));
 
         } catch (NoSuchEntityException $e) {

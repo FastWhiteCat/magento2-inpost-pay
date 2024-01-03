@@ -19,6 +19,7 @@ interface InPostPayQuoteInterface
     public const BROWSER_ID = 'browser_id';
     public const NAME = 'name';
     public const SURNAME = 'surname';
+    public const REFRESH_REQUIRED = 'refresh_required';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -57,6 +58,9 @@ interface InPostPayQuoteInterface
 
     public function getSurname(): ?string;
     public function setSurname(string $surname): InPostPayQuoteInterface;
+
+    public function getRefreshRequired(): bool;
+    public function setRefreshRequired(bool $refreshRequired): InPostPayQuoteInterface;
 
     public function getCreatedAt(): string;
     public function getUpdatedAt(): string;

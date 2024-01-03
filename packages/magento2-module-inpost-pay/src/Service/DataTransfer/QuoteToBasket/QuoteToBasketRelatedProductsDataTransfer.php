@@ -20,6 +20,8 @@ use Magento\Quote\Model\Quote;
 
 class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTransferInterface
 {
+    private const MAX_CROSS_SELL_PRODUCTS = 10;
+
     public function __construct(
         private readonly ProductInterfaceFactory $productFactory,
         private readonly ProductCollectionFactory $productCollectionFactory,
@@ -74,8 +76,14 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                 );
 
             foreach ($productsCollection->load() as $crossSellProduct) {
-                if ($crossSellProduct instanceof Product && $crossSellProduct->getTypeId() === Type::TYPE_SIMPLE) {
+                if ($crossSellProduct instanceof Product
+                    && $crossSellProduct->getTypeId() === Type::TYPE_SIMPLE
+                    && $crossSellProduct->isVisibleInCatalog()
+                ) {
                     $crossSellProducts[] = $crossSellProduct;
+                    if (count($crossSellProducts) >= self::MAX_CROSS_SELL_PRODUCTS) {
+                        break;
+                    }
                 }
             }
         }
@@ -94,6 +102,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         $productLinkCollection = $this->productLinkCollectionFactory->create()
             ->addFieldToFilter('link_type_id', ['eq' => Link::LINK_TYPE_CROSSSELL])
             ->addFieldToFilter('product_id', ['in' => $productIds])
+            ->addFieldToFilter('linked_product_id', ['nin' => $productIds])
             ->load();
 
         foreach ($productLinkCollection as $link) {

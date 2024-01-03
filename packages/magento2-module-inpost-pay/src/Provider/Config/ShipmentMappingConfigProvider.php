@@ -58,15 +58,21 @@ class ShipmentMappingConfigProvider
     }
 
     /**
+     * @param bool $withJoinedOption
      * @return string[]
      */
-    public function getNonStandardDeliveryOptions(): array
+    public function getNonStandardDeliveryOptions(bool $withJoinedOption = false): array
     {
-        return [
+        $nonStandardOptions = [
             InPostDeliveryOption::COD->name,
             InPostDeliveryOption::PWW->name,
-            InPostDeliveryOption::CODPWW->name
         ];
+
+        if ($withJoinedOption) {
+            $nonStandardOptions[] = InPostDeliveryOption::CODPWW->name;
+        }
+
+        return $nonStandardOptions;
     }
 
     public function isFreeShippingEnabledForCarrier(string $code, string $method = ''): bool
