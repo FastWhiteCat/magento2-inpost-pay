@@ -51,8 +51,7 @@ class Widget implements ArgumentInterface
         private readonly ProductRepositoryInterface        $productRepository,
         private readonly StoreManagerInterface             $storeManager,
         private readonly LoggerInterface                   $logger
-    )
-    {
+    ) {
     }
 
     public function isEnabled(): bool
