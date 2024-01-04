@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\Data\Merchant\Basket;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
+
 interface SummaryInterface
 {
     public const BASKET_BASE_PRICE = 'basket_base_price';
@@ -13,6 +15,7 @@ interface SummaryInterface
     public const BASKET_ADDITIONAL_INFORMATION = 'basket_additional_information';
     public const BASKET_EXPIRATION_DATE = 'basket_expiration_date';
     public const PAYMENT_TYPE = 'payment_type';
+    public const BASKET_NOTICE = 'basket_notice';
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
@@ -46,6 +49,17 @@ interface SummaryInterface
      * @return void
      */
     public function setBasketPromoPrice(PriceInterface $basketPromoPrice): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface|null
+     */
+    public function getBasketNotice(): ?NoticeInterface;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface|null $basketNotice
+     * @return void
+     */
+    public function setBasketNotice(?NoticeInterface $basketNotice): void;
 
     /**
      * @return string
