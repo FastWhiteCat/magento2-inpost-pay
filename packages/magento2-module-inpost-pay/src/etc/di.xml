@@ -224,6 +224,7 @@
                 <item name="delivery" xsi:type="object">InPost\InPostPay\Validator\Order\DeliveryValidator</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Validator\Order\ConsentsValidator</item>
                 <item name="billing_information" xsi:type="object">InPost\InPostPay\Validator\Order\BillingInformationValidator</item>
+                <item name="stock" xsi:type="object">InPost\InPostPay\Validator\Order\StockValidator</item>
             </argument>
         </arguments>
     </type>
@@ -433,6 +434,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\Order\StockValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Webapi\Rest\ModifyExceptionResultPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
