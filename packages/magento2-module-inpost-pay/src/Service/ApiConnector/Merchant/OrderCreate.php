@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Exception\BasketNotFoundException;
+use InPost\InPostPay\Exception\OrderNotCreateException;
+use InPost\InPostPay\Exception\OrderNotUpdateException;
+use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
@@ -58,8 +62,9 @@ class OrderCreate implements OrderCreateInterface
      * @return OrderInterface
      * @throws InPostPayBadRequestException
      * @throws InPostPayAuthorizationException
-     * @throws OrderNotFoundException
+     * @throws BasketNotFoundException
      * @throws InPostPayInternalException
+     * @throws OrderNotCreateException
      */
     public function execute(
         OrderDetailsInterface $orderDetails,
@@ -106,7 +111,11 @@ class OrderCreate implements OrderCreateInterface
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
-            throw new OrderNotFoundException();
+            throw new BasketNotFoundException();
+        }  catch (QuoteItemOutOfStockException $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new OrderNotCreateException(__($e->getMessage()));
         } catch (InPostPayAuthorizationException $e) {
             $this->logger->error($e->getMessage());
 

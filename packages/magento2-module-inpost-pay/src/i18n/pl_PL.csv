@@ -121,3 +121,5 @@
 "Payment Status: %1","Status Płatności: %1",module,InPost_InPostPay
 "Payment ID: %1","ID Płatności: %1",module,InPost_InPostPay
 "Payment Reference Nr: %1","Nr Referencyjny Płatności: %1",module,InPost_InPostPay
+"Product is no longer available in requested quantity.","Produkt nie jest dostępny w żądanej ilości.",module,InPost_InPostPay
+"Item ""%1"" is no longer available in requested quantity: %2. Currently available: %3","Produkt ""%1"" nie jest dostępny w żądanej ilości: %2. Dostępny stan: %3",module,InPost_InPostPay

@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\MerchantEndpoint\Debug;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
 use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -24,7 +25,7 @@ class IziOrderUpdateAfterEventObserver extends MerchantEndpointEventObserver imp
                 $orderUpdateData = $this->objectConverter->toNestedArray(
                     $orderUpdate,
                     [],
-                    QuantityUpdateInterface::class
+                    OrderUpdateInterface::class
                 );
             }
 

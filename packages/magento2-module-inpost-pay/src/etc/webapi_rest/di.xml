@@ -8,4 +8,8 @@
         <plugin name="InPost_InPostPay::allowLowerCasePrefixForWebapiRestEndpointsPlugin"
                 type="InPost\InPostPay\Plugin\Controller\Rest\AllowLowerCasePrefixForWebapiRestEndpointsPlugin"/>
     </type>
+    <type name="Magento\Framework\Webapi\Rest\Response\Renderer\Json">
+        <plugin name="InPost_InPostPay::modifyExceptionResultPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\ModifyExceptionResultPlugin"/>
+    </type>
 </config>
