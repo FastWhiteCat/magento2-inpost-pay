@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Plugin\Webapi\Rest;
 
+use InPost\InPostPay\Exception\BasketNotFoundException;
+use InPost\InPostPay\Exception\InPostPayAuthorizationException;
+use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayException;
+use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Exception\OrderNotCreateException;
+use InPost\InPostPay\Exception\OrderNotFoundException;
+use InPost\InPostPay\Exception\OrderNotUpdateException;
 use Magento\Framework\Webapi\Rest\Response\Renderer\Json as Subject;
 use Psr\Log\LoggerInterface;
 
@@ -14,13 +21,13 @@ class ModifyExceptionResultPlugin
     public const INPOST_EXCEPTION_RESULT_ERROR_MESSAGE = 'error_message';
 
     private array $customizableErrorCodes = [
-        'UNAUTHORIZED',
-        'INTERNAL_SERVER_ERROR',
-        'BAD_REQUEST',
-        'BASKET_NOT_FOUND',
-        'ORDER_NOT_CREATE',
-        'ORDER_NOT_UPDATE',
-        'ORDER_NOT_FOUND'
+        InPostPayAuthorizationException::ERROR_CODE,
+        InPostPayInternalException::ERROR_CODE,
+        InPostPayBadRequestException::ERROR_CODE,
+        BasketNotFoundException::ERROR_CODE,
+        OrderNotCreateException::ERROR_CODE,
+        OrderNotFoundException::ERROR_CODE,
+        OrderNotUpdateException::ERROR_CODE
     ];
 
     public function __construct(
