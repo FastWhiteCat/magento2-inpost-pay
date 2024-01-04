@@ -19,6 +19,7 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
+use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 
 /**
@@ -28,6 +29,7 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
+    private ?MagentoProductInterface $product = null;
 
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
@@ -44,14 +46,15 @@ class ProductToInPostProductDataTransfer
         Product $product,
         ProductInterface $inPostProduct,
         int $websiteId,
-        ?float $quantity = null
+        ?float $quantity = null,
+        array $selectedOptions = []
     ): void {
         $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
         $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
         if ($quantity === null) {
             $quantity = $stockItemConfiguration->getMinSaleQty();
         }
-        $description = ($product->getData('short_description') ?? $product->getData('description'));
+        $description = $this->getDescription($product);
         $canCastQtyToInt = $this->canCastToInteger($quantity);
         try {
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
@@ -61,7 +64,6 @@ class ProductToInPostProductDataTransfer
         $stockQuantity = $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
         $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
         $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
-        $description = (is_scalar($description)) ? (string)$description : '';
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
@@ -86,7 +88,7 @@ class ProductToInPostProductDataTransfer
         $quantityObj->setAvailableQuantity($stockQuantity);
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
-        $inPostProduct->setProductAttributes($this->getProductAttributes($product));
+        $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
     }
 
     private function getProductImageUrl(Product $product): string
@@ -102,15 +104,19 @@ class ProductToInPostProductDataTransfer
         return $imageUrl;
     }
 
-    private function getProductAttributes(Product $product): array
+    private function getProductAttributes(Product $product, array $selectedOptions = []): array
     {
-        try {
-            $product = $this->productRepository->getById((int)$product->getId(), false, (int)$product->getStoreId());
-        } catch (NoSuchEntityException $e) {
-            $product = null;
+        $productAttributesData = [];
+
+        foreach ($selectedOptions as $selectedOption) {
+            /** @var ProductAttributeInterface $inPostProductAttribute */
+            $inPostProductAttribute = $this->productAttributeFactory->create();
+            $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($selectedOption['label']));
+            $inPostProductAttribute->setAttributeValue($this->escaper->escapeUrl($selectedOption['value']));
+            $productAttributesData[] = $inPostProductAttribute;
         }
 
-        $productAttributesData = [];
+        $product = $this->getProduct($product);
         if ($product instanceof Product) {
             $attributes = $product->getAttributes();
             foreach ($attributes as $attribute) {
@@ -134,5 +140,38 @@ class ProductToInPostProductDataTransfer
     private function canCastToInteger(float $value): bool
     {
         return number_format(round($value, 2), 2, '.', '') === number_format((int)$value, 2, '.', '');
+    }
+
+    private function getDescription(Product $product): string
+    {
+        $product = $this->getProduct($product);
+        $description = '';
+
+        if ($product instanceof Product) {
+            $description = $product->getData('short_description') ?? $product->getData('description');
+            $description = is_scalar($description) ? (string)$description : '';
+        }
+
+        return $description;
+    }
+
+    private function getProduct(Product $product): ?MagentoProductInterface
+    {
+
+        if ($this->product && $this->product->getId() === $product->getId()) {
+            return $this->product;
+        }
+
+        try {
+            $this->product = $this->productRepository->getById(
+                (int)$product->getId(),
+                false,
+                (int)$product->getStoreId()
+            );
+        } catch (NoSuchEntityException $e) {
+            $this->product = null;
+        }
+
+        return $this->product;
     }
 }
