@@ -8,6 +8,8 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition;
 use Magento\InventorySalesApi\Model\GetSalableQtyInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -24,6 +26,16 @@ class StockValidator implements OrderValidatorInterface
     ) {
     }
 
+    /**
+     * @param Quote $quote
+     * @param InPostPayQuoteInterface $inPostPayQuote
+     * @param OrderInterface $inPostOrder
+     * @return void
+     * @throws QuoteItemOutOfStockException
+     * @throws InputException
+     * @throws LocalizedException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         $websiteId = (int)$quote->getStore()->getWebsiteId();
@@ -36,6 +48,8 @@ class StockValidator implements OrderValidatorInterface
             $errors = $stockValidationResult->getErrors();
 
             foreach ($errors as $error) {
+                $this->logger->error($error->getMessage());
+
                 throw new QuoteItemOutOfStockException(
                     __(
                         'Item "%1" is no longer available in requested quantity: %2. Currently available: %3',

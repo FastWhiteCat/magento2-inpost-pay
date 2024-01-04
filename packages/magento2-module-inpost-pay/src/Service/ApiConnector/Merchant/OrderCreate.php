@@ -112,7 +112,7 @@ class OrderCreate implements OrderCreateInterface
             $this->logger->error($e->getMessage());
 
             throw new BasketNotFoundException();
-        }  catch (QuoteItemOutOfStockException $e) {
+        } catch (QuoteItemOutOfStockException $e) {
             $this->logger->error($e->getMessage());
 
             throw new OrderNotCreateException(__($e->getMessage()));
