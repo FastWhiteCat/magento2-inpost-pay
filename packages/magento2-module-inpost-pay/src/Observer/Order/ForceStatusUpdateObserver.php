@@ -31,7 +31,7 @@ class ForceStatusUpdateObserver implements ObserverInterface
     {
         $order = $observer->getEvent()->getData('order');
         if ($order instanceof Order) {
-            $orderId = is_scalar($order->getId()) ? (int)$order->getId() : null;
+            $orderId = is_scalar($order->getId()) ? (int)$order->getId() : 0;
             try {
                 $inPostPayOrder = $this->getInPostPayOrderByOrderId($orderId);
                 if ($inPostPayOrder) {
