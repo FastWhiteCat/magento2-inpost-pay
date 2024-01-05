@@ -193,9 +193,10 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         return $limit;
     }
 
-    private function setBasketNoticeVirtualProducts(BasketInterface $basket) {
+    private function setBasketNoticeVirtualProducts(BasketInterface $basket): void
+    {
         $summary = $basket->getSummary();
-        $error = __('Order contains products that cannot be shipped.',)->render();
+        $error = __('Order contains products that cannot be shipped.')->render();
         if ($notice = $summary->getBasketNotice()) {
             $notice->setDescription($notice->getDescription() . PHP_EOL . $error);
         } else {
