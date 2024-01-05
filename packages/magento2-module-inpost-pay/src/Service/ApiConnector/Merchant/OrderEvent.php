@@ -11,6 +11,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
@@ -79,10 +80,9 @@ class OrderEvent implements OrderEventInterface
 
             return $orderUpdate;
         } catch (NoSuchEntityException $e) {
-            $errorMsg = __('Order not found.');
             $this->logger->error($e->getMessage());
 
-            throw new NoSuchEntityException($errorMsg);
+            throw new OrderNotFoundException();
         } catch (OrderNotUpdateException $e) {
             $this->logger->error($e->getMessage());
 
