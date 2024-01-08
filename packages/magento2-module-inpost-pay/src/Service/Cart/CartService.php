@@ -152,10 +152,11 @@ class CartService
     private function getItemIdByProductFromCart(Quote $quote, Product $product): ?int
     {
         foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
-                if ($itemId = $this->getItemIdByChildProductId($item, $product)) {
-                    return $itemId;
-                }
+            /** @var Item $item */
+            if ($item->getProduct()->getTypeId() === Configurable::TYPE_CODE
+                && $itemId = $this->getItemIdByChildProductId($item, $product)
+            ) {
+                return $itemId;
             }
 
             if ($item->getProductId() === $product->getId()) {
