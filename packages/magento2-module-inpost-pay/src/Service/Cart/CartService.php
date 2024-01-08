@@ -16,6 +16,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\CouponManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\Option;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -151,15 +152,26 @@ class CartService
     private function getItemIdByProductFromCart(Quote $quote, Product $product): ?int
     {
         foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getTypeId() == Configurable::TYPE_CODE) {
-                $productId = $item->getOptionByCode('simple_product')->getProduct()->getId();
-                $productId = is_scalar($productId) ? (int)$productId : null;
-                if ((int)$product->getId() === $productId) {
-                    return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
+            if ($item->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
+                if ($itemId = $this->getItemIdByChildProductId($item, $product)) {
+                    return $itemId;
                 }
             }
 
             if ($item->getProductId() === $product->getId()) {
+                return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
+            }
+        }
+
+        return null;
+    }
+
+    private function getItemIdByChildProductId(Item $item, Product $product): ?int
+    {
+        $option = $item->getOptionByCode('simple_product');
+        if ($option instanceof Option) {
+            $productId = (int)$option->getProduct()->getId();
+            if ((int)$product->getId() === $productId) {
                 return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
             }
         }
