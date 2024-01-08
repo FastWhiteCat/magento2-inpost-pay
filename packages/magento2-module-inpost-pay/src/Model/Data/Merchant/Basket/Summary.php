@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
 use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
@@ -92,6 +93,29 @@ class Summary extends DataObject implements SummaryInterface, ExtensibleDataInte
     public function setBasketPromoPrice(PriceInterface $basketPromoPrice): void
     {
         $this->setData(self::BASKET_PROMO_PRICE, $basketPromoPrice);
+    }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface|null
+     */
+    public function getBasketNotice(): ?NoticeInterface
+    {
+        $basketNotice = $this->getData(self::BASKET_NOTICE);
+
+        if ($basketNotice instanceof NoticeInterface) {
+            return $basketNotice;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface|null $basketNotice
+     * @return void
+     */
+    public function setBasketNotice(?NoticeInterface $basketNotice): void
+    {
+        $this->setData(self::BASKET_NOTICE, $basketNotice);
     }
 
     /**

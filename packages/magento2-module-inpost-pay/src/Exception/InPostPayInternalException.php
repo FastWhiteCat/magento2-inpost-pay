@@ -4,24 +4,11 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Exception;
 
-use Magento\Framework\Webapi\Exception;
-use Magento\Framework\Phrase;
-
-class InPostPayInternalException extends Exception
+class InPostPayInternalException extends InPostPayException
 {
-    public const HTTP_INTERNAL_ERROR = 500;
-    private const INTERNAL_ERROR_MSG = 'Something went wrong. Please try again later.';
+    public const ERROR_CODE = 'INTERNAL_SERVER_ERROR';
 
-    public function __construct(Phrase $phrase = null, $code = 0)
-    {
-        if ($phrase === null) {
-            $msg = self::INTERNAL_ERROR_MSG;
-            $phrase = new Phrase($msg);
-        }
-        parent::__construct(
-            $phrase,
-            $code,
-            self::HTTP_INTERNAL_ERROR
-        );
-    }
+    protected int $httpCode = 500;
+    protected string $errorCode = self::ERROR_CODE;
+    protected string $errorMsg = 'Something went wrong. Please try again later.';
 }
