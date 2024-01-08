@@ -123,4 +123,5 @@
 "Payment Reference Nr: %1","Nr Referencyjny Płatności: %1",module,InPost_InPostPay
 "Product is no longer available in requested quantity.","Produkt nie jest dostępny w żądanej ilości.",module,InPost_InPostPay
 "Item ""%1"" is no longer available in requested quantity: %2. Currently available: %3","Produkt ""%1"" nie jest dostępny w żądanej ilości: %2. Dostępny stan: %3",module,InPost_InPostPay
+"Promo code ""%1"" is invalid.","Kod rabatowy ""%1"" jest niepoprawny.",module,InPost_InPostPay
 "Order contains products that cannot be shipped.","Zamówienie zawiera produkty które nie mogą zostać wysłane.",module,InPost_InPostPay

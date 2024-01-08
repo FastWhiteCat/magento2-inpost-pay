@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Cart;
 
+use InPost\InPostPay\Exception\InvalidPromoCodeException;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -16,6 +18,9 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class CartService
 {
     public const ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS = 'allow_inpost_pay_quote_remote_access';
@@ -100,14 +105,18 @@ class CartService
     }
 
     /**
-     * @throws LocalizedException
+     * @throws InvalidPromoCodeException
      */
     public function applyPromo(Quote $quote, string $couponCode): void
     {
         if (is_scalar($quote->getId())) {
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
-            $this->couponManagement->set((int)$quote->getId(), $couponCode);
+            try {
+                $this->couponManagement->set((int)$quote->getId(), $couponCode);
+            } catch (CouldNotSaveException | NoSuchEntityException $e) {
+                throw new InvalidPromoCodeException(__('Promo code "%1" is invalid.', $couponCode));
+            }
             $this->logger->debug(
                 sprintf('Coupon code: %s has been applied to quote ID %s', $couponCode, (int)$quote->getId())
             );
