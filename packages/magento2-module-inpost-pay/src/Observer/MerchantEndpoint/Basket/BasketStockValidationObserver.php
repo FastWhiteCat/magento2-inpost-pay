@@ -28,7 +28,15 @@ class BasketStockValidationObserver implements ObserverInterface
             $errors = $this->prepareBasketStockErrors($basket);
             if (!empty($errors)) {
                 $summary = $basket->getSummary();
-                $summary->setBasketNotice($this->prepareStockAttentionNotice(implode(PHP_EOL, $errors)));
+                if ($notice = $summary->getBasketNotice()) {
+                    $noticeErrors = explode(PHP_EOL, $notice->getDescription());
+                    $errors = array_merge($noticeErrors, $errors);
+                    $notice->setDescription(implode(PHP_EOL, $errors));
+                } else {
+                    $notice = $this->prepareStockAttentionNotice(implode(PHP_EOL, $errors));
+                }
+
+                $summary->setBasketNotice($notice);
             }
         }
     }

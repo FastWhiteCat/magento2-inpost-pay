@@ -16,6 +16,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\CollectionFactory as Produc
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
 use Magento\Quote\Model\Quote;
 
 class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTransferInterface
@@ -27,7 +28,8 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly ProductLinkCollectionFactory $productLinkCollectionFactory,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
-        private readonly CatalogConfig $catalogConfig
+        private readonly CatalogConfig $catalogConfig,
+        private readonly StatusFactory $stockStatusFactory
     ) {
     }
 
@@ -74,6 +76,10 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                     $productsCollection->getProductEntityMetadata()->getLinkField(),
                     ['in' => $linkedProductIds]
                 );
+
+            $stockStatusResource = $this->stockStatusFactory->create();
+            $stockStatusResource->addStockDataToCollection($productsCollection, true);
+            $productsCollection->setFlag('has_stock_status_filter', true);
 
             foreach ($productsCollection->load() as $crossSellProduct) {
                 if ($crossSellProduct instanceof Product
