@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
@@ -32,7 +34,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
-        private readonly ShippingMethodManagementInterface $shippingManager
+        private readonly ShippingMethodManagementInterface $shippingManager,
+        private readonly NoticeInterfaceFactory $noticeFactory
     ) {
     }
 
@@ -42,6 +45,20 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         if (empty($shippingAddress->getCountryId())) {
             $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
         }
+
+        if ($quote->isVirtual()) {
+            $basket->setDelivery([]);
+            $this->setBasketNoticeVirtualProducts($basket);
+            return;
+        }
+
+        foreach ($quote->getAllVisibleItems() as $item) {
+            if ($item->getProduct()->getIsVirtual()) {
+                $this->setBasketNoticeVirtualProducts($basket);
+                break;
+            }
+        }
+
         // @phpstan-ignore-next-line
         $shippingMethods = $this->shippingManager->estimateByExtendedAddress((int)$quote->getId(), $shippingAddress);
         $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods);
@@ -174,5 +191,21 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         return $limit;
+    }
+
+    private function setBasketNoticeVirtualProducts(BasketInterface $basket): void
+    {
+        $summary = $basket->getSummary();
+        $error = __('Order contains products that cannot be shipped.')->render();
+        if ($notice = $summary->getBasketNotice()) {
+            $notice->setDescription($notice->getDescription() . PHP_EOL . $error);
+        } else {
+            /** @var NoticeInterface $notice */
+            $notice = $this->noticeFactory->create();
+            $notice->setType(NoticeInterface::ATTENTION);
+            $notice->setDescription($error);
+        }
+
+        $summary->setBasketNotice($notice);
     }
 }

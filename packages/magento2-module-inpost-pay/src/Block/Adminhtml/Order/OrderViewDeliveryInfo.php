@@ -55,7 +55,7 @@ class OrderViewDeliveryInfo extends Template
     public function canShowInPostPayInfo(): bool
     {
         try {
-            return !$this->getCurrentOrder()->getIsVirtual() && $this->isInPostPayOrder();
+            return $this->isInPostPayOrder();
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
