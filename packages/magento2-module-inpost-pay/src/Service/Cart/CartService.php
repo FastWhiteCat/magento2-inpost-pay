@@ -8,7 +8,7 @@ use InPost\InPostPay\Exception\InvalidPromoCodeException;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -150,20 +150,20 @@ class CartService
 
     private function getItemIdByProductFromCart(Quote $quote, Product $product): ?int
     {
-        $item = null;
-        $typeId = (is_scalar($product->getTypeId())) ? (string)$product->getTypeId() : '';
-        if ($typeId === Type::TYPE_SIMPLE) {
-            $item = $quote->getItemByProduct($product);
-        } else {
-            foreach ($quote->getAllVisibleItems() as $item) {
-                /** @var Item $item */
-                $itemProductId = (is_scalar($item->getData('product_id'))) ? (int)$item->getData('product_id') : 0;
-                if ($itemProductId === (int)$product->getId()) {
-                    break;
+        foreach ($quote->getAllVisibleItems() as $item) {
+            if ($item->getProduct()->getTypeId() == Configurable::TYPE_CODE) {
+                $productId = $item->getOptionByCode('simple_product')->getProduct()->getId();
+                $productId = is_scalar($productId) ? (int)$productId : null;
+                if ((int)$product->getId() === $productId) {
+                    return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
                 }
+            }
+
+            if ($item->getProductId() === $product->getId()) {
+                return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
             }
         }
 
-        return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
+        return null;
     }
 }

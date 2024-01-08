@@ -36,6 +36,8 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $options = [];
 
             if ($quoteItem->getProduct()->getTypeId() == Configurable::TYPE_CODE) {
+                $productId = $quoteItem->getOptionByCode('simple_product')->getProduct()->getId();
+                $product->setData('simple_product_id', (string)$productId);
                 // @phpstan-ignore-next-line
                 $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo($product);
             }
