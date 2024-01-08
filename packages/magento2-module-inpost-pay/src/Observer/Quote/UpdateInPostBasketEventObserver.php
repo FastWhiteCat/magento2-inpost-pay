@@ -69,8 +69,7 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         }
 
         foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getIsVirtual()
-                || $item->getProduct()->getTypeId() === Type::TYPE_BUNDLE
+            if ($item->getProduct()->getTypeId() === Type::TYPE_BUNDLE
                 || $item->getProduct()->getTypeId() === Grouped::TYPE_CODE
             ) {
                 return false;

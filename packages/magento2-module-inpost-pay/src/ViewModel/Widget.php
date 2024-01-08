@@ -27,7 +27,7 @@ class Widget implements ArgumentInterface
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
 
-    private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped', 'downloadable', 'virtual'];
+    private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped'];
 
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
