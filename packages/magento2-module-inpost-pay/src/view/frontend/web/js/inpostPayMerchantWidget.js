@@ -425,6 +425,21 @@ define([
                     return isAddedProduct
                 })
             }
+
+            var $groupedProductElements = $productForm.find('[name*="super_group"]')
+            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
+                return this.value > 0;
+            })
+
+            if (simpleProductsInGrouped.length) {
+                var addedSimpleProducts = 0;
+                _.each(simpleProductsInGrouped, function (item) {
+                    if (cartData.items.some(function (cartItem) {
+                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
+                    })) addedSimpleProducts++
+                })
+                return addedSimpleProducts === simpleProductsInGrouped.length;
+            }
         }
     });
 });
