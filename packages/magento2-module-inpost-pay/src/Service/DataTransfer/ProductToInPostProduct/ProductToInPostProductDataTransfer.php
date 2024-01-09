@@ -68,7 +68,13 @@ class ProductToInPostProductDataTransfer
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
 
-        $inPostProduct->setProductId((string)$product->getId());
+        if ($product->getData('simple_product_id') && is_scalar($product->getData('simple_product_id'))) {
+            $productId = (string)$product->getData('simple_product_id');
+        } else {
+            $productId = (string)$product->getId();
+        }
+
+        $inPostProduct->setProductId($productId);
         $inPostProduct->setProductCategory((string)max($product->getCategoryIds()));
         $inPostProduct->setEan((string)$product->getSku());
         $inPostProduct->setProductName((string)$product->getName());

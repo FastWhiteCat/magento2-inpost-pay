@@ -14,6 +14,8 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\Option;
 
 class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInterface
 {
@@ -29,6 +31,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         $products = [];
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
             /** @var ProductInterface $inPostProduct */
+            /** @var Item $quoteItem */
             $inPostProduct = $this->productFactory->create();
             $product = $quoteItem->getProduct();
             $websiteId = (int)$quote->getStore()->getWebsiteId();
@@ -36,6 +39,11 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $options = [];
 
             if ($quoteItem->getProduct()->getTypeId() == Configurable::TYPE_CODE) {
+                $option = $quoteItem->getOptionByCode('simple_product');
+                if ($option instanceof Option) {
+                    $product->setData('simple_product_id', (string)$option->getProduct()->getId());
+
+                }
                 // @phpstan-ignore-next-line
                 $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo($product);
             }
