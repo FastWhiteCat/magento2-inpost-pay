@@ -52,6 +52,11 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             return;
         }
 
+        if ((int)$quote->getItemsCount() === 0) {
+            $basket->setDelivery([]);
+            return;
+        }
+
         foreach ($quote->getAllVisibleItems() as $item) {
             if ($item->getProduct()->getIsVirtual()) {
                 $this->setBasketNoticeVirtualProducts($basket);
