@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="inpost_pay_shipment" translate="label" type="text" sortOrder="30"
-           showInDefault="1" showInWebsite="1" showInStore="0">
+    <group id="inpost_pay_shipment" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1">
         <label>Shipment Mapping Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <include path="InPost_InPostPay::system/courier/delivery_options_mapping.xml"/>

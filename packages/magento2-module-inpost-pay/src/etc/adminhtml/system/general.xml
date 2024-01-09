@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="inpost_pay_general" translate="label" type="text" sortOrder="10"
-           showInDefault="1" showInWebsite="1" showInStore="0">
+    <group id="inpost_pay_general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1">
         <label>General Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="active" translate="label" type="select" sortOrder="10"
