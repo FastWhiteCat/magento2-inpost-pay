@@ -10,7 +10,7 @@
         </field>
         <field id="basket_lifetime" translate="label comment" type="text" sortOrder="40" showInDefault="1">
             <label>Basket Lifetime</label>
-            <validate>validate-number validate-zero-or-greater</validate>
+            <validate>required-entry validate-number validate-zero-or-greater</validate>
             <config_path>payment/inpost_pay/basket_lifetime</config_path>
             <comment>InPost basket lifetime in seconds.</comment>
         </field>
