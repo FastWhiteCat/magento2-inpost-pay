@@ -38,7 +38,7 @@ class ModifyExceptionResultPlugin
     /**
      * @param Subject $subject
      * @param object|array|int|string|bool|float|null $data
-     * @return array[]
+     * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function beforeRender(Subject $subject, $data): array

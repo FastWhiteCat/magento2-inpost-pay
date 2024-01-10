@@ -36,20 +36,20 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         if ($quote->isVirtual() || (int)$quote->getItemsCount() === 0) {
             $totals = $quote->getTotals();
 
-            $finalPriceExclTax = DecimalCalculator::round(
-                DecimalCalculator::sub((float)$totals['grand_total']['value'], (float)$totals['tax']['value'])
-            );
-            $finalPriceInclTax = DecimalCalculator::round(
-                (float)$totals['grand_total']['value']
-            );
-            $finalPriceTax = DecimalCalculator::round((float)$totals['tax']['value']);
+            $grandTotal = is_scalar($totals['grand_total']['value']) ? (float)$totals['grand_total']['value'] : 0;
+            $tax = is_scalar($totals['tax']['value']) ? (float)$totals['tax']['value'] : 0;
+            $subTotalIncTax = is_scalar($totals['subtotal']['value_incl_tax'])
+                ? (float)$totals['subtotal']['value_incl_tax'] : 0;
+            $subTotalExcTax = is_scalar($totals['subtotal']['value_excl_tax'])
+                ? (float)$totals['subtotal']['value_excl_tax'] : 0;
 
-            $promoPriceInclTax = DecimalCalculator::round((float)$totals['subtotal']['value_incl_tax']);
-            $promoPriceExclTax = DecimalCalculator::round((float)$totals['subtotal']['value_excl_tax']);
-            $promoPriceTax = DecimalCalculator::sub(
-                (float)$totals['subtotal']['value_incl_tax'],
-                (float)$totals['subtotal']['value_excl_tax']
-            );
+            $finalPriceExclTax = DecimalCalculator::round(DecimalCalculator::sub($grandTotal, $tax));
+            $finalPriceInclTax = DecimalCalculator::round($grandTotal);
+            $finalPriceTax = DecimalCalculator::round($tax);
+
+            $promoPriceInclTax = DecimalCalculator::round($subTotalIncTax);
+            $promoPriceExclTax = DecimalCalculator::round($subTotalExcTax);
+            $promoPriceTax = DecimalCalculator::sub($subTotalIncTax, $subTotalExcTax);
         } else {
             $finalPriceExclTax = DecimalCalculator::round(
                 DecimalCalculator::add((float)$address->getSubtotal(), $discountExclTax)
