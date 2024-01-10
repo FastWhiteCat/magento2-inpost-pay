@@ -125,3 +125,7 @@
 "Item ""%1"" is no longer available in requested quantity: %2. Currently available: %3","Produkt ""%1"" nie jest dostępny w żądanej ilości: %2. Dostępny stan: %3",module,InPost_InPostPay
 "Promo code ""%1"" is invalid.","Kod rabatowy ""%1"" jest niepoprawny.",module,InPost_InPostPay
 "Order contains products that cannot be shipped.","Zamówienie zawiera produkty które nie mogą zostać wysłane.",module,InPost_InPostPay
+"small rounding","małe zaokrąglenie",module,InPost_InPostPay
+"large rounding","duże zaokrąglenie",module,InPost_InPostPay
+"Max widget width(value between 220 and 600)","Maksymalna szerokość widgetu(wartość pomiędzy 220 a 600)",module,InPost_InPostPay
+"Widget frame corner style","Styl rogów ramki widgetu",module,InPost_InPostPay

@@ -26,6 +26,8 @@ class Widget implements ArgumentInterface
 {
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
+    private const MAX_WIDTH = 'maxWidth';
+    private const FRAME_STYLE = 'frameStyle';
 
     private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped'];
 
@@ -77,10 +79,14 @@ class Widget implements ArgumentInterface
     {
         $variant = $this->layoutConfigProvider->getColorVariant();
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
+        $maxWidth = $this->layoutConfigProvider->getMaxWidth();
+        $frameStyle = $this->layoutConfigProvider->getFrameStyle();
 
         return [
             self::VARIANT => $variant,
-            self::DARK_MODE => $darkMode
+            self::DARK_MODE => $darkMode,
+            self::MAX_WIDTH => $maxWidth,
+            self::FRAME_STYLE => $frameStyle
         ];
     }
 
