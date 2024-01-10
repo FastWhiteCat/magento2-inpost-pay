@@ -37,23 +37,25 @@ class ModifyExceptionResultPlugin
 
     /**
      * @param Subject $subject
-     * @param array $data
+     * @param object|array|int|string|bool|float|null $data
      * @return array[]
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function beforeRender(Subject $subject, array $data): array
+    public function beforeRender(Subject $subject, $data): array
     {
-        $errorMessage = $this->extractErrorMessage($data);
-        $errorParams = $this->extractErrorParams($data);
-        $errorCode = $this->extractErrorCodeFromParams($errorParams);
+        if (is_array($data)) {
+            $errorMessage = $this->extractErrorMessage($data);
+            $errorParams = $this->extractErrorParams($data);
+            $errorCode = $this->extractErrorCodeFromParams($errorParams);
 
-        if ($errorCode && $errorMessage && in_array($errorCode, $this->customizableErrorCodes)) {
-            $data = [
-                self::INPOST_EXCEPTION_RESULT_ERROR_CODE => $errorCode,
-                self::INPOST_EXCEPTION_RESULT_ERROR_MESSAGE => $errorMessage
-            ];
+            if ($errorCode && $errorMessage && in_array($errorCode, $this->customizableErrorCodes)) {
+                $data = [
+                    self::INPOST_EXCEPTION_RESULT_ERROR_CODE => $errorCode,
+                    self::INPOST_EXCEPTION_RESULT_ERROR_MESSAGE => $errorMessage
+                ];
 
-            $this->logger->error('INCOMING: Exception Response', $data);
+                $this->logger->error('INCOMING: Exception Response', $data);
+            }
         }
 
         return [$data];
