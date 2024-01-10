@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Observer\MerchantEndpoint\Debug;
 
 use InPost\InPostPay\Provider\Config\DebugConfigProvider;
+use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Monolog\Logger;
@@ -16,6 +17,7 @@ class MerchantEndpointEventObserver
     public function __construct(
         protected readonly ExtensibleDataObjectConverter $objectConverter,
         private readonly DebugConfigProvider $debugConfigProvider,
+        private readonly SerializerInterface $serializer,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -27,6 +29,8 @@ class MerchantEndpointEventObserver
 
     protected function createEventDataLog(array $eventData): void
     {
-        $this->logger->debug($this->eventDescription, $eventData);
+        $this->logger->debug(
+            sprintf('%s. Context: %s', $this->eventDescription, $this->serializer->serialize($eventData))
+        );
     }
 }
