@@ -16,5 +16,17 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/inpost_pay/widget_dark_mode</config_path>
         </field>
+        <field id="widget_max_width" translate="label" type="text" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Max widget width(value between 220 and 600)</label>
+            <config_path>payment/inpost_pay/widget_max_width</config_path>
+            <validate>validate-digits validate-not-negative-number validate-digits-range digits-range-220-600</validate>
+        </field>
+        <field id="frame_style" translate="label" type="select" sortOrder="40"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Widget frame corner style</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\FrameStyle</source_model>
+            <config_path>payment/inpost_pay/widget_frame_style</config_path>
+        </field>
     </group>
 </include>
