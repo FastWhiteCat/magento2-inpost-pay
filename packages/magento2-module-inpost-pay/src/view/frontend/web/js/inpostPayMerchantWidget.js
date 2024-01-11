@@ -111,6 +111,10 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
+                        if (!Object.keys(data).length) {
+                            reject(new Error($.mage.__('Something went wrong, refresh the page and try again')));
+                        }
+
                         if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
                             resolve([]);
