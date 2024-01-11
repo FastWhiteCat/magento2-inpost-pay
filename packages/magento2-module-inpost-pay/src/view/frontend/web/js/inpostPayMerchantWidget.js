@@ -227,6 +227,10 @@ define([
                 return new Promise((resolve, reject) => {
                     var basketId = localStorage.getItem('basketId');
 
+                    if (!basketId) {
+                        reject(new Error($.mage.__('Missing basket ID')));
+                    }
+
                     xhrForOrderConfirmation = $.ajax({
                         url: urlBuilder.build('inpostizi/OrderComplete/Get'
                             + '/?basketId='
@@ -311,10 +315,6 @@ define([
                 checkCartWidget(cartData);
                 updateCounter(cartData.summary_count);
             });
-
-            document.addEventListener('iziModalEventClose', function () {
-                abortRequest(xhrForBasketConfirmation)
-            })
 
             window.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail);
