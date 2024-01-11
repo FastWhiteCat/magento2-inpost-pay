@@ -27,6 +27,7 @@ use Magento\Quote\Model\Quote;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
@@ -221,10 +222,14 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         if (empty($shippingAddress->getCountryId())
             && $this->customerSession->isLoggedIn()
-            && $this->customerSession->getCustomer()->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING)
+            && $this->customerSession->getCustomer()
+                ->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING)
         ) {
-            $customerShippingAddress = $this->customerSession->getCustomer()->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING);
-            $shippingAddress->setData($customerShippingAddress->getData());
+            $customerShippingAddress = $this->customerSession->getCustomer()
+                ->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING);
+            if (is_array($customerShippingAddress->getData())) {
+                $shippingAddress->setData($customerShippingAddress->getData());
+            }
         }
 
         if (empty($shippingAddress->getCountryId())) {
