@@ -17,7 +17,10 @@ use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Customer\Api\Data\AddressInterface as CustomerAddressInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
@@ -35,16 +38,14 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager,
+        private readonly CustomerSession $customerSession,
         private readonly NoticeInterfaceFactory $noticeFactory
     ) {
     }
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $shippingAddress = $quote->getShippingAddress();
-        if (empty($shippingAddress->getCountryId())) {
-            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
-        }
+        $shippingAddress = $this->getShippingAddress($quote);
 
         if ($quote->isVirtual()) {
             $basket->setDelivery([]);
@@ -212,5 +213,24 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $summary->setBasketNotice($notice);
+    }
+
+    private function getShippingAddress(Quote $quote): AddressInterface
+    {
+        $shippingAddress = $quote->getShippingAddress();
+
+        if (empty($shippingAddress->getCountryId())
+            && $this->customerSession->isLoggedIn()
+            && $this->customerSession->getCustomer()->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING)
+        ) {
+            $customerShippingAddress = $this->customerSession->getCustomer()->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING);
+            $shippingAddress->setData($customerShippingAddress->getData());
+        }
+
+        if (empty($shippingAddress->getCountryId())) {
+            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
+        }
+
+        return $shippingAddress;
     }
 }
