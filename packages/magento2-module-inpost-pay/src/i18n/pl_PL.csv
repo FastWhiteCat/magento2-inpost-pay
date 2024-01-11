@@ -130,3 +130,4 @@
 "large rounding","duże zaokrąglenie",module,InPost_InPostPay
 "Max widget width(value between 220 and 600)","Maksymalna szerokość widgetu(wartość pomiędzy 220 a 600)",module,InPost_InPostPay
 "Widget frame corner style","Styl rogów ramki widgetu",module,InPost_InPostPay
+"Missing basket ID","Nie znaleziono ID koszyka",module,InPost_InPostPay
