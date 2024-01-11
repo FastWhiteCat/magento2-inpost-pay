@@ -10,7 +10,7 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
-"Network problem: ","Problem z siecią: ",module,InPost_InPostPay
+"Network problem","Problem z siecią",module,InPost_InPostPay
 "Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
 "Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
 "New Order Status","Status Nowego Zamówienia",module,InPost_InPostPay
@@ -130,5 +130,5 @@
 "large rounding","duże zaokrąglenie",module,InPost_InPostPay
 "Max widget width(value between 220 and 600)","Maksymalna szerokość widgetu(wartość pomiędzy 220 a 600)",module,InPost_InPostPay
 "Widget frame corner style","Styl rogów ramki widgetu",module,InPost_InPostPay
-"Missing basket ID","Nie znaleziono ID koszyka",module,InPost_InPostPay
+"Problem loading the cart, please refresh the page and try again","Problem z pobraniem koszyka, odśwież stronę i spróbuj ponownie",module,InPost_InPostPay
 "Something went wrong, refresh the page and try again","Coś poszło nie tak, odśwież stronę i spróbuj ponownie",module,InPost_InPostPay
