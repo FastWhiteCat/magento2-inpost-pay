@@ -33,6 +33,8 @@ if ($hasNotAllowedProducts) {
         variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
         basket="true"
         dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
+        max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
+        frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
         count="<?= /* @noEscape */ $cartItemsCount ?>"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">
     </inpost-izi-button>

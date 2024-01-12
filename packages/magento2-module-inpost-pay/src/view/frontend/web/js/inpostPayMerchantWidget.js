@@ -111,20 +111,22 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        if (Object.keys(data).length === 1 && data.basket_id) {
+                        if (!Object.keys(data).length) {
+                            reject(new Error($.mage.__('Something went wrong, refresh the page and try again')));
+                        } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
                             resolve([]);
+                        } else {
+                            localStorage.setItem('basketId', data.basket_id);
+                            resolve({
+                                qr_code: data.qr_code,
+                                deep_link: data.deep_link,
+                                deep_link_hms: data.deep_link_hms,
+                            })
                         }
-
-                        localStorage.setItem('basketId', data.basket_id);
-                        resolve({
-                            qr_code: data.qr_code,
-                            deep_link: data.deep_link,
-                            deep_link_hms: data.deep_link_hms,
-                        })
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -149,8 +151,8 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -203,14 +205,20 @@ define([
                                 setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
-                        .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem: ') + error));
+                        .fail(function () {
+                            reject(new Error($.mage.__('Network problem')));
                         });
                 });
             }
         },
 
         iziGetOrderComplete: function () {
+            var basketId = localStorage.getItem('basketId');
+
+            if (!basketId) {
+                return Promise.resolve(new Error($.mage.__('Problem loading the cart, please refresh the page and try again')))
+            }
+
             return new Promise((resolve, reject) => {
                 checkOrderStatus()
                     .then((data) => {
@@ -225,8 +233,6 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    var basketId = localStorage.getItem('basketId');
-
                     xhrForOrderConfirmation = $.ajax({
                         url: urlBuilder.build('inpostizi/OrderComplete/Get'
                             + '/?basketId='
@@ -247,7 +253,8 @@ define([
                             }
                         })
                         .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem: ') + error));
+                            console.log(error)
+                            reject(new Error($.mage.__('Network problem')));
                         });
                 });
             }
@@ -262,8 +269,8 @@ define([
                     .done(function () {
                         resolve()
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -311,10 +318,6 @@ define([
                 checkCartWidget(cartData);
                 updateCounter(cartData.summary_count);
             });
-
-            document.addEventListener('iziModalEventClose', function () {
-                abortRequest(xhrForBasketConfirmation)
-            })
 
             window.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail);

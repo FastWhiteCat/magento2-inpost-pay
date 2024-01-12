@@ -10,7 +10,7 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
-"Network problem: ","Problem z siecią: ",module,InPost_InPostPay
+"Network problem","Problem z siecią",module,InPost_InPostPay
 "Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
 "Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
 "New Order Status","Status Nowego Zamówienia",module,InPost_InPostPay
@@ -125,7 +125,10 @@
 "Item ""%1"" is no longer available in requested quantity: %2. Currently available: %3","Produkt ""%1"" nie jest dostępny w żądanej ilości: %2. Dostępny stan: %3",module,InPost_InPostPay
 "Promo code ""%1"" is invalid.","Kod rabatowy ""%1"" jest niepoprawny.",module,InPost_InPostPay
 "Order contains products that cannot be shipped.","Zamówienie zawiera produkty które nie mogą zostać wysłane.",module,InPost_InPostPay
+"classic","klasyczny",module,InPost_InPostPay
 "small rounding","małe zaokrąglenie",module,InPost_InPostPay
 "large rounding","duże zaokrąglenie",module,InPost_InPostPay
 "Max widget width(value between 220 and 600)","Maksymalna szerokość widgetu(wartość pomiędzy 220 a 600)",module,InPost_InPostPay
 "Widget frame corner style","Styl rogów ramki widgetu",module,InPost_InPostPay
+"Problem loading the cart, please refresh the page and try again","Problem z pobraniem koszyka, odśwież stronę i spróbuj ponownie",module,InPost_InPostPay
+"Something went wrong, refresh the page and try again","Coś poszło nie tak, odśwież stronę i spróbuj ponownie",module,InPost_InPostPay
