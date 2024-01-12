@@ -17,8 +17,7 @@ use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
-use Magento\Customer\Model\Session as CustomerSession;
-use Magento\Customer\Api\Data\AddressInterface as CustomerAddressInterface;
+use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
@@ -39,7 +38,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager,
-        private readonly CustomerSession $customerSession,
+        private readonly AddressRepositoryInterface $addressRepository,
         private readonly NoticeInterfaceFactory $noticeFactory
     ) {
     }
@@ -219,16 +218,11 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     private function getShippingAddress(Quote $quote): AddressInterface
     {
         $shippingAddress = $quote->getShippingAddress();
-
-        if (empty($shippingAddress->getCountryId())
-            && $this->customerSession->isLoggedIn()
-            && $this->customerSession->getCustomer()
-                ->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING)
-        ) {
-            $customerShippingAddress = $this->customerSession->getCustomer()
-                ->getPrimaryAddress(CustomerAddressInterface::DEFAULT_SHIPPING);
-            if (is_array($customerShippingAddress->getData())) {
-                $shippingAddress->setData($customerShippingAddress->getData());
+        if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+            $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
+            $customerShippingAddress->getCountryId();
+            if ($customerShippingAddress->getCountryId()) {
+                $shippingAddress->setCountryId($customerShippingAddress->getCountryId());
             }
         }
 
