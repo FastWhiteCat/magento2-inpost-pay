@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
+use InPost\InPostPay\Model\Utils\StringUtils;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Escaper;
@@ -37,6 +38,7 @@ class ProductToInPostProductDataTransfer
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
+        private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper
     ) {
@@ -129,11 +131,12 @@ class ProductToInPostProductDataTransfer
                 if ($attribute->getIsVisibleOnFront()) {
                     $value = $attribute->getFrontend()->getValue($product);
                     if (is_string($value) && strlen(trim($value))) {
+                        $attributeValue = $this->escaper->escapeUrl($value);
                         /** @var ProductAttributeInterface $inPostProductAttribute */
                         $inPostProductAttribute = $this->productAttributeFactory->create();
                         $storeLabel = $attribute->getStoreLabel((int)$product->getStoreId());
                         $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($storeLabel));
-                        $inPostProductAttribute->setAttributeValue($this->escaper->escapeUrl($value));
+                        $inPostProductAttribute->setAttributeValue($this->stringUtils->cleanUpString($attributeValue));
                         $productAttributesData[] = $inPostProductAttribute;
                     }
                 }
@@ -156,6 +159,7 @@ class ProductToInPostProductDataTransfer
         if ($product instanceof Product) {
             $description = $product->getData('short_description') ?? $product->getData('description');
             $description = is_scalar($description) ? (string)$description : '';
+            $description = $this->stringUtils->cleanUpString($description);
         }
 
         return $description;
@@ -163,7 +167,6 @@ class ProductToInPostProductDataTransfer
 
     private function getProduct(Product $product): ?MagentoProductInterface
     {
-
         if ($this->product && $this->product->getId() === $product->getId()) {
             return $this->product;
         }
