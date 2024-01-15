@@ -319,6 +319,10 @@ define([
                 updateCounter(cartData.summary_count);
             });
 
+            document.addEventListener('iziModalEventOpen', function () {
+                $('.block-minicart').dropdownDialog('close');
+            })
+
             window.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail);
             });
