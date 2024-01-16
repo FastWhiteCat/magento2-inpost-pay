@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Exception\OrderNotCreateException;
-use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface;
@@ -22,7 +23,6 @@ use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer;
 use InPost\InPostPay\Validator\OrderValidator;
 use Magento\Framework\Event\ManagerInterface as EventManager;
@@ -49,6 +49,7 @@ class OrderCreate implements OrderCreateInterface
         private readonly OrderToInPostOrderDataTransfer $orderToInPostOrderDataTransfer,
         private readonly OrderInterfaceFactory $orderFactory,
         private readonly EventManager $eventManager,
+        private readonly CreateBasketNotice $createBasketNotice,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -111,22 +112,27 @@ class OrderCreate implements OrderCreateInterface
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
+            $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
             throw new BasketNotFoundException();
         } catch (QuoteItemOutOfStockException $e) {
             $this->logger->error($e->getMessage());
 
+            $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
             throw new OrderNotCreateException(__($e->getMessage()));
         } catch (InPostPayAuthorizationException $e) {
             $this->logger->error($e->getMessage());
 
+            $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
             throw $e;
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
+            $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
             throw new InPostPayBadRequestException();
         } catch (Throwable $e) {
             $this->logger->critical($e->getMessage());
 
+            $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
             throw new InPostPayInternalException();
         }
     }
@@ -156,5 +162,13 @@ class OrderCreate implements OrderCreateInterface
         $this->orderToInPostOrderDataTransfer->transfer($order, $inPostOrder);
 
         return $inPostOrder;
+    }
+
+    private function addBasketNoticeError(string $basketId, string $message) {
+        $this->createBasketNotice->execute(
+            $basketId,
+            InPostPayBasketNoticeInterface::ERROR,
+            $message
+        );
     }
 }

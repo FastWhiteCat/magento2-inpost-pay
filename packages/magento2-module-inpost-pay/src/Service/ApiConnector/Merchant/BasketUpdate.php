@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Exception\InvalidPromoCodeException;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
@@ -43,9 +43,9 @@ class BasketUpdate implements BasketUpdateInterface
         private readonly CartService $cartService,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
-        private readonly NoticeInterfaceFactory $noticeFactory,
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly EventManager $eventManager,
+        private readonly CreateBasketNotice $createBasketNotice,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -96,20 +96,17 @@ class BasketUpdate implements BasketUpdateInterface
                     $promoCodesEventData
                 );
             } catch (InvalidPromoCodeException $e) {
-                /** @var NoticeInterface $basketNoticeInvalidPromoCodeError */
-                $basketNoticeInvalidPromoCodeError = $this->noticeFactory->create();
-                $basketNoticeInvalidPromoCodeError->setType(NoticeInterface::ERROR);
-                $basketNoticeInvalidPromoCodeError->setDescription($e->getMessage());
+                $this->createBasketNotice->execute(
+                    $basketId,
+                    InPostPayBasketNoticeInterface::ERROR,
+                    $e->getMessage()
+                );
             }
 
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
             $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
-
-            if (isset($basketNoticeInvalidPromoCodeError)) {
-                $this->mergeBasketNotice($basket, $basketNoticeInvalidPromoCodeError);
-            }
 
             $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
 
@@ -228,17 +225,5 @@ class BasketUpdate implements BasketUpdateInterface
         }
 
         return (isset($quote) && $quote instanceof Quote) ? $quote : null;
-    }
-
-    private function mergeBasketNotice(BasketInterface $basket, NoticeInterface $newBasketNoticeError): void
-    {
-        $existingBasketNotice = $basket->getSummary()->getBasketNotice();
-        if ($existingBasketNotice) {
-            $existingBasketNotice->setDescription(
-                $existingBasketNotice->getDescription() . PHP_EOL . $newBasketNoticeError->getDescription()
-            );
-        } else {
-            $basket->getSummary()->setBasketNotice($newBasketNoticeError);
-        }
     }
 }

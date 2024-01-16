@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
@@ -17,6 +16,7 @@ use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
@@ -35,7 +35,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager,
-        private readonly NoticeInterfaceFactory $noticeFactory
+        private readonly CreateBasketNotice $createBasketNotice,
     ) {
     }
 
@@ -48,7 +48,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         if ($quote->isVirtual()) {
             $basket->setDelivery([]);
-            $this->setBasketNoticeVirtualProducts($basket);
+            $this->setBasketNoticeVirtualProducts($basket->getBasketId());
             return;
         }
 
@@ -59,7 +59,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         foreach ($quote->getAllVisibleItems() as $item) {
             if ($item->getProduct()->getIsVirtual()) {
-                $this->setBasketNoticeVirtualProducts($basket);
+                $this->setBasketNoticeVirtualProducts($basket->getBasketId());
                 break;
             }
         }
@@ -198,19 +198,12 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         return $limit;
     }
 
-    private function setBasketNoticeVirtualProducts(BasketInterface $basket): void
+    private function setBasketNoticeVirtualProducts(string $basketId): void
     {
-        $summary = $basket->getSummary();
-        $error = __('Order contains products that cannot be shipped.')->render();
-        if ($notice = $summary->getBasketNotice()) {
-            $notice->setDescription($notice->getDescription() . PHP_EOL . $error);
-        } else {
-            /** @var NoticeInterface $notice */
-            $notice = $this->noticeFactory->create();
-            $notice->setType(NoticeInterface::ATTENTION);
-            $notice->setDescription($error);
-        }
-
-        $summary->setBasketNotice($notice);
+        $this->createBasketNotice->execute(
+            $basketId,
+            InPostPayBasketNoticeInterface::ATTENTION,
+            __('Order contains products that cannot be shipped.')->render()
+        );
     }
 }
