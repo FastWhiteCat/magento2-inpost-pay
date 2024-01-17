@@ -50,7 +50,7 @@ class Delete implements HttpGetActionInterface
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
                 $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
-                if ($inPostPayQuote->getQuoteId()) {
+                if ($inPostPayQuote->getQuoteId() && $inPostPayQuote->getInpostBasketId()) {
                     $this->basketBindingDelete->execute($inPostPayQuote->getBasketId());
                     $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
                         ? $inPostPayQuote->getInPostPayQuoteId()

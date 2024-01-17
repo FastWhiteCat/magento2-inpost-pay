@@ -115,6 +115,7 @@ define([
                             reject(new Error($.mage.__('Something went wrong, refresh the page and try again')));
                         } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
+                            localStorage.setItem('basketId', data.basket_id);
                             resolve([]);
                         } else {
                             localStorage.setItem('basketId', data.basket_id);
@@ -318,6 +319,10 @@ define([
                 checkCartWidget(cartData);
                 updateCounter(cartData.summary_count);
             });
+
+            document.addEventListener('iziModalEventOpen', function () {
+                $('.block-minicart').dropdownDialog('close');
+            })
 
             window.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail);
