@@ -23,6 +23,7 @@ use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -56,6 +57,7 @@ class ProductToInPostProductDataTransfer
         if ($product->getTypeId() === Type::TYPE_BUNDLE) {
             $maxBundleQuantity = null;
             $bundleStockQuantity = null;
+            /** @var AbstractItem[] $children */
             $children = $product->getData('children');
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
 
@@ -86,8 +88,9 @@ class ProductToInPostProductDataTransfer
                 $maxBundleQuantity = min([$maxBundleQuantity, $maxQuantity]);
             }
 
-            $maxQuantity = $maxBundleQuantity;
-            $stockQuantity = $bundleStockQuantity;
+            $canCastQtyToInt = $this->canCastToInteger($quantity);
+            $maxQuantity = (float)$maxBundleQuantity;
+            $stockQuantity = (float)$bundleStockQuantity;
         } else {
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
@@ -224,8 +227,12 @@ class ProductToInPostProductDataTransfer
         return $this->product;
     }
 
-    private function getSimpleProductStockQuantity($stockId, $product, $quantity, $canCastQtyToInt)
-    {
+    private function getSimpleProductStockQuantity(
+        int $stockId,
+        Product $product,
+        float $quantity,
+        float $canCastQtyToInt
+    ): int|float {
         try {
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
         } catch (InputException | LocalizedException $e) {

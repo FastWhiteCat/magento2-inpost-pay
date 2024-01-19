@@ -53,9 +53,9 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 $product->setData('children', $children);
 
                 $selectedOptions = $quoteItem->getProduct()
-                    ->getTypeInstance(true)->getOrderOptions($quoteItem->getProduct());
+                    ->getTypeInstance()->getOrderOptions($quoteItem->getProduct());
                 if ($selectedOptions && $selectedOptions['bundle_options']) {
-                    foreach ($selectedOptions['bundle_options'] as $option){
+                    foreach ($selectedOptions['bundle_options'] as $option) {
                         $options[] = [
                             'label' => $option['label'],
                             'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title'] . " "
