@@ -84,11 +84,7 @@ class ProductToInPostProductDataTransfer
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
 
-        if ($product->getData('simple_product_id') && is_scalar($product->getData('simple_product_id'))) {
-            $productId = (string)$product->getData('simple_product_id');
-        } else {
-            $productId = (string)$product->getId();
-        }
+        $productId = $this->extractProductId($product);
 
         $inPostProduct->setProductId($productId);
         $inPostProduct->setProductCategory((string)max($product->getCategoryIds()));
@@ -239,6 +235,15 @@ class ProductToInPostProductDataTransfer
             'maxQuantity' =>  (float)$maxBundleQuantity,
             'stockQuantity' => (float)$bundleStockQuantity
         ];
+    }
+
+    private function extractProductId(Product $product): string
+    {
+        if ($product->getData('simple_product_id') && is_scalar($product->getData('simple_product_id'))) {
+            return (string)$product->getData('simple_product_id');
+        }
+
+        return (string)$product->getId();
     }
 
     private function getSimpleProductStockQuantity(
