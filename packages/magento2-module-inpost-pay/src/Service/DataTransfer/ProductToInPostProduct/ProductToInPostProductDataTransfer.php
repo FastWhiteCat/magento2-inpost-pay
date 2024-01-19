@@ -229,9 +229,9 @@ class ProductToInPostProductDataTransfer
 
     private function getSimpleProductStockQuantity(
         int $stockId,
-        Product $product,
+        AbstractItem | Product $product,
         float $quantity,
-        float $canCastQtyToInt
+        bool $canCastQtyToInt
     ): int|float {
         try {
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
