@@ -55,10 +55,10 @@ class ProductToInPostProductDataTransfer
         array $quoteItemsQuantity = []
     ): void {
         if ($product->getTypeId() === Type::TYPE_BUNDLE) {
-            $bundleQuantity = $this->getBundleQuantity($product, $websiteId, $quoteItemsQuantity);
             if ($quantity === null) {
                 $quantity = 1.0;
             }
+            $bundleQuantity = $this->getBundleQuantity($product, $quantity, $websiteId, $quoteItemsQuantity);
             $canCastQtyToInt = $this->canCastToInteger($quantity);
             $maxQuantity = $bundleQuantity['maxQuantity'];
             $stockQuantity = $bundleQuantity['stockQuantity'];
@@ -200,10 +200,10 @@ class ProductToInPostProductDataTransfer
 
     private function getBundleQuantity(
         Product $product,
+        float $quantity,
         int $websiteId,
         array $quoteItemsQuantity = []
-    ): array
-    {
+    ): array {
         $maxBundleQuantity = null;
         $bundleStockQuantity = null;
         /** @var AbstractItem[] $children */
@@ -213,16 +213,13 @@ class ProductToInPostProductDataTransfer
         foreach ($children as $child) {
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($child->getSku(), $stockId);
             $childQuantity = $child->getQty();
-            if ($childQuantity === null) {
-                $childQuantity = $stockItemConfiguration->getMinSaleQty();
-            }
             $canCastQtyToInt = $this->canCastToInteger($childQuantity);
             $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $child, $childQuantity, $canCastQtyToInt);
 
             $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
             if ($quoteItemsQuantity) {
-                $maxQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $childQuantity);
-                $stockQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $childQuantity);
+                $maxQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - ($childQuantity * $quantity));
+                $stockQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - ($childQuantity * $quantity));
             }
 
             $maxQuantity = (int)($maxQuantity / $childQuantity);
