@@ -11,6 +11,7 @@ use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Model\Utils\StringUtils;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
@@ -49,23 +50,62 @@ class ProductToInPostProductDataTransfer
         ProductInterface $inPostProduct,
         int $websiteId,
         ?float $quantity = null,
-        array $selectedOptions = []
+        array $selectedOptions = [],
+        array $quoteItemsQuantity = []
     ): void {
-        $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
-        $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
-        if ($quantity === null) {
-            $quantity = $stockItemConfiguration->getMinSaleQty();
+        if ($product->getTypeId() === Type::TYPE_BUNDLE) {
+            $maxBundleQuantity = null;
+            $bundleStockQuantity = null;
+            $children = $product->getData('children');
+            $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
+
+            foreach ($children as $child) {
+                $stockItemConfiguration = $this->getStockItemConfiguration->execute($child->getSku(), $stockId);
+                if ($quantity === null) {
+                    $quantity = $stockItemConfiguration->getMinSaleQty();
+                }
+                $canCastQtyToInt = $this->canCastToInteger($quantity);
+                $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $child, $quantity, $canCastQtyToInt);
+
+                $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
+                if ($quoteItemsQuantity) {
+                    $maxQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $child->getQty());
+                    $stockQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $child->getQty());
+                }
+
+                $maxQuantity = (int)($maxQuantity / $child->getQty());
+                $stockQuantity = (int)($stockQuantity / $child->getQty());
+
+                if ($bundleStockQuantity === null) {
+                    $bundleStockQuantity = $stockQuantity;
+                }
+                $bundleStockQuantity = min([$bundleStockQuantity, $stockQuantity]);
+                if ($maxBundleQuantity === null) {
+                    $maxBundleQuantity = $maxQuantity;
+                }
+                $maxBundleQuantity = min([$maxBundleQuantity, $maxQuantity]);
+            }
+
+            $maxQuantity = $maxBundleQuantity;
+            $stockQuantity = $bundleStockQuantity;
+        } else {
+            $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
+            $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
+            if ($quantity === null) {
+                $quantity = $stockItemConfiguration->getMinSaleQty();
+            }
+            $canCastQtyToInt = $this->canCastToInteger($quantity);
+
+            $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $product, $quantity, $canCastQtyToInt);
+            $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
+            if ($quoteItemsQuantity) {
+                $maxQuantity -= ($quoteItemsQuantity[$product->getId()] - $quantity);
+                $stockQuantity -= ($quoteItemsQuantity[$product->getId()] - $quantity);
+            }
+            $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
         }
+
         $description = $this->getDescription($product);
-        $canCastQtyToInt = $this->canCastToInteger($quantity);
-        try {
-            $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
-        } catch (InputException | LocalizedException $e) {
-            $stockQuantity = $quantity;
-        }
-        $stockQuantity = $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
-        $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
-        $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
@@ -182,5 +222,16 @@ class ProductToInPostProductDataTransfer
         }
 
         return $this->product;
+    }
+
+    private function getSimpleProductStockQuantity($stockId, $product, $quantity, $canCastQtyToInt)
+    {
+        try {
+            $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
+        } catch (InputException | LocalizedException $e) {
+            $stockQuantity = $quantity;
+        }
+
+        return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
     }
 }

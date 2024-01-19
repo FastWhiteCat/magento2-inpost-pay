@@ -16,12 +16,7 @@ $bindingPlace = $block->getBindingPlace();
 $language = $widgetViewModel->getCurrentLanguageCode();
 $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
-$hasNotAllowedProducts = $widgetViewModel->hasNotAllowedProducts();
 $widgetWrapperClass = "inpay-widget-wrapper";
-
-if ($hasNotAllowedProducts) {
-    return;
-}
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">

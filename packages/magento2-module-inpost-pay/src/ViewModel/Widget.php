@@ -29,8 +29,6 @@ class Widget implements ArgumentInterface
     private const MAX_WIDTH = 'maxWidth';
     private const FRAME_STYLE = 'frameStyle';
 
-    private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped'];
-
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
@@ -174,22 +172,5 @@ class Widget implements ArgumentInterface
         }
 
         return ($product instanceof Product) ? $product : null;
-    }
-
-    public function hasNotAllowedProducts(): bool
-    {
-        try {
-            $quote = $this->checkoutSession->getQuote();
-
-            foreach ($quote->getAllVisibleItems() as $item) {
-                if (in_array($item->getProduct()->getTypeId(), self::NOT_ALLOWED_PRODUCT_TYPES)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } catch (NoSuchEntityException|LocalizedException $e) {
-            return false;
-        }
     }
 }

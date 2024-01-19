@@ -12,6 +12,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
+use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
@@ -29,6 +30,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $products = [];
+        $quoteItemsQuantity = $this->prepareQuoteProductsQuantity($quote);
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
             /** @var ProductInterface $inPostProduct */
             /** @var Item $quoteItem */
@@ -38,7 +40,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $qty = (float)$quoteItem->getQty();
             $options = [];
 
-            if ($quoteItem->getProduct()->getTypeId() == Configurable::TYPE_CODE) {
+            if ($quoteItem->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
                 $option = $quoteItem->getOptionByCode('simple_product');
                 if ($option instanceof Option) {
                     $product->setData('simple_product_id', (string)$option->getProduct()->getId());
@@ -46,6 +48,21 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 }
                 // @phpstan-ignore-next-line
                 $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo($product);
+            } elseif ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
+                $children = $quoteItem->getChildren();
+                $product->setData('children', $children);
+
+                $selectedOptions = $quoteItem->getProduct()
+                    ->getTypeInstance(true)->getOrderOptions($quoteItem->getProduct());
+                if ($selectedOptions && $selectedOptions['bundle_options']) {
+                    foreach ($selectedOptions['bundle_options'] as $option){
+                        $options[] = [
+                            'label' => $option['label'],
+                            'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title'] . " "
+                                . DecimalCalculator::round((float)$option['value'][0]['price'])
+                            ];
+                    }
+                }
             }
 
             $this->productToInPostProductDataTransfer->transfer(
@@ -53,8 +70,22 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 $inPostProduct,
                 $websiteId,
                 $qty,
-                $options
+                $options,
+                $quoteItemsQuantity
             );
+
+            if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
+                $basePriceExclTax = DecimalCalculator::round((float)$quoteItem->getBasePrice());
+                $basePriceInclTax = DecimalCalculator::round((float)$quoteItem->getBasePriceInclTax());
+                $baseTaxValue = DecimalCalculator::sub($basePriceInclTax, $basePriceExclTax);
+
+                /** @var PriceInterface $basePrice */
+                $basePrice = $this->priceFactory->create();
+                $basePrice->setNet($basePriceExclTax);
+                $basePrice->setGross($basePriceInclTax);
+                $basePrice->setVat($baseTaxValue);
+                $inPostProduct->setBasePrice($basePrice);
+            }
 
             $priceExclTax = DecimalCalculator::round((float)$quoteItem->getPrice());
             $priceInclTax = DecimalCalculator::round((float)$quoteItem->getPriceInclTax());
@@ -70,5 +101,32 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $basket->setProducts($products);
+    }
+
+    private function prepareQuoteProductsQuantity(Quote $quote): array
+    {
+        $quoteItemsQuantity = [];
+        foreach ($quote->getAllVisibleItems() as $quoteItem) {
+            if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
+                foreach ($quoteItem->getChildren() as $child) {
+                    $qty = $child->getQty() * $quoteItem->getQty();
+                    $this->setQuoteItemQuantity((int)$child->getProduct()->getId(), $qty, $quoteItemsQuantity);
+                }
+            } else {
+                $qty = $quoteItem->getQty();
+                $this->setQuoteItemQuantity((int)$quoteItem->getProduct()->getId(), $qty, $quoteItemsQuantity);
+            }
+        }
+
+        return $quoteItemsQuantity;
+    }
+
+    private function setQuoteItemQuantity(int $productId, float $qty, array &$quoteItemsQuantity): void
+    {
+        if (array_key_exists($productId, $quoteItemsQuantity)) {
+            $quoteItemsQuantity[$productId] += $qty;
+        } else {
+            $quoteItemsQuantity[$productId] = $qty;
+        }
     }
 }
