@@ -55,42 +55,13 @@ class ProductToInPostProductDataTransfer
         array $quoteItemsQuantity = []
     ): void {
         if ($product->getTypeId() === Type::TYPE_BUNDLE) {
-            $maxBundleQuantity = null;
-            $bundleStockQuantity = null;
-            /** @var AbstractItem[] $children */
-            $children = $product->getData('children');
-            $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
-
-            foreach ($children as $child) {
-                $stockItemConfiguration = $this->getStockItemConfiguration->execute($child->getSku(), $stockId);
-                if ($quantity === null) {
-                    $quantity = $stockItemConfiguration->getMinSaleQty();
-                }
-                $canCastQtyToInt = $this->canCastToInteger($quantity);
-                $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $child, $quantity, $canCastQtyToInt);
-
-                $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
-                if ($quoteItemsQuantity) {
-                    $maxQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $child->getQty());
-                    $stockQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $child->getQty());
-                }
-
-                $maxQuantity = (int)($maxQuantity / $child->getQty());
-                $stockQuantity = (int)($stockQuantity / $child->getQty());
-
-                if ($bundleStockQuantity === null) {
-                    $bundleStockQuantity = $stockQuantity;
-                }
-                $bundleStockQuantity = min([$bundleStockQuantity, $stockQuantity]);
-                if ($maxBundleQuantity === null) {
-                    $maxBundleQuantity = $maxQuantity;
-                }
-                $maxBundleQuantity = min([$maxBundleQuantity, $maxQuantity]);
+            $bundleQuantity = $this->getBundleQuantity($product, $websiteId, $quoteItemsQuantity);
+            if ($quantity === null) {
+                $quantity = 1.0;
             }
-
             $canCastQtyToInt = $this->canCastToInteger($quantity);
-            $maxQuantity = (float)$maxBundleQuantity;
-            $stockQuantity = (float)$bundleStockQuantity;
+            $maxQuantity = $bundleQuantity['maxQuantity'];
+            $stockQuantity = $bundleQuantity['stockQuantity'];
         } else {
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
@@ -225,6 +196,52 @@ class ProductToInPostProductDataTransfer
         }
 
         return $this->product;
+    }
+
+    private function getBundleQuantity(
+        Product $product,
+        int $websiteId,
+        array $quoteItemsQuantity = []
+    ): array
+    {
+        $maxBundleQuantity = null;
+        $bundleStockQuantity = null;
+        /** @var AbstractItem[] $children */
+        $children = $product->getData('children');
+        $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
+
+        foreach ($children as $child) {
+            $stockItemConfiguration = $this->getStockItemConfiguration->execute($child->getSku(), $stockId);
+            $childQuantity = $child->getQty();
+            if ($childQuantity === null) {
+                $childQuantity = $stockItemConfiguration->getMinSaleQty();
+            }
+            $canCastQtyToInt = $this->canCastToInteger($childQuantity);
+            $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $child, $childQuantity, $canCastQtyToInt);
+
+            $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
+            if ($quoteItemsQuantity) {
+                $maxQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $childQuantity);
+                $stockQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - $childQuantity);
+            }
+
+            $maxQuantity = (int)($maxQuantity / $childQuantity);
+            $stockQuantity = (int)($stockQuantity / $childQuantity);
+
+            if ($bundleStockQuantity === null) {
+                $bundleStockQuantity = $stockQuantity;
+            }
+            $bundleStockQuantity = min([$bundleStockQuantity, $stockQuantity]);
+            if ($maxBundleQuantity === null) {
+                $maxBundleQuantity = $maxQuantity;
+            }
+            $maxBundleQuantity = min([$maxBundleQuantity, $maxQuantity]);
+        }
+
+        return [
+            'maxQuantity' =>  (float)$maxBundleQuantity,
+            'stockQuantity' => (float)$bundleStockQuantity
+        ];
     }
 
     private function getSimpleProductStockQuantity(
