@@ -36,8 +36,8 @@ class RestrictionsRuleProductRepository implements RestrictionsRuleProductReposi
     ) {
     }
 
-    public function save(RestrictionsRuleProductInterface $restrictionsRuleProduct
-    ): RestrictionsRuleProductInterface {
+    public function save(RestrictionsRuleProductInterface $restrictionsRuleProduct): RestrictionsRuleProductInterface
+    {
         try {
             // @phpstan-ignore-next-line
             $this->resource->save($restrictionsRuleProduct);
@@ -55,7 +55,8 @@ class RestrictionsRuleProductRepository implements RestrictionsRuleProductReposi
         // @phpstan-ignore-next-line
         $this->resource->load($restrictionsRuleProduct, $indexId);
         if (!$restrictionsRuleProduct->getRuleId()) {
-            throw new NoSuchEntityException(__('Restrictions Rule Product with ID "%1" does not exist.', $indexId)
+            throw new NoSuchEntityException(
+                __('Restrictions Rule Product with ID "%1" does not exist.', $indexId)
             );
         }
         return $restrictionsRuleProduct;

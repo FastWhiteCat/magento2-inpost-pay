@@ -139,7 +139,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getUpdatedAt(): string
     {
-        return (string)$this->getData(self::UPDATED_AT);
+        return is_scalar($this->getData(self::UPDATED_AT)) ? (string)$this->getData(self::UPDATED_AT) : '';
     }
 
     public function getConditionsSerialized(): ?string
