@@ -18,8 +18,10 @@ use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use Magento\Customer\Api\AddressRepositoryInterface;
 use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
@@ -27,6 +29,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
@@ -38,6 +41,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager,
+        private readonly AddressRepositoryInterface $addressRepository,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly NoticeInterfaceFactory $noticeFactory,
         private readonly LoggerInterface $logger
@@ -46,10 +50,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $shippingAddress = $quote->getShippingAddress();
-        if (empty($shippingAddress->getCountryId())) {
-            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
-        }
+        $shippingAddress = $this->getShippingAddress($quote);
 
         if ($quote->isVirtual()) {
             $this->logger->error('Quote is virtual. Setting empty delivery.');
@@ -229,5 +230,23 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $summary->setBasketNotice($notice);
+    }
+
+    private function getShippingAddress(Quote $quote): AddressInterface
+    {
+        $shippingAddress = $quote->getShippingAddress();
+        if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+            $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
+            $customerShippingAddress->getCountryId();
+            if ($customerShippingAddress->getCountryId()) {
+                $shippingAddress->setCountryId($customerShippingAddress->getCountryId());
+            }
+        }
+
+        if (empty($shippingAddress->getCountryId())) {
+            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
+        }
+
+        return $shippingAddress;
     }
 }
