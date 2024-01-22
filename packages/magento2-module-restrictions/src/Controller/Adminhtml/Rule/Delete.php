@@ -45,7 +45,8 @@ class Delete extends RestrictionsController implements HttpGetActionInterface
     public function execute(): ResultInterface
     {
         $resultRedirect = $this->redirectFactory->create();
-        $ruleId = (int) $this->getRequest()->getParam(RestrictionsRuleInterface::RULE_ID);
+        $ruleId = $this->getRequest()->getParam(RestrictionsRuleInterface::RULE_ID);
+        $ruleId = (is_scalar($ruleId)) ? (int)$ruleId : 0;
 
         try {
             $this->restrictionsRuleRepository->deleteById($ruleId);

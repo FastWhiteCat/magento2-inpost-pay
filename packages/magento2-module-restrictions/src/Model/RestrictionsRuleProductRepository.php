@@ -72,6 +72,7 @@ class RestrictionsRuleProductRepository implements RestrictionsRuleProductReposi
             $items[] = $model;
         }
 
+        // @phpstan-ignore-next-line
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
 

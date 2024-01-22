@@ -48,7 +48,8 @@ class Edit extends RestrictionsController implements HttpGetActionInterface
      */
     public function execute(): ResultInterface
     {
-        $ruleId = (int) $this->getRequest()->getParam(RestrictionsRuleInterface::RULE_ID);
+        $ruleId = $this->getRequest()->getParam(RestrictionsRuleInterface::RULE_ID);
+        $ruleId = (is_scalar($ruleId)) ? (int)$ruleId : 0;
 
         try {
             $restrictionsRule = $this->restrictionsRuleRepository->get($ruleId);

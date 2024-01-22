@@ -36,7 +36,8 @@ class RestrictionsRuleRepository implements RestrictionsRuleRepositoryInterface
     ) {
     }
 
-    public function save(RestrictionsRuleInterface $restrictionsRule): RestrictionsRuleInterface {
+    public function save(RestrictionsRuleInterface $restrictionsRule): RestrictionsRuleInterface
+    {
         try {
             // @phpstan-ignore-next-line
             $this->resource->save($restrictionsRule);
@@ -68,6 +69,7 @@ class RestrictionsRuleRepository implements RestrictionsRuleRepositoryInterface
             $items[] = $model;
         }
 
+        // @phpstan-ignore-next-line
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
 

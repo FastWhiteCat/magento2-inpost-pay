@@ -17,6 +17,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get implements HttpGetActionInterface
 {
     private readonly ManagerInterface $messageManager;

@@ -78,6 +78,7 @@ class ConditionsSerialized extends CatalogRuleConditions
             ]
         )->setData('rule', $restrictionsRule)->setRenderer($this->_conditions);
 
+        // @phpstan-ignore-next-line
         $form->setValues($restrictionsRule->getData());
         $this->setConditionFormName($restrictionsRule->getConditions(), $formName, $conditionsFieldSetId);
 
@@ -109,7 +110,7 @@ class ConditionsSerialized extends CatalogRuleConditions
     private function setConditionFormName(AbstractCondition $conditions, string $formName, string $jsFormName): void
     {
         $conditions->setData('form_name', $formName);
-        if ($conditions->getConditions() && is_array($conditions->getConditions())) {
+        if ($conditions->getConditions()) {
             foreach ($conditions->getConditions() as $condition) {
                 $this->setConditionFormName($condition, $formName, $jsFormName);
             }

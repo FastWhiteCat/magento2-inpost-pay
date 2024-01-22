@@ -52,6 +52,7 @@ class RestrictionsRuleDataProvider extends AbstractDataProvider
 
         if (!empty($data)) {
             $model = $this->collection->getNewEmptyItem();
+            // @phpstan-ignore-next-line
             $model->setData($data);
             $this->loadedData[$model->getId()] = $model->getData();
             $this->dataPersistor->clear(RestrictionsRuleInterface::ENTITY_NAME);

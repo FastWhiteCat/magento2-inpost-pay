@@ -51,6 +51,7 @@ class RestrictedProductIdsProvider
     public function flushList(int $websiteId, int $appliesTo): void
     {
         $cacheKey = $this->getCacheKey($websiteId, $appliesTo);
+        $this->restrictedProductsCache->clean();
         $this->restrictedProductsCache->remove($cacheKey);
         $this->cachedRestrictedProductIds[$cacheKey] = null;
     }

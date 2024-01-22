@@ -19,7 +19,7 @@ class RestrictionsRuleProduct extends AbstractModel implements RestrictionsRuleP
 
     public function getIndexId(): ?int
     {
-        return ($this->hasData(self::INDEX_ID)) ? (int) $this->getData(self::INDEX_ID) : null;
+        return is_scalar($this->getData(self::INDEX_ID)) ? (int) $this->getData(self::INDEX_ID) : null;
     }
 
     public function setIndexId(int $indexId): RestrictionsRuleProductInterface
@@ -29,7 +29,7 @@ class RestrictionsRuleProduct extends AbstractModel implements RestrictionsRuleP
 
     public function getRuleId(): int
     {
-        return (int) $this->getData(self::RULE_ID);
+        return is_scalar($this->getData(self::RULE_ID)) ? (int)$this->getData(self::RULE_ID) : 0;
     }
 
     public function setRuleId(int $ruleId): RestrictionsRuleProductInterface
@@ -39,7 +39,7 @@ class RestrictionsRuleProduct extends AbstractModel implements RestrictionsRuleP
 
     public function getProductId(): int
     {
-        return (int) $this->getData(self::PRODUCT_ID);
+        return is_scalar($this->getData(self::PRODUCT_ID)) ? (int)$this->getData(self::PRODUCT_ID) : 0;
     }
 
     public function setProductId(int $productId): RestrictionsRuleProductInterface
@@ -49,7 +49,7 @@ class RestrictionsRuleProduct extends AbstractModel implements RestrictionsRuleP
 
     public function getAppliesTo(): int
     {
-        return (int) $this->getData(self::APPLIES_TO);
+        return is_scalar($this->getData(self::APPLIES_TO)) ? (int)$this->getData(self::APPLIES_TO) : 0;
     }
 
     public function setAppliesTo(int $appliesTo): RestrictionsRuleProductInterface

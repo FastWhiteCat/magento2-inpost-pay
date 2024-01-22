@@ -7,7 +7,7 @@ namespace InPost\Restrictions\Block\Adminhtml\RestrictionsRule\Edit;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use Magento\Backend\Block\Widget\Context;
 
-abstract class GenericButton
+class GenericButton
 {
     /**
      * @param Context $context
@@ -21,7 +21,7 @@ abstract class GenericButton
     {
         $ruleId = $this->context->getRequest()->getParam(RestrictionsRuleInterface::RULE_ID);
 
-        return ($ruleId) ? (int) $ruleId : null;
+        return (is_scalar($ruleId)) ? (int) $ruleId : null;
     }
 
     protected function getUrl(string $route = '', array $params = []): string

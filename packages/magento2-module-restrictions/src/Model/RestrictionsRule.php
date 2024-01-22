@@ -84,7 +84,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getRuleId(): ?int
     {
-        return ($this->hasData(self::RULE_ID)) ? (int) $this->getData(self::RULE_ID) : null;
+        return (is_scalar($this->getData(self::RULE_ID))) ? (int) $this->getData(self::RULE_ID) : null;
     }
 
     public function setRuleId(int $ruleId): RestrictionsRuleInterface
@@ -94,7 +94,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getName(): string
     {
-        return (string)$this->getData(self::NAME);
+        return is_scalar($this->getData(self::NAME)) ? (string)$this->getData(self::NAME) :  '';
     }
 
     public function setName(string $name): RestrictionsRuleInterface
@@ -104,7 +104,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getIsEnabled(): bool
     {
-        return (bool) $this->getData(self::IS_ENABLED);
+        return is_scalar($this->getData(self::IS_ENABLED)) && (bool)$this->getData(self::IS_ENABLED);
     }
 
     public function setIsEnabled(bool $isEnabled): RestrictionsRuleInterface
@@ -114,7 +114,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getWebsiteId(): int
     {
-        return (int) $this->getData(self::WEBSITE_ID);
+        return is_scalar($this->getData(self::WEBSITE_ID)) ? (int)$this->getData(self::WEBSITE_ID) : 0;
     }
 
     public function setWebsiteId(int $websiteId): RestrictionsRuleInterface
@@ -124,7 +124,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getAppliesTo(): int
     {
-        return (int) $this->getData(self::APPLIES_TO);
+        return is_scalar($this->getData(self::APPLIES_TO)) ? (int)$this->getData(self::APPLIES_TO) : 0;
     }
 
     public function setAppliesTo(int $appliesTo): RestrictionsRuleInterface
@@ -134,7 +134,7 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getCreatedAt(): string
     {
-        return (string)$this->getData(self::CREATED_AT);
+        return is_scalar($this->getData(self::CREATED_AT)) ? (string)$this->getData(self::CREATED_AT) : '';
     }
 
     public function getUpdatedAt(): string
@@ -144,7 +144,9 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getConditionsSerialized(): ?string
     {
-        return $this->getData(self::CONDITIONS_SERIALIZED);
+        $conditionsSerialized = $this->getData(self::CONDITIONS_SERIALIZED);
+
+        return is_scalar($conditionsSerialized)? (string)$conditionsSerialized : null;
     }
 
     public function setConditionsSerialized(string $conditionsSerialized): RestrictionsRuleInterface
@@ -164,7 +166,9 @@ class RestrictionsRule extends AbstractModel implements RestrictionsRuleInterfac
 
     public function getConditionsFieldSetId(string $formName = ''): string
     {
-        return sprintf('%srule_conditions_fieldset_%s', $formName, $this->getId());
+        $id = is_scalar($this->getId()) ? (int)$this->getId() : 0;
+
+        return sprintf('%srule_conditions_fieldset_%s', $formName, $id);
     }
 
     public function getProductIdsByConditions(): array

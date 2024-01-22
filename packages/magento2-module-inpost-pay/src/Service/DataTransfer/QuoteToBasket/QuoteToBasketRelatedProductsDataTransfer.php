@@ -134,14 +134,4 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
 
         return $linkedProductIds;
     }
-
-    private function isRestricted(int $productId, int $websiteId): bool
-    {
-        $restrictedProductIds = $this->restrictedProductIdsProvider->getList(
-            $websiteId,
-            RestrictionsRuleInterface::APPLIES_TO_PAYMENT
-        );
-
-        return in_array($productId, $restrictedProductIds);
-    }
 }

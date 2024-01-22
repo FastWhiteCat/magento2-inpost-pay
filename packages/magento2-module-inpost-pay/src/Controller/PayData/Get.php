@@ -17,6 +17,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
@@ -64,7 +65,7 @@ class Get implements HttpPostActionInterface
         $this->request = $context->getRequest();
     }
 
-    public function execute(): \Magento\Framework\Controller\Result\Json
+    public function execute(): Json
     {
         if (!$this->formKeyValidator->validate($this->request)) {
             $this->messageManager->addErrorMessage(
@@ -87,26 +88,7 @@ class Get implements HttpPostActionInterface
                 $params = $this->serializer->unserialize($this->request->getContent());
 
                 if (isset($params['browser']) && isset($params['binding_place'])) {
-
-                    if ($basketId = $this->tryBindExistingBasket($quoteId)) {
-                        return $this->jsonFactory->create()->setData(['basket_id' => $basketId]);
-                    }
-
-                    $browser = $this->base64serializer->unserialize($params['browser']);
-                    $browserData = [];
-                    if (is_array($browser)) {
-                        $browserData = $this->prepareBrowserData($browser);
-                    }
-
-                    $result = $this->basketBindingCreate->execute(
-                        $quoteId,
-                        $params['binding_place'],
-                        $browserData,
-                        $params['prefix'] ?? null,
-                        $params['number'] ?? null
-                    );
-
-                    $data = $result->getData();
+                    return $this->processPayData($quoteId, $params);
                 }
             }
         } catch (InPostPayRestrictedProductException $e) {
@@ -121,6 +103,29 @@ class Get implements HttpPostActionInterface
         }
 
         return $this->jsonFactory->create()->setData($data);
+    }
+
+    private function processPayData(int $quoteId, array $params): Json
+    {
+        if ($basketId = $this->tryBindExistingBasket($quoteId)) {
+            return $this->jsonFactory->create()->setData(['basket_id' => $basketId]);
+        }
+
+        $browser = $this->base64serializer->unserialize($params['browser']);
+        $browserData = [];
+        if (is_array($browser)) {
+            $browserData = $this->prepareBrowserData($browser);
+        }
+
+        $result = $this->basketBindingCreate->execute(
+            $quoteId,
+            $params['binding_place'],
+            $browserData,
+            $params['prefix'] ?? null,
+            $params['number'] ?? null
+        );
+
+        return $this->jsonFactory->create()->setData($result->getData());
     }
 
     private function prepareBrowserData(array $browser): array
