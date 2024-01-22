@@ -24,11 +24,19 @@
     <table name="inpost_restrictions_rule_product" resource="default" engine="innodb">
 		<column name="index_id" xsi:type="int" padding="10" unsigned="true" nullable="false" identity="true"/>
         <column name="rule_id" nullable="false" xsi:type="int" unsigned="true" identity="false" default="0"/>
+        <column name="website_id" nullable="false" xsi:type="smallint" unsigned="true" identity="false" default="0"/>
         <column name="applies_to" nullable="false" xsi:type="tinyint" default="2"/>
         <column name="product_id" nullable="false" xsi:type="int" unsigned="true" identity="false" default="0"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="index_id"/>
         </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_RESTRICTIONS_RULE_PRODUCT_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID"
+                    table="inpost_restrictions_rule_product"
+                    column="website_id"
+                    referenceTable="store_website"
+                    referenceColumn="website_id"
+                    onDelete="CASCADE"/>
         <constraint xsi:type="foreign"
                     referenceId="INPOST_RESTRICTIONS_RULE_PRODUCT_RULE_ID_INPOST_RESTRICTIONS_RULE_RULE_ID"
                     table="inpost_restrictions_rule_product"
@@ -43,10 +51,11 @@
                     referenceTable="catalog_product_entity"
                     referenceColumn="entity_id"
                     onDelete="CASCADE" />
-        <constraint xsi:type="unique" referenceId="UNQ_INPOST_RESTRICTIONS_RULE_PRODUCT_PRODUCT_ID_RULE_ID_APPLIES_TO">
+        <constraint xsi:type="unique" referenceId="UNQ_INPOST_RESTRICTIONS_RULE_PRODUCT_PRODUCT_ID_RULE_ID_APPLIES_TO_WEBSITE_ID">
             <column name="product_id"/>
             <column name="rule_id"/>
             <column name="applies_to"/>
+            <column name="website_id"/>
         </constraint>
 	</table>
 </schema>

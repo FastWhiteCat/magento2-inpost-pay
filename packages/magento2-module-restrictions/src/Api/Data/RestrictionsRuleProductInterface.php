@@ -10,6 +10,7 @@ interface RestrictionsRuleProductInterface
     public const ENTITY_NAME = 'inpost_restrictions_rule_product';
     public const INDEX_ID = 'index_id';
     public const RULE_ID = 'rule_id';
+    public const WEBSITE_ID = 'website_id';
     public const PRODUCT_ID = 'product_id';
     public const APPLIES_TO = 'applies_to';
 

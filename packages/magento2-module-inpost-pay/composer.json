@@ -11,7 +11,8 @@
         "laminas/laminas-http": "*",
         "monolog/monolog": "*",
         "psr/log": "*",
-        "guzzlehttp/guzzle": "*"
+        "guzzlehttp/guzzle": "*",
+        "inpost/magento2-module-restrictions": ">=1.0.0"
     },
     "autoload": {
         "files": [

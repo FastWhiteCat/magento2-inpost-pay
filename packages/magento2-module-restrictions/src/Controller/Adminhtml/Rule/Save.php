@@ -15,7 +15,7 @@ use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
-use InPost\Restrictions\Service\RestrictionRulePersistorService;
+use InPost\Restrictions\Service\RestrictionsRulePersistorService;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -34,7 +34,7 @@ class Save extends RestrictionsController implements HttpPostActionInterface
      * @param RequestInterface $request
      * @param ManagerInterface $messageManager
      * @param DataPersistorInterface $dataPersistor
-     * @param RestrictionRulePersistorService $restrictionRulePersistorService
+     * @param RestrictionsRulePersistorService $restrictionRulePersistorService
      */
     public function __construct(
         PageFactory $pageFactory,
@@ -43,7 +43,7 @@ class Save extends RestrictionsController implements HttpPostActionInterface
         RequestInterface $request,
         ManagerInterface $messageManager,
         private readonly DataPersistorInterface $dataPersistor,
-        private readonly RestrictionRulePersistorService $restrictionRulePersistorService
+        private readonly RestrictionsRulePersistorService $restrictionRulePersistorService
     ) {
         parent::__construct($pageFactory, $redirectFactory, $authorization, $request, $messageManager);
     }

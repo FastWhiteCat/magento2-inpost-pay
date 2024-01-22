@@ -131,4 +131,5 @@
 "Max widget width(value between 220 and 600)","Maksymalna szerokość widgetu(wartość pomiędzy 220 a 600)",module,InPost_InPostPay
 "Widget frame corner style","Styl rogów ramki widgetu",module,InPost_InPostPay
 "Problem loading the cart, please refresh the page and try again","Problem z pobraniem koszyka, odśwież stronę i spróbuj ponownie",module,InPost_InPostPay
-"Something went wrong, refresh the page and try again","Coś poszło nie tak, odśwież stronę i spróbuj ponownie",module,InPost_InPostPay
+"Something went wrong, refresh the page and try again","Coś poszło nie tak, odśwież stronę i spróbuj ponownie.",module,InPost_InPostPay
+"Product ""%1"" is not available for InPost Pay mobile basket. Please complete Your order on Merchants page.","Produkt ""%1"" nie jest obsługiwany przez mobilną aplikację InPost Pay. Prosimy o dokończenie zakupów na stronie sprzedawcy.",module,InPost_InPostPay

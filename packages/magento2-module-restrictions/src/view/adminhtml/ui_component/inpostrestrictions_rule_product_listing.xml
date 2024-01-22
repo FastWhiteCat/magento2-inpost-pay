@@ -61,6 +61,22 @@
                 <options class="InPost\Restrictions\Model\Source\RestrictionsRule"/>
             </settings>
         </column>
+        <column name="website_id" class="InPost\Restrictions\Ui\Component\Listing\Column\WebsiteOptions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Website</item>
+                </item>
+                <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\Store\Website</item>
+            </argument>
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Website</label>
+            </settings>
+        </column>
         <column name="product_id">
             <settings>
                 <filter>text</filter>

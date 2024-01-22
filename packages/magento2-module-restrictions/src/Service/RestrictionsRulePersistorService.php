@@ -9,7 +9,7 @@ use Magento\Framework\Exception\LocalizedException;
 use InPost\Restrictions\Api\RestrictionsRuleRepositoryInterface;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterfaceFactory;
 
-class RestrictionRulePersistorService
+class RestrictionsRulePersistorService
 {
     /**
      * @param RestrictionsRuleRepositoryInterface $restrictionRuleRepository

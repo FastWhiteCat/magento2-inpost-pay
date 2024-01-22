@@ -7,10 +7,12 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Enum\InPostBasketStatus;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCreate;
 use InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket;
 use InPost\InPostPay\Service\GetBasketId;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -55,6 +57,7 @@ class Get implements HttpPostActionInterface
         private readonly CartRepositoryInterface $cartRepository,
         private readonly BasketBindingCheck $basketBindingCheck,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -75,6 +78,7 @@ class Get implements HttpPostActionInterface
         $data = [];
         try {
             $quote = $this->checkoutSession->getQuote();
+            $this->quoteRestrictionsValidator->validate($quote);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
                 $this->quoteRepository->getActive($quoteId);
@@ -105,6 +109,13 @@ class Get implements HttpPostActionInterface
                     $data = $result->getData();
                 }
             }
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->messageManager->addErrorMessage($e->getMessage());
+            $data = [
+                'errorMessage' => $e->getMessage(),
+                'action' => 'reject'
+            ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
         }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Controller\BasketConfirmation;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -25,6 +27,7 @@ class Get implements HttpGetActionInterface
         private readonly CheckoutSession $checkoutSession,
         private readonly Validator $formKeyValidator,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly JsonFactory $jsonFactory,
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly LoggerInterface $logger
@@ -47,7 +50,7 @@ class Get implements HttpGetActionInterface
 
         try {
             $quote = $this->checkoutSession->getQuote();
-
+            $this->quoteRestrictionsValidator->validate($quote);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
 
@@ -74,6 +77,13 @@ class Get implements HttpGetActionInterface
                     ];
                 }
             }
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->messageManager->addErrorMessage($e->getMessage());
+            $data = [
+                'errorMessage' => $e->getMessage(),
+                'action' => 'reject'
+            ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             $data = [

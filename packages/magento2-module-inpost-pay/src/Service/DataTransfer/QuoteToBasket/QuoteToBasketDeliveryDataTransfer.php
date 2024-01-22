@@ -14,13 +14,16 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -35,7 +38,9 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager,
-        private readonly NoticeInterfaceFactory $noticeFactory
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
+        private readonly NoticeInterfaceFactory $noticeFactory,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -47,12 +52,24 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         if ($quote->isVirtual()) {
+            $this->logger->error('Quote is virtual. Setting empty delivery.');
             $basket->setDelivery([]);
             $this->setBasketNoticeVirtualProducts($basket);
             return;
         }
 
+        try {
+            $this->quoteRestrictionsValidator->validate($quote, true);
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->logger->error(
+                sprintf('Restricted product in cart. Setting empty delivery. Reason: %s', $e->getMessage())
+            );
+            $basket->setDelivery([]);
+            return;
+        }
+
         if ((int)$quote->getItemsCount() === 0) {
+            $this->logger->error('Empty cart. Setting empty delivery.');
             $basket->setDelivery([]);
             return;
         }

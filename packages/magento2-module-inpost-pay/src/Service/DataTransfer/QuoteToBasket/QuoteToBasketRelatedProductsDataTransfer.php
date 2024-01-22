@@ -7,6 +7,8 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
+use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Link;
@@ -18,7 +20,11 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory a
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
 use Magento\Quote\Model\Quote;
+use Magento\Store\Model\Store;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTransferInterface
 {
     private const MAX_CROSS_SELL_PRODUCTS = 10;
@@ -28,6 +34,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         private readonly ProductCollectionFactory $productCollectionFactory,
         private readonly ProductLinkCollectionFactory $productLinkCollectionFactory,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly CatalogConfig $catalogConfig,
         private readonly StatusFactory $stockStatusFactory
     ) {
@@ -43,7 +50,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         }
 
         if ($cartProductIds) {
-            foreach ($this->getCrossSellProducts($cartProductIds, (int)$quote->getStoreId()) as $crossSellProduct) {
+            foreach ($this->getCrossSellProducts($cartProductIds, $quote->getStore()) as $crossSellProduct) {
                 $inPostCrossSellProduct = $this->productFactory->create();
                 $this->productToInPostProductDataTransfer->transfer(
                     $crossSellProduct,
@@ -59,11 +66,13 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
 
     /**
      * @param int[] $productIds
-     * @param int $storeId
+     * @param Store $store
      * @return Product[]
      */
-    private function getCrossSellProducts(array $productIds, int $storeId): array
+    private function getCrossSellProducts(array $productIds, Store $store): array
     {
+        $websiteId = (int)$store->getWebsiteId();
+        $storeId = (int)$store->getId();
         $crossSellProducts = [];
         $linkedProductIds = $this->getCrossLinkedProductIds($productIds);
         if ($linkedProductIds) {
@@ -75,6 +84,12 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                 ->addFieldToFilter(
                     $productsCollection->getProductEntityMetadata()->getLinkField(),
                     ['in' => $linkedProductIds]
+                )->addFieldToFilter(
+                    $productsCollection->getProductEntityMetadata()->getLinkField(),
+                    ['nin' => $this->restrictedProductIdsProvider->getList(
+                        $websiteId,
+                        RestrictionsRuleInterface::APPLIES_TO_PAYMENT
+                    )]
                 );
 
             $stockStatusResource = $this->stockStatusFactory->create();
@@ -118,5 +133,15 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         }
 
         return $linkedProductIds;
+    }
+
+    private function isRestricted(int $productId, int $websiteId): bool
+    {
+        $restrictedProductIds = $this->restrictedProductIdsProvider->getList(
+            $websiteId,
+            RestrictionsRuleInterface::APPLIES_TO_PAYMENT
+        );
+
+        return in_array($productId, $restrictedProductIds);
     }
 }

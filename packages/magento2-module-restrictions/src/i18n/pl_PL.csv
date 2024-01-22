@@ -1,0 +1,3 @@
+"InPost Restricted Products Cache","Pamięć systemowa produktów objętych restrykcjami dla InPost",module,InPost_InPostPay
+"Cached list of product IDs restricted for InPost Delivery and/or InPost Pay.","Przechowywana w pamięci systemowej lista ID produktów objętych restrykcjami dostaw InPost i/lub usługi InPost Pay.",module,InPost_InPostPay
+

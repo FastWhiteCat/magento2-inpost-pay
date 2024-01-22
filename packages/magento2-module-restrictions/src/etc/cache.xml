@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Cache/etc/cache.xsd">
+    <type name="inpost_restricted_products" translate="label,description"
+          instance="InPost\Restrictions\Model\Cache\RestrictedProducts\Type">
+        <label>InPost Restricted Products Cache</label>
+        <description>Cached list of product IDs restricted for InPost Delivery and/or InPost Pay.</description>
+    </type>
+</config>
