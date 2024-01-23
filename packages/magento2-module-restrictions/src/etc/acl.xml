@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="InPost_Restrictions::management"
+                              title="InPost Restrictions Management" sortOrder="1000">
+                        <resource id="InPost_Restrictions::rule_save"
+                                  title="Restrictions Rule Saving" sortOrder="10" />
+                        <resource id="InPost_Restrictions::rule_delete"
+                                  title="Restrictions Rule Deleting" sortOrder="15" />
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

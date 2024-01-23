@@ -19,7 +19,7 @@ $layoutConfig = $widgetViewModel->getLayoutConfig();
 $hasNotAllowedProducts = $widgetViewModel->hasNotAllowedProducts();
 $widgetWrapperClass = "inpay-widget-wrapper";
 
-if ($hasNotAllowedProducts) {
+if ($hasNotAllowedProducts || !$widgetViewModel->canShowForWholeCart()) {
     return;
 }
 ?>
