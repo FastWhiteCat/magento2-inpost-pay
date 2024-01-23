@@ -53,7 +53,7 @@ class Get implements HttpGetActionInterface
 
         try {
             $quote = $this->checkoutSession->getQuote();
-            $this->quoteRestrictionsValidator->validate($quote);
+            $this->quoteRestrictionsValidator->validate($quote, true);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
 

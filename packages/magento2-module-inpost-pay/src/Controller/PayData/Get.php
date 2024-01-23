@@ -79,7 +79,7 @@ class Get implements HttpPostActionInterface
         $data = [];
         try {
             $quote = $this->checkoutSession->getQuote();
-            $this->quoteRestrictionsValidator->validate($quote);
+            $this->quoteRestrictionsValidator->validate($quote, true);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
                 $this->quoteRepository->getActive($quoteId);
