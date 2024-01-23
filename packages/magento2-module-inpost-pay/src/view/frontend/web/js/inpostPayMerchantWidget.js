@@ -108,11 +108,13 @@ define([
                 })
                     .done(function (data) {
                         if (!Object.keys(data).length) {
-                            reject(new Error($.mage.__('Something went wrong, refresh the page and try again')));
+                            reject({ message: new Error($.mage.__('Something went wrong, refresh the page and try again')) });
                         } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
                             localStorage.setItem('basketId', data.basket_id);
                             resolve([]);
+                        } else if (data.action){
+                            reject({ message: data.errorMessage });
                         } else {
                             localStorage.setItem('basketId', data.basket_id);
                             resolve({
@@ -162,7 +164,6 @@ define([
                     })
                     .catch(function(error) {
                         reject(error)
-                        console.error(error);
                     });
             });
 
@@ -186,7 +187,7 @@ define([
 
                                 switch (data.status) {
                                     case 'REJECT':
-                                        reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
+                                        reject({ message: new Error($.mage.__('Connection has been interrupted, please try again.')) });
                                         break;
                                     case 'PENDING':
                                         setTimerAndRunCallback(checkIsBound, resolve, reject);
@@ -198,8 +199,14 @@ define([
                                     default:
                                         break;
                                 }
+                            } else if (data.errorMessage && !data.action){
+                                reject({ message: data.errorMessage });
                             } else {
-                                setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                if (data.action && data.action === 'reject') {
+                                    reject({ message: data.errorMessage });
+                                } else {
+                                    setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                }
                             }
                         })
                         .fail(function () {
@@ -223,7 +230,6 @@ define([
                     })
                     .catch(function(error) {
                         reject(error)
-                        console.error(error);
                     });
             });
             function checkOrderStatus() {
@@ -250,7 +256,6 @@ define([
                             }
                         })
                         .fail(function (error) {
-                            console.log(error)
                             reject(new Error($.mage.__('Network problem')));
                         });
                 });
@@ -393,7 +398,6 @@ define([
                     })
                     .catch(function(error) {
                         reject(error);
-                        console.error(error);
                     });
             }, LONG_POLLING_TIME);
         },

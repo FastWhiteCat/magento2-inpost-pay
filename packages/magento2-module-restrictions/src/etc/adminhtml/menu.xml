@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add id="InPost_Restrictions::management"
+             title="InPost Restrictions"
+             module="InPost_Restrictions"
+             sortOrder="1000"
+             parent="Magento_Backend::stores"
+             resource="InPost_Restrictions::management"/>
+		<add id="InPost_Restrictions::rules"
+             title="Restriction Rules"
+             module="InPost_Restrictions"
+             sortOrder="10"
+             resource="InPost_Restrictions::management"
+             parent="InPost_Restrictions::management"
+             action="inpostrestrictions/rule/index"/>
+        <add id="InPost_Restrictions::products"
+             title="Restricted Products"
+             module="InPost_Restrictions"
+             sortOrder="20"
+             resource="InPost_Restrictions::management"
+             parent="InPost_Restrictions::management"
+             action="inpostrestrictions/product/index"/>
+    </menu>
+</config>

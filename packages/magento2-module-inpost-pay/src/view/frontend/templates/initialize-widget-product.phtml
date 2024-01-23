@@ -17,7 +17,7 @@ $productId = $block->getRequest()->getParam('id');
 $productId = is_scalar($productId) ? (string)$productId : "";
 $isProductSaleable = $widgetViewModel->validateProductIsSaleableById((int)$productId);
 
-if (!$isProductSaleable) {
+if (!$isProductSaleable || $widgetViewModel->isProductRestricted((int)$productId)) {
     return;
 }
 

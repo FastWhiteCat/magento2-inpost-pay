@@ -7,14 +7,17 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Enum\InPostBasketStatus;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCreate;
 use InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket;
 use InPost\InPostPay\Service\GetBasketId;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
@@ -55,13 +58,14 @@ class Get implements HttpPostActionInterface
         private readonly CartRepositoryInterface $cartRepository,
         private readonly BasketBindingCheck $basketBindingCheck,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
         $this->request = $context->getRequest();
     }
 
-    public function execute(): \Magento\Framework\Controller\Result\Json
+    public function execute(): Json
     {
         if (!$this->formKeyValidator->validate($this->request)) {
             $this->messageManager->addErrorMessage(
@@ -75,6 +79,7 @@ class Get implements HttpPostActionInterface
         $data = [];
         try {
             $quote = $this->checkoutSession->getQuote();
+            $this->quoteRestrictionsValidator->validate($quote, true);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
                 $this->quoteRepository->getActive($quoteId);
@@ -83,33 +88,44 @@ class Get implements HttpPostActionInterface
                 $params = $this->serializer->unserialize($this->request->getContent());
 
                 if (isset($params['browser']) && isset($params['binding_place'])) {
-
-                    if ($basketId = $this->tryBindExistingBasket($quoteId)) {
-                        return $this->jsonFactory->create()->setData(['basket_id' => $basketId]);
-                    }
-
-                    $browser = $this->base64serializer->unserialize($params['browser']);
-                    $browserData = [];
-                    if (is_array($browser)) {
-                        $browserData = $this->prepareBrowserData($browser);
-                    }
-
-                    $result = $this->basketBindingCreate->execute(
-                        $quoteId,
-                        $params['binding_place'],
-                        $browserData,
-                        $params['prefix'] ?? null,
-                        $params['number'] ?? null
-                    );
-
-                    $data = $result->getData();
+                    return $this->processPayData($quoteId, $params);
                 }
             }
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->messageManager->addWarningMessage(__('Connecting to InPost Pay failed.')->render());
+            $data = [
+                'errorMessage' => $e->getMessage(),
+                'action' => 'reject'
+            ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
         }
 
         return $this->jsonFactory->create()->setData($data);
+    }
+
+    private function processPayData(int $quoteId, array $params): Json
+    {
+        if ($basketId = $this->tryBindExistingBasket($quoteId)) {
+            return $this->jsonFactory->create()->setData(['basket_id' => $basketId]);
+        }
+
+        $browser = $this->base64serializer->unserialize($params['browser']);
+        $browserData = [];
+        if (is_array($browser)) {
+            $browserData = $this->prepareBrowserData($browser);
+        }
+
+        $result = $this->basketBindingCreate->execute(
+            $quoteId,
+            $params['binding_place'],
+            $browserData,
+            $params['prefix'] ?? null,
+            $params['number'] ?? null
+        );
+
+        return $this->jsonFactory->create()->setData($result->getData());
     }
 
     private function prepareBrowserData(array $browser): array

@@ -8,6 +8,8 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -50,6 +52,7 @@ class Widget implements ArgumentInterface
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly ProductRepositoryInterface        $productRepository,
         private readonly StoreManagerInterface             $storeManager,
+        private readonly RestrictedProductIdsProvider      $restrictedProductIdsProvider,
         private readonly LoggerInterface                   $logger
     ) {
     }
@@ -130,6 +133,35 @@ class Widget implements ArgumentInterface
         } catch (NoSuchEntityException|LocalizedException $e) {
             return 0;
         }
+    }
+
+    public function isProductRestricted(int $productId): bool
+    {
+        $websiteId = (int)$this->storeManager->getWebsite()->getId();
+
+        return in_array(
+            $productId,
+            $this->restrictedProductIdsProvider->getList($websiteId, RestrictionsRuleInterface::APPLIES_TO_PAYMENT)
+        );
+    }
+
+    /**
+     * Returns true if at least one product in cart is not restricted
+     *
+     * @return bool
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function canShowForWholeCart(): bool
+    {
+        foreach ($this->checkoutSession->getQuote()->getAllVisibleItems() as $item) {
+            $productId = (int)$item->getProduct()->getId();
+            if (!$this->isProductRestricted($productId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function isInPostPayOrder(): bool
