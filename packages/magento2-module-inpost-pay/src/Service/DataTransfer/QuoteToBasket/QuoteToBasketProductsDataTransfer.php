@@ -75,6 +75,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             );
 
             if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
+                $inPostProduct->setProductId($inPostProduct->getProductId() . '_' . $quoteItem->getId());
                 $basePriceExclTax = DecimalCalculator::round((float)$quoteItem->getBasePrice());
                 $basePriceInclTax = DecimalCalculator::round((float)$quoteItem->getBasePriceInclTax());
                 $baseTaxValue = DecimalCalculator::sub($basePriceInclTax, $basePriceExclTax);
