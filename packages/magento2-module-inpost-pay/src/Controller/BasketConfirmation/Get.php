@@ -82,7 +82,7 @@ class Get implements HttpGetActionInterface
             }
         } catch (InPostPayRestrictedProductException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
-            $this->messageManager->addErrorMessage($e->getMessage());
+            $this->messageManager->addWarningMessage($e->getMessage());
             $data = [
                 'errorMessage' => $e->getMessage(),
                 'action' => 'reject'

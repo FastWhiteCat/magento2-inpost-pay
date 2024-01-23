@@ -93,7 +93,7 @@ class Get implements HttpPostActionInterface
             }
         } catch (InPostPayRestrictedProductException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
-            $this->messageManager->addErrorMessage($e->getMessage());
+            $this->messageManager->addWarningMessage(__('Connecting to InPost Pay failed.')->render());
             $data = [
                 'errorMessage' => $e->getMessage(),
                 'action' => 'reject'

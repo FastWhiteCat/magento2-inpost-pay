@@ -43,9 +43,8 @@ class QuoteRestrictionsValidator
     private function createExceptionForRestrictedProduct(string $productName): string
     {
         $errorPhrase = __(
-            'Product "%1" is not available for InPost Pay mobile basket.'
-            . ' Please complete Your order on Merchants page.',
-            $productName
+            'Product "%1" is not available for InPost Pay mobile basket.',
+            mb_substr($productName, 0, 30) . '...'
         );
 
         throw new InPostPayRestrictedProductException($errorPhrase);

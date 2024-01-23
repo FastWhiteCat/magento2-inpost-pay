@@ -235,7 +235,9 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     private function getShippingAddress(Quote $quote): AddressInterface
     {
         $shippingAddress = $quote->getShippingAddress();
+        // @phpstan-ignore-next-line
         if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+            // @phpstan-ignore-next-line
             $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
             $customerShippingAddress->getCountryId();
             if ($customerShippingAddress->getCountryId()) {
