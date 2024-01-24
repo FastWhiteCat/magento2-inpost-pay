@@ -31,7 +31,7 @@ class InPostPayBasketNotice extends AbstractDb
         $select = $connection->select()
             ->from(['main_table' => $mainTable], ['basket_notice_id', 'type', 'description'])
             ->where('main_table.inpost_pay_quote_id' . '=?', $inPostPayQuoteId)
-            ->where('main_table.is_sent = 1')
+            ->where('main_table.is_sent = 0')
             ->order('type desc');
 
         $result = $connection->fetchAll($select);
