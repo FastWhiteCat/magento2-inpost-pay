@@ -18,7 +18,6 @@ class AddErrorsToBasketPlugin
     ) {
     }
 
-
     /**
      * @param QuoteToBasketDataTransfer $subject
      * @param null $result
