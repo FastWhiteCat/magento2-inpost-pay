@@ -16,6 +16,7 @@ use InPost\InPostPay\Service\CreateBasketNotice;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
+use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
