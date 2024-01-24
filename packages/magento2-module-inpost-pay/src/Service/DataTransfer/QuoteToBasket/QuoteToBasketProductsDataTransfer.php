@@ -60,8 +60,8 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $productId = (int)$product->getId();
             if ($this->isRestricted($productId, $websiteId)) {
                 $noticePhrase = __(
-                    'Product "%1" is not available for InPost Pay mobile basket.',
-                    mb_substr((string)$product->getName(), 0, 30) . '...'
+                    'Product "%1" is not available for InPost Pay.',
+                    mb_substr((string)$product->getName(), 0, 50)
                 );
                 $this->addBasketNotice(
                     $basket,
