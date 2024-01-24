@@ -9,7 +9,7 @@ use InPost\InPostPay\Model\ResourceModel\InPostPayQuote as InPostPayQuoteResourc
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
 use Magento\Quote\Model\Quote;
 
-class addErrorsToBasketPlugin
+class AddErrorsToBasketPlugin
 {
     public function __construct(
         private readonly InPostPayBasketNoticeResource $inPostPayBasketNotice,

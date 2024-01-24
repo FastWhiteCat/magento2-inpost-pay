@@ -167,7 +167,7 @@
     </type>
     <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <plugin name="InPost_InPostPay::addErrorsToBasketPlugin"
-                type="InPost\InPostPay\Plugin\addErrorsToBasketPlugin" />
+                type="InPost\InPostPay\Plugin\AddErrorsToBasketPlugin" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
