@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
@@ -29,9 +29,9 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
     public function __construct(
         private readonly ProductInterfaceFactory $productFactory,
         private readonly PriceInterfaceFactory $priceFactory,
-        private readonly NoticeInterfaceFactory $noticeFactory,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
-        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
+        private readonly CreateBasketNotice $createBasketNotice
     ) {
     }
 
@@ -63,10 +63,10 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                     'Product "%1" is not available for InPost Pay.',
                     mb_substr((string)$product->getName(), 0, 50)
                 );
+
                 $this->addBasketNotice(
-                    $basket,
-                    $noticePhrase->render(),
-                    NoticeInterface::ATTENTION
+                    $basket->getBasketId(),
+                    $noticePhrase->render()
                 );
 
                 continue;
@@ -106,21 +106,11 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         return in_array($productId, $restrictedProductIds);
     }
 
-    private function addBasketNotice(BasketInterface $basket, string $message, string $noticeType): void
-    {
-        $summary = $basket->getSummary();
-        $basketNotice = $summary->getBasketNotice();
-        if (!$basketNotice instanceof NoticeInterface) {
-            /** @var NoticeInterface $basketNotice */
-            $basketNotice = $this->noticeFactory->create();
-            $basketNotice->setType($noticeType);
-            $description = '';
-        } else {
-            $description = $basketNotice->getDescription() . PHP_EOL;
-        }
-
-        $description .= $message;
-        $basketNotice->setDescription($description);
-        $summary->setBasketNotice($basketNotice);
+    private function addBasketNotice(string $basketId, string $message) {
+        $this->createBasketNotice->execute(
+            $basketId,
+            InPostPayBasketNoticeInterface::ATTENTION,
+            $message
+        );
     }
 }

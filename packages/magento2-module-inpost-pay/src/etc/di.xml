@@ -53,6 +53,8 @@
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
                 type="InPost\InPostPay\Model\InPostPayQuote"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface"
+                type="InPost\InPostPay\Model\InPostPayBasketNotice"/>
     <preference for="InPost\InPostPay\Api\InPostPayOrderRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayOrderRepository"/>
     <preference for="InPost\InPostPay\Api\OrderLockerServiceInterface"
@@ -77,6 +79,8 @@
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayBasketNoticeRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayBasketNoticeRepository"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
     <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
@@ -160,6 +164,10 @@
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface">
         <plugin name="InPost_InPostPay::orderEventIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <plugin name="InPost_InPostPay::addErrorsToBasketPlugin"
+                type="InPost\InPostPay\Plugin\AddErrorsToBasketPlugin" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>

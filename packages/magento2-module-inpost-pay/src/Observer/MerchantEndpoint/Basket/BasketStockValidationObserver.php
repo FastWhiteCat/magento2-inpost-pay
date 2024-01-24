@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Observer\MerchantEndpoint\Basket;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Psr\Log\LoggerInterface;
@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 class BasketStockValidationObserver implements ObserverInterface
 {
     public function __construct(
-        private readonly NoticeInterfaceFactory $noticeFactory,
+        private readonly CreateBasketNotice $createBasketNotice,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -27,16 +27,13 @@ class BasketStockValidationObserver implements ObserverInterface
         if ($basket instanceof BasketInterface) {
             $errors = $this->prepareBasketStockErrors($basket);
             if (!empty($errors)) {
-                $summary = $basket->getSummary();
-                if ($notice = $summary->getBasketNotice()) {
-                    $noticeErrors = explode(PHP_EOL, $notice->getDescription());
-                    $errors = array_merge($noticeErrors, $errors);
-                    $notice->setDescription(implode(PHP_EOL, $errors));
-                } else {
-                    $notice = $this->prepareStockAttentionNotice(implode(PHP_EOL, $errors));
+                foreach ($errors as $error) {
+                    $this->createBasketNotice->execute(
+                        $basket->getBasketId(),
+                        InPostPayBasketNoticeInterface::ATTENTION,
+                        $error
+                    );
                 }
-
-                $summary->setBasketNotice($notice);
             }
         }
     }
@@ -65,15 +62,5 @@ class BasketStockValidationObserver implements ObserverInterface
         }
 
         return $errors;
-    }
-
-    private function prepareStockAttentionNotice(string $description): NoticeInterface
-    {
-        /** @var NoticeInterface $notice */
-        $notice = $this->noticeFactory->create();
-        $notice->setType(NoticeInterface::ATTENTION);
-        $notice->setDescription($description);
-
-        return $notice;
     }
 }
