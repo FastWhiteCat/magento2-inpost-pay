@@ -18,12 +18,12 @@ class AddErrorsToBasketPlugin
     ) {
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function afterTransfer(
-        // @phpstan-ignore-next-line
         QuoteToBasketDataTransfer $subject,
-        // @phpstan-ignore-next-line
         $result,
-        // @phpstan-ignore-next-line
         Quote $quote,
         BasketInterface $basket
     ): void {
