@@ -23,6 +23,7 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
 
 /**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInterface
