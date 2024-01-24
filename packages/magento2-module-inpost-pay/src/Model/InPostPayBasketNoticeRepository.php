@@ -69,7 +69,8 @@ class InPostPayBasketNoticeRepository implements InPostPayBasketNoticeRepository
             // @phpstan-ignore-next-line
             $inPostPayBasketNotice,
             $inPostPayQuoteId,
-            InPostPayBasketNoticeInterface::INPOST_PAY_QUOTE_ID);
+            InPostPayBasketNoticeInterface::INPOST_PAY_QUOTE_ID
+        );
 
         try {
             $inPostPayBasketNotice->getBasketNoticeId();
