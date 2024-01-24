@@ -95,6 +95,7 @@ class CartService
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         try {
+            $itemId = null;
             if ($isQuoteItemId) {
                 $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
                 if ($product instanceof Product) {
