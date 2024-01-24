@@ -18,7 +18,7 @@ class InPostPayBasketNotice extends AbstractDb
         );
     }
 
-    public function getBasketNoticesByInPostPayQuoteId(string $inPostPayQuoteId): array
+    public function getBasketNoticesByInPostPayQuoteId(int $inPostPayQuoteId): array
     {
         $connection = $this->getConnection();
 
@@ -52,7 +52,10 @@ class InPostPayBasketNotice extends AbstractDb
         $connection->update(
             $mainTable,
             ['is_sent' => true],
-            ['inpost_pay_quote_id = ?' => $inPostPayQuoteId]
+            [
+                'inpost_pay_quote_id = ?' => $inPostPayQuoteId,
+                'basket_notice_id IN ?' => $noticeIds
+            ]
         );
     }
 }

@@ -164,7 +164,8 @@ class OrderCreate implements OrderCreateInterface
         return $inPostOrder;
     }
 
-    private function addBasketNoticeError(string $basketId, string $message) {
+    private function addBasketNoticeError(string $basketId, string $message): void
+    {
         $this->createBasketNotice->execute(
             $basketId,
             InPostPayBasketNoticeInterface::ERROR,
