@@ -53,13 +53,17 @@ class CartService
                 }
 
                 $itemId = $this->getItemIdByProductFromCart($quote, $product);
+
+                if ($itemId === null) {
+                    $quote->addProduct($product, (float)$qty);
+                } else {
+                    $quoteItem = $quote->getItemById($itemId);
+                    if ($quoteItem) {
+                        $quoteItem->setQty($qty);
+                    }
+                }
             } else {
                 $itemId = $productId;
-            }
-
-            if ($itemId === null) {
-                $quote->addProduct($product, (float)$qty);
-            } else {
                 $quoteItem = $quote->getItemById($itemId);
                 if ($quoteItem) {
                     $quoteItem->setQty($qty);
@@ -91,6 +95,7 @@ class CartService
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         try {
+            $itemId = null;
             if ($isQuoteItemId) {
                 $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
                 if ($product instanceof Product) {
@@ -100,7 +105,7 @@ class CartService
                 $itemId = $productId;
             }
 
-            if ($itemId ) {
+            if ($itemId) {
                 $quote->removeItem($itemId);
                 $this->applyQuoteChanges($quote);
                 $this->logger->debug(

@@ -105,6 +105,7 @@ class BasketUpdate implements BasketUpdateInterface
 
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
+            $basket->setBasketId($basketId);
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
             $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
 
