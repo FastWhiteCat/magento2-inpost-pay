@@ -52,7 +52,7 @@ class InPostPayBasketNotice extends AbstractDb
             ['is_sent' => true],
             [
                 'inpost_pay_quote_id = ?' => $inPostPayQuoteId,
-                'basket_notice_id IN ?' => $noticeIds
+                'basket_notice_id IN (?)' => $noticeIds
             ]
         );
     }

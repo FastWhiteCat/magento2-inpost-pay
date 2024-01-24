@@ -19,6 +19,12 @@ class AddErrorsToBasketPlugin
     }
 
     public function afterTransfer(
+        // @phpstan-ignore-next-line
+        QuoteToBasketDataTransfer $subject,
+        // @phpstan-ignore-next-line
+        $result,
+        // @phpstan-ignore-next-line
+        Quote $quote,
         BasketInterface $basket
     ): void {
         $inPostPayQuoteId = $this->inPostPayQuote->getInPostPayQuoteIdByBasketId((string)$basket->getBasketId());
