@@ -34,9 +34,7 @@ class InPostPayBasketNotice extends AbstractDb
             ->where('main_table.is_sent = 0')
             ->order('type desc');
 
-        $result = $connection->fetchAll($select);
-
-        return is_array($result) ? $result : [];
+        return $connection->fetchAll($select);
     }
 
     public function setNoticeAsSent(array $noticeIds, int $inPostPayQuoteId): void
