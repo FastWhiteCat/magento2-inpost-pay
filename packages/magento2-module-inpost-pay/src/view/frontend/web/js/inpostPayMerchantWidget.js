@@ -18,10 +18,6 @@ define([
         DOWNLOADABLE: 'downloadable',
         BUNDLE: 'bundle'
     };
-    var NOT_ALLOWED_PRODUCT_TYPES = [
-        PRODUCT_TYPES.GROUPED,
-        PRODUCT_TYPES.BUNDLE
-    ];
 
     return Component.extend({
         initialize: function (config) {
@@ -338,14 +334,6 @@ define([
                 var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
                 var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
                 var counter = cartData ? cartData.summary_count : getConfig().count || 0;
-                var hasCartNotAllowedProducts = cartData ? cartData.items.some(function(item) {
-                    return NOT_ALLOWED_PRODUCT_TYPES.includes(item.product_type)
-                }) : false;
-
-                if (hasCartNotAllowedProducts) {
-                    $inpayWrapperOnBasket.hide()
-                    return;
-                }
 
                 if ($inpayWrapperOnBasket.length) {
                     if (counter === 0) {
@@ -441,6 +429,21 @@ define([
 
                     return isAddedProduct
                 })
+            }
+
+            var $groupedProductElements = $productForm.find('[name*="super_group"]')
+            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
+                return this.value > 0;
+            })
+
+            if (simpleProductsInGrouped.length) {
+                var addedSimpleProducts = 0;
+                _.each(simpleProductsInGrouped, function (item) {
+                    if (cartData.items.some(function (cartItem) {
+                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
+                    })) addedSimpleProducts++
+                })
+                return addedSimpleProducts === simpleProductsInGrouped.length;
             }
         }
     });

@@ -170,12 +170,20 @@ class BasketUpdate implements BasketUpdateInterface
 
     private function handleProductQuantities(Quote $quote, QuantityUpdateInterface $productQuantity): void
     {
-        $productId = (int)$productQuantity->getProductId();
+        $productIdArr = explode('_', $productQuantity->getProductId());
+        $isQuoteItemId = false;
+        if (isset($productIdArr[1])) {
+            $productId = (int)$productIdArr[1];
+            $isQuoteItemId = true;
+        } else {
+            $productId = (int)$productQuantity->getProductId();
+        }
+
         $qty = (float)$productQuantity->getQuantity()->getQuantity();
         if ($qty) {
-            $this->cartService->addToCart($quote, $productId, $qty);
+            $this->cartService->addToCart($quote, $productId, $qty, $isQuoteItemId);
         } else {
-            $this->cartService->removeFromCart($quote, $productId);
+            $this->cartService->removeFromCart($quote, $productId, $isQuoteItemId);
         }
     }
 
