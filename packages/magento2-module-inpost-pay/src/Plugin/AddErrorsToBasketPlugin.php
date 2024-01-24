@@ -18,13 +18,21 @@ class AddErrorsToBasketPlugin
     ) {
     }
 
+    /**
+     * @param QuoteToBasketDataTransfer $subject
+     * @param null $result
+     * @param Quote $quote
+     * @param BasketInterface $basket
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function afterTransfer(
         QuoteToBasketDataTransfer $subject,
         $result,
         Quote $quote,
         BasketInterface $basket
     ): void {
-        $inPostPayQuoteId = $this->inPostPayQuote->getInPostPayQuoteIdByBasketId($basket->getBasketId());
+        $inPostPayQuoteId = $this->inPostPayQuote->getInPostPayQuoteIdByBasketId((string)$basket->getBasketId());
         $errors = $this->inPostPayBasketNotice->getBasketNoticesByInPostPayQuoteId($inPostPayQuoteId);
 
         if ($errors) {

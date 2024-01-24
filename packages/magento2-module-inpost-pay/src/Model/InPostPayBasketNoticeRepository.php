@@ -64,12 +64,14 @@ class InPostPayBasketNoticeRepository implements InPostPayBasketNoticeRepository
     public function getByInPostPayQuoteId(int $inPostPayQuoteId): InPostPayBasketNoticeInterface
     {
         $inPostPayBasketNotice = $this->inPostPayBasketNoticeInterfaceFactory->create();
-        // @phpstan-ignore-next-line
+
         $this->resource->load(
+            // @phpstan-ignore-next-line
             $inPostPayBasketNotice,
             $inPostPayQuoteId,
             InPostPayBasketNoticeInterface::INPOST_PAY_QUOTE_ID
         );
+
         try {
             $inPostPayBasketNotice->getBasketNoticeId();
         } catch (LocalizedException $e) {

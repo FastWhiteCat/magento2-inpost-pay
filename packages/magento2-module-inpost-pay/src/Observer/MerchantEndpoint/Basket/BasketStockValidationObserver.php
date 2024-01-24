@@ -29,7 +29,7 @@ class BasketStockValidationObserver implements ObserverInterface
             if (!empty($errors)) {
                 foreach ($errors as $error) {
                     $this->createBasketNotice->execute(
-                        $basket->getBasketId(),
+                        (string)$basket->getBasketId(),
                         InPostPayBasketNoticeInterface::ATTENTION,
                         $error
                     );

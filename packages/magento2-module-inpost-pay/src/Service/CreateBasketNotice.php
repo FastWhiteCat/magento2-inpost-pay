@@ -10,8 +10,6 @@ use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 
 class CreateBasketNotice
 {
-    private array $inPostPayQuote = [];
-
     public function __construct(
         private readonly InPostPayBasketNoticeInterfaceFactory $inPostPayBasketNoticeInterfaceFactory,
         private readonly InPostPayBasketNoticeRepositoryInterface $inPostPayBasketNoticeRepository,

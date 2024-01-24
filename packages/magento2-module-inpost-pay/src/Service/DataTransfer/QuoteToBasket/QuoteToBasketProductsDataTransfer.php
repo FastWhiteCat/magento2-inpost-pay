@@ -81,7 +81,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 );
 
                 $this->addBasketNotice(
-                    $basket->getBasketId(),
+                    (string)$basket->getBasketId(),
                     $noticePhrase->render()
                 );
 
@@ -164,7 +164,8 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         return in_array($productId, $restrictedProductIds);
     }
 
-    private function addBasketNotice(string $basketId, string $message) {
+    private function addBasketNotice(string $basketId, string $message): void
+    {
         $this->createBasketNotice->execute(
             $basketId,
             InPostPayBasketNoticeInterface::ATTENTION,

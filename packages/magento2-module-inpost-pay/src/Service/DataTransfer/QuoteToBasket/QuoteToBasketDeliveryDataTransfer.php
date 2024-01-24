@@ -43,7 +43,6 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly AddressRepositoryInterface $addressRepository,
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
-        private readonly NoticeInterfaceFactory $noticeFactory,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -55,7 +54,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         if ($quote->isVirtual()) {
             $this->logger->error('Quote is virtual. Setting empty delivery.');
             $basket->setDelivery([]);
-            $this->setBasketNoticeVirtualProducts($basket->getBasketId());
+            $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
             return;
         }
 
@@ -77,7 +76,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         foreach ($quote->getAllVisibleItems() as $item) {
             if ($item->getProduct()->getIsVirtual()) {
-                $this->setBasketNoticeVirtualProducts($basket->getBasketId());
+                $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
                 break;
             }
         }
