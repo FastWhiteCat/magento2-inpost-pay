@@ -97,12 +97,12 @@ class CartService
         try {
             $itemId = null;
             if ($isQuoteItemId) {
+                $itemId = $productId;
+            } else {
                 $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
                 if ($product instanceof Product) {
                     $itemId = $this->getItemIdByProductFromCart($quote, $product);
                 }
-            } else {
-                $itemId = $productId;
             }
 
             if ($itemId) {
