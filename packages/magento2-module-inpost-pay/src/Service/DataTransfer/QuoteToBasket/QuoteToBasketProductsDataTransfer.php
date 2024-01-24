@@ -6,23 +6,32 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
+use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInterface
 {
     public function __construct(
         private readonly ProductInterfaceFactory $productFactory,
         private readonly PriceInterfaceFactory $priceFactory,
-        private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer
+        private readonly NoticeInterfaceFactory $noticeFactory,
+        private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider
     ) {
     }
 
@@ -48,6 +57,21 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo($product);
             }
 
+            $productId = (int)$product->getId();
+            if ($this->isRestricted($productId, $websiteId)) {
+                $noticePhrase = __(
+                    'Product "%1" is not available for InPost Pay.',
+                    mb_substr((string)$product->getName(), 0, 50)
+                );
+                $this->addBasketNotice(
+                    $basket,
+                    $noticePhrase->render(),
+                    NoticeInterface::ATTENTION
+                );
+
+                continue;
+            }
+
             $this->productToInPostProductDataTransfer->transfer(
                 $product,
                 $inPostProduct,
@@ -70,5 +94,33 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $basket->setProducts($products);
+    }
+
+    private function isRestricted(int $productId, int $websiteId): bool
+    {
+        $restrictedProductIds = $this->restrictedProductIdsProvider->getList(
+            $websiteId,
+            RestrictionsRuleInterface::APPLIES_TO_PAYMENT
+        );
+
+        return in_array($productId, $restrictedProductIds);
+    }
+
+    private function addBasketNotice(BasketInterface $basket, string $message, string $noticeType): void
+    {
+        $summary = $basket->getSummary();
+        $basketNotice = $summary->getBasketNotice();
+        if (!$basketNotice instanceof NoticeInterface) {
+            /** @var NoticeInterface $basketNotice */
+            $basketNotice = $this->noticeFactory->create();
+            $basketNotice->setType($noticeType);
+            $description = '';
+        } else {
+            $description = $basketNotice->getDescription() . PHP_EOL;
+        }
+
+        $description .= $message;
+        $basketNotice->setDescription($description);
+        $summary->setBasketNotice($basketNotice);
     }
 }

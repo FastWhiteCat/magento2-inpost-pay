@@ -229,6 +229,7 @@
     <type name="InPost\InPostPay\Validator\OrderValidator">
         <arguments>
             <argument name="orderValidators" xsi:type="array">
+                <item name="restrictions_validator" xsi:type="object">InPost\InPostPay\Validator\Order\RestrictionsValidator</item>
                 <item name="basket_price" xsi:type="object">InPost\InPostPay\Validator\Order\BasketPriceValidator</item>
                 <item name="payment_type" xsi:type="object">InPost\InPostPay\Validator\Order\PaymentTypeValidator</item>
                 <item name="delivery" xsi:type="object">InPost\InPostPay\Validator\Order\DeliveryValidator</item>
@@ -459,6 +460,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Observer\Order\ForceStatusUpdateObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\Order\RestrictionsValidator">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

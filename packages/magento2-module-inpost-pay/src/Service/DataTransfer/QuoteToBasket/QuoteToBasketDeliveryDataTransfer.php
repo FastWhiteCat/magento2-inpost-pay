@@ -13,16 +13,19 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\CreateBasketNotice;
 use Magento\Customer\Api\AddressRepositoryInterface;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -39,6 +42,9 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly ShippingMethodManagementInterface $shippingManager,
         private readonly AddressRepositoryInterface $addressRepository,
         private readonly CreateBasketNotice $createBasketNotice,
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
+        private readonly NoticeInterfaceFactory $noticeFactory,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -47,12 +53,24 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         $shippingAddress = $this->getShippingAddress($quote);
 
         if ($quote->isVirtual()) {
+            $this->logger->error('Quote is virtual. Setting empty delivery.');
             $basket->setDelivery([]);
             $this->setBasketNoticeVirtualProducts($basket->getBasketId());
             return;
         }
 
+        try {
+            $this->quoteRestrictionsValidator->validate($quote, true);
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->logger->error(
+                sprintf('Restricted product in cart. Setting empty delivery. Reason: %s', $e->getMessage())
+            );
+            $basket->setDelivery([]);
+            return;
+        }
+
         if ((int)$quote->getItemsCount() === 0) {
+            $this->logger->error('Empty cart. Setting empty delivery.');
             $basket->setDelivery([]);
             return;
         }
@@ -210,7 +228,9 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     private function getShippingAddress(Quote $quote): AddressInterface
     {
         $shippingAddress = $quote->getShippingAddress();
+        // @phpstan-ignore-next-line
         if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+            // @phpstan-ignore-next-line
             $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
             $customerShippingAddress->getCountryId();
             if ($customerShippingAddress->getCountryId()) {
