@@ -68,8 +68,9 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                     foreach ($selectedOptions['bundle_options'] as $option) {
                         $options[] = [
                             'label' => $option['label'],
-                            'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title'] . " "
-                                . DecimalCalculator::round((float)$option['value'][0]['price'])
+                            'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title']
+                                . ' ' . DecimalCalculator::round((float)$option['value'][0]['price'])
+                                . ' ' . $quote->getStore()->getCurrentCurrency()->getCurrencySymbol()
                             ];
                     }
                 }
