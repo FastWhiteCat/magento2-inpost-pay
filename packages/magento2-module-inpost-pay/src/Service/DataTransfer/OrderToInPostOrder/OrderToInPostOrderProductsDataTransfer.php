@@ -18,6 +18,9 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTransferInterface
 {
     public function __construct(
