@@ -16,6 +16,7 @@ use Magento\InventorySalesApi\Model\GetSalableQtyInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -56,7 +57,7 @@ class StockValidator implements OrderValidatorInterface
         }
     }
 
-    private function checkProductIsSalable(Item | Item\AbstractItem $item, int $stockId): void
+    private function checkProductIsSalable(Item | AbstractItem $item, int $stockId): void
     {
         $name = (string)$item->getName();
         $sku = (string)$item->getSku();
