@@ -10,7 +10,7 @@
     <route url="/v1/izi/basket/:basketId/event" method="POST">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface" method="execute"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
     <route url="/v1/izi/basket/:basketId/binding" method="DELETE">
