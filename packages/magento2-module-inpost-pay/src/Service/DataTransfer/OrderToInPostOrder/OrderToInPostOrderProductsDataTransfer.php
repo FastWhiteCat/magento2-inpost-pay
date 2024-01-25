@@ -19,7 +19,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
 
 /**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTransferInterface
 {
