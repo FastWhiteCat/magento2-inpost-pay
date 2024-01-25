@@ -11,6 +11,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Checkout\Model\Cart;
 use Magento\Quote\Model\Quote;
 
 class UpdateInPostBasketAfterAddProductEventObserver implements ObserverInterface
@@ -30,9 +31,11 @@ class UpdateInPostBasketAfterAddProductEventObserver implements ObserverInterfac
     public function execute(Observer $observer): void
     {
         $cart = $observer->getEvent()->getData('cart');
-        $quote = $cart->getQuote();
-        if ($quote instanceof Quote && $this->canSync($quote)) {
-            $this->updateInPostBasketEvent->execute($quote);
+        if ($cart instanceof Cart) {
+            $quote = $cart->getQuote();
+            if ($quote instanceof Quote && $this->canSync($quote)) {
+                $this->updateInPostBasketEvent->execute($quote);
+            }
         }
     }
 
