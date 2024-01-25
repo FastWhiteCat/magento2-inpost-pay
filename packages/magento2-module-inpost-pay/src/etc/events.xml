@@ -2,6 +2,9 @@
     <event name="sales_quote_save_after">
         <observer name="InPost_InPostPay::updateInPostBasketEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver" />
     </event>
+    <event name="checkout_cart_save_after">
+        <observer name="InPost_InPostPay::updateInPostBasketAfterAddProductEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterAddProductEventObserver" />
+    </event>
     <event name="sales_order_save_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
