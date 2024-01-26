@@ -86,7 +86,11 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods);
 
         if (empty($deliveries)) {
-            throw new LocalizedException(__('No delivery method is allowed for this basket.'));
+            $this->createBasketNotice->execute(
+                $basket->getBasketId(),
+                InPostPayBasketNoticeInterface::ATTENTION,
+                __('No delivery method is allowed for this basket.')->render()
+            );
         }
 
         $basket->setDelivery($deliveries);
