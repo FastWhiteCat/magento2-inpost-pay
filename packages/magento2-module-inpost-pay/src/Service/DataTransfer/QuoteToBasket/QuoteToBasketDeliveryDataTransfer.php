@@ -87,7 +87,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         if (empty($deliveries)) {
             $this->createBasketNotice->execute(
-                $basket->getBasketId(),
+                (string)$basket->getBasketId(),
                 InPostPayBasketNoticeInterface::ATTENTION,
                 __('No delivery method is allowed for this basket.')->render()
             );
@@ -232,7 +232,10 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     {
         $shippingAddress = $quote->getShippingAddress();
         // @phpstan-ignore-next-line
-        if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+        if ((empty($shippingAddress->getCountryId()) || !$shippingAddress->getPostcode())
+            // @phpstan-ignore-next-line
+            && $quote->getCustomer()->getId()
+        ) {
             // @phpstan-ignore-next-line
             $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
             $customerShippingAddress->getCountryId();
