@@ -87,8 +87,6 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                     (string)$basket->getBasketId(),
                     $noticePhrase->render()
                 );
-
-                continue;
             }
 
             $this->productToInPostProductDataTransfer->transfer(
