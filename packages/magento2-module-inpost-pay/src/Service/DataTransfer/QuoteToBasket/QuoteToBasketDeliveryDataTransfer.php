@@ -232,7 +232,10 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     {
         $shippingAddress = $quote->getShippingAddress();
         // @phpstan-ignore-next-line
-        if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+        if ((empty($shippingAddress->getCountryId()) || !$shippingAddress->getPostcode())
+            && $quote->getCustomer()
+            && $quote->getCustomer()->getId()
+        ) {
             // @phpstan-ignore-next-line
             $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
             $customerShippingAddress->getCountryId();
