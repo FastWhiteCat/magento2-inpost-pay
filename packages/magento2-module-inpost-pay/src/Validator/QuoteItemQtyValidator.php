@@ -32,7 +32,7 @@ class QuoteItemQtyValidator
         array $quoteItemsQuantity
     ): bool {
         $websiteId = (int)$quote->getStore()->getWebsiteId();
-
+        $maxQuantity = 0;
         if ($isQuoteItemId) {
             $quoteItem = $quote->getItemById($productId);
             if ($quoteItem) {
@@ -50,13 +50,14 @@ class QuoteItemQtyValidator
                 return false;
             }
             $quoteItem = $quote->getItemByProduct($product);
+            $itemQty = $quoteItem ? $quoteItem->getQty() : 0;
 
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
             $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $product, $requestedQuantity);
             $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
             if ($quoteItemsQuantity) {
-                $maxQuantity -= ($quoteItemsQuantity[$product->getId()] - $quoteItem->getQty());
+                $maxQuantity -= ($quoteItemsQuantity[$product->getId()] - $itemQty);
             }
             $maxQuantity = (float)$maxQuantity;
         }

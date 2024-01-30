@@ -39,6 +39,9 @@ class BasketUpdate implements BasketUpdateInterface
 {
     private const PROMO_CODES_EVENT = 'PROMO_CODES';
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,

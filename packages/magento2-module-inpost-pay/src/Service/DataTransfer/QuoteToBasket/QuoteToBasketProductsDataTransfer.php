@@ -128,7 +128,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $promoPrice->setGross($priceInclTax);
             $promoPrice->setVat($taxValue);
             $inPostProduct->setPromoPrice($promoPrice);
-            $this->checkBasketStockAvailability($basket->getBasketId(), $inPostProduct);
+            $this->checkBasketStockAvailability((string)$basket->getBasketId(), $inPostProduct);
             $products[] = $inPostProduct;
         }
 
