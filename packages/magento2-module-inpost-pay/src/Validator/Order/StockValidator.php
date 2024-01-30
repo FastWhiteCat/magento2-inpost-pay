@@ -67,13 +67,17 @@ class StockValidator implements OrderValidatorInterface
 
         foreach ($errors as $error) {
             $this->logger->error($error->getMessage());
+            $availableQty = $this->getSalableQty->execute($sku, $stockId);
+            if ($availableQty < 0) {
+                $availableQty = 0;
+            }
 
             throw new QuoteItemOutOfStockException(
                 __(
                     'Item "%1" is no longer available in requested quantity: %2. Currently available: %3',
                     $name,
                     $qty,
-                    $this->getSalableQty->execute($sku, $stockId)
+                    $availableQty
                 )
             );
         }

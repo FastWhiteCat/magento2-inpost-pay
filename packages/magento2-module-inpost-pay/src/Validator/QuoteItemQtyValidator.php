@@ -12,6 +12,7 @@ use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 
 class QuoteItemQtyValidator
@@ -50,7 +51,11 @@ class QuoteItemQtyValidator
                 return false;
             }
             $quoteItem = $quote->getItemByProduct($product);
-            $itemQty = $quoteItem ? $quoteItem->getQty() : 0;
+
+            $itemQty = 0;
+            if ($quoteItem instanceof Item) {
+                $itemQty = $quoteItem->getQty();
+            }
 
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
