@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\CreateBasketNotice;
+use InPost\InPostPay\Service\PrepareQuoteProductsQuantity;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
@@ -21,6 +22,7 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -33,14 +35,16 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         private readonly PriceInterfaceFactory $priceFactory,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
-        private readonly CreateBasketNotice $createBasketNotice
+        private readonly CreateBasketNotice $createBasketNotice,
+        private readonly PrepareQuoteProductsQuantity $prepareQuoteProductsQuantity,
+        private readonly LoggerInterface $logger
     ) {
     }
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $products = [];
-        $quoteItemsQuantity = $this->prepareQuoteProductsQuantity($quote);
+        $quoteItemsQuantity = $this->prepareQuoteProductsQuantity->execute($quote);
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
             /** @var ProductInterface $inPostProduct */
             /** @var Item $quoteItem */
@@ -124,37 +128,11 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             $promoPrice->setGross($priceInclTax);
             $promoPrice->setVat($taxValue);
             $inPostProduct->setPromoPrice($promoPrice);
+            $this->checkBasketStockAvailability($basket->getBasketId(), $inPostProduct);
             $products[] = $inPostProduct;
         }
 
         $basket->setProducts($products);
-    }
-
-    private function prepareQuoteProductsQuantity(Quote $quote): array
-    {
-        $quoteItemsQuantity = [];
-        foreach ($quote->getAllVisibleItems() as $quoteItem) {
-            if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
-                foreach ($quoteItem->getChildren() as $child) {
-                    $qty = $child->getQty() * $quoteItem->getQty();
-                    $this->setQuoteItemQuantity((int)$child->getProduct()->getId(), $qty, $quoteItemsQuantity);
-                }
-            } else {
-                $qty = $quoteItem->getQty();
-                $this->setQuoteItemQuantity((int)$quoteItem->getProduct()->getId(), $qty, $quoteItemsQuantity);
-            }
-        }
-
-        return $quoteItemsQuantity;
-    }
-
-    private function setQuoteItemQuantity(int $productId, float $qty, array &$quoteItemsQuantity): void
-    {
-        if (array_key_exists($productId, $quoteItemsQuantity)) {
-            $quoteItemsQuantity[$productId] += $qty;
-        } else {
-            $quoteItemsQuantity[$productId] = $qty;
-        }
     }
 
     private function isRestricted(int $productId, int $websiteId): bool
@@ -174,5 +152,26 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             InPostPayBasketNoticeInterface::ATTENTION,
             $message
         );
+    }
+
+    private function checkBasketStockAvailability(string $basketId, ProductInterface $product): void
+    {
+        $quantity = $product->getQuantity();
+        $basketQuantity = (float)$quantity->getQuantity();
+        $availableQuantity = $quantity->getAvailableQuantity();
+        if ($basketQuantity > $availableQuantity) {
+            $error = __(
+                'Item "%1" is no longer available in requested quantity: %2. Currently available: %3',
+                $product->getProductName(),
+                $basketQuantity,
+                $availableQuantity
+            )->render();
+
+            $this->logger->warning(
+                sprintf('Basket %s Stock Validation Warning: %s', $basketId, $error)
+            );
+
+            $this->addBasketNotice($basketId, $error);
+        }
     }
 }
