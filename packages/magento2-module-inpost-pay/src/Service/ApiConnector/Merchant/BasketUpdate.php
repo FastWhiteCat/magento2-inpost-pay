@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 use InPost\InPostPay\Exception\InvalidPromoCodeException;
 use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Service\CreateBasketNotice;
+use InPost\InPostPay\Service\PrepareQuoteProductsQuantity;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
@@ -23,6 +24,7 @@ use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use InPost\InPostPay\Validator\QuoteItemQtyValidator;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -37,6 +39,9 @@ class BasketUpdate implements BasketUpdateInterface
 {
     private const PROMO_CODES_EVENT = 'PROMO_CODES';
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
@@ -46,6 +51,8 @@ class BasketUpdate implements BasketUpdateInterface
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly EventManager $eventManager,
         private readonly CreateBasketNotice $createBasketNotice,
+        private readonly PrepareQuoteProductsQuantity $prepareQuoteProductsQuantity,
+        private readonly QuoteItemQtyValidator $qtyValidator,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -95,7 +102,7 @@ class BasketUpdate implements BasketUpdateInterface
                     $relatedProductsEventData,
                     $promoCodesEventData
                 );
-            } catch (InvalidPromoCodeException $e) {
+            } catch (InvalidPromoCodeException|LocalizedException $e) {
                 $this->createBasketNotice->execute(
                     $basketId,
                     InPostPayBasketNoticeInterface::ERROR,
@@ -181,6 +188,8 @@ class BasketUpdate implements BasketUpdateInterface
 
         $qty = (float)$productQuantity->getQuantity()->getQuantity();
         if ($qty) {
+            $quoteItemsQuantity = $this->prepareQuoteProductsQuantity->execute($quote);
+            $this->qtyValidator->validate($quote, $productId, $qty, $isQuoteItemId, $quoteItemsQuantity);
             $this->cartService->addToCart($quote, $productId, $qty, $isQuoteItemId);
         } else {
             $this->cartService->removeFromCart($quote, $productId, $isQuoteItemId);
