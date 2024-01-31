@@ -66,7 +66,7 @@ class QuoteItemQtyValidator
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
             $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $product, $requestedQuantity);
             $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
-            if ($quoteItemsQuantity) {
+            if ($quoteItemsQuantity && isset($quoteItemsQuantity[$product->getId()])) {
                 $maxQuantity -= ($quoteItemsQuantity[$product->getId()] - $itemQty);
             }
             $maxQuantity = (float)$maxQuantity;
@@ -99,7 +99,7 @@ class QuoteItemQtyValidator
             $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $child, $childQuantity);
 
             $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
-            if ($quoteItemsQuantity) {
+            if ($quoteItemsQuantity && isset($quoteItemsQuantity[$child->getProduct()->getId()])) {
                 $maxQuantity -= ($quoteItemsQuantity[$child->getProduct()->getId()] - ($childQuantity * $quantity));
             }
 
