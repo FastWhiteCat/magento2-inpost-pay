@@ -158,9 +158,9 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         $basketQuantity = (float)$quantity->getQuantity();
         $availableQuantity = $quantity->getAvailableQuantity();
         if ($basketQuantity > $availableQuantity) {
-           if ($availableQuantity < 0) {
-               $availableQuantity = 0;
-           }
+            if ($availableQuantity < 0) {
+                $availableQuantity = 0;
+            }
 
             $error = __(
                 'Item "%1" is no longer available in requested quantity: %2. Currently available: %3',
