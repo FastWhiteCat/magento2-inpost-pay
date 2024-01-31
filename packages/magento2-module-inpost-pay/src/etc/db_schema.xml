@@ -69,4 +69,30 @@
                     column="agreement_id" referenceTable="checkout_agreement" referenceColumn="agreement_id"
                     onDelete="CASCADE"/>
     </table>
+    <table name="inpost_pay_basket_notice" resource="default" engine="innodb">
+        <column xsi:type="int" name="basket_notice_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="inpost_pay_quote_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="type" length="255" nullable="false"/>
+        <column xsi:type="varchar" name="description" length="255" nullable="false"/>
+        <column xsi:type="tinyint" name="is_sent" nullable="false" default="0"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="basket_notice_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID_INPOST_PAY_QUOTE_INPOST_PAY_QUOTE_ID"
+                    table="inpost_pay_basket_notice" column="inpost_pay_quote_id"
+                    referenceTable="inpost_pay_quote" referenceColumn="inpost_pay_quote_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID">
+            <column name="basket_notice_id"/>
+        </constraint>
+        <index referenceId="INPOST_PAY_BASKET_NOTICE_INPOST_PAY_QUOTE_ID" indexType="btree">
+            <column name="inpost_pay_quote_id"/>
+        </index>
+        <index referenceId="INPOST_PAY_BASKET_NOTICE_IS_SENT" indexType="btree">
+            <column name="is_sent"/>
+        </index>
+    </table>
 </schema>

@@ -38,22 +38,32 @@ class CartService
      * @param Quote $quote
      * @param int $productId
      * @param float $qty
+     * @param bool $isQuoteItemId
      * @return void
      * @throws LocalizedException
      */
-    public function addToCart(Quote $quote, int $productId, float $qty): void
+    public function addToCart(Quote $quote, int $productId, float $qty, bool $isQuoteItemId = false): void
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         try {
-            $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
-            if (!$product instanceof Product) {
-                throw new NoSuchEntityException(__('Product ID: %1 not found.', $productId));
-            }
+            if (!$isQuoteItemId) {
+                $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
+                if (!$product instanceof Product) {
+                    throw new NoSuchEntityException(__('Product ID: %1 not found.', $productId));
+                }
 
-            $itemId = $this->getItemIdByProductFromCart($quote, $product);
-            if ($itemId === null) {
-                $quote->addProduct($product, (float)$qty);
+                $itemId = $this->getItemIdByProductFromCart($quote, $product);
+
+                if ($itemId === null) {
+                    $quote->addProduct($product, (float)$qty);
+                } else {
+                    $quoteItem = $quote->getItemById($itemId);
+                    if ($quoteItem) {
+                        $quoteItem->setQty($qty);
+                    }
+                }
             } else {
+                $itemId = $productId;
                 $quoteItem = $quote->getItemById($itemId);
                 if ($quoteItem) {
                     $quoteItem->setQty($qty);
@@ -77,21 +87,27 @@ class CartService
     /**
      * @param Quote $quote
      * @param int $productId
+     * @param bool $isQuoteItemId
      * @return void
      * @throws LocalizedException
      */
-    public function removeFromCart(Quote $quote, int $productId): void
+    public function removeFromCart(Quote $quote, int $productId, bool $isQuoteItemId = false): void
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         try {
-            $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
-            if ($product instanceof Product) {
-                $itemId = $this->getItemIdByProductFromCart($quote, $product);
-                if ($itemId) {
-                    $quote->removeItem($itemId);
+            $itemId = null;
+            if ($isQuoteItemId) {
+                $itemId = $productId;
+            } else {
+                $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
+                if ($product instanceof Product) {
+                    $itemId = $this->getItemIdByProductFromCart($quote, $product);
                 }
-                $this->applyQuoteChanges($quote);
+            }
 
+            if ($itemId) {
+                $quote->removeItem($itemId);
+                $this->applyQuoteChanges($quote);
                 $this->logger->debug(
                     sprintf('Product ID %s has been removed from quote ID %s', $productId, $quoteId)
                 );

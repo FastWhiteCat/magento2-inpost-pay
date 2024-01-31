@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFactory;
@@ -18,6 +17,7 @@ use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
@@ -29,7 +29,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
@@ -42,8 +41,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
         private readonly ShippingMethodManagementInterface $shippingManager,
         private readonly AddressRepositoryInterface $addressRepository,
+        private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
-        private readonly NoticeInterfaceFactory $noticeFactory,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -55,7 +54,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         if ($quote->isVirtual()) {
             $this->logger->error('Quote is virtual. Setting empty delivery.');
             $basket->setDelivery([]);
-            $this->setBasketNoticeVirtualProducts($basket);
+            $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
             return;
         }
 
@@ -77,7 +76,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
         foreach ($quote->getAllVisibleItems() as $item) {
             if ($item->getProduct()->getIsVirtual()) {
-                $this->setBasketNoticeVirtualProducts($basket);
+                $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
                 break;
             }
         }
@@ -87,7 +86,11 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods);
 
         if (empty($deliveries)) {
-            throw new LocalizedException(__('No delivery method is allowed for this basket.'));
+            $this->createBasketNotice->execute(
+                (string)$basket->getBasketId(),
+                InPostPayBasketNoticeInterface::ATTENTION,
+                __('No delivery method is allowed for this basket.')->render()
+            );
         }
 
         $basket->setDelivery($deliveries);
@@ -216,27 +219,23 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         return $limit;
     }
 
-    private function setBasketNoticeVirtualProducts(BasketInterface $basket): void
+    private function setBasketNoticeVirtualProducts(string $basketId): void
     {
-        $summary = $basket->getSummary();
-        $error = __('Order contains products that cannot be shipped.')->render();
-        if ($notice = $summary->getBasketNotice()) {
-            $notice->setDescription($notice->getDescription() . PHP_EOL . $error);
-        } else {
-            /** @var NoticeInterface $notice */
-            $notice = $this->noticeFactory->create();
-            $notice->setType(NoticeInterface::ATTENTION);
-            $notice->setDescription($error);
-        }
-
-        $summary->setBasketNotice($notice);
+        $this->createBasketNotice->execute(
+            $basketId,
+            InPostPayBasketNoticeInterface::ATTENTION,
+            __('Order contains products that cannot be shipped.')->render()
+        );
     }
 
     private function getShippingAddress(Quote $quote): AddressInterface
     {
         $shippingAddress = $quote->getShippingAddress();
         // @phpstan-ignore-next-line
-        if (empty($shippingAddress->getCountryId()) && $quote->getCustomer() && $quote->getCustomer()->getId()) {
+        if ((empty($shippingAddress->getCountryId()) || !$shippingAddress->getPostcode())
+            // @phpstan-ignore-next-line
+            && $quote->getCustomer()->getId()
+        ) {
             // @phpstan-ignore-next-line
             $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
             $customerShippingAddress->getCountryId();

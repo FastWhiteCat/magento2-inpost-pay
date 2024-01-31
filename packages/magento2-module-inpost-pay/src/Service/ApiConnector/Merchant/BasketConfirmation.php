@@ -104,6 +104,7 @@ class BasketConfirmation implements BasketConfirmationInterface
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
 
             $basket = $this->basketFactory->create();
+            $basket->setBasketId($basketId);
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
             $this->eventManager->dispatch(
                 'izi_basket_confirmation_after',

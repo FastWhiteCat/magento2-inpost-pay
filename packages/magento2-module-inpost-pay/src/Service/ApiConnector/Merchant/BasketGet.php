@@ -54,6 +54,7 @@ class BasketGet implements BasketGetInterface
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
             $basket = $this->basketFactory->create();
+            $basket->setBasketId($basketId);
             $this->quoteToBasketDataTransfer->transfer($quote, $basket);
 
             $this->eventManager->dispatch('izi_basket_get_after', [BasketConfirmationInterface::BASKET => $basket]);
