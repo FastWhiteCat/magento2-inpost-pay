@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Validator;
 
+use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -31,12 +33,14 @@ class QuoteItemQtyValidator
         float $requestedQuantity,
         bool $isQuoteItemId,
         array $quoteItemsQuantity
-    ): bool {
+    ): void {
         $websiteId = (int)$quote->getStore()->getWebsiteId();
         $maxQuantity = 0;
+        $name = '';
         if ($isQuoteItemId) {
             $quoteItem = $quote->getItemById($productId);
             if ($quoteItem) {
+                $name = $quoteItem->getName();
                 $maxQuantity = $this->getBundleQuantity(
                     $quoteItem->getChildren(),
                     $quoteItem->getQty(),
@@ -48,10 +52,11 @@ class QuoteItemQtyValidator
             $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
 
             if (!$product instanceof Product) {
-                return false;
+                throw new NoSuchEntityException(__('Product ID: %1 not found.', $productId));
             }
-            $quoteItem = $quote->getItemByProduct($product);
 
+            $quoteItem = $quote->getItemByProduct($product);
+            $name = $product->getName();
             $itemQty = 0;
             if ($quoteItem instanceof Item) {
                 $itemQty = $quoteItem->getQty();
@@ -67,7 +72,16 @@ class QuoteItemQtyValidator
             $maxQuantity = (float)$maxQuantity;
         }
 
-        return $requestedQuantity <= $maxQuantity;
+        if ($requestedQuantity > $maxQuantity) {
+            throw new QuoteItemOutOfStockException(
+                __(
+                    'Item "%1" is no longer available in requested quantity: %2. Currently available: %3',
+                    $name,
+                    $requestedQuantity,
+                    $maxQuantity
+                )
+            );
+        }
     }
 
     private function getBundleQuantity(

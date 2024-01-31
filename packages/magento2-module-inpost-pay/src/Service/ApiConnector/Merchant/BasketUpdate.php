@@ -189,13 +189,8 @@ class BasketUpdate implements BasketUpdateInterface
         $qty = (float)$productQuantity->getQuantity()->getQuantity();
         if ($qty) {
             $quoteItemsQuantity = $this->prepareQuoteProductsQuantity->execute($quote);
-            if ($this->qtyValidator->validate($quote, $productId, $qty, $isQuoteItemId, $quoteItemsQuantity)) {
-                $this->cartService->addToCart($quote, $productId, $qty, $isQuoteItemId);
-            } else {
-                throw new LocalizedException(
-                    __('Could not add product ID %1 in quantity of %2 to cart.', (string)$productId, (string)$qty)
-                );
-            }
+            $this->qtyValidator->validate($quote, $productId, $qty, $isQuoteItemId, $quoteItemsQuantity);
+            $this->cartService->addToCart($quote, $productId, $qty, $isQuoteItemId);
         } else {
             $this->cartService->removeFromCart($quote, $productId, $isQuoteItemId);
         }
