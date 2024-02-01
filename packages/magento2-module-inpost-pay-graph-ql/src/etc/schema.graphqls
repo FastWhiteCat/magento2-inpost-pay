@@ -1,0 +1,22 @@
+type Mutation {
+    inPostPayInitBasket(input: InPostPayBrowserData!): InPostPayBasketData
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayInitBasketResolver")
+    @doc(description:"Subscribe email for product stock alert")
+}
+
+input InPostPayBrowserData {
+    binding_place: String! @doc(description: "Type of place in service where binding was initiated.")
+    browser: String! @doc(description: "Browser hash.")
+    cart_id: String! @doc(description: "Cart ID.")
+    number: String @doc(description: "Phone number.")
+    prefix: String @doc(description: "Phone number prefix.")
+}
+
+type InPostPayBasketData {
+    basket_id: String @doc(description: "Basket ID.")
+    qr_code: String @doc(description: "QR code hash.")
+    deep_link: String @doc(description: "Android and iOS deep link.")
+    deep_link_hms: String @doc(description: "HMS system deep link.")
+    error_message: String @doc(description: "Error details.")
+    action: String @doc(description: "Action to be taken in case of failed process.")
+}
