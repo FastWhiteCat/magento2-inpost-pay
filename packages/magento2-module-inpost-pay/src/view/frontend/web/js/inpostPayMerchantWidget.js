@@ -76,6 +76,10 @@ define([
             })
                 .done(function (data) {
                     if (data.status && data.status === 'SUCCESS') {
+                        if (data.basket_id) {
+                            localStorage.setItem('basketId', data.basket_id);
+                        }
+
                         var $iziButtons = $("inpost-izi-button");
                         if (!$iziButtons.length) return;
 
@@ -194,6 +198,7 @@ define([
                                         break;
                                     case 'SUCCESS':
                                         localStorage.setItem('browser_id', data.browser.browser_id);
+                                        delete data.basket_id;
                                         resolve(data)
                                         break;
                                     default:
