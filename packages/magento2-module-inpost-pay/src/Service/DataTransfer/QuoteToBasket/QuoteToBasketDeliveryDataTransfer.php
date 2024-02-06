@@ -244,8 +244,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
                 if ($customerShippingAddress->getCountryId()) {
                     $shippingAddress->setCountryId($customerShippingAddress->getCountryId());
                 }
-                // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCATCH
             } catch (LocalizedException $e) {
+                $this->logger->error($e->getMessage());
             }
         }
 
