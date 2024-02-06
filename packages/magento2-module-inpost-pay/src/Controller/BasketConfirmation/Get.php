@@ -62,6 +62,7 @@ class Get implements HttpGetActionInterface
 
                     $data = [
                         'status' => $inpostPayQuote->getStatus(),
+                        'basket_id' => $inpostPayQuote->getBasketId(),
                         'phone_number' => [
                             'country_prefix' => (string)$inpostPayQuote->getCountryPrefix(),
                             'phone' => (string)$inpostPayQuote->getPhone()
