@@ -237,13 +237,15 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             && $quote->getCustomer()->getId()
         ) {
             try {
-                // @phpstan-ignore-next-line
-                $customerShippingAddress = $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
+                $customerShippingAddress =
+                    // @phpstan-ignore-next-line
+                    $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
                 $customerShippingAddress->getCountryId();
                 if ($customerShippingAddress->getCountryId()) {
                     $shippingAddress->setCountryId($customerShippingAddress->getCountryId());
                 }
             } catch (LocalizedException $e) {
+                $this->logger->error($e->getMessage());
             }
         }
 
