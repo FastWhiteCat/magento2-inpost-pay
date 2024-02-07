@@ -9,7 +9,7 @@ define([
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
-    var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation, globalOrderResetFlag = false;
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -121,6 +121,7 @@ define([
                             reject({ message: data.errorMessage });
                         } else {
                             localStorage.setItem('basketId', data.basket_id);
+                            globalOrderResetFlag = false;
                             resolve({
                                 qr_code: data.qr_code,
                                 deep_link: data.deep_link,
@@ -241,6 +242,8 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
+                    if (globalOrderResetFlag) resolve({action: 'error'});
+
                     xhrForOrderConfirmation = $.ajax({
                         url: urlBuilder.build('inpostizi/OrderComplete/Get'
                             + '/?basketId='
@@ -274,11 +277,13 @@ define([
                     method: 'GET',
                 })
                     .done(function () {
+                        globalOrderResetFlag = true;
                         resolve()
                     })
                     .fail(function () {
+                        globalOrderResetFlag = true;
                         reject(new Error($.mage.__('Network problem')));
-                    });
+                    })
             });
         },
 
