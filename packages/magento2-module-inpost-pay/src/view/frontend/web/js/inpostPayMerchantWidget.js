@@ -232,7 +232,9 @@ define([
             return new Promise((resolve, reject) => {
                 checkOrderStatus()
                     .then((data) => {
-                        resolve(data)
+                        if (data) {
+                            resolve(data)
+                        }
                     })
                     .catch(function(error) {
                         reject(error)
@@ -242,7 +244,7 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    if (globalOrderResetFlag) resolve({action: 'error'});
+                    if (globalOrderResetFlag) resolve();
 
                     xhrForOrderConfirmation = $.ajax({
                         url: urlBuilder.build('inpostizi/OrderComplete/Get'
