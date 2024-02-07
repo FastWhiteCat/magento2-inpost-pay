@@ -99,8 +99,8 @@ define([
             var prefixValue = !browserId && prefix ? "" : prefix ? "+" + prefix : "";
             var phoneNumberValue = !browserId && phoneNumber ? "" : phoneNumber ? phoneNumber : "";
             var data = {
-                prefix: prefixValue, //prefix && "+" + prefix || "",
-                number: phoneNumberValue, //phoneNumber || "",
+                prefix: prefixValue,
+                number: phoneNumberValue,
                 browser: browserData,
                 binding_place: bindingPlace
             };
