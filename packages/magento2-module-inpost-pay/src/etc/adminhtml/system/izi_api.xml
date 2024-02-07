@@ -29,5 +29,11 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/inpost_pay/async_basket_export</config_path>
         </field>
+        <field id="remove_html_and_special_chars_from_attributes" translate="label comment" type="select" sortOrder="60"
+               showInDefault="1" canRestore="1">
+            <label>Enable removing special characters and HTML code from product attributes sent to InPost Pay Mobile App.</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/remove_html_and_special_chars_from_attributes</config_path>
+        </field>
     </group>
 </include>
