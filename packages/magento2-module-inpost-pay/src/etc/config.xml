@@ -25,6 +25,7 @@
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
                 <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
                 <async_basket_export>0</async_basket_export>
+                <remove_html_and_special_chars_from_attributes>1</remove_html_and_special_chars_from_attributes>
                 <sandbox_enabled>0</sandbox_enabled>
                 <sandbox_client_id></sandbox_client_id>
                 <sandbox_client_secret></sandbox_client_secret>
