@@ -9,7 +9,9 @@ define([
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
-    var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation, globalOrderResetFlag = false;
+    var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var globalOrderResetFlag = false;
+    var globalBindingCheckedFlag = false;
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -95,9 +97,8 @@ define([
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
-            var browserId = getCookie('BrowserId');
-            var prefixValue = !browserId && prefix ? "" : prefix ? "+" + prefix : "";
-            var phoneNumberValue = !browserId && phoneNumber ? "" : phoneNumber ? phoneNumber : "";
+            var prefixValue = globalBindingCheckedFlag ? "" : prefix ? "+" + prefix : "";
+            var phoneNumberValue = globalBindingCheckedFlag ? "" : phoneNumber ? phoneNumber : "";
             var data = {
                 prefix: prefixValue,
                 number: phoneNumberValue,
@@ -119,6 +120,7 @@ define([
                         } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
                             localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = true;
                             resolve([]);
                         } else if (data.action){
                             reject({ message: data.errorMessage });
@@ -136,20 +138,6 @@ define([
                         reject(new Error($.mage.__('Network problem')));
                     });
             });
-
-            function getCookie(name) {
-                var cookieArr = document.cookie.split(";");
-
-                for (let i = 0; i < cookieArr.length; i++) {
-                    let cookiePair = cookieArr[i].split("=");
-
-                    if (name === cookiePair[0].trim()) {
-                        return decodeURIComponent(cookiePair[1]);
-                    }
-                }
-
-                return null;
-            }
         },
 
         iziGetBrowserData: function (params) {
