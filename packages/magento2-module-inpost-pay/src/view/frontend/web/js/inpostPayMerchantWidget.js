@@ -10,6 +10,8 @@ define([
 
     var LONG_POLLING_TIME = 10000;
     var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var globalOrderResetFlag = false;
+    var globalBindingCheckedFlag = false;
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -76,6 +78,10 @@ define([
             })
                 .done(function (data) {
                     if (data.status && data.status === 'SUCCESS') {
+                        if (data.basket_id) {
+                            localStorage.setItem('basketId', data.basket_id);
+                        }
+
                         var $iziButtons = $("inpost-izi-button");
                         if (!$iziButtons.length) return;
 
@@ -91,9 +97,11 @@ define([
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
+            var prefixValue = globalBindingCheckedFlag ? "" : prefix ? "+" + prefix : "";
+            var phoneNumberValue = globalBindingCheckedFlag ? "" : phoneNumber ? phoneNumber : "";
             var data = {
-                prefix: prefix && "+" + prefix || "",
-                number: phoneNumber || "",
+                prefix: prefixValue,
+                number: phoneNumberValue,
                 browser: browserData,
                 binding_place: bindingPlace
             };
@@ -112,11 +120,14 @@ define([
                         } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
                             localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = true;
                             resolve([]);
                         } else if (data.action){
                             reject({ message: data.errorMessage });
                         } else {
                             localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = false;
+                            globalOrderResetFlag = false;
                             resolve({
                                 qr_code: data.qr_code,
                                 deep_link: data.deep_link,
@@ -194,6 +205,7 @@ define([
                                         break;
                                     case 'SUCCESS':
                                         localStorage.setItem('browser_id', data.browser.browser_id);
+                                        delete data.basket_id;
                                         resolve(data)
                                         break;
                                     default:
@@ -226,7 +238,9 @@ define([
             return new Promise((resolve, reject) => {
                 checkOrderStatus()
                     .then((data) => {
-                        resolve(data)
+                        if (data) {
+                            resolve(data)
+                        }
                     })
                     .catch(function(error) {
                         reject(error)
@@ -236,6 +250,8 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
+                    if (globalOrderResetFlag) resolve();
+
                     xhrForOrderConfirmation = $.ajax({
                         url: urlBuilder.build('inpostizi/OrderComplete/Get'
                             + '/?basketId='
@@ -269,11 +285,13 @@ define([
                     method: 'GET',
                 })
                     .done(function () {
+                        globalOrderResetFlag = true;
                         resolve()
                     })
                     .fail(function () {
+                        globalOrderResetFlag = true;
                         reject(new Error($.mage.__('Network problem')));
-                    });
+                    })
             });
         },
 

@@ -141,12 +141,11 @@ class ProductToInPostProductDataTransfer
                 if ($attribute->getIsVisibleOnFront()) {
                     $value = $attribute->getFrontend()->getValue($product);
                     if (is_string($value) && strlen(trim($value))) {
-                        $attributeValue = $this->escaper->escapeUrl($value);
                         /** @var ProductAttributeInterface $inPostProductAttribute */
                         $inPostProductAttribute = $this->productAttributeFactory->create();
                         $storeLabel = $attribute->getStoreLabel((int)$product->getStoreId());
                         $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($storeLabel));
-                        $inPostProductAttribute->setAttributeValue($this->stringUtils->cleanUpString($attributeValue));
+                        $inPostProductAttribute->setAttributeValue($this->stringUtils->cleanUpString($value));
                         $productAttributesData[] = $inPostProductAttribute;
                     }
                 }
