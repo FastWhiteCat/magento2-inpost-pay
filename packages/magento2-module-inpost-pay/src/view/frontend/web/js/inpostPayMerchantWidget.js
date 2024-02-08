@@ -95,9 +95,12 @@ define([
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
+            var browserId = getCookie('BrowserId');
+            var prefixValue = !browserId && prefix ? "" : prefix ? "+" + prefix : "";
+            var phoneNumberValue = !browserId && phoneNumber ? "" : phoneNumber ? phoneNumber : "";
             var data = {
-                prefix: prefix && "+" + prefix || "",
-                number: phoneNumber || "",
+                prefix: prefixValue,
+                number: phoneNumberValue,
                 browser: browserData,
                 binding_place: bindingPlace
             };
@@ -133,6 +136,20 @@ define([
                         reject(new Error($.mage.__('Network problem')));
                     });
             });
+
+            function getCookie(name) {
+                var cookieArr = document.cookie.split(";");
+
+                for (let i = 0; i < cookieArr.length; i++) {
+                    let cookiePair = cookieArr[i].split("=");
+
+                    if (name === cookiePair[0].trim()) {
+                        return decodeURIComponent(cookiePair[1]);
+                    }
+                }
+
+                return null;
+            }
         },
 
         iziGetBrowserData: function (params) {
