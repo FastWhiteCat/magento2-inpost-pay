@@ -126,6 +126,7 @@ define([
                             reject({ message: data.errorMessage });
                         } else {
                             localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = false;
                             globalOrderResetFlag = false;
                             resolve({
                                 qr_code: data.qr_code,
