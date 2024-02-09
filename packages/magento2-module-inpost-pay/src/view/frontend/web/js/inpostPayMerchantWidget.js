@@ -121,13 +121,13 @@ define([
                             window.checkIsBinding();
                             localStorage.setItem('basketId', data.basket_id);
                             globalBindingCheckedFlag = true;
+                            globalOrderResetFlag = false;
                             resolve([]);
                         } else if (data.action){
                             reject({ message: data.errorMessage });
                         } else {
                             localStorage.setItem('basketId', data.basket_id);
                             globalBindingCheckedFlag = false;
-                            globalOrderResetFlag = false;
                             resolve({
                                 qr_code: data.qr_code,
                                 deep_link: data.deep_link,
@@ -250,30 +250,32 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    if (globalOrderResetFlag) resolve();
-
-                    xhrForOrderConfirmation = $.ajax({
-                        url: urlBuilder.build('inpostizi/OrderComplete/Get'
-                            + '/?basketId='
-                            + basketId
-                        ),
-                        method: 'GET',
-                    })
-                        .done(function (data) {
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                                abortRequest(xhrForBasketConfirmation)
-                            }
-
-                            if (!data.action) {
-                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                            } else {
-                                resolve(data);
-                            }
+                    if (globalOrderResetFlag) {
+                        resolve();
+                    } else {
+                        xhrForOrderConfirmation = $.ajax({
+                            url: urlBuilder.build('inpostizi/OrderComplete/Get'
+                                + '/?basketId='
+                                + basketId
+                            ),
+                            method: 'GET',
                         })
-                        .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem')));
-                        });
+                            .done(function (data) {
+                                if (timeoutId) {
+                                    clearTimeout(timeoutId);
+                                    abortRequest(xhrForBasketConfirmation)
+                                }
+
+                                if (!data.action) {
+                                    setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                } else {
+                                    resolve(data);
+                                }
+                            })
+                            .fail(function () {
+                                reject(new Error($.mage.__('Network problem')));
+                            });
+                    }
                 });
             }
         },

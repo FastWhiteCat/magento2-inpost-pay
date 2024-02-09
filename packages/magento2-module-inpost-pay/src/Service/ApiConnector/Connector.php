@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\ApiConnector\RequestInterface;
 use Laminas\Http\Response;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Event\ManagerInterface as EventManager;
@@ -58,6 +59,10 @@ class Connector implements ConnectorInterface
             );
             $this->logger->critical($errorMsg);
 
+            if ((int)$e->getCode() === 404) {
+                throw new NotFoundException(__($errorMsg));
+            }
+
             throw new LocalizedException(__($errorMsg));
         }
 
@@ -89,6 +94,7 @@ class Connector implements ConnectorInterface
     {
         $responseBody = (string)$response->getBody()->getContents();
         $statusCode = (int)$response->getStatusCode();
+
         if ($statusCode !== Response::STATUS_CODE_200
             && $statusCode !== Response::STATUS_CODE_201
             && $statusCode !== Response::STATUS_CODE_202
