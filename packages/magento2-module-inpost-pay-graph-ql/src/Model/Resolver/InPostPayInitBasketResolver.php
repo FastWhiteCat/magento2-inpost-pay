@@ -53,8 +53,12 @@ class InPostPayInitBasketResolver implements ResolverInterface
         return $result;
     }
 
-    private function validateArgs(array $args): void
+    private function validateArgs(array $args = null): void
     {
+        if ($args === null) {
+            throw new GraphQlInputException(__('Empty input data.'));
+        }
+
         if (empty($args['input']['cart_id'])) {
             throw new GraphQlInputException(__('Required parameter "cart_id" is missing'));
         }

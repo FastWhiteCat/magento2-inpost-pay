@@ -30,6 +30,9 @@ class InPostPayBasketConfirmationResolver implements ResolverInterface
     ) {
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
         $this->validateArgs($args);
@@ -112,9 +115,9 @@ class InPostPayBasketConfirmationResolver implements ResolverInterface
         ];
     }
 
-    private function validateArgs(array $args): void
+    private function validateArgs(array $args = null): void
     {
-        if (empty($args['cart_id'])) {
+        if ($args === null || empty($args['cart_id'])) {
             throw new GraphQlInputException(__('Required parameter "cart_id" is missing'));
         }
     }
