@@ -12,6 +12,7 @@ use InPost\InPostPay\Model\IziApi\Request\BasketBindingRequestFactory;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Model\IziApi\Response\BasketInformationResponseFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NotFoundException;
 use Psr\Log\LoggerInterface;
 
 class BasketBindingDelete
@@ -40,6 +41,9 @@ class BasketBindingDelete
 
         try {
             $this->connector->sendRequest($request);
+        } catch (NotFoundException $e) {
+            $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
+            $this->logger->critical($errorMsg->render());
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
