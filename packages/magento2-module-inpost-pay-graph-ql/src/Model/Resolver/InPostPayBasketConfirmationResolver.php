@@ -39,7 +39,8 @@ class InPostPayBasketConfirmationResolver implements ResolverInterface
 
         // @phpstan-ignore-next-line
         $storeId = (int)$context->getExtensionAttributes()->getStore()->getId();
-        $maskedCartId = is_scalar($args && $args['cart_id']) ? (string)$args['cart_id'] : '';
+        $maskedCartId = $args['cart_id'] ?? '';
+        $maskedCartId = is_scalar($maskedCartId) ? (string)$maskedCartId : '';
         try {
             // @phpstan-ignore-next-line
             $quote = $this->cartForUser->execute($maskedCartId, $context->getUserId(), $storeId);

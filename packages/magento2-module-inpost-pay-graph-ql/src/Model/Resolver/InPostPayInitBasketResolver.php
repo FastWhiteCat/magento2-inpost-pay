@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 
 class InPostPayInitBasketResolver implements ResolverInterface
 {
-    private const ACTION_RETRY = 'retry';
     private const ACTION_REJECT = 'reject';
 
     public function __construct(
@@ -36,7 +35,8 @@ class InPostPayInitBasketResolver implements ResolverInterface
 
         // @phpstan-ignore-next-line
         $storeId = (int)$context->getExtensionAttributes()->getStore()->getId();
-        $maskedCartId = is_scalar($args && $args['input']['cart_id']) ? (string)$args['input']['cart_id'] : '';
+        $maskedCartId = $args['input']['cart_id'] ?? '';
+        $maskedCartId = is_scalar($maskedCartId) ? (string)$maskedCartId : '';
 
         try {
             // @phpstan-ignore-next-line
