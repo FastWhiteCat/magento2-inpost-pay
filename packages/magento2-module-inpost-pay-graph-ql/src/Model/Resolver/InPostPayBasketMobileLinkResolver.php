@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace InPost\InPostPayGraphQl\Model\Resolver;
 
-use InPost\InPostPay\Service\PayDataProcessor;
+use InPost\InPostPay\Controller\MobileLink\Get;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
-use Magento\Framework\App\Action\Context as AppActionContext;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
+use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use Psr\Log\LoggerInterface;
 
-class InPostPayInitBasketResolver extends InPostBasketResolver implements ResolverInterface
+class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements ResolverInterface
 {
     public function __construct(
         GetCartForUser $cartForUser,
         LoggerInterface $logger,
-        private readonly AppActionContext $appActionContext,
-        private readonly PayDataProcessor $payDataProcessor
+        private readonly BasketBindingCheck $basketBindingCheck,
+        private readonly SandboxConfigProvider $sandboxConfigProvider
     ) {
         parent::__construct($cartForUser, $logger);
     }
@@ -30,17 +31,21 @@ class InPostPayInitBasketResolver extends InPostBasketResolver implements Resolv
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
         try {
-            $inputData = $args && isset($args['input']) ? (array)$args['input'] : [];
-            $cartMaskId = $this->extractCartMaskId($inputData);
+            $cartMaskId = $this->extractCartMaskId($args);
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
-            $quoteId = (is_scalar($quote->getId())) ? (int)$quote->getId() : 0;
+            $result = $this->basketBindingCheck->execute((is_scalar($quote->getId())) ? (int)$quote->getId() : 0);
 
-            // @phpstan-ignore-next-line
-            return $this->payDataProcessor->process($quoteId, $inputData, $this->appActionContext->getRequest());
+            return [
+                'link' => sprintf(
+                    '%s%s',
+                    $this->sandboxConfigProvider->isSandboxEnabled() ? Get::SANDBOX_MOBILE_LINK : Get::MOBILE_LINK,
+                    $result['inpost_basket_id'] ?? ''
+                )
+            ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
-            return $this->prepareErrorResponse(self::ACTION_REJECT, $e->getMessage());
+            return $this->prepareErrorResponse(null, $e->getMessage());
         }
     }
 }

@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
-use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
+use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequest;
 use InPost\InPostPay\Model\IziApi\Request\BasketBindingVerifyRequestFactory;
 use InPost\InPostPay\Service\GetBasketId;
 use Magento\Framework\Exception\LocalizedException;
@@ -40,7 +40,7 @@ class BasketBindingCheck
             return ['browser_trusted' => false, 'basket_linked' => false];
         }
 
-        /** @var PublicKeyRequest $request */
+        /** @var BasketBindingVerifyRequest $request */
         $request = $this->basketBindingVerifyRequest->create();
 
         $params['basket_id'] = $basketId;

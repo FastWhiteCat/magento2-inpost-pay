@@ -17,8 +17,8 @@ use Psr\Log\LoggerInterface;
 
 class Get implements HttpGetActionInterface
 {
-    private const MOBILE_LINK = 'inpost://izilink?basket_id=';
-    private const SANDBOX_MOBILE_LINK = 'inpost://izilinksandbox?basket_id=';
+    public const MOBILE_LINK = 'inpost://izilink?basket_id=';
+    public const SANDBOX_MOBILE_LINK = 'inpost://izilinksandbox?basket_id=';
     private readonly ManagerInterface $messageManager;
     private readonly RequestInterface $request;
 
