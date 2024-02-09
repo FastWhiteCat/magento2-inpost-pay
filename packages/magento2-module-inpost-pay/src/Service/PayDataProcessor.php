@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class PayDataProcessor
 {
@@ -62,7 +63,7 @@ class PayDataProcessor
             $params['number'] ?? null
         );
 
-        return $result->getData();
+        return is_array($result->getData()) ? $result->getData() : [];
     }
 
     private function prepareBrowserData(array $browser, RequestInterface $request): array
