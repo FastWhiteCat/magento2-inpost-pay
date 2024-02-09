@@ -4,6 +4,14 @@ type Mutation {
     @doc(description:"Subscribe email for product stock alert")
 }
 
+type Query {
+    inPostPayGetBasketConfirmation (
+        cart_id: String! @doc(description: "Cart ID.")
+    ): InPostPayBasketConfirmationData
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayBasketConfirmationResolver")
+    @doc(description: "This query is used to receive confirmation that basked has been approved by customer in InPost Pay mobile app.")
+}
+
 input InPostPayBrowserData {
     binding_place: String! @doc(description: "Type of place in service where binding was initiated.")
     browser: String! @doc(description: "Browser hash.")
@@ -19,4 +27,26 @@ type InPostPayBasketData {
     deep_link_hms: String @doc(description: "HMS system deep link.")
     error_message: String @doc(description: "Error details.")
     action: String @doc(description: "Action to be taken in case of failed process.")
+}
+
+type InPostPayBasketConfirmationData {
+    basket_id: String @doc(description: "Basket ID.")
+    status: String @doc(description: "Basket status.")
+    phone_number: InPostPayBasketPhoneNumber @doc(description: "Basket Phone Number object.")
+    browser: InPostPayBasketBrowser @doc(description: "Basket Browser object.")
+    name: String @doc(description: "User name.")
+    surname: String @doc(description: "User surname.")
+    masked_phone_number: String @doc(description: "Phone number mask.")
+    error_message: String @doc(description: "Error details.")
+    action: String @doc(description: "Action to be taken in case of failed process.")
+}
+
+type InPostPayBasketPhoneNumber {
+    country_prefix: String @doc(description: "Country prefix.")
+    phone: String @doc(description: "Phone number.")
+}
+
+type InPostPayBasketBrowser {
+    browser_id: String @doc(description: "Browser ID.")
+    browser_trusted: Boolean @doc(description: "Browser trusted flag.")
 }
