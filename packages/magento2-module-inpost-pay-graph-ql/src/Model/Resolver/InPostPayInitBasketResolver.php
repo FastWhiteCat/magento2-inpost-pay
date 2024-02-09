@@ -16,6 +16,9 @@ use Psr\Log\LoggerInterface;
 
 class InPostPayInitBasketResolver implements ResolverInterface
 {
+    private const ACTION_RETRY = 'retry';
+    private const ACTION_REJECT = 'reject';
+
     public function __construct(
         private readonly AppActionContext $appActionContext,
         private readonly GetCartForUser $cartForUser,
@@ -24,20 +27,38 @@ class InPostPayInitBasketResolver implements ResolverInterface
     ) {
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
         $this->validateArgs($args);
 
         // @phpstan-ignore-next-line
         $storeId = (int)$context->getExtensionAttributes()->getStore()->getId();
-        $maskedCartId = is_scalar($args['input']['cart_id']) ? (string)$args['input']['cart_id'] : '';
-        $quote = $this->cartForUser->execute($maskedCartId, $context->getUserId(), $storeId);
+        $maskedCartId = is_scalar($args && $args['input']['cart_id']) ? (string)$args['input']['cart_id'] : '';
+
+        try {
+            // @phpstan-ignore-next-line
+            $quote = $this->cartForUser->execute($maskedCartId, $context->getUserId(), $storeId);
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+
+            return [
+                'error_message' => $e->getMessage(),
+                'action' => self::ACTION_REJECT
+            ];
+        }
+
         if (!$quote->getIsActive()) {
-            throw new GraphQlInputException(__('Quote is inactive.'));
+            return [
+                'error_message' => __('Quote is inactive.'),
+                'action' => self::ACTION_REJECT
+            ];
         }
 
         $quoteId = (is_scalar($quote->getId())) ? (int)$quote->getId() : 0;
-        $inputParams = (array)$args['input'];
+        $inputParams = $args && isset($args['input']) ? (array)$args['input'] : [];
 
         try {
             // @phpstan-ignore-next-line
@@ -46,7 +67,7 @@ class InPostPayInitBasketResolver implements ResolverInterface
             $this->logger->error($e->getMessage(), $e->getTrace());
             $result = [
                 'error_message' => $e->getMessage(),
-                'action' => 'reject'
+                'action' => self::ACTION_REJECT
             ];
         }
 
