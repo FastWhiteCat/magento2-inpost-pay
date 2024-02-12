@@ -72,7 +72,7 @@ class InPostPayDeleteBrowserBindingResolver extends InPostBasketResolver impleme
      */
     private function deleteBrowserBinding(InPostPayQuoteInterface $inPostPayQuote): void
     {
-        $response = $this->browserBinding->delete($inPostPayQuote->getBrowserId());
+        $response = $this->browserBinding->delete((string)$inPostPayQuote->getBrowserId());
         if (empty($response)) {
             $inPostPayQuote->setBrowserId('');
             $inPostPayQuote->setBrowserTrusted(false);
