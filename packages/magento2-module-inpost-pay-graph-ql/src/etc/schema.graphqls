@@ -1,7 +1,11 @@
 type Mutation {
     inPostPayInitBasket(input: InPostPayBrowserData!): InPostPayBasketData
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayInitBasketResolver")
-    @doc(description:"Subscribe email for product stock alert")
+    @doc(description:"Initiate InPost Pay basket.")
+
+    inPostPayDeleteBrowserBinding(cart_id: String! @doc(description: "Cart ID.")): InPostPayBrowserBindingDeleteResult
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayDeleteBrowserBindingResolver")
+    @doc(description:"Delete browser binding in InPost Pay API.")
 }
 
 type Query {
@@ -33,6 +37,11 @@ type InPostPayBasketData {
     deep_link_hms: String @doc(description: "HMS system deep link.")
     error_message: String @doc(description: "Error details.")
     action: String @doc(description: "Action to be taken in case of failed process.")
+}
+
+type InPostPayBrowserBindingDeleteResult {
+    success: Boolean @doc(description: "True if browser binding was successfully deleted in InPost Pay API.")
+    error_message: String @doc(description: "Error details.")
 }
 
 type InPostPayBasketConfirmationData {

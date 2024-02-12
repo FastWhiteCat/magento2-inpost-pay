@@ -12,6 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class InPostBasketResolver
 {
+    public const ERROR_MESSAGE = 'error_message';
+    public const ACTION = 'action';
     public const ACTION_RETRY = 'retry';
     public const ACTION_REJECT = 'reject';
 
@@ -48,11 +50,11 @@ class InPostBasketResolver
         $errorResult = [];
 
         if ($action) {
-            $errorResult['action'] = $action;
+            $errorResult[self::ACTION] = $action;
         }
 
         if ($errorMessage) {
-            $errorResult['error_message'] = $errorMessage;
+            $errorResult[self::ERROR_MESSAGE] = $errorMessage;
         }
 
         return $errorResult;

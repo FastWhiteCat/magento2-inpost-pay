@@ -32,14 +32,14 @@ class InPostPayBasketConfirmationResolver extends InPostBasketResolver implement
      */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
+        $cartMaskId = $this->extractCartMaskId($args ?? []);
         try {
-            $cartMaskId = $this->extractCartMaskId($args ?? []);
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
             $this->quoteRestrictionsValidator->validate($quote, true);
 
             return $this->prepareBasketConfirmationData((is_scalar($quote->getId())) ? (int)$quote->getId() : 0);
         } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
 
             return $this->prepareErrorResponse(self::ACTION_REJECT, $e->getMessage());
         }
@@ -63,18 +63,16 @@ class InPostPayBasketConfirmationResolver extends InPostBasketResolver implement
                     ],
                     'name' => $inpostPayQuote->getName(),
                     'surname' => $inpostPayQuote->getSurname(),
-                    'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber(),
-                    'error_message' => null,
-                    'action' => null
+                    'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
                 ];
             } else {
                 $result = $this->prepareErrorResponse(self::ACTION_RETRY);
             }
         } catch (InPostPayRestrictedProductException $e) {
-            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->logger->error($e->getMessage(), ['quote_id' => $quoteId]);
             $result = $this->prepareErrorResponse(self::ACTION_REJECT, $e->getMessage());
         } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->logger->error($e->getMessage(), ['quote_id' => $quoteId]);
             $result = $this->prepareErrorResponse(self::ACTION_RETRY);
         }
 
