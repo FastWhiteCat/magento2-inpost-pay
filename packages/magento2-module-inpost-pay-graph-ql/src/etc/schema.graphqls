@@ -10,6 +10,12 @@ type Query {
     ): InPostPayBasketConfirmationData
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayBasketConfirmationResolver")
     @doc(description: "This query is used to receive confirmation that basked has been approved by customer in InPost Pay mobile app.")
+
+    inPostPayGetBasketMobileLink (
+        cart_id: String! @doc(description: "Cart ID.")
+    ): InPostPayBasketMobileLinkData
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayBasketMobileLinkResolver")
+    @doc(description: "This query is used to receive mobile link for basked binding alternative method.")
 }
 
 input InPostPayBrowserData {
@@ -39,6 +45,11 @@ type InPostPayBasketConfirmationData {
     masked_phone_number: String @doc(description: "Phone number mask.")
     error_message: String @doc(description: "Error details.")
     action: String @doc(description: "Action to be taken in case of failed process.")
+}
+
+type InPostPayBasketMobileLinkData {
+    link: String @doc(description: "Deep link for Basket binding.")
+    error_message: String @doc(description: "Error details.")
 }
 
 type InPostPayBasketPhoneNumber {
