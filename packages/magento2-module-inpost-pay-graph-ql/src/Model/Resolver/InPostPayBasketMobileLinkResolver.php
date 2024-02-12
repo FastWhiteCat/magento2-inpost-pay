@@ -30,8 +30,8 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
      */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
+        $cartMaskId = $this->extractCartMaskId($args ?? []);
         try {
-            $cartMaskId = $this->extractCartMaskId($args ?? []);
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
             $result = $this->basketBindingCheck->execute((is_scalar($quote->getId())) ? (int)$quote->getId() : 0);
 
@@ -43,7 +43,7 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
                 )
             ];
         } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
 
             return $this->prepareErrorResponse(null, $e->getMessage());
         }

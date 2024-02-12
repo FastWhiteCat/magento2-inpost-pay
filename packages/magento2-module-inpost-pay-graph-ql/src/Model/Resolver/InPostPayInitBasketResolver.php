@@ -29,16 +29,17 @@ class InPostPayInitBasketResolver extends InPostBasketResolver implements Resolv
      */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
+        $inputData = $args && isset($args['input']) ? (array)$args['input'] : [];
+        $cartMaskId = $this->extractCartMaskId($inputData);
+
         try {
-            $inputData = $args && isset($args['input']) ? (array)$args['input'] : [];
-            $cartMaskId = $this->extractCartMaskId($inputData);
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
             $quoteId = (is_scalar($quote->getId())) ? (int)$quote->getId() : 0;
 
             // @phpstan-ignore-next-line
             return $this->payDataProcessor->process($quoteId, $inputData, $this->appActionContext->getRequest());
         } catch (LocalizedException $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
 
             return $this->prepareErrorResponse(self::ACTION_REJECT, $e->getMessage());
         }
