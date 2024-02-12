@@ -6,6 +6,10 @@ type Mutation {
     inPostPayDeleteBrowserBinding(cart_id: String! @doc(description: "Cart ID.")): InPostPayBrowserBindingDeleteResult
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayDeleteBrowserBindingResolver")
     @doc(description:"Delete browser binding in InPost Pay API.")
+
+    inPostPayDeleteBasketBinding(cart_id: String! @doc(description: "Cart ID.")): InPostPayBasketBindingDeleteResult
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayDeleteBasketBindingResolver")
+    @doc(description:"Delete basket binding in InPost Pay API.")
 }
 
 type Query {
@@ -41,6 +45,11 @@ type InPostPayBasketData {
 
 type InPostPayBrowserBindingDeleteResult {
     success: Boolean @doc(description: "True if browser binding was successfully deleted in InPost Pay API.")
+    error_message: String @doc(description: "Error details.")
+}
+
+type InPostPayBasketBindingDeleteResult {
+    success: Boolean @doc(description: "True if basket binding was successfully deleted in InPost Pay API.")
     error_message: String @doc(description: "Error details.")
 }
 
