@@ -33,7 +33,7 @@ class InPostPayBasketConfirmationResolver extends InPostBasketResolver implement
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
         try {
-            $cartMaskId = $this->extractCartMaskId($args);
+            $cartMaskId = $this->extractCartMaskId($args ?? []);
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
             $this->quoteRestrictionsValidator->validate($quote, true);
 

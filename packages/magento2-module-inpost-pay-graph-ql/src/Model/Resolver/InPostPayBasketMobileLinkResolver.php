@@ -31,7 +31,7 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
         try {
-            $cartMaskId = $this->extractCartMaskId($args);
+            $cartMaskId = $this->extractCartMaskId($args ?? []);
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
             $result = $this->basketBindingCheck->execute((is_scalar($quote->getId())) ? (int)$quote->getId() : 0);
 
