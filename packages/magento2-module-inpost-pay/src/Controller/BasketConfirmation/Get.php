@@ -53,7 +53,7 @@ class Get implements HttpGetActionInterface
 
         try {
             $quote = $this->checkoutSession->getQuote();
-            $this->quoteRestrictionsValidator->validate($quote, true);
+
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
 
@@ -81,13 +81,11 @@ class Get implements HttpGetActionInterface
                     ];
                 }
             }
+            $this->quoteRestrictionsValidator->validate($quote, true);
         } catch (InPostPayRestrictedProductException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             $this->messageManager->addWarningMessage($e->getMessage());
-            $data = [
-                'errorMessage' => $e->getMessage(),
-                'action' => 'reject'
-            ];
+            $data['errorMessage'] = $e->getMessage();
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             $data = [
