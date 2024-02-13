@@ -6,23 +6,24 @@ namespace InPost\InPostPayGraphQl\Model\Resolver;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
-use InPost\InPostPay\Service\ApiConnector\BrowserBinding;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use Psr\Log\LoggerInterface;
 
-class InPostPayDeleteBrowserBindingResolver extends InPostBasketResolver implements ResolverInterface
+class InPostPayDeleteBasketBindingResolver extends InPostBasketResolver implements ResolverInterface
 {
     private const SUCCESS = 'success';
 
     public function __construct(
         GetCartForUser $cartForUser,
         LoggerInterface $logger,
-        private readonly BrowserBinding $browserBinding,
+        private readonly BasketBindingDelete $basketBindingDelete,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
     ) {
         parent::__construct($cartForUser, $logger);
@@ -40,16 +41,20 @@ class InPostPayDeleteBrowserBindingResolver extends InPostBasketResolver impleme
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
             $quoteId = (is_scalar($quote->getId())) ? (int)$quote->getId() : 0;
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
-            if ($inPostPayQuote->getQuoteId() && $inPostPayQuote->getBrowserId()) {
-                $this->deleteBrowserBinding($inPostPayQuote);
+            if ($inPostPayQuote->getQuoteId() && $inPostPayQuote->getInpostBasketId()) {
+                $this->deleteBasketBinding($inPostPayQuote);
                 $result[self::SUCCESS] = true;
             } else {
-                $errorPhrase = __('Basked does not have browser ID so binding cannot be deleted.');
+                $errorPhrase = __('Basked does not have InPost Pay ID so binding cannot be deleted.');
                 $this->logger->error($errorPhrase->getText(), ['cart_mask_id' => $cartMaskId]);
                 $result = $this->prepareErrorResponse(null, $errorPhrase->render());
             }
 
             return $result;
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
+
+            return $this->prepareErrorResponse(null, __('Basket binding does not exist for this cart.')->render());
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
 
@@ -57,7 +62,7 @@ class InPostPayDeleteBrowserBindingResolver extends InPostBasketResolver impleme
                 null,
                 sprintf(
                     '%s %s',
-                    __('There was an error during basket browser binding delete process.')->render(),
+                    __('There was an error during basket binding delete process.')->render(),
                     __('Try repeating this action or contact Merchant Administrator.')->render()
                 )
             );
@@ -68,15 +73,15 @@ class InPostPayDeleteBrowserBindingResolver extends InPostBasketResolver impleme
      * @param InPostPayQuoteInterface $inPostPayQuote
      * @return void
      * @throws LocalizedException
-     * @throws CouldNotSaveException
+     * @throws CouldNotDeleteException
+     * @throws NoSuchEntityException
      */
-    private function deleteBrowserBinding(InPostPayQuoteInterface $inPostPayQuote): void
+    private function deleteBasketBinding(InPostPayQuoteInterface $inPostPayQuote): void
     {
-        $response = $this->browserBinding->delete((string)$inPostPayQuote->getBrowserId());
-        if (empty($response)) {
-            $inPostPayQuote->setBrowserId('');
-            $inPostPayQuote->setBrowserTrusted(false);
-            $this->inPostPayQuoteRepository->save($inPostPayQuote);
+        $this->basketBindingDelete->execute($inPostPayQuote->getBasketId());
+
+        if ($inPostPayQuote->getInPostPayQuoteId()) {
+            $this->inPostPayQuoteRepository->deleteById((int)$inPostPayQuote->getInPostPayQuoteId());
         }
     }
 

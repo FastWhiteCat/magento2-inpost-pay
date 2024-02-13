@@ -1,3 +1,6 @@
-"Basked does not have browser ID so binding cannot be proceed.","Koszyk nie posiada ID powiązania przeglądarki, zatem powiązanie nie może zostać usunięte.",module,InPost_InPostPayGraphQl
+"Basked does not have browser ID so binding cannot be deleted.","Koszyk nie posiada ID powiązania przeglądarki, zatem powiązanie nie może zostać usunięte.",module,InPost_InPostPayGraphQl
 "There was an error during basket browser binding delete process.","Wystąpił błąd podczas usuwania powiązania przeglądarki.",module,InPost_InPostPayGraphQl
 "Try repeating this action or contact Merchant Administrator.","Spróbuj ponownie lub skontaktuj się z Administratorem Sklepu.",module,InPost_InPostPayGraphQl
+"Basked does not have InPost Pay ID so binding cannot be deleted.","Koszyk nie posiada identyfikatora InPost Pay, zatem powiązanie nie może zostać usunięte.",module,InPost_InPostPayGraphQl
+"There was an error during basket binding delete process.","Wystąpił błąd podczas usuwania powiązania koszyka.",module,InPost_InPostPayGraphQl
+"Basket binding does not exist for this cart.","Nie istnieje powiązanie tego koszyka.",module,InPost_InPostPayGraphQl
