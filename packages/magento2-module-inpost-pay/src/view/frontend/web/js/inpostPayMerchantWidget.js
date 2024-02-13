@@ -204,21 +204,22 @@ define([
                                         setTimerAndRunCallback(checkIsBound, resolve, reject);
                                         break;
                                     case 'SUCCESS':
-                                        localStorage.setItem('browser_id', data.browser.browser_id);
-                                        delete data.basket_id;
-                                        resolve(data)
+                                        if (data.errorMessage){
+                                            reject({ message: data.errorMessage });
+                                        } else {
+                                            localStorage.setItem('browser_id', data.browser.browser_id);
+                                            delete data.basket_id;
+                                            resolve(data)
+                                        }
+
                                         break;
                                     default:
                                         break;
                                 }
-                            } else if (data.errorMessage && !data.action){
+                            } else if (data.errorMessage){
                                 reject({ message: data.errorMessage });
                             } else {
-                                if (data.action && data.action === 'reject') {
-                                    reject({ message: data.errorMessage });
-                                } else {
-                                    setTimerAndRunCallback(checkIsBound, resolve, reject);
-                                }
+                                setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
                         .fail(function () {
