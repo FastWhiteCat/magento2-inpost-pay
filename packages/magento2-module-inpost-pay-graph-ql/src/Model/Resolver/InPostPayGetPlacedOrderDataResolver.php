@@ -1,0 +1,110 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPayGraphQl\Model\Resolver;
+
+use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Controller\MobileLink\Get;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Framework\UrlInterface;
+use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
+use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
+use InPost\InPostPay\Model\ResourceModel\InPostPayQuote as InPostPayQuoteResource;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Psr\Log\LoggerInterface;
+
+class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implements ResolverInterface
+{
+    private const REDIRECT = 'redirect';
+    private const ORDER_ID = 'order_id';
+    private const STATUS = 'status';
+    private const STATUS_LABEL = 'status_label';
+
+    public function __construct(
+        GetCartForUser $cartForUser,
+        LoggerInterface $logger,
+        private readonly InPostPayQuoteResource $inPostPayQuoteResource,
+        private readonly UrlInterface $urlBuilder,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly CheckoutSession $checkoutSession,
+        private readonly BasketBindingCheck $basketBindingCheck,
+        private readonly SandboxConfigProvider $sandboxConfigProvider
+    ) {
+        parent::__construct($cartForUser, $logger);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
+    {
+        $basketId = $this->extractBasketId($args);
+
+        try {
+            $inPostPayData = $this->inPostPayQuoteResource->getRefreshRequiredAndOrderId($basketId);
+            $refreshRequired = (bool)($inPostPayData[InPostPayQuoteInterface::REFRESH_REQUIRED] ?? false);
+            $orderId = (int)($inPostPayData[InPostPayOrderInterface::ORDER_ID] ?? 0);
+            $result = $this->prepareRefreshResponse();
+            if ($orderId) {
+                $order = $this->orderRepository->get($orderId);
+                $this->setLastOrder($order);
+                $result = $this->preparePlacedOrderResponse($order);
+            }
+
+            if ($refreshRequired) {
+                $this->inPostPayQuoteResource->updateRefreshRequired($basketId);
+            }
+
+            return $result;
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage(), ['basket_id' => $basketId]);
+
+            return $this->prepareErrorResponse(
+                self::ACTION_REFRESH,
+                __('There was an error while checking if order was placed in InPost Pay Mobile App.')->render()
+            );
+        }
+    }
+
+    private function preparePlacedOrderResponse(OrderInterface $order): array
+    {
+        return [
+            self::ACTION => self::ACTION_REDIRECT,
+            self::REDIRECT => $this->urlBuilder->getUrl('checkout/onepage/success/'),
+            self::ORDER_ID => (string)$order->getIncrementId(),
+            self::STATUS => (string)$order->getStatus(),
+            self::STATUS_LABEL => (string)$order->getStatusLabel()
+        ];
+    }
+
+    private function prepareRefreshResponse(): array
+    {
+        return [
+            self::ACTION => self::ACTION_REFRESH
+        ];
+    }
+
+    private function setLastOrder(OrderInterface $order): void
+    {
+        $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+        $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+        $this->checkoutSession->setLastOrderId($order->getEntityId());
+        $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+        $this->checkoutSession->setLastOrderStatus($order->getStatus());
+    }
+
+    protected function extractBasketId(array $data): string
+    {
+        $basketId = $data['basket_id'] ?? '';
+
+        return is_scalar($basketId) ? (string)$basketId : '';
+    }
+}

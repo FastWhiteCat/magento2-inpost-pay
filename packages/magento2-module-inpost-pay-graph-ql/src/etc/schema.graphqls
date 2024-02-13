@@ -24,6 +24,12 @@ type Query {
     ): InPostPayBasketMobileLinkData
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayBasketMobileLinkResolver")
     @doc(description: "This query is used to receive mobile link for basked binding alternative method.")
+
+    inPostPayGetPlacedOrderData (
+        basket_id: String! @doc(description: "InPost Pay Basket ID.")
+    ): InPostPayPlacedOrderData
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayGetPlacedOrderDataResolver")
+    @doc(description: "This query is used to receive placed order data using basket ID.")
 }
 
 input InPostPayBrowserData {
@@ -40,7 +46,7 @@ type InPostPayBasketData {
     deep_link: String @doc(description: "Android and iOS deep link.")
     deep_link_hms: String @doc(description: "HMS system deep link.")
     error_message: String @doc(description: "Error details.")
-    action: String @doc(description: "Action to be taken in case of failed process.")
+    action: String @doc(description: "Action to be taken.")
 }
 
 type InPostPayBrowserBindingDeleteResult {
@@ -53,6 +59,15 @@ type InPostPayBasketBindingDeleteResult {
     error_message: String @doc(description: "Error details.")
 }
 
+type InPostPayPlacedOrderData {
+    action: InPostPayAction @doc(description: "Action to be taken.")
+    redirect: String @doc(description: "Success page URL for placed order in InPost Pay Mobile App.")
+    order_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
+    status: String @doc(description: "Status of placed order in InPost Pay Mobile App.")
+    status_label: String @doc(description: "Status label of placed order in InPost Pay Mobile App.")
+    error_message: String @doc(description: "Error details.")
+}
+
 type InPostPayBasketConfirmationData {
     basket_id: String @doc(description: "Basket ID.")
     status: String @doc(description: "Basket status.")
@@ -62,7 +77,7 @@ type InPostPayBasketConfirmationData {
     surname: String @doc(description: "User surname.")
     masked_phone_number: String @doc(description: "Phone number mask.")
     error_message: String @doc(description: "Error details.")
-    action: String @doc(description: "Action to be taken in case of failed process.")
+    action: String @doc(description: "Action to be taken.")
 }
 
 type InPostPayBasketMobileLinkData {
@@ -78,4 +93,11 @@ type InPostPayBasketPhoneNumber {
 type InPostPayBasketBrowser {
     browser_id: String @doc(description: "Browser ID.")
     browser_trusted: Boolean @doc(description: "Browser trusted flag.")
+}
+
+enum InPostPayAction @doc(description: "Defines action to be taken.") {
+    retry
+    reject
+    refresh
+    redirect
 }

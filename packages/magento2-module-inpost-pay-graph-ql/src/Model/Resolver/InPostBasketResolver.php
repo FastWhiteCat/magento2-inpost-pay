@@ -16,6 +16,8 @@ class InPostBasketResolver
     public const ACTION = 'action';
     public const ACTION_RETRY = 'retry';
     public const ACTION_REJECT = 'reject';
+    public const ACTION_REFRESH = 'refresh';
+    public const ACTION_REDIRECT = 'redirect';
 
     public function __construct(
         protected readonly GetCartForUser $cartForUser,
