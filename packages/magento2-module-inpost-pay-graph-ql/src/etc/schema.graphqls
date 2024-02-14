@@ -46,7 +46,7 @@ type InPostPayBasketData {
     deep_link: String @doc(description: "Android and iOS deep link.")
     deep_link_hms: String @doc(description: "HMS system deep link.")
     error_message: String @doc(description: "Error details.")
-    action: String @doc(description: "Action to be taken.")
+    action: InPostPayAction @doc(description: "Action to be taken.")
 }
 
 type InPostPayBrowserBindingDeleteResult {
@@ -61,7 +61,6 @@ type InPostPayBasketBindingDeleteResult {
 
 type InPostPayPlacedOrderData {
     action: InPostPayAction @doc(description: "Action to be taken.")
-    redirect: String @doc(description: "Success page URL for placed order in InPost Pay Mobile App.")
     order_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
     status: String @doc(description: "Status of placed order in InPost Pay Mobile App.")
     status_label: String @doc(description: "Status label of placed order in InPost Pay Mobile App.")
@@ -77,7 +76,7 @@ type InPostPayBasketConfirmationData {
     surname: String @doc(description: "User surname.")
     masked_phone_number: String @doc(description: "Phone number mask.")
     error_message: String @doc(description: "Error details.")
-    action: String @doc(description: "Action to be taken.")
+    action: InPostPayAction @doc(description: "Action to be taken.")
 }
 
 type InPostPayBasketMobileLinkData {
@@ -95,7 +94,7 @@ type InPostPayBasketBrowser {
     browser_trusted: Boolean @doc(description: "Browser trusted flag.")
 }
 
-enum InPostPayAction @doc(description: "Defines action to be taken.") {
+enum InPostPayAction @doc(description: "Defines action that should be taken as a result of processing request") {
     retry
     reject
     refresh

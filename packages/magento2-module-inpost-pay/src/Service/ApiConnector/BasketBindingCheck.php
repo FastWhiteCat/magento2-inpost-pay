@@ -29,10 +29,11 @@ class BasketBindingCheck
 
     /**
      * @param int $quoteId
+     * @param string|null $browserId
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function execute(int $quoteId): array
+    public function execute(int $quoteId, ?string $browserId = null): array
     {
         $basketId = $this->getBasketId->get($quoteId);
 
@@ -44,8 +45,11 @@ class BasketBindingCheck
         $request = $this->basketBindingVerifyRequest->create();
 
         $params['basket_id'] = $basketId;
+        if ($browserId === null) {
+            $browserId = $this->cookieManager->getCookie('BrowserId');
+        }
 
-        if ($browserId = $this->cookieManager->getCookie('BrowserId')) {
+        if ($browserId) {
             $params['browser_id'] = '?browser_id=' . $browserId;
         }
 

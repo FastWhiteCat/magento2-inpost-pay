@@ -6,15 +6,11 @@ namespace InPost\InPostPayGraphQl\Model\Resolver;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
-use InPost\InPostPay\Controller\MobileLink\Get;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
-use Magento\Framework\UrlInterface;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
-use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
-use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote as InPostPayQuoteResource;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -23,7 +19,6 @@ use Psr\Log\LoggerInterface;
 
 class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implements ResolverInterface
 {
-    private const REDIRECT = 'redirect';
     private const ORDER_ID = 'order_id';
     private const STATUS = 'status';
     private const STATUS_LABEL = 'status_label';
@@ -32,11 +27,8 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
         GetCartForUser $cartForUser,
         LoggerInterface $logger,
         private readonly InPostPayQuoteResource $inPostPayQuoteResource,
-        private readonly UrlInterface $urlBuilder,
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly CheckoutSession $checkoutSession,
-        private readonly BasketBindingCheck $basketBindingCheck,
-        private readonly SandboxConfigProvider $sandboxConfigProvider
+        private readonly CheckoutSession $checkoutSession
     ) {
         parent::__construct($cartForUser, $logger);
     }
@@ -46,7 +38,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
      */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
-        $basketId = $this->extractBasketId($args);
+        $basketId = $this->extractBasketId($args ?? []);
 
         try {
             $inPostPayData = $this->inPostPayQuoteResource->getRefreshRequiredAndOrderId($basketId);
@@ -78,7 +70,6 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
     {
         return [
             self::ACTION => self::ACTION_REDIRECT,
-            self::REDIRECT => $this->urlBuilder->getUrl('checkout/onepage/success/'),
             self::ORDER_ID => (string)$order->getIncrementId(),
             self::STATUS => (string)$order->getStatus(),
             self::STATUS_LABEL => (string)$order->getStatusLabel()
@@ -101,7 +92,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
         $this->checkoutSession->setLastOrderStatus($order->getStatus());
     }
 
-    protected function extractBasketId(array $data): string
+    private function extractBasketId(array $data): string
     {
         $basketId = $data['basket_id'] ?? '';
 
