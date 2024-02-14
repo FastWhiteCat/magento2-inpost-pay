@@ -12,6 +12,7 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
+use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements ResolverInterface
@@ -19,6 +20,7 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
     public function __construct(
         GetCartForUser $cartForUser,
         LoggerInterface $logger,
+        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly BasketBindingCheck $basketBindingCheck,
         private readonly SandboxConfigProvider $sandboxConfigProvider
     ) {
@@ -33,13 +35,15 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
         $cartMaskId = $this->extractCartMaskId($args ?? []);
         try {
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
-            $result = $this->basketBindingCheck->execute((is_scalar($quote->getId())) ? (int)$quote->getId() : 0);
+            $quoteId = (is_scalar($quote->getId())) ? (int)$quote->getId() : 0;
+            $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
+            $result = $this->basketBindingCheck->execute($quoteId, $inPostPayQuote->getBrowserId());
 
             return [
                 'link' => sprintf(
                     '%s%s',
                     $this->sandboxConfigProvider->isSandboxEnabled() ? Get::SANDBOX_MOBILE_LINK : Get::MOBILE_LINK,
-                    $result['inpost_basket_id'] ?? ''
+                    $result['inpost_basket_id'] ?? (string)$inPostPayQuote->getInpostBasketId()
                 )
             ];
         } catch (LocalizedException $e) {
