@@ -17,6 +17,9 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+ */
 class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implements ResolverInterface
 {
     private const ORDER_ID = 'order_id';
