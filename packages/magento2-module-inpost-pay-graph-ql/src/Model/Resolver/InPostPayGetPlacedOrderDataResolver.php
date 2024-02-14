@@ -68,11 +68,13 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
 
     private function preparePlacedOrderResponse(OrderInterface $order): array
     {
+        // @phpstan-ignore-next-line
+        $statusLabel = (string)$order->getStatusLabel();
         return [
             self::ACTION => self::ACTION_REDIRECT,
             self::ORDER_ID => (string)$order->getIncrementId(),
             self::STATUS => (string)$order->getStatus(),
-            self::STATUS_LABEL => (string)$order->getStatusLabel()
+            self::STATUS_LABEL => $statusLabel
         ];
     }
 
