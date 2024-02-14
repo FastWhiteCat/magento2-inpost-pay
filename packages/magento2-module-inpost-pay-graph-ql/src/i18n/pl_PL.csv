@@ -4,3 +4,4 @@
 "Basked does not have InPost Pay ID so binding cannot be deleted.","Koszyk nie posiada identyfikatora InPost Pay, zatem powiązanie nie może zostać usunięte.",module,InPost_InPostPayGraphQl
 "There was an error during basket binding delete process.","Wystąpił błąd podczas usuwania powiązania koszyka.",module,InPost_InPostPayGraphQl
 "Basket binding does not exist for this cart.","Nie istnieje powiązanie tego koszyka.",module,InPost_InPostPayGraphQl
+"There was an error while checking if order was placed in InPost Pay Mobile App.","Wystąpił błąd podczas sprawdzania czy zamówienie zostało złożone w Aplikacji Mobilnej InPost Pay.",module,InPost_InPostPayGraphQl
