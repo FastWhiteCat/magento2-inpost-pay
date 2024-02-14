@@ -61,13 +61,15 @@ class LayoutConfigProvider
     }
 
     /**
+     * @param int|null $websiteId
      * @return string
      */
-    public function getFrameStyle(): string
+    public function getFrameStyle(?int $websiteId = null): string
     {
         $value = $this->scopeConfig->getValue(
             self::XML_PATH_FRAME_STYLE,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
         );
 
         return is_scalar($value) ? (string)$value : '';

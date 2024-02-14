@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\StoreGraphQl\Model\Resolver\Store\StoreConfigDataProvider">
+        <arguments>
+            <argument name="extendedConfigData" xsi:type="array">
+                <item name="inpost_pay_show_on_product_cart" xsi:type="string">payment/inpost_pay/show_on_product_cart</item>
+                <item name="inpost_pay_show_on_cart" xsi:type="string">payment/inpost_pay/show_on_cart</item>
+                <item name="inpost_pay_show_in_minicart" xsi:type="string">payment/inpost_pay/show_in_minicart</item>
+                <item name="inpost_pay_show_on_success_page" xsi:type="string">payment/inpost_pay/show_on_success_page</item>
+                <item name="inpost_pay_widget_color_variant" xsi:type="string">payment/inpost_pay/widget_color_variant</item>
+                <item name="inpost_pay_widget_dark_mode" xsi:type="string">payment/inpost_pay/widget_dark_mode</item>
+                <item name="inpost_pay_widget_max_width" xsi:type="string">payment/inpost_pay/widget_max_width</item>
+                <item name="inpost_pay_widget_frame_style" xsi:type="string">payment/inpost_pay/widget_frame_style</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -79,3 +79,41 @@ type InPostPayBasketBrowser {
     browser_id: String @doc(description: "Browser ID.")
     browser_trusted: Boolean @doc(description: "Browser trusted flag.")
 }
+
+type StoreConfig {
+    inpost_pay_show_on_product_cart : String
+    @doc(description: "Indicates whether widget should be displayed on product page or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_show_on_cart : String
+    @doc(description: "Indicates whether widget should be displayed on cart page or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_show_in_minicart : String
+    @doc(description: "Indicates whether widget should be displayed on minicart or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_show_on_success_page : String
+    @doc(description: "Indicates whether widget should be displayed on success page or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_widget_color_variant : InPostPayWidgetColorVariantEnum
+    @doc(description: "InPost Pay Widget color variant.")
+
+    inpost_pay_widget_dark_mode : String
+    @doc(description: "Indicates whether dark mode is enabled or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_widget_max_width : String
+    @doc(description: "Widget max width value in range between 220 and 600.")
+
+    inpost_pay_widget_frame_style : InPostPayWidgetFrameStyleEnum
+    @doc(description: "InPost Pay widget frame corner style.")
+    @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayWidgetFrameStyleResolver")
+}
+
+enum InPostPayWidgetColorVariantEnum @doc(description: "Defines InPost Pay Widget color variants.") {
+    primary
+    secondary
+}
+
+enum InPostPayWidgetFrameStyleEnum @doc(description: "Defines InPost Pay Widget frame corner styles.") {
+    classic
+    rounded
+    round
+}
