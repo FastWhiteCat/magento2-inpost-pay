@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="InPost\InPostPayGraphQl\Model\Resolver\InPostPayInitBasketResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPayGraphQl\Model\Resolver\InPostPayBasketConfirmationResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPayGraphQl\Model\Resolver\InPostPayBasketMobileLinkResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPayGraphQl\Model\Resolver\InPostPayDeleteBrowserBindingResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPayGraphQl\Model\Resolver\InPostPayDeleteBasketBindingResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPayGraphQl\Model\Resolver\InPostPayGetPlacedOrderDataResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+</config>
