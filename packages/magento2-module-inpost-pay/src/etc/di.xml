@@ -223,6 +223,7 @@
                 <item name="delivery" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDeliveryDataTransfer</item>
                 <item name="products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderProductsDataTransfer</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderConsentsDataTransfer</item>
+                <item name="order_discount" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDiscountDataTransfer</item>
             </argument>
         </arguments>
     </type>

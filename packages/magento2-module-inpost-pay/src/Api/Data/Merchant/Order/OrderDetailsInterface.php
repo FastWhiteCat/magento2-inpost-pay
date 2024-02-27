@@ -15,6 +15,7 @@ interface OrderDetailsInterface
     public const ORDER_COMMENTS = 'order_comments';
     public const COMMENTS = 'comments';
     public const ORDER_ID = 'order_id';
+    public const ORDER_DISCOUNT = 'order_discount';
     public const POS_ID = 'pos_id';
     public const ORDER_CREATION_DATE = 'order_creation_date';
     public const ORDER_MERCHANT_STATUS_DESCRIPTION = 'order_merchant_status_description';
@@ -43,6 +44,17 @@ interface OrderDetailsInterface
      * @return void
      */
     public function setOrderId(string $orderId): void;
+
+    /**
+     * @return float
+     */
+    public function getOrderDiscount(): float;
+
+    /**
+     * @param float $orderDiscount
+     * @return void
+     */
+    public function setOrderDiscount(float $orderDiscount): void;
 
     /**
      * @return string
