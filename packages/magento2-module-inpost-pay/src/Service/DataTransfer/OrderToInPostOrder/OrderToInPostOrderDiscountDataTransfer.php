@@ -17,6 +17,7 @@ class OrderToInPostOrderDiscountDataTransfer implements OrderToInPostOrderDataTr
      * @param Order $order
      * @param OrderInterface $inPostOrder
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function transfer(Order $order, OrderInterface $inPostOrder): void
     {
