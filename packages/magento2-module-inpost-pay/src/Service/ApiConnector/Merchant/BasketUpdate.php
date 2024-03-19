@@ -114,7 +114,7 @@ class BasketUpdate implements BasketUpdateInterface
             $basket = $this->basketFactory->create();
             $basket->setBasketId($basketId);
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
-            $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
+            $this->inPostPayQuote->updateCartVersion($inPostPayQuote->getBasketId());
 
             $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
 

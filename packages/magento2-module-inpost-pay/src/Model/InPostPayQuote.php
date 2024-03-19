@@ -193,13 +193,15 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         throw new LocalizedException(__('Invalid InPost Pay Quote updated at value.'));
     }
 
-    public function getRefreshRequired(): bool
+    public function getCartVersion(): string
     {
-        return (bool)$this->getData(self::REFRESH_REQUIRED);
+        $cartVersion = $this->getData(self::CART_VERSION);
+
+        return is_scalar($cartVersion) ? (string)$cartVersion : '';
     }
 
-    public function setRefreshRequired(bool $refreshRequired): InPostPayQuoteInterface
+    public function setCartVersion(string $cartVersion): InPostPayQuoteInterface
     {
-        return $this->setData(self::REFRESH_REQUIRED, $refreshRequired);
+        return $this->setData(self::CART_VERSION, $cartVersion);
     }
 }

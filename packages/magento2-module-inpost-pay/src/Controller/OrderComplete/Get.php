@@ -42,10 +42,9 @@ class Get implements HttpGetActionInterface
                 '';
 
             if ($basketId) {
-                $inPostPayData = $this->inPostPayQuote->getRefreshRequiredAndOrderId($basketId);
-                if (empty($inPostPayData)) {
-                    $data = ['action' => 'refresh'];
-                } elseif (isset($inPostPayData[InPostPayOrderInterface::ORDER_ID])) {
+                $inPostPayData = $this->inPostPayQuote->getCartVersionAndOrderId($basketId);
+
+                if (isset($inPostPayData[InPostPayOrderInterface::ORDER_ID])) {
                     $data = [
                         'action' => 'redirect',
                         'redirect' => $this->urlBuilder->getUrl('checkout/onepage/success/')
@@ -58,12 +57,10 @@ class Get implements HttpGetActionInterface
                     $this->checkoutSession->setLastOrderId($order->getEntityId());
                     $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
                     $this->checkoutSession->setLastOrderStatus($order->getStatus());
-                } elseif (isset($inPostPayData[InPostPayQuoteInterface::REFRESH_REQUIRED]) &&
-                    $inPostPayData[InPostPayQuoteInterface::REFRESH_REQUIRED]
-                ) {
-                    $this->inPostPayQuote->updateRefreshRequired($basketId);
-                    $data = ['action' => 'refresh'];
                 }
+
+                $cartVersion = (string)($inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '');
+                $data[InPostPayQuoteInterface::CART_VERSION] = $cartVersion;
             }
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
