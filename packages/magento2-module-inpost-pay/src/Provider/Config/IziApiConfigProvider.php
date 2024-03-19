@@ -14,6 +14,7 @@ class IziApiConfigProvider
     private const XML_PATH_BASKET_LIFETIME = 'payment/inpost_pay/basket_lifetime';
     private const XML_PATH_ACCEPTED_PAYMENT_TYPES = 'payment/inpost_pay/accepted_payment_types';
     private const XML_PATH_ASYNC_BASKET_EXPORT = 'payment/inpost_pay/async_basket_export';
+    private const XML_PATH_PROD_ATTR_CLEANING = 'payment/inpost_pay/remove_html_and_special_chars_from_attributes';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -73,5 +74,10 @@ class IziApiConfigProvider
     public function isAsyncBasketExportEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_ASYNC_BASKET_EXPORT);
+    }
+
+    public function isProductAttributesHTMLAndSpecialCharactersCleaningEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_PROD_ATTR_CLEANING);
     }
 }

@@ -17,7 +17,6 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 ?>
-
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
         name=""
@@ -27,6 +26,8 @@ $widgetWrapperClass = "inpay-widget-wrapper";
         variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
         basket="false"
         dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
+        max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
+        frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
         count="0"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">
     </inpost-izi-button>

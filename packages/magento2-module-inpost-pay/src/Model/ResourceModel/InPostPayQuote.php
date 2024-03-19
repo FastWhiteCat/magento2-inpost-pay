@@ -71,4 +71,21 @@ class InPostPayQuote extends AbstractDb
             ['basket_id = ?' => $basketId]
         );
     }
+
+    public function getInPostPayQuoteIdByBasketId(string $basketId): int
+    {
+        $connection = $this->getConnection();
+
+        if (!$connection) {
+            throw new LocalizedException(__('Connection is not defined'));
+        }
+
+        $mainTable = $this->getMainTable();
+
+        $select = $connection->select()
+            ->from($mainTable, ['inpost_pay_quote_id'])
+            ->where('basket_id' . '=?', $basketId);
+
+        return (int)$connection->fetchOne($select);
+    }
 }

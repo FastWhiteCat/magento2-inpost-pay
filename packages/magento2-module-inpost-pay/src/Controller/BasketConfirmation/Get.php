@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Controller\BasketConfirmation;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -15,6 +17,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get implements HttpGetActionInterface
 {
     private readonly ManagerInterface $messageManager;
@@ -25,6 +30,7 @@ class Get implements HttpGetActionInterface
         private readonly CheckoutSession $checkoutSession,
         private readonly Validator $formKeyValidator,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly JsonFactory $jsonFactory,
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly LoggerInterface $logger
@@ -56,6 +62,7 @@ class Get implements HttpGetActionInterface
 
                     $data = [
                         'status' => $inpostPayQuote->getStatus(),
+                        'basket_id' => $inpostPayQuote->getBasketId(),
                         'phone_number' => [
                             'country_prefix' => (string)$inpostPayQuote->getCountryPrefix(),
                             'phone' => (string)$inpostPayQuote->getPhone()
@@ -74,6 +81,11 @@ class Get implements HttpGetActionInterface
                     ];
                 }
             }
+            $this->quoteRestrictionsValidator->validate($quote, true);
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->messageManager->addWarningMessage($e->getMessage());
+            $data['errorMessage'] = $e->getMessage();
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             $data = [

@@ -12,6 +12,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -50,7 +51,7 @@ class Delete implements HttpGetActionInterface
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
                 $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
-                if ($inPostPayQuote->getQuoteId()) {
+                if ($inPostPayQuote->getQuoteId() && $inPostPayQuote->getInpostBasketId()) {
                     $this->basketBindingDelete->execute($inPostPayQuote->getBasketId());
                     $inPostPayQuoteId = is_scalar($inPostPayQuote->getInPostPayQuoteId())
                         ? $inPostPayQuote->getInPostPayQuoteId()
@@ -60,6 +61,8 @@ class Delete implements HttpGetActionInterface
                     return $this->jsonFactory->create()->setData([]);
                 }
             }
+        } catch (NoSuchEntityException $e) {
+            return $this->jsonFactory->create()->setData([]);
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
 

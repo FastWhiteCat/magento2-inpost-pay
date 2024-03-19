@@ -2,6 +2,9 @@
     <event name="sales_quote_save_after">
         <observer name="InPost_InPostPay::updateInPostBasketEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver" />
     </event>
+    <event name="checkout_cart_save_after">
+        <observer name="InPost_InPostPay::updateInPostBasketAfterAddProductEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterAddProductEventObserver" />
+    </event>
     <event name="sales_order_save_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
@@ -39,14 +42,12 @@
         <observer name="InPost_InPostPay::iziBasketUpdateBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketUpdateBeforeEventObserver" />
     </event>
     <event name="izi_basket_update_after">
-        <observer name="InPost_InPostPay::BasketStockValidationObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Basket\BasketStockValidationObserver" />
         <observer name="InPost_InPostPay::iziBasketUpdateAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketUpdateAfterEventObserver" />
     </event>
     <event name="izi_basket_get_before">
         <observer name="InPost_InPostPay::iziBasketGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketGetBeforeEventObserver" />
     </event>
     <event name="izi_basket_get_after">
-        <observer name="InPost_InPostPay::BasketStockValidationObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Basket\BasketStockValidationObserver" />
         <observer name="InPost_InPostPay::iziBasketGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketGetAfterEventObserver" />
     </event>
     <event name="izi_basket_binding_delete_before">

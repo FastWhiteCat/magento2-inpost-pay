@@ -8,6 +8,8 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -26,8 +28,8 @@ class Widget implements ArgumentInterface
 {
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
-
-    private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped'];
+    private const MAX_WIDTH = 'maxWidth';
+    private const FRAME_STYLE = 'frameStyle';
 
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
@@ -50,6 +52,7 @@ class Widget implements ArgumentInterface
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly ProductRepositoryInterface        $productRepository,
         private readonly StoreManagerInterface             $storeManager,
+        private readonly RestrictedProductIdsProvider      $restrictedProductIdsProvider,
         private readonly LoggerInterface                   $logger
     ) {
     }
@@ -77,10 +80,14 @@ class Widget implements ArgumentInterface
     {
         $variant = $this->layoutConfigProvider->getColorVariant();
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
+        $maxWidth = $this->layoutConfigProvider->getMaxWidth();
+        $frameStyle = $this->layoutConfigProvider->getFrameStyle();
 
         return [
             self::VARIANT => $variant,
-            self::DARK_MODE => $darkMode
+            self::DARK_MODE => $darkMode,
+            self::MAX_WIDTH => $maxWidth,
+            self::FRAME_STYLE => $frameStyle
         ];
     }
 
@@ -128,6 +135,35 @@ class Widget implements ArgumentInterface
         }
     }
 
+    public function isProductRestricted(int $productId): bool
+    {
+        $websiteId = (int)$this->storeManager->getWebsite()->getId();
+
+        return in_array(
+            $productId,
+            $this->restrictedProductIdsProvider->getList($websiteId, RestrictionsRuleInterface::APPLIES_TO_PAYMENT)
+        );
+    }
+
+    /**
+     * Returns true if at least one product in cart is not restricted
+     *
+     * @return bool
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function canShowForWholeCart(): bool
+    {
+        foreach ($this->checkoutSession->getQuote()->getAllVisibleItems() as $item) {
+            $productId = (int)$item->getProduct()->getId();
+            if (!$this->isProductRestricted($productId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function isInPostPayOrder(): bool
     {
         try {
@@ -168,22 +204,5 @@ class Widget implements ArgumentInterface
         }
 
         return ($product instanceof Product) ? $product : null;
-    }
-
-    public function hasNotAllowedProducts(): bool
-    {
-        try {
-            $quote = $this->checkoutSession->getQuote();
-
-            foreach ($quote->getAllVisibleItems() as $item) {
-                if (in_array($item->getProduct()->getTypeId(), self::NOT_ALLOWED_PRODUCT_TYPES)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } catch (NoSuchEntityException|LocalizedException $e) {
-            return false;
-        }
     }
 }

@@ -10,6 +10,8 @@ define([
 
     var LONG_POLLING_TIME = 10000;
     var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var globalOrderResetFlag = false;
+    var globalBindingCheckedFlag = false;
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -18,10 +20,6 @@ define([
         DOWNLOADABLE: 'downloadable',
         BUNDLE: 'bundle'
     };
-    var NOT_ALLOWED_PRODUCT_TYPES = [
-        PRODUCT_TYPES.GROUPED,
-        PRODUCT_TYPES.BUNDLE
-    ];
 
     return Component.extend({
         initialize: function (config) {
@@ -80,6 +78,10 @@ define([
             })
                 .done(function (data) {
                     if (data.status && data.status === 'SUCCESS') {
+                        if (data.basket_id) {
+                            localStorage.setItem('basketId', data.basket_id);
+                        }
+
                         var $iziButtons = $("inpost-izi-button");
                         if (!$iziButtons.length) return;
 
@@ -95,9 +97,11 @@ define([
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
+            var prefixValue = globalBindingCheckedFlag ? "" : prefix ? "+" + prefix : "";
+            var phoneNumberValue = globalBindingCheckedFlag ? "" : phoneNumber ? phoneNumber : "";
             var data = {
-                prefix: prefix && "+" + prefix || "",
-                number: phoneNumber || "",
+                prefix: prefixValue,
+                number: phoneNumberValue,
                 browser: browserData,
                 binding_place: bindingPlace
             };
@@ -111,20 +115,28 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        if (Object.keys(data).length === 1 && data.basket_id) {
+                        if (!Object.keys(data).length) {
+                            reject({ message: new Error($.mage.__('Something went wrong, refresh the page and try again')) });
+                        } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
+                            localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = true;
+                            globalOrderResetFlag = false;
                             resolve([]);
+                        } else if (data.action){
+                            reject({ message: data.errorMessage });
+                        } else {
+                            localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = false;
+                            resolve({
+                                qr_code: data.qr_code,
+                                deep_link: data.deep_link,
+                                deep_link_hms: data.deep_link_hms,
+                            })
                         }
-
-                        localStorage.setItem('basketId', data.basket_id);
-                        resolve({
-                            qr_code: data.qr_code,
-                            deep_link: data.deep_link,
-                            deep_link_hms: data.deep_link_hms,
-                        })
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -149,8 +161,8 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -163,7 +175,6 @@ define([
                     })
                     .catch(function(error) {
                         reject(error)
-                        console.error(error);
                     });
             });
 
@@ -187,68 +198,85 @@ define([
 
                                 switch (data.status) {
                                     case 'REJECT':
-                                        reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
+                                        reject({ message: new Error($.mage.__('Connection has been interrupted, please try again.')) });
                                         break;
                                     case 'PENDING':
                                         setTimerAndRunCallback(checkIsBound, resolve, reject);
                                         break;
                                     case 'SUCCESS':
-                                        localStorage.setItem('browser_id', data.browser.browser_id);
-                                        resolve(data)
+                                        if (data.errorMessage){
+                                            reject({ message: data.errorMessage });
+                                        } else {
+                                            localStorage.setItem('browser_id', data.browser.browser_id);
+                                            delete data.basket_id;
+                                            resolve(data)
+                                        }
+
                                         break;
                                     default:
                                         break;
                                 }
+                            } else if (data.errorMessage){
+                                reject({ message: data.errorMessage });
                             } else {
                                 setTimerAndRunCallback(checkIsBound, resolve, reject);
                             }
                         })
-                        .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem: ') + error));
+                        .fail(function () {
+                            reject(new Error($.mage.__('Network problem')));
                         });
                 });
             }
         },
 
         iziGetOrderComplete: function () {
+            var basketId = localStorage.getItem('basketId');
+
+            if (!basketId) {
+                return Promise.resolve(new Error($.mage.__('Problem loading the cart, please refresh the page and try again')))
+            }
+
             return new Promise((resolve, reject) => {
                 checkOrderStatus()
                     .then((data) => {
-                        resolve(data)
+                        if (data) {
+                            resolve(data)
+                        }
                     })
                     .catch(function(error) {
                         reject(error)
-                        console.error(error);
                     });
             });
             function checkOrderStatus() {
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    var basketId = localStorage.getItem('basketId');
-
-                    xhrForOrderConfirmation = $.ajax({
-                        url: urlBuilder.build('inpostizi/OrderComplete/Get'
-                            + '/?basketId='
-                            + basketId
-                        ),
-                        method: 'GET',
-                    })
-                        .done(function (data) {
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                                abortRequest(xhrForBasketConfirmation)
-                            }
-
-                            if (!data.action) {
-                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                            } else {
-                                resolve(data);
-                            }
+                    if (globalOrderResetFlag) {
+                        resolve();
+                    } else {
+                        xhrForOrderConfirmation = $.ajax({
+                            url: urlBuilder.build('inpostizi/OrderComplete/Get'
+                                + '/?basketId='
+                                + basketId
+                            ),
+                            method: 'GET',
                         })
-                        .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem: ') + error));
-                        });
+                            .done(function (data) {
+                                if (timeoutId) {
+                                    clearTimeout(timeoutId);
+                                    abortRequest(xhrForBasketConfirmation)
+                                }
+
+                                if (!data.action) {
+                                    setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                } else {
+                                    resolve(data);
+                                }
+                            })
+                            .fail(function () {
+                                reject(new Error($.mage.__('Network problem')));
+                            });
+                    }
                 });
             }
         },
@@ -260,11 +288,13 @@ define([
                     method: 'GET',
                 })
                     .done(function () {
+                        globalOrderResetFlag = true;
                         resolve()
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
-                    });
+                    .fail(function () {
+                        globalOrderResetFlag = true;
+                        reject(new Error($.mage.__('Network problem')));
+                    })
             });
         },
 
@@ -312,8 +342,8 @@ define([
                 updateCounter(cartData.summary_count);
             });
 
-            document.addEventListener('iziModalEventClose', function () {
-                abortRequest(xhrForBasketConfirmation)
+            document.addEventListener('iziModalEventOpen', function () {
+                $('.block-minicart').dropdownDialog('close');
             })
 
             window.addEventListener("inpost-update-count", function (e){
@@ -325,14 +355,6 @@ define([
                 var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
                 var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
                 var counter = cartData ? cartData.summary_count : getConfig().count || 0;
-                var hasCartNotAllowedProducts = cartData ? cartData.items.some(function(item) {
-                    return NOT_ALLOWED_PRODUCT_TYPES.includes(item.product_type)
-                }) : false;
-
-                if (hasCartNotAllowedProducts) {
-                    $inpayWrapperOnBasket.hide()
-                    return;
-                }
 
                 if ($inpayWrapperOnBasket.length) {
                     if (counter === 0) {
@@ -397,7 +419,6 @@ define([
                     })
                     .catch(function(error) {
                         reject(error);
-                        console.error(error);
                     });
             }, LONG_POLLING_TIME);
         },
@@ -429,6 +450,21 @@ define([
 
                     return isAddedProduct
                 })
+            }
+
+            var $groupedProductElements = $productForm.find('[name*="super_group"]')
+            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
+                return this.value > 0;
+            })
+
+            if (simpleProductsInGrouped.length) {
+                var addedSimpleProducts = 0;
+                _.each(simpleProductsInGrouped, function (item) {
+                    if (cartData.items.some(function (cartItem) {
+                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
+                    })) addedSimpleProducts++
+                })
+                return addedSimpleProducts === simpleProductsInGrouped.length;
             }
         }
     });

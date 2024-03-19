@@ -8,7 +8,7 @@ use InPost\InPostPay\Exception\InvalidPromoCodeException;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -16,6 +16,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\CouponManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\Option;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -37,22 +38,32 @@ class CartService
      * @param Quote $quote
      * @param int $productId
      * @param float $qty
+     * @param bool $isQuoteItemId
      * @return void
      * @throws LocalizedException
      */
-    public function addToCart(Quote $quote, int $productId, float $qty): void
+    public function addToCart(Quote $quote, int $productId, float $qty, bool $isQuoteItemId = false): void
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         try {
-            $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
-            if (!$product instanceof Product) {
-                throw new NoSuchEntityException(__('Product ID: %1 not found.', $productId));
-            }
+            if (!$isQuoteItemId) {
+                $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
+                if (!$product instanceof Product) {
+                    throw new NoSuchEntityException(__('Product ID: %1 not found.', $productId));
+                }
 
-            $itemId = $this->getItemIdByProductFromCart($quote, $product);
-            if ($itemId === null) {
-                $quote->addProduct($product, (float)$qty);
+                $itemId = $this->getItemIdByProductFromCart($quote, $product);
+
+                if ($itemId === null) {
+                    $quote->addProduct($product, (float)$qty);
+                } else {
+                    $quoteItem = $quote->getItemById($itemId);
+                    if ($quoteItem) {
+                        $quoteItem->setQty($qty);
+                    }
+                }
             } else {
+                $itemId = $productId;
                 $quoteItem = $quote->getItemById($itemId);
                 if ($quoteItem) {
                     $quoteItem->setQty($qty);
@@ -76,21 +87,27 @@ class CartService
     /**
      * @param Quote $quote
      * @param int $productId
+     * @param bool $isQuoteItemId
      * @return void
      * @throws LocalizedException
      */
-    public function removeFromCart(Quote $quote, int $productId): void
+    public function removeFromCart(Quote $quote, int $productId, bool $isQuoteItemId = false): void
     {
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         try {
-            $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
-            if ($product instanceof Product) {
-                $itemId = $this->getItemIdByProductFromCart($quote, $product);
-                if ($itemId) {
-                    $quote->removeItem($itemId);
+            $itemId = null;
+            if ($isQuoteItemId) {
+                $itemId = $productId;
+            } else {
+                $product = $this->productRepository->getById($productId, false, $quote->getStoreId());
+                if ($product instanceof Product) {
+                    $itemId = $this->getItemIdByProductFromCart($quote, $product);
                 }
-                $this->applyQuoteChanges($quote);
+            }
 
+            if ($itemId) {
+                $quote->removeItem($itemId);
+                $this->applyQuoteChanges($quote);
                 $this->logger->debug(
                     sprintf('Product ID %s has been removed from quote ID %s', $productId, $quoteId)
                 );
@@ -150,20 +167,32 @@ class CartService
 
     private function getItemIdByProductFromCart(Quote $quote, Product $product): ?int
     {
-        $item = null;
-        $typeId = (is_scalar($product->getTypeId())) ? (string)$product->getTypeId() : '';
-        if ($typeId === Type::TYPE_SIMPLE) {
-            $item = $quote->getItemByProduct($product);
-        } else {
-            foreach ($quote->getAllVisibleItems() as $item) {
-                /** @var Item $item */
-                $itemProductId = (is_scalar($item->getData('product_id'))) ? (int)$item->getData('product_id') : 0;
-                if ($itemProductId === (int)$product->getId()) {
-                    break;
-                }
+        foreach ($quote->getAllVisibleItems() as $item) {
+            /** @var Item $item */
+            if ($item->getProduct()->getTypeId() === Configurable::TYPE_CODE
+                && $itemId = $this->getItemIdByChildProductId($item, $product)
+            ) {
+                return $itemId;
+            }
+
+            if ($item->getProductId() === $product->getId()) {
+                return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
             }
         }
 
-        return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
+        return null;
+    }
+
+    private function getItemIdByChildProductId(Item $item, Product $product): ?int
+    {
+        $option = $item->getOptionByCode('simple_product');
+        if ($option instanceof Option) {
+            $productId = (int)$option->getProduct()->getId();
+            if ((int)$product->getId() === $productId) {
+                return ($item instanceof Item && is_scalar($item->getId()) ? (int)$item->getId() : null);
+            }
+        }
+
+        return null;
     }
 }
