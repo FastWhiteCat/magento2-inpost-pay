@@ -267,10 +267,27 @@ define([
                                     abortRequest(xhrForBasketConfirmation)
                                 }
 
-                                if (!data.action) {
+                                if (data.action) {
+                                    sessionStorage.setItem('cart_version', data.cart_version)
+                                    delete data.cart_version;
+                                    resolve(data);
+                                } else if (!data) {
                                     setTimerAndRunCallback(checkOrderStatus, resolve, reject);
                                 } else {
-                                    resolve(data);
+                                    if (data.cart_version) {
+                                        var cartVersion = sessionStorage.getItem('cart_version');
+
+                                        if (cartVersion && data.cart_version === cartVersion) {
+                                            setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                        } else if (!cartVersion || (cartVersion && data.cart_version !== cartVersion)) {
+                                            sessionStorage.setItem('cart_version', data.cart_version)
+                                            resolve({action: 'refresh'});
+                                        } else {
+                                            setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                        }
+                                    } else {
+                                        setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                    }
                                 }
                             })
                             .fail(function () {
@@ -288,6 +305,7 @@ define([
                     method: 'GET',
                 })
                     .done(function () {
+                        sessionStorage.removeItem('cart_version');
                         globalOrderResetFlag = true;
                         resolve()
                     })
