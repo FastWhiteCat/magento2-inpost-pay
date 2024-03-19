@@ -266,22 +266,27 @@ define([
                                     abortRequest(xhrForBasketConfirmation)
                                 }
 
-                                if (data.hash) {
-                                    var hash = sessionStorage.getItem('basketHash');
+                                if (data.action) {
+                                    sessionStorage.setItem('cart_version', data.cart_version)
+                                    delete data.cart_version;
+                                    resolve(data);
+                                } else if (!data) {
+                                    setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                } else {
+                                    if (data.cart_version) {
+                                        var cartVersion = sessionStorage.getItem('cart_version');
 
-                                    if (!hash) {
-                                        sessionStorage.setItem('basketHash', data.hash)
-                                        setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                                    } else if (hash && data.hash === hash) {
-                                        sessionStorage.removeItem('basketHash');
-                                        resolve({action: 'refresh'});
+                                        if (cartVersion && data.cart_version === cartVersion) {
+                                            setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                        } else if (!cartVersion || (cartVersion && data.cart_version !== cartVersion)) {
+                                            sessionStorage.setItem('cart_version', data.cart_version)
+                                            resolve({action: 'refresh'});
+                                        } else {
+                                            setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                        }
                                     } else {
                                         setTimerAndRunCallback(checkOrderStatus, resolve, reject);
                                     }
-                                } else if (!data.action) {
-                                    setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                                } else {
-                                    resolve(data);
                                 }
                             })
                             .fail(function () {
@@ -299,6 +304,7 @@ define([
                     method: 'GET',
                 })
                     .done(function () {
+                        sessionStorage.removeItem('cart_version');
                         globalOrderResetFlag = true;
                         resolve()
                     })
