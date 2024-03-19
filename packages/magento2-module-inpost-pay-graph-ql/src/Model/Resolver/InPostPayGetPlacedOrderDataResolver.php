@@ -46,7 +46,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
 
         try {
             $inPostPayData = $this->inPostPayQuoteResource->getCartVersionAndOrderId($basketId);
-            $cartVersion = (string)$inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '';
+            $cartVersion = (string)($inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '');
             $orderId = (int)($inPostPayData[InPostPayOrderInterface::ORDER_ID] ?? 0);
             $result = $this->prepareRefreshResponse($cartVersion);
 

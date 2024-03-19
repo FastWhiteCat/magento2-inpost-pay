@@ -59,7 +59,7 @@ class Get implements HttpGetActionInterface
                     $this->checkoutSession->setLastOrderStatus($order->getStatus());
                 }
 
-                $cartVersion = (string)$inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '';
+                $cartVersion = (string)($inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '');
                 $data[InPostPayQuoteInterface::CART_VERSION] = $cartVersion;
             }
         } catch (LocalizedException $e) {
