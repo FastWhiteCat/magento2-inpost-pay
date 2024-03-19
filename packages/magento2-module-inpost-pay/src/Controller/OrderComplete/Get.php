@@ -18,6 +18,9 @@ use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get implements HttpGetActionInterface
 {
     private readonly RequestInterface $request;
