@@ -40,7 +40,7 @@
             "updated_at": true,
             "phone": true,
             "country_prefix": true,
-            "refresh_required": true
+            "cart_version": true
         },
         "constraint": {
             "PRIMARY": true,

@@ -25,6 +25,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
     private const ORDER_ID = 'order_id';
     private const STATUS = 'status';
     private const STATUS_LABEL = 'status_label';
+    private const CART_VERSION = 'cart_version';
 
     public function __construct(
         GetCartForUser $cartForUser,
@@ -44,36 +45,40 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
         $basketId = $this->extractBasketId($args ?? []);
 
         try {
-            $inPostPayData = $this->inPostPayQuoteResource->getRefreshRequiredAndOrderId($basketId);
-            $refreshRequired = (bool)($inPostPayData[InPostPayQuoteInterface::REFRESH_REQUIRED] ?? false);
+            $inPostPayData = $this->inPostPayQuoteResource->getCartVersionAndOrderId($basketId);
+            $cartVersion = (string)$inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '';
             $orderId = (int)($inPostPayData[InPostPayOrderInterface::ORDER_ID] ?? 0);
-            $result = $this->prepareRefreshResponse();
+            $result = $this->prepareRefreshResponse($cartVersion);
+
             if ($orderId) {
                 $order = $this->orderRepository->get($orderId);
                 $this->setLastOrder($order);
-                $result = $this->preparePlacedOrderResponse($order);
-            }
-
-            if ($refreshRequired) {
-                $this->inPostPayQuoteResource->updateRefreshRequired($basketId);
+                $result = $this->preparePlacedOrderResponse($order, $cartVersion);
             }
 
             return $result;
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['basket_id' => $basketId]);
 
-            return $this->prepareErrorResponse(
-                self::ACTION_REFRESH,
+            $errorResponse = $this->prepareErrorResponse(
+                null,
                 __('There was an error while checking if order was placed in InPost Pay Mobile App.')->render()
             );
+
+            if (isset($cartVersion)) {
+                $errorResponse[self::CART_VERSION] = $cartVersion;
+            }
+
+            return $errorResponse;
         }
     }
 
-    private function preparePlacedOrderResponse(OrderInterface $order): array
+    private function preparePlacedOrderResponse(OrderInterface $order, string $cartVersion): array
     {
         // @phpstan-ignore-next-line
         $statusLabel = (string)$order->getStatusLabel();
         return [
+            self::CART_VERSION => $cartVersion,
             self::ACTION => self::ACTION_REDIRECT,
             self::ORDER_ID => (string)$order->getIncrementId(),
             self::STATUS => (string)$order->getStatus(),
@@ -81,10 +86,10 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
         ];
     }
 
-    private function prepareRefreshResponse(): array
+    private function prepareRefreshResponse(string $cartVersion): array
     {
         return [
-            self::ACTION => self::ACTION_REFRESH
+            self::CART_VERSION => $cartVersion
         ];
     }
 
