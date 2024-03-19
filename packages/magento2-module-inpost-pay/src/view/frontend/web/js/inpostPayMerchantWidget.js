@@ -266,7 +266,19 @@ define([
                                     abortRequest(xhrForBasketConfirmation)
                                 }
 
-                                if (!data.action) {
+                                if (data.hash) {
+                                    var hash = sessionStorage.getItem('basketHash');
+
+                                    if (!hash) {
+                                        sessionStorage.setItem('basketHash', data.hash)
+                                        setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                    } else if (hash && data.hash === hash) {
+                                        sessionStorage.removeItem('basketHash');
+                                        resolve({action: 'refresh'});
+                                    } else {
+                                        setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                    }
+                                } else if (!data.action) {
                                     setTimerAndRunCallback(checkOrderStatus, resolve, reject);
                                 } else {
                                     resolve(data);
