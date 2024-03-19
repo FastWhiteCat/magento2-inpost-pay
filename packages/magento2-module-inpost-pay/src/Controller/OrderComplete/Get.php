@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Controller\OrderComplete;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
@@ -12,10 +13,14 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get implements HttpGetActionInterface
 {
     private readonly RequestInterface $request;
@@ -27,6 +32,7 @@ class Get implements HttpGetActionInterface
         private readonly UrlInterface $urlBuilder,
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly OrderRepositoryInterface $orderRepository,
+        private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly LoggerInterface $logger
     ) {
         $this->request = $context->getRequest();
@@ -43,6 +49,10 @@ class Get implements HttpGetActionInterface
 
             if ($basketId) {
                 $inPostPayData = $this->inPostPayQuote->getCartVersionAndOrderId($basketId);
+
+                if (empty($inPostPayData)) {
+                    $inPostPayData = $this->getInPostPayOrderDataByBasketId($basketId);
+                }
 
                 if (isset($inPostPayData[InPostPayOrderInterface::ORDER_ID])) {
                     $data = [
@@ -67,5 +77,17 @@ class Get implements HttpGetActionInterface
         }
 
         return $this->jsonFactory->create()->setData($data);
+    }
+
+    private function getInPostPayOrderDataByBasketId(string $basketId): array
+    {
+        try {
+            $inPostPayOrder = $this->inPostPayOrderRepository->getByBasketId($basketId);
+            $inPostPayData[InPostPayOrderInterface::ORDER_ID] = $inPostPayOrder->getOrderId();
+        } catch (NoSuchEntityException | LocalizedException $e) {
+            $inPostPayData = [];
+        }
+
+        return $inPostPayData;
     }
 }
