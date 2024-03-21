@@ -153,7 +153,7 @@ class Widget implements ArgumentInterface
                 if ($this->inPostPayQuote->isBasketConnected($quoteId)) {
                     $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
 
-                    return $inpostPayQuote->getMaskedPhoneNumber();
+                    return $inpostPayQuote->getMaskedPhoneNumber()?: "";
                 }
             }
         } catch (LocalizedException) {
