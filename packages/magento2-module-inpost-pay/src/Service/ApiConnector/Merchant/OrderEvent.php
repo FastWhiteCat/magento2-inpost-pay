@@ -153,8 +153,7 @@ class OrderEvent implements OrderEventInterface
         if ($order->getStatus() === $this->generalConfigProvider->getNewOrderStatus()) {
             $payment = $order->getPayment();
             if ($payment) {
-                /** @var Payment $payment */
-                //$payment->setTransactionId($eventData->getPaymentId());
+                /** @var \Magento\Sales\Model\Order\Payment $payment */
                 $payment->capture();
 
                 $this->addTransaction($payment, $order, $eventData);
