@@ -8,8 +8,8 @@ use InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface;
-use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterfaceFactory;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
@@ -17,8 +17,14 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface as TransactionBuilder;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +45,8 @@ class OrderEvent implements OrderEventInterface
         private readonly OrderUpdateInterfaceFactory $orderUpdateFactory,
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
         private readonly EventManager $eventManager,
+        private readonly TransactionBuilder $transactionBuilder,
+        private readonly TransactionRepositoryInterface $transactionRepository,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -124,7 +132,7 @@ class OrderEvent implements OrderEventInterface
         $orderStatus = $eventData->getOrderStatus();
 
         if ($paymentStatus === self::PAYMENT_STATUS_AUTHORIZED) {
-            $this->updateOrderPayment($order);
+            $this->updateOrderPayment($order, $eventData);
             $this->addOrderCommentAndSave($order, $eventData);
             $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_COMPLETED);
             return self::ORDER_STATUS_COMPLETED;
@@ -140,13 +148,17 @@ class OrderEvent implements OrderEventInterface
         throw new OrderNotUpdateException();
     }
 
-    private function updateOrderPayment(Order $order): void
+    private function updateOrderPayment(Order $order, EventDataInterface $eventData): void
     {
         if ($order->getStatus() === $this->generalConfigProvider->getNewOrderStatus()) {
             $payment = $order->getPayment();
             if ($payment) {
-                /** @var \Magento\Sales\Model\Order\Payment $payment */
+                /** @var Payment $payment */
+                //$payment->setTransactionId($eventData->getPaymentId());
                 $payment->capture();
+
+                $this->addTransaction($payment, $order, $eventData);
+
                 $order->setIsInProcess(true);
 
                 return;
@@ -202,5 +214,25 @@ class OrderEvent implements OrderEventInterface
     {
         $inPostPayOrder->setOrderStatus($status);
         $this->inPostPayOrderRepository->save($inPostPayOrder);
+    }
+
+    private function addTransaction(
+        OrderPaymentInterface $payment,
+        OrderInterface $order,
+        EventDataInterface $eventData
+    ): void {
+        $transaction = $this->transactionBuilder
+            ->setPayment($payment)
+            ->setOrder($order)
+            ->setTransactionId($eventData->getPaymentId())
+            ->setAdditionalInformation(
+                [
+                    'reference' => $eventData->getPaymentReference()
+                ]
+            )
+            ->setFailSafe(true)
+            ->build(TransactionInterface::TYPE_CAPTURE);
+
+        $this->transactionRepository->save($transaction);
     }
 }
