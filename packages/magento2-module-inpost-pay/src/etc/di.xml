@@ -263,6 +263,12 @@
             <argument name="debugConfigProvider" xsi:type="object">InPost\InPostPay\Provider\Config\DebugConfigProvider</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Service\Refund\SignatureGenerator">
+        <arguments>
+            <argument name="hashAlgorithmName" xsi:type="const">InPost\InPostPay\Service\Refund\SignatureGenerator::DEFAULT_ALGORITHM_HASH_NAME</argument>
+            <argument name="hashAlgorithmPrefix" xsi:type="const">InPost\InPostPay\Service\Refund\SignatureGenerator::DEFAULT_ALGORITHM_HASH_PREFIX</argument>
+        </arguments>
+    </type>
     <virtualType name="InPost\InPostPay\Logger\InPostPayLogger" type="Magento\Framework\Logger\Monolog">
         <arguments>
             <argument name="handlers" xsi:type="array">
