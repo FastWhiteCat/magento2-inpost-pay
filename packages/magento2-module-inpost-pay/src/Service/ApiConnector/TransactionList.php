@@ -21,7 +21,7 @@ class TransactionList
     }
 
     public function execute(
-        int $perPage = 50,
+        int $perPage = 10,
         int $page = 0,
         ?string $sortDirection = 'ASC',
         ?string $sortBy = null,
