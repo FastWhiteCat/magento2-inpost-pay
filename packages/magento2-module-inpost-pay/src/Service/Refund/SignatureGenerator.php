@@ -36,15 +36,16 @@ class SignatureGenerator
             $merchantSecret = $this->authConfigProvider->getMerchantSecret();
             $extRefundId = $requestData['external_refund_id'] ?? '';
             $refundAmount = $requestData['refund_amount'] ?? null;
-            $additionalBusinessData = $this->getPreparedBusinessData(
-                (string)($requestData['additional_business_data'] ?? '')
+            $additionalBusinessData = $requestData['additional_business_data']['additional_data'] ?? '';
+            $additionalData = $this->getPreparedAdditionalData(
+                is_scalar($additionalBusinessData) ? (string)$additionalBusinessData : ''
             );
 
             $intermediateSignature = sprintf(
                 '%s%s%s%s%s%s',
                 $xCommandId,
                 $transactionId,
-                $additionalBusinessData,
+                $additionalData,
                 $extRefundId,
                 $refundAmount,
                 $merchantSecret
@@ -63,11 +64,11 @@ class SignatureGenerator
         }
     }
 
-    private function getPreparedBusinessData(string $additionalBusinessData): ?string
+    private function getPreparedAdditionalData(string $additionalData): ?string
     {
-        $preparedBusinessData = $additionalBusinessData ? json_decode($additionalBusinessData, true) : null;
+        $preparedData = $additionalData ? json_decode($additionalData, true) : null;
 
-        if (empty($preparedBusinessData) || !is_array($preparedBusinessData)) {
+        if (empty($preparedData) || !is_array($preparedData)) {
             return null;
         }
 
@@ -75,8 +76,8 @@ class SignatureGenerator
             static function ($key, $value) {
                 return sprintf('%s%s', $key, $value);
             },
-            array_keys($preparedBusinessData),
-            $preparedBusinessData
+            array_keys($preparedData),
+            $preparedData
         ));
     }
 }
