@@ -49,7 +49,7 @@ class TransactionListResponseDataTransfer
     private function createTransactionItem(array $itemData): TransactionItem
     {
         $transactionId = (string)($itemData[TransactionItem::TRANSACTION_ID] ?? '');
-        $merchantPosId = (string)$itemData[TransactionItem::MERCHANT_POS_ID] ?? '');
+        $merchantPosId = (string)($itemData[TransactionItem::MERCHANT_POS_ID] ?? '');
         $externalTransactionId = (string)($itemData[TransactionItem::EXTERNAL_TRANSACTION_ID] ?? '');
         $description = (string)($itemData[TransactionItem::DESCRIPTION] ?? '');
         $status = (string)($itemData[TransactionItem::STATUS] ?? '');
