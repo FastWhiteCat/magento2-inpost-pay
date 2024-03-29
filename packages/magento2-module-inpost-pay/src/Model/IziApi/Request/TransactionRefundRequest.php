@@ -38,8 +38,8 @@ class TransactionRefundRequest extends Request implements RequestInterface
         $uri = $this->uri;
         $params = $this->getParams();
         if (array_key_exists(self::TRANSACTION_ID, $params) && is_scalar($params[self::TRANSACTION_ID])) {
-            $browserId = (string)$params[self::TRANSACTION_ID];
-            $uri = str_replace(sprintf('{%s}', self::TRANSACTION_ID), $browserId, $uri);
+            $transactionId = (string)$params[self::TRANSACTION_ID];
+            $uri = str_replace(sprintf('{%s}', self::TRANSACTION_ID), $transactionId, $uri);
             if (!$keepParamsIntact) {
                 unset($params[self::TRANSACTION_ID]);
                 $this->setParams($params);

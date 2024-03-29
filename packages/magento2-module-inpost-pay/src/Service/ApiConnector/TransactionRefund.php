@@ -6,12 +6,13 @@ namespace InPost\InPostPay\Service\ApiConnector;
 
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
-use InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessData;
+use InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\RefundInterfaceFactory;
 use InPost\InPostPay\Model\IziApi\Request\TransactionRefundRequest;
 use InPost\InPostPay\Model\IziApi\Request\TransactionRefundRequestFactory;
 use InPost\InPostPay\Model\IziApi\Response\TransactionRefundResponse;
 use InPost\InPostPay\Model\IziApi\Response\TransactionRefundResponseFactory;
-use InPost\InPostPay\Service\Converter\InPostRefundAdditionalDataToArrayConverter;
+use InPost\InPostPay\Service\Converter\InPostRefundToArrayConverter;
 use InPost\InPostPay\Service\Refund\SignatureGenerator;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
@@ -19,40 +20,40 @@ use Psr\Log\LoggerInterface;
 class TransactionRefund
 {
     public function __construct(
-        private readonly AdditionalBusinessData $additionalBusinessData,
+        private readonly AdditionalBusinessDataInterfaceFactory $additionalBusinessDataFactory,
         private readonly ConnectorInterface $connector,
+        private readonly RefundInterfaceFactory $refundFactory,
         private readonly SignatureGenerator $signatureGenerator,
         private readonly TransactionRefundRequestFactory $transactionRefundRequestFactory,
         private readonly TransactionRefundResponseFactory $transactionRefundResponseFactory,
-        private readonly InPostRefundAdditionalDataToArrayConverter $inPostRefundAdditionalDataToArrayConverter,
+        private readonly InPostRefundToArrayConverter $inPostRefundToArrayConverter,
         private readonly LoggerInterface $logger
     ) {
     }
 
     public function execute(
-        string $transactionId,
-        array $requestData = []
+        ?string $transactionId = null,
+        ?string $refundId = null,
+        ?string $refundAdditionalInfo = null,
+        ?float $refundAmount = null
     ): TransactionRefundResponse {
+        /** @var TransactionRefundRequest $request */
         $request = $this->transactionRefundRequestFactory->create();
 
-        $xCommandId = uniqid('', true);
-        $additionalDataObject = $this->additionalBusinessData->setAdditionalData(null);
-        $additionalData = $this->inPostRefundAdditionalDataToArrayConverter->convert($additionalDataObject);
-        $refundId = $requestData['refund_id'] ?? '';
-        $refundAmount = (float)($requestData['refund_amount'] ?? 0);
+        $additionalBusinessData = $this->additionalBusinessDataFactory->create();
+        $additionalBusinessData->setAdditionalData($refundAdditionalInfo);
 
-        $params = [
-            TransactionRefundRequest::X_COMMAND_ID => $xCommandId,
-            TransactionRefundRequest::TRANSACTION_ID => $transactionId,
-            TransactionRefundRequest::EXTERNAL_REFUND_ID => $refundId,
-            TransactionRefundRequest::REFUND_AMOUNT => $refundAmount,
-            TransactionRefundRequest::ADDITIONAL_BUSINESS_DATA => $additionalData
-        ];
+        $refund = $this->refundFactory->create();
+        $refund->setXCommandId(uniqid('', true));
+        $refund->setTransactionId($transactionId);
+        $refund->setExternalRefundId($refundId);
+        $refund->setRefundAmount($refundAmount);
+        $refund->setAdditionalBusinessData($additionalBusinessData);
+        $refund->setSignature($this->signatureGenerator->generate($refund));
 
-        $params[TransactionRefundRequest::SIGNATURE] = $this->signatureGenerator
-            ->generate($xCommandId, $transactionId, $params);
+        $refundParams = $this->inPostRefundToArrayConverter->convert($refund);
 
-        $request->setParams($params);
+        $request->setParams($refundParams);
 
         try {
             $result = $this->connector->sendRequest($request);
