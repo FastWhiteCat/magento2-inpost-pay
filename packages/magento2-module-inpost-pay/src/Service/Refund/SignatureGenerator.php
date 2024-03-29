@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Refund;
 
 use Exception;
+use InPost\InPostPay\Api\Data\Merchant\RefundInterface;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
@@ -29,25 +30,22 @@ class SignatureGenerator
 
     public function generate(
         string $xCommandId,
-        string $transactionId,
-        array $requestData = []
+        RefundInterface $refund,
     ): string {
         try {
             $merchantSecret = $this->authConfigProvider->getMerchantSecret();
-            $extRefundId = $requestData['external_refund_id'] ?? '';
-            $refundAmount = $requestData['refund_amount'] ?? null;
-            $additionalBusinessData = $requestData['additional_business_data']['additional_data'] ?? '';
-            $additionalData = $this->getPreparedAdditionalData(
-                is_scalar($additionalBusinessData) ? (string)$additionalBusinessData : ''
+            $refundAdditionalBusinessData = $refund->getAdditionalBusinessData()->getAdditionalData();
+            $preparedAdditionalData = $this->getPreparedAdditionalData(
+                $refundAdditionalBusinessData
             );
 
             $intermediateSignature = sprintf(
                 '%s%s%s%s%s%s',
                 $xCommandId,
-                $transactionId,
-                $additionalData,
-                $extRefundId,
-                $refundAmount,
+                $refund->getTransactionId(),
+                $preparedAdditionalData,
+                $refund->getExternalRefundId(),
+                $refund->getRefundAmount(),
                 $merchantSecret
             );
 
