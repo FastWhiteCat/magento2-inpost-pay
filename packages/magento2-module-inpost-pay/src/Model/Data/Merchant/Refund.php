@@ -19,6 +19,18 @@ class Refund extends DataObject implements RefundInterface, ExtensibleDataInterf
         parent::__construct($data);
     }
 
+    public function getXCommandId(): string
+    {
+        $xCommandId = $this->getData(self::X_COMMAND_ID);
+
+        return is_scalar($xCommandId) ? (string)$xCommandId : '';
+    }
+
+    public function setXCommandId(string $xCommandId): void
+    {
+        $this->setData(self::X_COMMAND_ID, $xCommandId);
+    }
+
     public function getTransactionId(): ?string
     {
         $transactionId = $this->getData(self::TRANSACTION_ID);
@@ -53,6 +65,18 @@ class Refund extends DataObject implements RefundInterface, ExtensibleDataInterf
     public function setRefundAmount(?float $refundAmount): void
     {
         $this->setData(self::REFUND_AMOUNT, $refundAmount);
+    }
+
+    public function getSignature(): string
+    {
+        $signature = $this->getData(self::SIGNATURE);
+
+        return is_scalar($signature) ? (string)$signature : '';
+    }
+
+    public function setSignature(string $signature): void
+    {
+        $this->setData(self::SIGNATURE, $signature);
     }
 
     public function getAdditionalBusinessData(): AdditionalBusinessDataInterface

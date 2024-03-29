@@ -29,26 +29,22 @@ class SignatureGenerator
     }
 
     public function generate(
-        string $xCommandId,
         RefundInterface $refund,
     ): string {
         try {
             $merchantSecret = $this->authConfigProvider->getMerchantSecret();
             $refundAdditionalBusinessData = $refund->getAdditionalBusinessData()->getAdditionalData();
-            $preparedAdditionalData = $this->getPreparedAdditionalData(
-                $refundAdditionalBusinessData
-            );
+            $preparedAdditionalData = $this->getPreparedAdditionalData($refundAdditionalBusinessData);
 
             $intermediateSignature = sprintf(
                 '%s%s%s%s%s%s',
-                $xCommandId,
+                $refund->getXCommandId(),
                 $refund->getTransactionId(),
                 $preparedAdditionalData,
                 $refund->getExternalRefundId(),
                 $refund->getRefundAmount(),
                 $merchantSecret
             );
-
             $signature = hash($this->hashAlgorithmName, $intermediateSignature);
 
             return $this->hashAlgorithmPrefix . "_$signature";
@@ -62,10 +58,9 @@ class SignatureGenerator
         }
     }
 
-    private function getPreparedAdditionalData(string $additionalData): ?string
+    private function getPreparedAdditionalData(?string $additionalData): ?string
     {
         $preparedData = $additionalData ? json_decode($additionalData, true) : null;
-
         if (empty($preparedData) || !is_array($preparedData)) {
             return null;
         }
