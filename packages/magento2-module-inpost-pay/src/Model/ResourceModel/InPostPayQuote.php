@@ -40,13 +40,6 @@ class InPostPayQuote extends AbstractDb
 
         $result = $connection->fetchRow($select);
 
-        if (empty($result)) {
-            $inPostPayQuoteId = $this->getInPostPayQuoteIdByBasketId($basketId);
-            if (empty($inPostPayQuoteId)) {
-                throw new BasketNotFoundException(__('Could not find a basket with ID:%1', $basketId));
-            }
-        }
-
         return is_array($result) ? $result : [];
     }
 

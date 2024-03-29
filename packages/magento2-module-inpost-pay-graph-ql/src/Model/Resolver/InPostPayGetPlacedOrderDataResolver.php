@@ -6,8 +6,10 @@ namespace InPost\InPostPayGraphQl\Model\Resolver;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\BasketNotFoundException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
@@ -33,6 +35,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
     public function __construct(
         GetCartForUser $cartForUser,
         LoggerInterface $logger,
+        private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly InPostPayQuoteResource $inPostPayQuoteResource,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly CheckoutSession $checkoutSession
@@ -50,9 +53,17 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
 
         try {
             $inPostPayData = $this->inPostPayQuoteResource->getCartVersionAndOrderId($basketId);
+
+            if (empty($inPostPayData)) {
+                $inPostPayData = $this->getInPostPayOrderDataByBasketId($basketId);
+            }
+
+            if (empty($inPostPayData)) {
+                throw new BasketNotFoundException(__('Could not find a basket with ID:%1', $basketId));
+            }
+
             $cartVersion = (string)($inPostPayData[InPostPayQuoteInterface::CART_VERSION] ?? '');
             $orderId = (int)($inPostPayData[InPostPayOrderInterface::ORDER_ID] ?? 0);
-            $result = $this->prepareRefreshResponse($cartVersion);
 
             if ($orderId) {
                 $order = $this->orderRepository->get($orderId);
@@ -102,13 +113,6 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
         ];
     }
 
-    private function prepareRefreshResponse(string $cartVersion): array
-    {
-        return [
-            self::CART_VERSION => $cartVersion
-        ];
-    }
-
     private function setLastOrder(OrderInterface $order): void
     {
         $this->checkoutSession->setLastQuoteId($order->getQuoteId());
@@ -123,5 +127,17 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
         $basketId = $data['basket_id'] ?? '';
 
         return is_scalar($basketId) ? (string)$basketId : '';
+    }
+
+    private function getInPostPayOrderDataByBasketId(string $basketId): array
+    {
+        try {
+            $inPostPayOrder = $this->inPostPayOrderRepository->getByBasketId($basketId);
+            $inPostPayData[InPostPayOrderInterface::ORDER_ID] = $inPostPayOrder->getOrderId();
+        } catch (NoSuchEntityException | LocalizedException $e) {
+            $inPostPayData = [];
+        }
+
+        return $inPostPayData;
     }
 }
