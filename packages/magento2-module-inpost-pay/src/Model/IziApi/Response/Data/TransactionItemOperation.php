@@ -50,7 +50,6 @@ class TransactionItemOperation extends DataObject
         $this->setData(self::STATUS, $status);
     }
 
-
     public function getAmount(): float
     {
         $amount = $this->getData(self::AMOUNT);
