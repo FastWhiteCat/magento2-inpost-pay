@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implements ResolverInterface
 {
@@ -45,6 +46,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
         $basketId = $this->extractBasketId($args ?? []);
+        $cartVersion = '';
 
         try {
             $inPostPayData = $this->inPostPayQuoteResource->getCartVersionAndOrderId($basketId);
@@ -73,9 +75,7 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
                 __('There was an error while checking if order was placed in InPost Pay Mobile App.')->render()
             );
 
-            if (isset($cartVersion)) {
-                $errorResponse[self::CART_VERSION] = $cartVersion;
-            }
+            $errorResponse[self::CART_VERSION] = $cartVersion;
 
             return $errorResponse;
         }

@@ -44,7 +44,8 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
 
                 return [
                     'link' => sprintf(
-                        '%s%s', $isSandbox ? Get::SANDBOX_MOBILE_LINK : Get::MOBILE_LINK,
+                        '%s%s',
+                        $isSandbox ? Get::SANDBOX_MOBILE_LINK : Get::MOBILE_LINK,
                         $result['inpost_basket_id']
                     )
                 ];
