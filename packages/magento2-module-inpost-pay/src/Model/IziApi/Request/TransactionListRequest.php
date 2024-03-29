@@ -23,6 +23,9 @@ class TransactionListRequest extends Request implements RequestInterface
     ) {
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getUri(bool $keepParamsIntact = false): string
     {
         $uri = $this->uri;
