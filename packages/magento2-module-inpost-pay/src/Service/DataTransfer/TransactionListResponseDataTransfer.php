@@ -88,12 +88,12 @@ class TransactionListResponseDataTransfer
 
     private function createTransactionItemOperation(array $itemOperationData): TransactionItemOperation
     {
-        $externalOperationId = (string)$itemOperationData[TransactionItemOperation::EXTERNAL_OPERATION_ID] ?? '';
-        $type = (string)$itemOperationData[TransactionItemOperation::TYPE] ?? '';
-        $status = (string)$itemOperationData[TransactionItemOperation::STATUS] ?? '';
-        $amount = (float)$itemOperationData[TransactionItemOperation::AMOUNT] ?? 0.00;
-        $currency = (string)$itemOperationData[TransactionItemOperation::CURRENCY] ?? '';
-        $operationDate = (string)$itemOperationData[TransactionItemOperation::OPERATION_DATE] ?? '';
+        $externalOperationId = (string)($itemOperationData[TransactionItemOperation::EXTERNAL_OPERATION_ID] ?? '');
+        $type = (string)($itemOperationData[TransactionItemOperation::TYPE] ?? '');
+        $status = (string)($itemOperationData[TransactionItemOperation::STATUS] ?? '');
+        $amount = (float)($itemOperationData[TransactionItemOperation::AMOUNT] ?? 0.00);
+        $currency = (string)($itemOperationData[TransactionItemOperation::CURRENCY] ?? '');
+        $operationDate = (string)($itemOperationData[TransactionItemOperation::OPERATION_DATE] ?? '');
 
         /** @var TransactionItemOperation $transactionItemOperation */
         $transactionItemOperation = $this->transactionItemOperationFactory->create();
