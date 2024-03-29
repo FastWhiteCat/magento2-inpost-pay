@@ -6,8 +6,10 @@ namespace InPost\InPostPayGraphQl\Model\Resolver;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
@@ -54,9 +56,15 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
                 $order = $this->orderRepository->get($orderId);
                 $this->setLastOrder($order);
                 $result = $this->preparePlacedOrderResponse($order, $cartVersion);
+            } else {
+                $result = $this->prepareUnplacedOrderResponse($cartVersion);
             }
 
             return $result;
+        } catch (BasketNotFoundException $e) {
+            throw new GraphQlNoSuchEntityException(
+                __($e->getMessage())
+            );
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['basket_id' => $basketId]);
 
@@ -83,6 +91,14 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
             self::ORDER_ID => (string)$order->getIncrementId(),
             self::STATUS => (string)$order->getStatus(),
             self::STATUS_LABEL => $statusLabel
+        ];
+    }
+
+    private function prepareUnplacedOrderResponse(string $cartVersion): array
+    {
+        return [
+            self::CART_VERSION => $cartVersion,
+            self::ACTION => self::ACTION_REFRESH
         ];
     }
 

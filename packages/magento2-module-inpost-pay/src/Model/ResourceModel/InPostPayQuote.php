@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Model\ResourceModel;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Enum\InPostBasketStatus;
+use InPost\InPostPay\Exception\BasketNotFoundException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
@@ -17,6 +18,10 @@ class InPostPayQuote extends AbstractDb
         $this->_init(InPostPayQuoteInterface::ENTITY_NAME, InPostPayQuoteInterface::INPOST_PAY_QUOTE_ID);
     }
 
+    /**
+     * @throws LocalizedException
+     * @throws BasketNotFoundException
+     */
     public function getCartVersionAndOrderId(string $basketId): array
     {
         $connection = $this->getConnection();
@@ -34,6 +39,13 @@ class InPostPayQuote extends AbstractDb
             ->where('main_table.basket_id' . '=?', $basketId);
 
         $result = $connection->fetchRow($select);
+
+        if (empty($result)) {
+            $inPostPayQuoteId = $this->getInPostPayQuoteIdByBasketId($basketId);
+            if (empty($inPostPayQuoteId)) {
+                throw new BasketNotFoundException(__('Could not find a basket with ID:%1', $basketId));
+            }
+        }
 
         return is_array($result) ? $result : [];
     }

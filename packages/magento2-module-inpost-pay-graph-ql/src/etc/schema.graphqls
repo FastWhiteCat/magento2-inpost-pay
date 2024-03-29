@@ -61,6 +61,7 @@ type InPostPayBasketBindingDeleteResult {
 
 type InPostPayPlacedOrderData {
     action: InPostPayAction @doc(description: "Action to be taken.")
+    cart_version: String @doc(description: "Cart Version.")
     order_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
     status: String @doc(description: "Status of placed order in InPost Pay Mobile App.")
     status_label: String @doc(description: "Status label of placed order in InPost Pay Mobile App.")
