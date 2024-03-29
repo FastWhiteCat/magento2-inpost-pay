@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
+use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
@@ -53,7 +55,9 @@ class Widget implements ArgumentInterface
         private readonly ProductRepositoryInterface        $productRepository,
         private readonly StoreManagerInterface             $storeManager,
         private readonly RestrictedProductIdsProvider      $restrictedProductIdsProvider,
-        private readonly LoggerInterface                   $logger
+        private readonly LoggerInterface                   $logger,
+        private readonly InPostPayQuote                    $inPostPayQuote,
+        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
     ) {
     }
 
@@ -133,6 +137,30 @@ class Widget implements ArgumentInterface
         } catch (NoSuchEntityException|LocalizedException $e) {
             return 0;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getMaskedPhoneNumber(): string
+    {
+        try {
+            $quote = $this->checkoutSession->getQuote();
+
+            if ($quote->getId()) {
+                $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+
+                if ($this->inPostPayQuote->isBasketConnected($quoteId)) {
+                    $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
+
+                    return $inpostPayQuote->getMaskedPhoneNumber()?: "";
+                }
+            }
+        } catch (LocalizedException) {
+            return "";
+        }
+
+        return "";
     }
 
     public function isProductRestricted(int $productId): bool
