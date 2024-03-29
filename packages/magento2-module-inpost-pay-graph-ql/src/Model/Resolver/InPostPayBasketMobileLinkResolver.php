@@ -51,7 +51,10 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
                 ];
             }
 
-            return ['link' => null];
+            return [
+                'link' => null,
+                'error_message' => __('Cart with ID "%1" is not bound.', $cartMaskId)
+            ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
 
