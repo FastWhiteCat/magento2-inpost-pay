@@ -48,16 +48,16 @@ class TransactionListResponseDataTransfer
      */
     private function createTransactionItem(array $itemData): TransactionItem
     {
-        $transactionId = (string)$itemData[TransactionItem::TRANSACTION_ID] ?? '';
-        $merchantPosId = (string)$itemData[TransactionItem::MERCHANT_POS_ID] ?? '';
-        $externalTransactionId = (string)$itemData[TransactionItem::EXTERNAL_TRANSACTION_ID] ?? '';
-        $description = (string)$itemData[TransactionItem::DESCRIPTION] ?? '';
-        $status = (string)$itemData[TransactionItem::STATUS] ?? '';
-        $createdDate = (string)$itemData[TransactionItem::CREATED_DATE] ?? '';
-        $amount = (float)$itemData[TransactionItem::AMOUNT] ?? 0.00;
-        $currency = (string)$itemData[TransactionItem::CURRENCY] ?? '';
-        $paymentMethod = (string)$itemData[TransactionItem::PAYMENT_METHOD] ?? '';
-        $orderId = (string)$itemData[TransactionItem::ORDER_ID] ?? '';
+        $transactionId = (string)($itemData[TransactionItem::TRANSACTION_ID] ?? '');
+        $merchantPosId = (string)$itemData[TransactionItem::MERCHANT_POS_ID] ?? '');
+        $externalTransactionId = (string)($itemData[TransactionItem::EXTERNAL_TRANSACTION_ID] ?? '');
+        $description = (string)($itemData[TransactionItem::DESCRIPTION] ?? '');
+        $status = (string)($itemData[TransactionItem::STATUS] ?? '');
+        $createdDate = (string)($itemData[TransactionItem::CREATED_DATE] ?? '');
+        $amount = (float)($itemData[TransactionItem::AMOUNT] ?? 0.00);
+        $currency = (string)($itemData[TransactionItem::CURRENCY] ?? '');
+        $paymentMethod = (string)($itemData[TransactionItem::PAYMENT_METHOD] ?? '');
+        $orderId = (string)($itemData[TransactionItem::ORDER_ID] ?? '');
 
         /** @var TransactionItem $transactionItem */
         $transactionItem = $this->transactionItemFactory->create();
