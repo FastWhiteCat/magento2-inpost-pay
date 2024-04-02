@@ -39,7 +39,7 @@
         <column xsi:type="varchar" name="browser_id" length="255" nullable="true"/>
         <column xsi:type="varchar" name="name" length="255" nullable="true"/>
         <column xsi:type="varchar" name="surname" length="255" nullable="true"/>
-        <column xsi:type="tinyint" name="refresh_required" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="cart_version" length="255" nullable="true" />
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
