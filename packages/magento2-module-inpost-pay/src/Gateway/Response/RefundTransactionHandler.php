@@ -59,8 +59,10 @@ class RefundTransactionHandler implements HandlerInterface
             __("Description: %1", $refundResponseDescription)->render()
         ];
 
-        $creditmemo->addComment(implode(PHP_EOL, $creditmemoCommentData));
-        $creditmemo->setCreditmemoStatus($mappedCreditmemoStatus);
+        if ($creditmemo) {
+            $creditmemo->addComment(implode(PHP_EOL, $creditmemoCommentData));
+            $creditmemo->setCreditmemoStatus($mappedCreditmemoStatus);
+        }
     }
 
     private function getMappedCreditmemoStatus(string $refundResponseStatus): int

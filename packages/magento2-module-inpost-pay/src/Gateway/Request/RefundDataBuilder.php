@@ -57,8 +57,8 @@ class RefundDataBuilder implements BuilderInterface
 
         $refundRequestData = [];
         $merchantTransactions = $this->getMerchantTransactions(
-            (int)$payment->getEntityId(),
-            (int)$order->getEntityId()
+            $payment->getEntityId(),
+            $order->getEntityId()
         );
         foreach ($inPostPayTransactionList->getItems() as $transaction) {
             $inPostPayTransactionId = (string)($transaction[RefundInterface::TRANSACTION_ID] ?? '');
@@ -77,7 +77,7 @@ class RefundDataBuilder implements BuilderInterface
         return ['body' => ['refund_request_data' => $refundRequestData]];
     }
 
-    private function getMerchantTransactions(int $orderId, int $paymentId): array
+    private function getMerchantTransactions(mixed $orderId, mixed $paymentId): array
     {
         $merchantTransactions = [];
 
