@@ -42,18 +42,19 @@ class RefundTransactionHandler implements HandlerInterface
 
         $refundResponseDescription = $refundResponse->getDescription();
         $refundResponseStatus = $refundResponse->getStatus();
+        $externalRefundId = $refundResponse->getExternalRefundId();
         $mappedCreditmemoStatus = $this->getMappedCreditmemoStatus($refundResponseStatus);
+
         if ($refundResponseStatus === InPostRefundStatus::FAILED->value) {
             $this->logger->error(
-                'Transaction Refund status failed, external_refund_id: ' . $refundResponse->getExternalRefundId() .
+                "InPostPay Transaction Refund status failed, external_refund_id: $externalRefundId" .
                 ', description: ' . $refundResponse->getDescription()
             );
-            return;
         }
 
         $creditmemoCommentData = [
-            __("InPost Pay Transaction Refund."),
-            __("External Refund Id: %1", $refundResponse->getExternalRefundId())->render(),
+            __('InPostPay Transaction Refund.'),
+            __("External Refund Id: %1", $externalRefundId)->render(),
             __("Status: %1", $refundResponseStatus)->render(),
             __("Description: %1", $refundResponseDescription)->render()
         ];
