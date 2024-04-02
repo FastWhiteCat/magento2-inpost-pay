@@ -21,8 +21,7 @@ class InPostRefundToArrayConverter
     {
         try {
             // @phpstan-ignore-next-line
-            $data = $this->extensibleDataObjectConverter
-                ->toNestedArray($refund, [], RefundInterface::class);
+            $data = $this->extensibleDataObjectConverter->toNestedArray($refund, [], RefundInterface::class);
         } catch (Exception $e) {
             $this->logger->error(
                 sprintf('Could not convert Refund data to array. Reason: %s', $e->getMessage())
