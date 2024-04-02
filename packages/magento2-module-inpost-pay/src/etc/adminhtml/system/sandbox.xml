@@ -34,7 +34,13 @@
                 <field id="enabled">1</field>
             </depends>
         </field>
-        <field id="sandbox_pos_id" translate="label" type="text" sortOrder="26"
+        <field id="sandbox_merchant_secret" translate="label" type="text" sortOrder="26"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Merchant Secret</label>
+            <config_path>payment/inpost_pay/sandbox_merchant_secret</config_path>
+            <comment>The key needed to generate returns</comment>
+        </field>
+        <field id="sandbox_pos_id" translate="label" type="text" sortOrder="27"
                showInDefault="1" showInWebsite="1" canRestore="1">
             <label>Sandbox POS ID</label>
             <config_path>payment/inpost_pay/sandbox_pos_id</config_path>
