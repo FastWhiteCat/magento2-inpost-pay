@@ -204,7 +204,16 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="capture" xsi:type="string">Magento\Payment\Gateway\Command\NullCommand</item>
+                <item name="refund" xsi:type="string">InPostPayRefundCommand</item>
             </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">InPost\InPostPay\Gateway\Request\RefundDataBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">InPost\InPostPay\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">InPost\InPostPay\Gateway\Http\Client\TransactionRefundClient</argument>
+            <argument name="handler" xsi:type="object">InPost\InPostPay\Gateway\Response\RefundTransactionHandler</argument>
         </arguments>
     </virtualType>
     <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
@@ -517,6 +526,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\Refund\SignatureGenerator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Gateway\Request\RefundDataBuilder">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Gateway\Response\RefundTransactionHandler">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
