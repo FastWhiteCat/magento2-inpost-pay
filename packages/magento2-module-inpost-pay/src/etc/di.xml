@@ -93,6 +93,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessData"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\RefundInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
 
@@ -500,6 +502,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\PayDataProcessor">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\TransactionRefund">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\InPostRefundToArrayConverter">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
