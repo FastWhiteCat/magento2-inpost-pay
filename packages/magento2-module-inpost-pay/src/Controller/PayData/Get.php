@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace InPost\InPostPay\Controller\PayData;
@@ -13,10 +14,14 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\QuoteManagement;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +44,7 @@ class Get implements HttpPostActionInterface
         private readonly JsonFactory $jsonFactory,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly PayDataProcessor $payDataProcessor,
+        private readonly QuoteManagement $quoteManagement,
         private readonly LoggerInterface $logger
     ) {
         $this->messageManager = $context->getMessageManager();
@@ -58,7 +64,7 @@ class Get implements HttpPostActionInterface
 
         $data = [];
         try {
-            $quote = $this->checkoutSession->getQuote();
+            $quote = $this->getQuote();
             $this->quoteRestrictionsValidator->validate($quote, true);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
@@ -85,5 +91,23 @@ class Get implements HttpPostActionInterface
         }
 
         return $this->jsonFactory->create()->setData($data);
+    }
+
+    /**
+     * @throws NoSuchEntityException
+     * @throws CouldNotSaveException
+     * @throws LocalizedException
+     */
+    private function getQuote(): CartInterface
+    {
+        $quote = $this->checkoutSession->getQuote();
+        if (!$quote->getId()) {
+            $quoteId = $this->quoteManagement->createEmptyCart();
+            $quote = $this->quoteRepository->get($quoteId);
+            // @phpstan-ignore-next-line
+            $this->checkoutSession->replaceQuote($quote);
+        }
+
+        return $quote;
     }
 }
