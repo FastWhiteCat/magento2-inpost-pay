@@ -65,6 +65,7 @@ class Get implements HttpPostActionInterface
         $data = [];
         try {
             $quote = $this->getQuote();
+            // @phpstan-ignore-next-line
             $this->quoteRestrictionsValidator->validate($quote, true);
             if ($quote->getId()) {
                 $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
