@@ -18,7 +18,7 @@ class DisplayConfigProvider
     public const BASKET_SUMMARY_BINDING_PLACE_NAME = 'BASKET_SUMMARY';
     public const BASKET_POPUP_BINDING_PLACE_NAME = 'BASKET_POPUP';
     public const THANK_YOU_PAGE_BINDING_PLACE_NAME = 'THANK_YOU_PAGE';
-    public const CHECKOUT_PAGE_BINDING_PLACE_NAME = 'CHECKOUT';
+    public const CHECKOUT_PAGE_BINDING_PLACE_NAME = 'CHECKOUT_PAGE';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
