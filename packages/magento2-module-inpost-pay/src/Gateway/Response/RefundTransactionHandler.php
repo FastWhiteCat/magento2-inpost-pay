@@ -53,7 +53,7 @@ class RefundTransactionHandler implements HandlerInterface
         }
 
         $creditmemoCommentData = [
-            __('InPostPay Transaction Refund.'),
+            __('InPostPay Transaction Refund.')->render(),
             __("External Refund Id: %1", $externalRefundId)->render(),
             __("Status: %1", $refundResponseStatus)->render(),
             __("Description: %1", $refundResponseDescription)->render()
