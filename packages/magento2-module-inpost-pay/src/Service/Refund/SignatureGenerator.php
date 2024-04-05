@@ -29,7 +29,7 @@ class SignatureGenerator
     }
 
     public function generate(
-        RefundInterface $refund,
+        RefundInterface $refund
     ): string {
         try {
             $merchantSecret = $this->authConfigProvider->getMerchantSecret();
