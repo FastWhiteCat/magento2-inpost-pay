@@ -75,14 +75,21 @@ class InPostPayGetPlacedOrderDataResolver extends InPostBasketResolver implement
 
             return $result;
         } catch (BasketNotFoundException $e) {
-            throw new GraphQlNoSuchEntityException(
-                __($e->getMessage())
+            $this->logger->error($e->getMessage(), ['basket_id' => $basketId]);
+
+            $errorResponse = $this->prepareErrorResponse(
+                InPostBasketResolver::ACTION_REJECT,
+                __($e->getMessage())->render()
             );
+
+            $errorResponse[self::CART_VERSION] = $cartVersion;
+
+            return $errorResponse;
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['basket_id' => $basketId]);
 
             $errorResponse = $this->prepareErrorResponse(
-                null,
+                InPostBasketResolver::ACTION_REJECT,
                 __('There was an error while checking if order was placed in InPost Pay Mobile App.')->render()
             );
 
