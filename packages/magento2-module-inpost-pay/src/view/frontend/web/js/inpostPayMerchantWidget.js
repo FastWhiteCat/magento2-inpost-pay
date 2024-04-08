@@ -446,7 +446,6 @@ define([
                 var event = new CustomEvent("inpost-update-count", {detail: count});
 
                 $iziButtons.each(function () {
-                    console.log('dispatcher')
                     this.dispatchEvent(event)
                 });
             }
