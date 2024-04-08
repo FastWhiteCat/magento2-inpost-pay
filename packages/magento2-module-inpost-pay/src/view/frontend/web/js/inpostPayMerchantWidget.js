@@ -53,11 +53,7 @@ define([
             }
 
             if (config && config.popupBindingPlace) {
-                this.bindEvents();
-
-                if (!config.bindingPlace) {
-                    this.checkIsBinding();
-                }
+                this.bindEvents(false);
             }
         },
 
@@ -75,12 +71,7 @@ define([
                 return;
             }
 
-            this.bindEvents();
-
-            //run handle inpost button in next tick after component template render
-            setTimeout(() => {
-                window.handleInpostIziButtons();
-            }, 0)
+            this.bindEvents(true);
         },
 
         visible: function() {
@@ -123,15 +114,14 @@ define([
                         if (data.basket_id) {
                             localStorage.setItem('basketId', data.basket_id);
                         }
-
                         var $iziButtons = $("inpost-izi-button");
                         if (!$iziButtons.length) return;
 
-                        var event = new CustomEvent("izi-binding-complete", {detail: data});
-
                         $iziButtons.each(function () {
-                            this.dispatchEvent(event)
+                            $(this).attr('masked_phone_number', data.masked_phone_number)
                         });
+
+                        window.handleInpostIziButtons();
                     }
                 });
         },
@@ -398,12 +388,30 @@ define([
             }
         },
 
-        bindEvents: function () {
+        bindEvents: function (isCheckout) {
+            var firstFired = false;
             checkCartWidget();
             customerData.invalidate(['cart']);
-            customerData.reload(['cart'], true);
+            customerData.reload(['cart']).done(function(cartData) {
+                firstFired = true;
+                checkCartWidget(cartData.cart);
+                updateCounter(cartData.cart.summary_count);
+
+                if (isCheckout) {
+                    //run handle inpost button in next tick after component template render
+                    setTimeout(() => {
+                        window.handleInpostIziButtons();
+                    }, 0)
+                } else {
+                    if (!window.getConfig().bindingPlace) {
+                        window.checkIsBinding();
+                    }
+                }
+            });
 
             customerData.get('cart').subscribe(function (cartData) {
+                if (!firstFired) return;
+
                 checkCartWidget(cartData);
                 updateCounter(cartData.summary_count);
             });
@@ -438,6 +446,7 @@ define([
                 var event = new CustomEvent("inpost-update-count", {detail: count});
 
                 $iziButtons.each(function () {
+                    console.log('dispatcher')
                     this.dispatchEvent(event)
                 });
             }
