@@ -101,7 +101,7 @@ define([
             return $productForm.validation('isValid');
         },
 
-        checkIsBinding: function() {
+        checkIsBinding: function(count) {
             $.ajax({
                 url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
                     + '/form_key/'
@@ -119,6 +119,10 @@ define([
 
                         $iziButtons.each(function () {
                             $(this).attr('masked_phone_number', data.masked_phone_number)
+
+                            if (count) {
+                                $(this).attr('count', count)
+                            }
                         });
 
                         window.handleInpostIziButtons();
@@ -390,6 +394,22 @@ define([
 
         bindEvents: function (isCheckout) {
             var firstFired = false;
+
+            document.addEventListener('iziModalEventOpen', function () {
+                $('.block-minicart').dropdownDialog('close');
+            })
+
+            window.addEventListener("inpost-update-count", function (e){
+                updateCounter(e.detail);
+            });
+
+            customerData.get('cart').subscribe(function (cartData) {
+                if (!firstFired) return;
+
+                checkCartWidget(cartData);
+                updateCounter(cartData.summary_count);
+            });
+
             checkCartWidget();
             customerData.invalidate(['cart']);
             customerData.reload(['cart']).done(function(cartData) {
@@ -404,24 +424,9 @@ define([
                     }, 0)
                 } else {
                     if (!window.getConfig().bindingPlace) {
-                        window.checkIsBinding();
+                        window.checkIsBinding(cartData.cart.summary_count);
                     }
                 }
-            });
-
-            customerData.get('cart').subscribe(function (cartData) {
-                if (!firstFired) return;
-
-                checkCartWidget(cartData);
-                updateCounter(cartData.summary_count);
-            });
-
-            document.addEventListener('iziModalEventOpen', function () {
-                $('.block-minicart').dropdownDialog('close');
-            })
-
-            window.addEventListener("inpost-update-count", function (e){
-                updateCounter(e.detail);
             });
 
             function checkCartWidget(cartData = "") {
