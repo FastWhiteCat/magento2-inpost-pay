@@ -419,12 +419,12 @@ define([
                 var config = window.getConfig();
 
                 if ((config.bindingPlace || isCheckout) && config.isEnabledMinicart) {
-                    if (config.masked_phone_number) {
+                    if (config.maskedPhoneNumber) {
                         var $iziButtons = $("inpost-izi-button");
 
                         if ($iziButtons.length) {
                             $iziButtons.each(function () {
-                                $(this).attr('masked_phone_number', config.masked_phone_number)
+                                $(this).attr('masked_phone_number', config.maskedPhoneNumber)
                             });
                         }
                     }
