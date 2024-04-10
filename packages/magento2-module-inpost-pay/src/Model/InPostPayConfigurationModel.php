@@ -28,7 +28,8 @@ class InPostPayConfigurationModel implements ConfigProviderInterface
             'count' => $this->widget->getCartItemsCount(),
             'bindingPlace' => DisplayConfigProvider::CHECKOUT_PAGE_BINDING_PLACE_NAME,
             'enabledOnCheckoutPage' => $this->widget->isEnabledOnCheckoutPage(),
-            'maskedPhoneNumber' => $this->widget->getMaskedPhoneNumber()
+            'maskedPhoneNumber' => $this->widget->getMaskedPhoneNumber(),
+            'isEnabledMinicart' => $this->widget->isEnabledInMiniCart()
         ];
 
         return $config;

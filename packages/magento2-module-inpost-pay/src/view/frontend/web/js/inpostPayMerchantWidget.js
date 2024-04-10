@@ -53,11 +53,7 @@ define([
             }
 
             if (config && config.popupBindingPlace) {
-                this.bindEvents();
-
-                if (!config.bindingPlace) {
-                    this.checkIsBinding();
-                }
+                this.bindEvents(false);
             }
         },
 
@@ -75,12 +71,7 @@ define([
                 return;
             }
 
-            this.bindEvents();
-
-            //run handle inpost button in next tick after component template render
-            setTimeout(() => {
-                window.handleInpostIziButtons();
-            }, 0)
+            this.bindEvents(true);
         },
 
         visible: function() {
@@ -110,7 +101,7 @@ define([
             return $productForm.validation('isValid');
         },
 
-        checkIsBinding: function() {
+        checkIsBinding: function(count) {
             $.ajax({
                 url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
                     + '/form_key/'
@@ -128,6 +119,10 @@ define([
 
                         $iziButtons.each(function () {
                             $(this).attr('masked_phone_number', data.masked_phone_number)
+
+                            if (count) {
+                                $(this).attr('count', count)
+                            }
                         });
 
                         window.handleInpostIziButtons();
@@ -397,15 +392,8 @@ define([
             }
         },
 
-        bindEvents: function () {
-            checkCartWidget();
-            customerData.invalidate(['cart']);
-            customerData.reload(['cart'], true);
-
-            customerData.get('cart').subscribe(function (cartData) {
-                checkCartWidget(cartData);
-                updateCounter(cartData.summary_count);
-            });
+        bindEvents: function (isCheckout) {
+            var firstFired = false;
 
             document.addEventListener('iziModalEventOpen', function () {
                 $('.block-minicart').dropdownDialog('close');
@@ -413,6 +401,47 @@ define([
 
             window.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail);
+            });
+
+            customerData.get('cart').subscribe(function (cartData) {
+                if (!firstFired) return;
+
+                checkCartWidget(cartData);
+                updateCounter(cartData.summary_count);
+            });
+
+            checkCartWidget();
+            customerData.invalidate(['cart']);
+            customerData.reload(['cart']).done(function(cartData) {
+                firstFired = true;
+                checkCartWidget(cartData.cart);
+                updateCounter(cartData.cart.summary_count);
+                var config = window.getConfig();
+
+                if ((config.bindingPlace || isCheckout) && config.isEnabledMinicart) {
+                    if (config.masked_phone_number) {
+                        var $iziButtons = $("inpost-izi-button");
+
+                        if ($iziButtons.length) {
+                            $iziButtons.each(function () {
+                                $(this).attr('masked_phone_number', config.masked_phone_number)
+                            });
+                        }
+                    }
+                }
+
+                if (isCheckout) {
+                    //run handle inpost button in next tick after component template render
+                    setTimeout(() => {
+                        window.handleInpostIziButtons();
+                    }, 0)
+                } else {
+                    if (!config.bindingPlace) {
+                        window.checkIsBinding(cartData.cart.summary_count);
+                    } else if (config.isEnabledMinicart) {
+                        window.handleInpostIziButtons();
+                    }
+                }
             });
 
             function checkCartWidget(cartData = "") {
