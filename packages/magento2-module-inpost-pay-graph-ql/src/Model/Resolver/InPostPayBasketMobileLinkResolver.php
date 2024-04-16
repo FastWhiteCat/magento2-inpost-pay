@@ -39,12 +39,21 @@ class InPostPayBasketMobileLinkResolver extends InPostBasketResolver implements 
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
             $result = $this->basketBindingCheck->execute($quoteId, $inPostPayQuote->getBrowserId());
 
+            if (isset($result['inpost_basket_id'])) {
+                $isSandbox = $this->sandboxConfigProvider->isSandboxEnabled();
+
+                return [
+                    'link' => sprintf(
+                        '%s%s',
+                        $isSandbox ? Get::SANDBOX_MOBILE_LINK : Get::MOBILE_LINK,
+                        $result['inpost_basket_id']
+                    )
+                ];
+            }
+
             return [
-                'link' => sprintf(
-                    '%s%s',
-                    $this->sandboxConfigProvider->isSandboxEnabled() ? Get::SANDBOX_MOBILE_LINK : Get::MOBILE_LINK,
-                    $result['inpost_basket_id'] ?? (string)$inPostPayQuote->getInpostBasketId()
-                )
+                'link' => null,
+                'error_message' => __('Cart with ID "%1" is not bound.', $cartMaskId)
             ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);

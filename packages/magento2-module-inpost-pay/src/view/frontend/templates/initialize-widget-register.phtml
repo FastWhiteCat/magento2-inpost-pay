@@ -8,36 +8,29 @@ use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
  */
 
 $widgetViewModel = $block->getData('widget_view_model');
-if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnProductCart()) {
+if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnRegisterPage()) {
     return;
 }
 
 $bindingPlace = $block->getBindingPlace();
-$productId = $block->getRequest()->getParam('id');
-$productId = is_scalar($productId) ? (string)$productId : "";
-$isProductSaleable = $widgetViewModel->validateProductIsSaleableById((int)$productId);
-
-if (!$isProductSaleable || $widgetViewModel->isProductRestricted((int)$productId)) {
-    return;
-}
-
 $language = $widgetViewModel->getCurrentLanguageCode();
+$cartItemsCount = $widgetViewModel->getCartItemsCount();
+$maskedPhoneNumber = $widgetViewModel->getMaskedPhoneNumber();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 ?>
-
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
-        name
-        masked_phone_number
-        data-product-id="<?= /* @noEscape */ $productId ?>"
+        name=""
+        masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
+        data-product-id=""
         language="<?= /* @noEscape */ $language ?>"
         variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
         basket="false"
         dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
         max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
         frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
-        count="0"
+        count="<?= /* @noEscape */ $cartItemsCount ?>"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">
     </inpost-izi-button>
 
@@ -47,7 +40,9 @@ $widgetWrapperClass = "inpay-widget-wrapper";
                 "InpostPayMerchantWidget" : {
                     "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
                     "popupBindingPlace": "<?= /* @noEscape */
-                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>"
+                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                    "count": <?= /* @noEscape */ $cartItemsCount ?>,
+                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>"
                 }
             }
         }

@@ -123,15 +123,14 @@ define([
                         if (data.basket_id) {
                             localStorage.setItem('basketId', data.basket_id);
                         }
-
                         var $iziButtons = $("inpost-izi-button");
                         if (!$iziButtons.length) return;
 
-                        var event = new CustomEvent("izi-binding-complete", {detail: data});
-
                         $iziButtons.each(function () {
-                            this.dispatchEvent(event)
+                            $(this).attr('masked_phone_number', data.masked_phone_number)
                         });
+
+                        window.handleInpostIziButtons();
                     }
                 });
         },
