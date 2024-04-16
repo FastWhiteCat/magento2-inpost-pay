@@ -61,6 +61,7 @@ type InPostPayBasketBindingDeleteResult {
 
 type InPostPayPlacedOrderData {
     action: InPostPayAction @doc(description: "Action to be taken.")
+    cart_version: String @doc(description: "Cart Version.")
     order_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
     status: String @doc(description: "Status of placed order in InPost Pay Mobile App.")
     status_label: String @doc(description: "Status label of placed order in InPost Pay Mobile App.")
@@ -106,6 +107,12 @@ type StoreConfig {
 
     inpost_pay_show_on_success_page : String
     @doc(description: "Indicates whether widget should be displayed on success page or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_show_on_register_page : String
+    @doc(description: "Indicates whether widget should be displayed on register page or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_show_on_login_page : String
+    @doc(description: "Indicates whether widget should be displayed on login page or not. Possible values: 1 (Yes) and 0 (No).")
 
     inpost_pay_show_on_checkout_page : String
     @doc(description: "Indicates whether widget should be displayed on checkout page or not. Possible values: 1 (Yes) and 0 (No).")

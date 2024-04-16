@@ -130,6 +130,22 @@ class Widget implements ArgumentInterface
     /**
      * @return bool
      */
+    public function isEnabledOnRegisterPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnRegisterPage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledOnLoginPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnLoginPage();
+    }
+
+    /**
+     * @return bool
+     */
     public function isEnabledOnCheckoutPage(): bool
     {
         return $this->displayConfigProvider->isEnabledOnCheckoutPage();
