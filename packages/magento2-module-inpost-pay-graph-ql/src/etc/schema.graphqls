@@ -114,6 +114,9 @@ type StoreConfig {
     inpost_pay_show_on_login_page : String
     @doc(description: "Indicates whether widget should be displayed on login page or not. Possible values: 1 (Yes) and 0 (No).")
 
+    inpost_pay_show_on_checkout_page : String
+    @doc(description: "Indicates whether widget should be displayed on checkout page or not. Possible values: 1 (Yes) and 0 (No).")
+
     inpost_pay_widget_color_variant : InPostPayWidgetColorVariantEnum
     @doc(description: "InPost Pay Widget color variant.")
 

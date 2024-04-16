@@ -2,10 +2,11 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Customer/js/customer-data',
+    'Magento_Customer/js/model/customer',
     'mage/url',
     'underscore',
     'mage/validation'
-], function (Component, $, customerData, urlBuilder, _) {
+], function (Component, $, customerData, customer, urlBuilder, _) {
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
@@ -24,36 +25,74 @@ define([
     return Component.extend({
         initialize: function (config) {
             this._super();
+            var self = this;
+            this.configuration = window.checkoutConfig ? window.checkoutConfig.inPostConfig : {};
 
-            if (this.isWidgetInitialized()) return;
+            if (this.disabledOnCheckoutPage(config)) {
+                return;
+            }
 
-            window.iziCanBeBound = this.iziCanBeBound;
-            window.iziGetPayData = this.iziGetPayData;
-            window.iziGetBrowserData = this.iziGetBrowserData;
-            window.iziMobileLink = this.iziMobileLink;
-            window.iziGetIsBound = this.iziGetIsBound;
-            window.iziGetOrderComplete = this.iziGetOrderComplete;
-            window.iziBindingDelete = this.iziBindingDelete;
-            window.iziAddToCart = this.iziAddToCart;
-            window.getBrowserDescription = this.getBrowserDescription;
-            window.abortRequest = this.abortRequest;
-            window.checkIfProductIsAdded = this.checkIfProductIsAdded;
-            window.setTimerAndRunCallback = this.setTimerAndRunCallback;
-            window.checkIsBinding = this.checkIsBinding;
+            if (!this.isWidgetInitialized()) {
+                window.iziCanBeBound = this.iziCanBeBound;
+                window.iziGetPayData = this.iziGetPayData;
+                window.iziGetBrowserData = this.iziGetBrowserData;
+                window.iziMobileLink = this.iziMobileLink;
+                window.iziGetIsBound = this.iziGetIsBound;
+                window.iziGetOrderComplete = this.iziGetOrderComplete;
+                window.iziBindingDelete = this.iziBindingDelete;
+                window.iziAddToCart = this.iziAddToCart;
+                window.getBrowserDescription = this.getBrowserDescription;
+                window.abortRequest = this.abortRequest;
+                window.checkIfProductIsAdded = this.checkIfProductIsAdded;
+                window.setTimerAndRunCallback = this.setTimerAndRunCallback;
+                window.checkIsBinding = this.checkIsBinding;
+            }
 
             window.getConfig = function (defaultConfig = config) {
-                return defaultConfig;
+                return defaultConfig.popupBindingPlace ? defaultConfig : self.configuration;
+            }
+
+            if (config && config.popupBindingPlace) {
+                this.bindEvents();
+
+                if (!config.bindingPlace) {
+                    this.checkIsBinding();
+                }
+            }
+        },
+
+        disabledOnCheckoutPage: function(config = {}) {
+            if (config && config.popupBindingPlace) return false;
+            if (!this.configuration) return false;
+
+            return this.configuration.hasOwnProperty('enabledOnCheckoutPage')
+                && !this.configuration.enabledOnCheckoutPage;
+        },
+
+        initAfterRender: function() {
+            if (this.disabledOnCheckoutPage()) {
+                $('#inpost-izi-button-wrapper').remove()
+                return;
             }
 
             this.bindEvents();
 
-            if (config && !config.bindingPlace) {
-                this.checkIsBinding();
-            }
+            //run handle inpost button in next tick after component template render
+            setTimeout(() => {
+                window.handleInpostIziButtons();
+            }, 0)
+        },
+
+        visible: function() {
+            return !customer.isLoggedIn() && this.configuration.enabledOnCheckoutPage
+        },
+
+        getConfiguration: function() {
+            return this.configuration.enabledOnCheckoutPage ? this.configuration : {};
         },
 
         isWidgetInitialized: function () {
-            return window.iziGetPayData && window.iziGetPayData && window.iziGetBrowserData && window.iziMobileLink;
+            return !!window.iziGetPayData && !!window.iziGetPayData && !!window.iziGetBrowserData && !!window.iziMobileLink;
         },
 
         iziCanBeBound: function (productId) {
@@ -377,10 +416,10 @@ define([
             });
 
             function checkCartWidget(cartData = "") {
-                var wrapperClass = getConfig().wrapperClass || "inpay-widget-wrapper";
-                var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
+                var wrapperClass = window.getConfig().wrapperClass || "inpay-widget-wrapper";
+                var popupBindingPlace = window.getConfig().popupBindingPlace || "BASKET_POPUP";
                 var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
-                var counter = cartData ? cartData.summary_count : getConfig().count || 0;
+                var counter = cartData ? cartData.summary_count : window.getConfig().count || 0;
 
                 if ($inpayWrapperOnBasket.length) {
                     if (counter === 0) {

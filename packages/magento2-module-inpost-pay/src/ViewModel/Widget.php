@@ -144,6 +144,14 @@ class Widget implements ArgumentInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabledOnCheckoutPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnCheckoutPage();
+    }
+
+    /**
      * @return float|int
      */
     public function getCartItemsCount(): float|int
