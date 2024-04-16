@@ -416,6 +416,19 @@ define([
                 firstFired = true;
                 checkCartWidget(cartData.cart);
                 updateCounter(cartData.cart.summary_count);
+                var config = window.getConfig();
+
+                if ((config.bindingPlace || isCheckout) && config.isEnabledMinicart) {
+                    if (config.maskedPhoneNumber) {
+                        var $iziButtons = $("inpost-izi-button");
+
+                        if ($iziButtons.length) {
+                            $iziButtons.each(function () {
+                                $(this).attr('masked_phone_number', config.maskedPhoneNumber)
+                            });
+                        }
+                    }
+                }
 
                 if (isCheckout) {
                     //run handle inpost button in next tick after component template render
@@ -423,8 +436,10 @@ define([
                         window.handleInpostIziButtons();
                     }, 0)
                 } else {
-                    if (!window.getConfig().bindingPlace) {
+                    if (!config.bindingPlace) {
                         window.checkIsBinding(cartData.cart.summary_count);
+                    } else if (config.isEnabledMinicart) {
+                        window.handleInpostIziButtons();
                     }
                 }
             });

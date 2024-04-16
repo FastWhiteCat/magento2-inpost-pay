@@ -47,7 +47,9 @@ if (!$widgetViewModel->canShowForWholeCart()) {
                     "popupBindingPlace": "<?= /* @noEscape */
                         DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
                     "count": <?= /* @noEscape */ $cartItemsCount ?>,
-                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>"
+                    "maskedPhoneNumber": "<?= /* @noEscape */ $maskedPhoneNumber ?>",
+                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
+                    "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>"
                 }
             }
         }
