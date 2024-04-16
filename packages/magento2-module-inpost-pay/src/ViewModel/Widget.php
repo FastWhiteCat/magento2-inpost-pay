@@ -128,6 +128,22 @@ class Widget implements ArgumentInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabledOnRegisterPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnRegisterPage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledOnLoginPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnLoginPage();
+    }
+
+    /**
      * @return float|int
      */
     public function getCartItemsCount(): float|int
