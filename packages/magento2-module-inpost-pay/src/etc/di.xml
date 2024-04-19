@@ -93,6 +93,10 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
+                type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
+    <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />

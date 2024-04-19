@@ -134,3 +134,7 @@
 "Something went wrong, refresh the page and try again","Coś poszło nie tak, odśwież stronę i spróbuj ponownie.",module,InPost_InPostPay
 "Product ""%1"" is not available for InPost Pay.","Produktu ""%1"" nie można kupić z InPost Pay.",module,InPost_InPostPay
 "Connecting to InPost Pay failed.","Nawiązanie połączenia z aplikacją InPost Pay nie powiodło się.",module,InPost_InPostPay
+"Synchronize payment methods","Zsynchronizuj dostępne metody płatności",module,InPost_InPostPay
+"Error occurred in payment method synchronization.","Wystąpił błąd podczas synronizacji metod płatności",module,InPost_InPostPay
+"Payment methods synchronization complete.","Synchronizacja metod płatności została ukończona",module,InPost_InPostPay
+"There was a problem with getting payment methods. Details: %1","Wystąpił problem z uzyskaniem metod płatności. Szczegóły %1 ",module,InPost_InPostPay
