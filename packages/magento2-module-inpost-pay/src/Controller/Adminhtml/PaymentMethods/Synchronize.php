@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Controller\Adminhtml\PaymentMethods;
 
-use InPost\InPostPay\Cron\SynchronizePaymentMethods;
+use InPost\InPostPay\Service\SynchronizePaymentMethods;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 
@@ -24,7 +24,7 @@ class Synchronize extends Action
         try {
             $this->synchronizePaymentMethods->execute();
         } catch (\Exception) {
-            $this->messageManager->addSuccessMessage(__('Error occurred in payment method synchronization.'));
+            $this->messageManager->addErrorMessage(__('Error occurred in payment method synchronization.'));
             return [];
         }
 
