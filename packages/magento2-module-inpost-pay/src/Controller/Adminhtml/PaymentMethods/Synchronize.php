@@ -29,6 +29,7 @@ class Synchronize extends Action
         }
 
         $this->messageManager->addSuccessMessage(__('Payment methods synchronization complete.'));
+
         return [];
     }
 }
