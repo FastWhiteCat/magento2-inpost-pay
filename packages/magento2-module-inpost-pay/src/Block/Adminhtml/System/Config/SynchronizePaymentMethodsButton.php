@@ -6,17 +6,18 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Button;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\UrlInterface;
 
 class SynchronizePaymentMethodsButton extends Field
 {
     /** @var UrlInterface */
-    protected $_urlBuilder;
+    private $urlBuilder;
 
     public function __construct(
         Context $context,
         array $data = []
     ) {
-        $this->_urlBuilder = $context->getUrlBuilder();
+        $this->urlBuilder = $context->getUrlBuilder();
         parent::__construct($context, $data);
     }
 
@@ -26,7 +27,7 @@ class SynchronizePaymentMethodsButton extends Field
         $this->setTemplate('InPost_InPostPay::system/config/synchronizePaymentMethodsButton.phtml');
     }
 
-    public function getButtonHtml()
+    public function getButtonHtml(): string
     {
         $button = $this->getLayout()->createBlock(
             Button::class
@@ -40,21 +41,25 @@ class SynchronizePaymentMethodsButton extends Field
         return $button->toHtml();
     }
 
-    public function getAdminUrl()
+    public function getAdminUrl(): string
     {
-        return $this->_urlBuilder->getUrl(
+        return $this->urlBuilder->getUrl(
             'inpostpay/paymentMethods/synchronize',
             ['store' => $this->_request->getParam('store')]
         );
     }
 
-    public function render(AbstractElement $element)
+    public function render(AbstractElement $element): string
     {
         $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
+
         return parent::render($element);
     }
 
-    protected function _getElementHtml(AbstractElement $element)
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function _getElementHtml(AbstractElement $element): string
     {
         return $this->_toHtml();
     }

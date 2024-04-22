@@ -12,7 +12,8 @@ class SynchronizePaymentMethods
     ) {
     }
 
-    public function execute() {
-       $this->synchronizePaymentMethods->execute();
+    public function execute(): void
+    {
+        $this->synchronizePaymentMethods->execute();
     }
 }

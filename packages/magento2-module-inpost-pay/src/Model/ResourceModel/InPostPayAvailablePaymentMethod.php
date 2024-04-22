@@ -13,11 +13,13 @@ class InPostPayAvailablePaymentMethod extends AbstractDb
 {
     protected function _construct(): void
     {
-        $this->_init(InPostPayAvailablePaymentMethodInterface::ENTITY_NAME,
-            InPostPayAvailablePaymentMethodInterface::PAYMENT_METHOD_ID);
+        $this->_init(
+            InPostPayAvailablePaymentMethodInterface::ENTITY_NAME,
+            InPostPayAvailablePaymentMethodInterface::PAYMENT_METHOD_ID
+        );
     }
 
-    public function getAllValuesAsArray()
+    public function getAllValuesAsArray(): array
     {
         $connection = $this->getConnection();
 
@@ -44,7 +46,7 @@ class InPostPayAvailablePaymentMethod extends AbstractDb
         $connection->truncateTable($mainTable);
     }
 
-    public function insertMultiple(array $data)
+    public function insertMultiple(array $data): void
     {
         $connection = $this->getConnection();
 

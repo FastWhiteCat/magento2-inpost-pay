@@ -14,7 +14,8 @@ class SynchronizePaymentMethods
     ) {
     }
 
-    public function execute() {
+    public function execute(): void
+    {
         $result = $this->paymentMethods->execute();
 
         if ($result['payment_type']) {

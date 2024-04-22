@@ -14,7 +14,9 @@ interface InPostPayAvailablePaymentMethodRepositoryInterface
      * @return InPostPayAvailablePaymentMethodInterface
      * @throws CouldNotSaveException
      */
-    public function save(InPostPayAvailablePaymentMethodInterface $paymentMethod): InPostPayAvailablePaymentMethodInterface;
+    public function save(
+        InPostPayAvailablePaymentMethodInterface $paymentMethod
+    ): InPostPayAvailablePaymentMethodInterface;
 
     /**
      * @param int $id

@@ -37,40 +37,40 @@ class InPostPayAvailablePaymentMethodRepository implements InPostPayAvailablePay
 
     public function get(int $id): InPostPayAvailablePaymentMethodInterface
     {
-        $inPostPayBasketNotice = $this->inPostPayAvailablePaymentMethodInterfaceFactory->create();
+        $availablePaymentMethod = $this->inPostPayAvailablePaymentMethodInterfaceFactory->create();
         // @phpstan-ignore-next-line
-        $this->resource->load($inPostPayBasketNotice, $id);
+        $this->resource->load($availablePaymentMethod, $id);
         try {
-            $inPostPayBasketNotice->getBasketNoticeId();
+            $availablePaymentMethod->getPaymentCode();
         } catch (LocalizedException $e) {
             throw new NoSuchEntityException(
                 __('Payment code with ID "%1" does not exist.', $id)
             );
         }
 
-        return $inPostPayBasketNotice;
+        return $availablePaymentMethod;
     }
 
     public function getByPaymentCode(string $paymentCode): InPostPayAvailablePaymentMethodInterface
     {
-        $inPostPayBasketNotice = $this->inPostPayAvailablePaymentMethodInterfaceFactory->create();
+        $availablePaymentMethod = $this->inPostPayAvailablePaymentMethodInterfaceFactory->create();
 
         $this->resource->load(
             // @phpstan-ignore-next-line
-            $inPostPayBasketNotice,
+            $availablePaymentMethod,
             $paymentCode,
             InPostPayAvailablePaymentMethodInterface::PAYMENT_CODE
         );
 
         try {
-            $inPostPayBasketNotice->getBasketNoticeId();
+            $availablePaymentMethod->getPaymentCode();
         } catch (LocalizedException $e) {
             throw new NoSuchEntityException(
                 __('Payment code with code "%1" does not exist.', $paymentCode)
             );
         }
 
-        return $inPostPayBasketNotice;
+        return $availablePaymentMethod;
     }
 
     public function getAllValuesAsArray(): array

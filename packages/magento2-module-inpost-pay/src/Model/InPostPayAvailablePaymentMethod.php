@@ -30,7 +30,7 @@ class InPostPayAvailablePaymentMethod extends AbstractModel implements InPostPay
         return $this->setData(self::PAYMENT_METHOD_ID, $paymentMethodId);
     }
 
-    public function getPaymentCode(): ?string
+    public function getPaymentCode(): string
     {
         $paymentCode = ($this->hasData(self::PAYMENT_CODE)) ? $this->getData(self::PAYMENT_CODE) : null;
 

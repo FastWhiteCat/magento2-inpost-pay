@@ -13,6 +13,6 @@ interface InPostPayAvailablePaymentMethodInterface
     public function getPaymentMethodId(): ?int;
     public function setPaymentMethodId(int $paymentMethodId): InPostPayAvailablePaymentMethodInterface;
 
-    public function getPaymentCode(): ?string;
+    public function getPaymentCode(): string;
     public function setPaymentCode(string $paymentCode): InPostPayAvailablePaymentMethodInterface;
 }

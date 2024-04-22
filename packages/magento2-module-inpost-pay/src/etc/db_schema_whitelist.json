@@ -81,5 +81,14 @@
             "FK_FAAB0B769017A18DA32E88ABB704AA2E": true,
             "INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID": true
         }
+    },
+    "inpost_pay_available_payment_method": {
+        "column": {
+            "payment_method_id": true,
+            "payment_code": true
+        },
+        "constraint": {
+            "INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID": true
+        }
     }
 }
