@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
+use InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -22,7 +23,8 @@ class IziApiConfigProvider
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly SandboxConfigProvider $sandboxConfigProvider
+        private readonly SandboxConfigProvider $sandboxConfigProvider,
+        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository
     ) {
     }
 
@@ -65,7 +67,12 @@ class IziApiConfigProvider
         $acceptedPaymentTypes = $this->scopeConfig->getValue(self::XML_PATH_ACCEPTED_PAYMENT_TYPES);
 
         if (!empty($acceptedPaymentTypes) && is_scalar($acceptedPaymentTypes)) {
-            return explode(',', (string)$acceptedPaymentTypes);
+            $acceptedPaymentTypes = explode(',', (string)$acceptedPaymentTypes);
+            $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
+            return array_intersect(
+                $acceptedPaymentTypes,
+                array_column($availablePaymentTypes, 'payment_code')
+            );
         }
 
         return [];
