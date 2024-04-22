@@ -25,8 +25,7 @@ class InPostPayAvailablePaymentMethodRepository implements InPostPayAvailablePay
 
     public function save(
         InPostPayAvailablePaymentMethodInterface $paymentMethod
-    ): InPostPayAvailablePaymentMethodInterface
-    {
+    ): InPostPayAvailablePaymentMethodInterface {
         try {
             // @phpstan-ignore-next-line
             $this->resource->save($paymentMethod);
