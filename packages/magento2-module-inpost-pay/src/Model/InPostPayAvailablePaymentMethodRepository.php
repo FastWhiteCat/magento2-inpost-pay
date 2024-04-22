@@ -23,7 +23,9 @@ class InPostPayAvailablePaymentMethodRepository implements InPostPayAvailablePay
     ) {
     }
 
-    public function save(InPostPayAvailablePaymentMethodInterface $paymentMethod): InPostPayAvailablePaymentMethodInterface
+    public function save(
+        InPostPayAvailablePaymentMethodInterface $paymentMethod
+    ): InPostPayAvailablePaymentMethodInterface
     {
         try {
             // @phpstan-ignore-next-line
