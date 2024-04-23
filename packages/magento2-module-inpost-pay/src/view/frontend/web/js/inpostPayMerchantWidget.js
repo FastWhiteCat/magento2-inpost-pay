@@ -3,10 +3,12 @@ define([
     'jquery',
     'Magento_Customer/js/customer-data',
     'Magento_Customer/js/model/customer',
+    'Magento_Checkout/js/model/step-navigator',
     'mage/url',
     'underscore',
-    'mage/validation'
-], function (Component, $, customerData, customer, urlBuilder, _) {
+    'ko',
+    'mage/validation',
+], function (Component, $, customerData, customer, stepNavigator, urlBuilder, _, ko) {
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
@@ -26,10 +28,18 @@ define([
         initialize: function (config) {
             this._super();
             var self = this;
-            this.configuration = window.checkoutConfig ? window.checkoutConfig.inPostConfig : {};
+            this.configuration = window.checkoutConfig ? window.checkoutConfig.inPostConfig : null;
+            this.isVisible = ko.observable(false);
 
             if (this.disabledOnCheckoutPage(config)) {
                 return;
+            }
+
+            if (this.configuration) {
+                stepNavigator.steps.subscribe(function (steps) {
+                    var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
+                    self.isVisible(!customer.isLoggedIn() && self.configuration.enabledOnCheckoutPage && shippingStep.isVisible())
+                })
             }
 
             if (!this.isWidgetInitialized()) {
@@ -72,10 +82,6 @@ define([
             }
 
             this.bindEvents(true);
-        },
-
-        visible: function() {
-            return !customer.isLoggedIn() && this.configuration.enabledOnCheckoutPage
         },
 
         getConfiguration: function() {
