@@ -95,8 +95,7 @@ class IziApiConfigProvider
     {
         $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
 
-        if (
-            empty($availablePaymentTypes)
+        if (empty($availablePaymentTypes)
             || strtotime($availablePaymentTypes[0]['created_at']) < strtotime("-1 day")
         ) {
             $this->synchronizePaymentMethods->execute();
