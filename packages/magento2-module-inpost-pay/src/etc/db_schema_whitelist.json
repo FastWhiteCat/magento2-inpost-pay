@@ -85,7 +85,8 @@
     "inpost_pay_available_payment_method": {
         "column": {
             "payment_method_id": true,
-            "payment_code": true
+            "payment_code": true,
+            "created_at": true
         },
         "constraint": {
             "INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID": true

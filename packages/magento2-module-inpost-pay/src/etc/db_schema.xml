@@ -98,6 +98,7 @@
     <table name="inpost_pay_available_payment_method" resource="default" engine="innodb">
         <column xsi:type="int" name="payment_method_id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="varchar" name="payment_code" length="255" nullable="false"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID">
             <column name="payment_method_id"/>
         </constraint>

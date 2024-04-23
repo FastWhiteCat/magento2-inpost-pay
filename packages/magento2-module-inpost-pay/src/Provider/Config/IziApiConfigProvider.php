@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Provider\Config;
 
 use InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Service\SynchronizePaymentMethods as SynchronizePaymentMethodsService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -24,7 +25,8 @@ class IziApiConfigProvider
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly SandboxConfigProvider $sandboxConfigProvider,
-        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository
+        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository,
+        private readonly SynchronizePaymentMethodsService $synchronizePaymentMethods
     ) {
     }
 
@@ -68,10 +70,11 @@ class IziApiConfigProvider
 
         if (!empty($acceptedPaymentTypes) && is_scalar($acceptedPaymentTypes)) {
             $acceptedPaymentTypes = explode(',', (string)$acceptedPaymentTypes);
-            $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
+            $availablePaymentMethodsCodes = $this->getAvailablePaymentMethodsCodes();
+
             return array_intersect(
                 $acceptedPaymentTypes,
-                array_column($availablePaymentTypes, 'payment_code')
+                $availablePaymentMethodsCodes
             );
         }
 
@@ -86,5 +89,19 @@ class IziApiConfigProvider
     public function isProductAttributesHTMLAndSpecialCharactersCleaningEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_PROD_ATTR_CLEANING);
+    }
+
+    private function getAvailablePaymentMethodsCodes(): array
+    {
+        $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
+
+        if (empty($availablePaymentTypes)
+            || strtotime($availablePaymentTypes[0]['created_at']) < strtotime("-1 day")
+        ) {
+            $this->synchronizePaymentMethods->execute();
+            $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
+        }
+
+        return !empty($availablePaymentTypes) ? array_column($availablePaymentTypes, 'payment_code') : [];
     }
 }
