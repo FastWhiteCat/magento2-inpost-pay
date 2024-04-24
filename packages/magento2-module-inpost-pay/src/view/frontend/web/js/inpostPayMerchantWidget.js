@@ -101,7 +101,7 @@ define([
             return $productForm.validation('isValid');
         },
 
-        checkIsBinding: function(count) {
+        checkIsBinding: function() {
             $.ajax({
                 url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
                     + '/form_key/'
@@ -119,10 +119,6 @@ define([
 
                         $iziButtons.each(function () {
                             $(this).attr('masked_phone_number', data.masked_phone_number)
-
-                            if (count) {
-                                $(this).attr('count', count)
-                            }
                         });
 
                         window.handleInpostIziButtons();
@@ -415,7 +411,8 @@ define([
             customerData.reload(['cart']).done(function(cartData) {
                 firstFired = true;
                 checkCartWidget(cartData.cart);
-                updateCounter(cartData.cart.summary_count);
+                updateCounter(cartData.cart.summary_count, true);
+
                 var config = window.getConfig();
 
                 if ((config.bindingPlace || isCheckout) && config.isEnabledMinicart) {
@@ -437,7 +434,7 @@ define([
                     }, 0)
                 } else {
                     if (!config.bindingPlace) {
-                        window.checkIsBinding(cartData.cart.summary_count);
+                        window.checkIsBinding();
                     } else if (config.isEnabledMinicart) {
                         window.handleInpostIziButtons();
                     }
@@ -459,15 +456,21 @@ define([
                 }
             }
 
-            function updateCounter(count) {
+            function updateCounter(count, onlyAttribute = false) {
                 var $iziButtons = $("inpost-izi-button");
                 if (!$iziButtons.length) return;
 
-                var event = new CustomEvent("inpost-update-count", {detail: count});
+                if (onlyAttribute) {
+                    $iziButtons.each(function () {
+                        $(this).attr('count', count)
+                    });
+                } else {
+                    var event = new CustomEvent("inpost-update-count", {detail: count});
 
-                $iziButtons.each(function () {
-                    this.dispatchEvent(event)
-                });
+                    $iziButtons.each(function () {
+                        this.dispatchEvent(event)
+                    });
+                }
             }
         },
 
