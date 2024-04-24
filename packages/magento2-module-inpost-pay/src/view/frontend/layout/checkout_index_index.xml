@@ -8,6 +8,15 @@
                     <item name="components" xsi:type="array">
                         <item name="checkout" xsi:type="array">
                             <item name="children" xsi:type="array">
+                                <item name="progressBar" xsi:type="array">
+                                    <item name="config" xsi:type="array">
+                                        <item name="deps" xsi:type="array">
+                                            <item name="0" xsi:type="string">checkout.steps.inpost-pay</item>
+                                            <item name="1" xsi:type="string">checkout.steps.shipping-step.shippingAddress</item>
+                                            <item name="2" xsi:type="string">checkout.steps.billing-step.payment</item>
+                                        </item>
+                                    </item>
+                                </item>
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <item name="inpost-pay" xsi:type="array">

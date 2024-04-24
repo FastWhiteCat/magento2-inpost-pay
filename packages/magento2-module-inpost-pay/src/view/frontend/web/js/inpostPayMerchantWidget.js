@@ -38,7 +38,8 @@ define([
             if (this.configuration) {
                 stepNavigator.steps.subscribe(function (steps) {
                     var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
-                    self.isVisible(!customer.isLoggedIn() && self.configuration.enabledOnCheckoutPage && shippingStep.isVisible())
+                    var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
+                    self.isVisible(!customer.isLoggedIn() && self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
                 })
             }
 
