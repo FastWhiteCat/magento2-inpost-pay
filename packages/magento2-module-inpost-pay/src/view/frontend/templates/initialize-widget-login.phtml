@@ -19,34 +19,36 @@ $maskedPhoneNumber = $widgetViewModel->getMaskedPhoneNumber();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 ?>
-<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
-    <inpost-izi-button
-        name=""
-        masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
-        data-product-id=""
-        language="<?= /* @noEscape */ $language ?>"
-        variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
-        basket="false"
-        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
-        max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
-        frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
-        count="<?= /* @noEscape */ $cartItemsCount ?>"
-        binding_place="<?= /* @noEscape */ $bindingPlace ?>">
-    </inpost-izi-button>
+<div class="inpay-login-wrapper">
+    <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+        <inpost-izi-button
+            name=""
+            masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
+            data-product-id=""
+            language="<?= /* @noEscape */ $language ?>"
+            variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
+            basket="false"
+            dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
+            max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
+            frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
+            count="<?= /* @noEscape */ $cartItemsCount ?>"
+            binding_place="<?= /* @noEscape */ $bindingPlace ?>">
+        </inpost-izi-button>
 
-    <script type="text/x-magento-init">
-        {
-            "*" : {
-                "InpostPayMerchantWidget" : {
-                    "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
-                    "popupBindingPlace": "<?= /* @noEscape */
-                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
-                    "count": <?= /* @noEscape */ $cartItemsCount ?>,
-                    "maskedPhoneNumber": "<?= /* @noEscape */ $maskedPhoneNumber ?>",
-                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
-                    "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>"
+        <script type="text/x-magento-init">
+            {
+                "*" : {
+                    "InpostPayMerchantWidget" : {
+                        "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
+                        "popupBindingPlace": "<?= /* @noEscape */
+                            DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                        "count": <?= /* @noEscape */ $cartItemsCount ?>,
+                        "maskedPhoneNumber": "<?= /* @noEscape */ $maskedPhoneNumber ?>",
+                        "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
+                        "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>"
+                    }
                 }
             }
-        }
-    </script>
+        </script>
+    </div>
 </div>
