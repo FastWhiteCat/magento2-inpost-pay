@@ -63,9 +63,11 @@ define([
                 return defaultConfig.popupBindingPlace ? defaultConfig : self.configuration;
             }
 
-            if (config && config.popupBindingPlace) {
-                this.bindEvents(false);
-            }
+            this.loadScript(config.scriptUrl, function() {
+                if (config && config.popupBindingPlace) {
+                    this.bindEvents(false);
+                }
+            }.bind(this));
         },
 
         disabledOnCheckoutPage: function(config = {}) {
@@ -82,7 +84,20 @@ define([
                 return;
             }
 
-            this.bindEvents(true);
+            this.loadScript(this.configuration.scriptUrl, function() {
+                this.bindEvents(true);
+            }.bind(this));
+        },
+
+        loadScript: function(url, callback) {
+            var script = document.createElement( "script" )
+            script.type = "text/javascript";
+            script.src = url;
+            script.onload = function() {
+                callback();
+            };
+
+            document.getElementsByTagName( "head" )[0].appendChild( script );
         },
 
         getConfiguration: function() {
@@ -442,9 +457,9 @@ define([
                 } else {
                     if (!config.bindingPlace) {
                         window.checkIsBinding();
-                    } else if (config.isEnabledMinicart) {
-                        window.handleInpostIziButtons();
                     }
+
+                    window.handleInpostIziButtons();
                 }
             });
 

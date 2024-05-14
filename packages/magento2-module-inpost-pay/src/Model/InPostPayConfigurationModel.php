@@ -17,6 +17,9 @@ class InPostPayConfigurationModel implements ConfigProviderInterface
     {
 
         $config = [];
+
+        $scriptUrl = $this->widget->getScriptUrl(DisplayConfigProvider::CHECKOUT_PAGE_BINDING_PLACE_NAME);
+
         $config['inPostConfig'] = [
             'name' => '',
             'productId' => '',
@@ -29,7 +32,8 @@ class InPostPayConfigurationModel implements ConfigProviderInterface
             'bindingPlace' => DisplayConfigProvider::CHECKOUT_PAGE_BINDING_PLACE_NAME,
             'enabledOnCheckoutPage' => $this->widget->isEnabledOnCheckoutPage(),
             'maskedPhoneNumber' => $this->widget->getMaskedPhoneNumber(),
-            'isEnabledMinicart' => $this->widget->isEnabledInMiniCart()
+            'isEnabledMinicart' => $this->widget->isEnabledInMiniCart(),
+            'scriptUrl' => $scriptUrl
         ];
 
         return $config;
