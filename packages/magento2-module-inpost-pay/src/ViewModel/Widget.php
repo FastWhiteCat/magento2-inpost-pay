@@ -6,6 +6,7 @@ namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
@@ -34,6 +35,7 @@ class Widget implements ArgumentInterface
     private const FRAME_STYLE = 'frameStyle';
 
     /**
+     * @param SandboxConfigProvider $sandboxConfigProvider
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
      * @param ResolverInterface $localeResolver
@@ -46,6 +48,7 @@ class Widget implements ArgumentInterface
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
+        private readonly SandboxConfigProvider             $sandboxConfigProvider,
         private readonly LayoutConfigProvider              $layoutConfigProvider,
         private readonly DisplayConfigProvider             $displayConfigProvider,
         private readonly ResolverInterface                 $localeResolver,
@@ -93,6 +96,14 @@ class Widget implements ArgumentInterface
             self::MAX_WIDTH => $maxWidth,
             self::FRAME_STYLE => $frameStyle
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSandboxEnabled(): bool
+    {
+        return $this->sandboxConfigProvider->isSandboxEnabled();
     }
 
     /**
@@ -256,5 +267,15 @@ class Widget implements ArgumentInterface
         }
 
         return ($product instanceof Product) ? $product : null;
+    }
+
+    public function getScriptUrl(string $bindingPlace): string
+    {
+        $sandboxMode = $this->isSandboxEnabled();
+        $shouldInitializeScript = !$this->isEnabledInMiniCart()
+            || $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME;
+        return $shouldInitializeScript
+            ? ($sandboxMode ? "https://izi-sandbox.inpost.pl/inpostizi.js" : "https://izi.inpost.pl/inpostizi.js")
+            : '';
     }
 }

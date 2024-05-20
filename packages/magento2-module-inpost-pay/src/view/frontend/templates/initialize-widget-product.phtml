@@ -24,6 +24,7 @@ if (!$isProductSaleable || $widgetViewModel->isProductRestricted((int)$productId
 $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
@@ -47,7 +48,8 @@ $widgetWrapperClass = "inpay-widget-wrapper";
                 "InpostPayMerchantWidget" : {
                     "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
                     "popupBindingPlace": "<?= /* @noEscape */
-                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>"
+                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>"
                 }
             }
         }
