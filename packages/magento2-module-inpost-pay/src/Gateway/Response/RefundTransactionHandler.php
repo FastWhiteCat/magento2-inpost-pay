@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Gateway\Response;
 
 use InPost\InPostPay\Enum\InPostRefundStatus;
 use InPost\InPostPay\Model\IziApi\Response\TransactionRefundResponse;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Creditmemo;
@@ -25,6 +26,7 @@ class RefundTransactionHandler implements HandlerInterface
      * @param array $handlingSubject
      * @param array $response
      * @return void
+     * @throws LocalizedException
      */
     public function handle(array $handlingSubject, array $response): void
     {
@@ -34,22 +36,22 @@ class RefundTransactionHandler implements HandlerInterface
         $payment = $paymentDataObject->getPayment();
         $creditmemo = $payment->getCreditmemo();
 
-        $refundResponse = $response['body'] ?? null;
-        if (!$refundResponse instanceof TransactionRefundResponse) {
-            $this->logger->error('Invalid Transaction Refund response.');
-            return;
-        }
+        $this->validResponse($response);
 
+        $refundResponse = $response['body'];
         $refundResponseDescription = $refundResponse->getDescription();
         $refundResponseStatus = $refundResponse->getStatus();
         $externalRefundId = $refundResponse->getExternalRefundId();
-        $mappedCreditmemoStatus = $this->getMappedCreditmemoStatus($refundResponseStatus);
 
         if ($refundResponseStatus === InPostRefundStatus::FAILED->value) {
-            $this->logger->error(
-                "InPostPay Transaction Refund status failed, external_refund_id: $externalRefundId" .
-                ', description: ' . $refundResponse->getDescription()
+            $errorMsg = __(
+                'InPost Pay API returned transaction refund status: failed. External Refund ID: %1 Description: %2',
+                $externalRefundId,
+                $refundResponse->getDescription()
             );
+            $this->logger->error($errorMsg->getText());
+
+            throw new LocalizedException($errorMsg);
         }
 
         $creditmemoCommentData = [
@@ -59,18 +61,38 @@ class RefundTransactionHandler implements HandlerInterface
             __("Description: %1", $refundResponseDescription)->render()
         ];
 
-        if ($creditmemo) {
-            $creditmemo->addComment(implode(PHP_EOL, $creditmemoCommentData));
-            $creditmemo->setCreditmemoStatus($mappedCreditmemoStatus);
-        }
+        $creditmemo?->addComment(implode(PHP_EOL, $creditmemoCommentData));
+        $creditmemo?->setState($this->getMappedCreditmemoState($refundResponseStatus));
     }
 
-    private function getMappedCreditmemoStatus(string $refundResponseStatus): int
+    private function getMappedCreditmemoState(?string $refundResponseStatus): int
     {
         return match ($refundResponseStatus) {
             InPostRefundStatus::PENDING->value => Creditmemo::STATE_OPEN,
             InPostRefundStatus::SUCCESS->value => Creditmemo::STATE_REFUNDED,
             default => Creditmemo::STATE_CANCELED,
         };
+    }
+
+    /**
+     * @param array $response
+     * @return void
+     * @throws LocalizedException
+     */
+    private function validResponse(array $response): void
+    {
+        if (array_key_exists('error', $response)) {
+            // This error is already logged in other place
+            throw new LocalizedException(
+                __('InPost Pay API refund request responded with error: %1', (string)$response['error'])
+            );
+        }
+
+        if (empty($response['body'] ?? null) || !$response['body'] instanceof TransactionRefundResponse) {
+            $errorMsg = 'Invalid Transaction Refund response.';
+            $this->logger->error($errorMsg);
+
+            throw new LocalizedException(__($errorMsg));
+        }
     }
 }

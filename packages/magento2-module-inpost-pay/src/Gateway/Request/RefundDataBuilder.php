@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\RefundInterface;
 use InPost\InPostPay\Model\IziApi\Response\TransactionListResponse;
 use InPost\InPostPay\Service\ApiConnector\TransactionList;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -28,6 +29,11 @@ class RefundDataBuilder implements BuilderInterface
     ) {
     }
 
+    /**
+     * @param array $buildSubject
+     * @return array|array[]
+     * @throws LocalizedException
+     */
     public function build(array $buildSubject): array
     {
         /** @var PaymentDataObjectInterface $paymentDataObject */
@@ -51,8 +57,10 @@ class RefundDataBuilder implements BuilderInterface
         }
 
         if (empty($inPostPayTransactionList->getItems())) {
-            $this->logger->error("Empty InPostPay Transaction list for OrderId: $orderId.");
-            return [];
+            $errorMsg = __('Empty InPost Pay Transaction list for OrderId: %1', $orderId);
+            $this->logger->error($errorMsg->getText());
+
+            throw new LocalizedException($errorMsg);
         }
 
         $refundRequestData = [];
