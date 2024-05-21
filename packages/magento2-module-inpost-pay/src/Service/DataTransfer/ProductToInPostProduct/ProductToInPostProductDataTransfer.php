@@ -87,7 +87,9 @@ class ProductToInPostProductDataTransfer
         $productId = $this->extractProductId($product);
 
         $inPostProduct->setProductId($productId);
-        $inPostProduct->setProductCategory((string)max($product->getCategoryIds()));
+        $inPostProduct->setProductCategory(
+            $product->getCategoryIds() ? (string)max($product->getCategoryIds()) : ''
+        );
         $inPostProduct->setEan((string)$product->getSku());
         $inPostProduct->setProductName((string)$product->getName());
         $inPostProduct->setProductDescription($description);
