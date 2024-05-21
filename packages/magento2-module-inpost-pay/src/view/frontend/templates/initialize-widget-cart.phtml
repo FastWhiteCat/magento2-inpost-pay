@@ -18,6 +18,7 @@ $cartItemsCount = $widgetViewModel->getCartItemsCount();
 $maskedPhoneNumber = $widgetViewModel->getMaskedPhoneNumber();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 
 if (!$widgetViewModel->canShowForWholeCart()) {
     return;
@@ -49,7 +50,8 @@ if (!$widgetViewModel->canShowForWholeCart()) {
                     "count": <?= /* @noEscape */ $cartItemsCount ?>,
                     "maskedPhoneNumber": "<?= /* @noEscape */ $maskedPhoneNumber ?>",
                     "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
-                    "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>"
+                    "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>",
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>"
                 }
             }
         }

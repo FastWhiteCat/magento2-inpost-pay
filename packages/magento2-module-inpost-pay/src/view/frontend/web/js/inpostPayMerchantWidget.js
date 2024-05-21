@@ -3,10 +3,12 @@ define([
     'jquery',
     'Magento_Customer/js/customer-data',
     'Magento_Customer/js/model/customer',
+    'Magento_Checkout/js/model/step-navigator',
     'mage/url',
     'underscore',
-    'mage/validation'
-], function (Component, $, customerData, customer, urlBuilder, _) {
+    'ko',
+    'mage/validation',
+], function (Component, $, customerData, customer, stepNavigator, urlBuilder, _, ko) {
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
@@ -26,10 +28,19 @@ define([
         initialize: function (config) {
             this._super();
             var self = this;
-            this.configuration = window.checkoutConfig ? window.checkoutConfig.inPostConfig : {};
+            this.configuration = window.checkoutConfig ? window.checkoutConfig.inPostConfig : null;
+            this.isVisible = ko.observable(false);
 
             if (this.disabledOnCheckoutPage(config)) {
                 return;
+            }
+
+            if (this.configuration) {
+                stepNavigator.steps.subscribe(function (steps) {
+                    var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
+                    var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
+                    self.isVisible(!customer.isLoggedIn() && self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
+                })
             }
 
             if (!this.isWidgetInitialized()) {
@@ -52,9 +63,11 @@ define([
                 return defaultConfig.popupBindingPlace ? defaultConfig : self.configuration;
             }
 
-            if (config && config.popupBindingPlace) {
-                this.bindEvents(false);
-            }
+            this.loadScript(config.scriptUrl, function() {
+                if (config && config.popupBindingPlace) {
+                    this.bindEvents(false);
+                }
+            }.bind(this));
         },
 
         disabledOnCheckoutPage: function(config = {}) {
@@ -71,11 +84,20 @@ define([
                 return;
             }
 
-            this.bindEvents(true);
+            this.loadScript(this.configuration.scriptUrl, function() {
+                this.bindEvents(true);
+            }.bind(this));
         },
 
-        visible: function() {
-            return !customer.isLoggedIn() && this.configuration.enabledOnCheckoutPage
+        loadScript: function(url, callback) {
+            var script = document.createElement( "script" )
+            script.type = "text/javascript";
+            script.src = url;
+            script.onload = function() {
+                callback();
+            };
+
+            document.getElementsByTagName( "head" )[0].appendChild( script );
         },
 
         getConfiguration: function() {
@@ -101,7 +123,7 @@ define([
             return $productForm.validation('isValid');
         },
 
-        checkIsBinding: function(count) {
+        checkIsBinding: function() {
             $.ajax({
                 url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
                     + '/form_key/'
@@ -119,10 +141,6 @@ define([
 
                         $iziButtons.each(function () {
                             $(this).attr('masked_phone_number', data.masked_phone_number)
-
-                            if (count) {
-                                $(this).attr('count', count)
-                            }
                         });
 
                         window.handleInpostIziButtons();
@@ -415,7 +433,8 @@ define([
             customerData.reload(['cart']).done(function(cartData) {
                 firstFired = true;
                 checkCartWidget(cartData.cart);
-                updateCounter(cartData.cart.summary_count);
+                updateCounter(cartData.cart.summary_count, true);
+
                 var config = window.getConfig();
 
                 if ((config.bindingPlace || isCheckout) && config.isEnabledMinicart) {
@@ -437,10 +456,10 @@ define([
                     }, 0)
                 } else {
                     if (!config.bindingPlace) {
-                        window.checkIsBinding(cartData.cart.summary_count);
-                    } else if (config.isEnabledMinicart) {
-                        window.handleInpostIziButtons();
+                        window.checkIsBinding();
                     }
+
+                    window.handleInpostIziButtons();
                 }
             });
 
@@ -459,15 +478,21 @@ define([
                 }
             }
 
-            function updateCounter(count) {
+            function updateCounter(count, onlyAttribute = false) {
                 var $iziButtons = $("inpost-izi-button");
                 if (!$iziButtons.length) return;
 
-                var event = new CustomEvent("inpost-update-count", {detail: count});
+                if (onlyAttribute) {
+                    $iziButtons.each(function () {
+                        $(this).attr('count', count)
+                    });
+                } else {
+                    var event = new CustomEvent("inpost-update-count", {detail: count});
 
-                $iziButtons.each(function () {
-                    this.dispatchEvent(event)
-                });
+                    $iziButtons.each(function () {
+                        this.dispatchEvent(event)
+                    });
+                }
             }
         },
 
