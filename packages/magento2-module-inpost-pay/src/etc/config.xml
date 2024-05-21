@@ -32,6 +32,9 @@
                 <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
                 <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
                 <min_log_level>100</min_log_level>
+                <can_capture>1</can_capture>
+                <can_refund>1</can_refund>
+                <is_offline>1</is_offline>
             </inpost_pay>
         </payment>
     </default>

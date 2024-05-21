@@ -93,6 +93,11 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\RefundInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
+
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
@@ -199,7 +204,16 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="capture" xsi:type="string">Magento\Payment\Gateway\Command\NullCommand</item>
+                <item name="refund" xsi:type="string">InPostPayRefundCommand</item>
             </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">InPost\InPostPay\Gateway\Request\RefundDataBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">InPost\InPostPay\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">InPost\InPostPay\Gateway\Http\Client\TransactionRefundClient</argument>
+            <argument name="handler" xsi:type="object">InPost\InPostPay\Gateway\Response\RefundTransactionHandler</argument>
         </arguments>
     </virtualType>
     <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
@@ -263,6 +277,12 @@
             <argument name="debugConfigProvider" xsi:type="object">InPost\InPostPay\Provider\Config\DebugConfigProvider</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Service\Refund\SignatureGenerator">
+        <arguments>
+            <argument name="hashAlgorithmName" xsi:type="const">InPost\InPostPay\Service\Refund\SignatureGenerator::DEFAULT_ALGORITHM_HASH_NAME</argument>
+            <argument name="hashAlgorithmPrefix" xsi:type="const">InPost\InPostPay\Service\Refund\SignatureGenerator::DEFAULT_ALGORITHM_HASH_PREFIX</argument>
+        </arguments>
+    </type>
     <virtualType name="InPost\InPostPay\Logger\InPostPayLogger" type="Magento\Framework\Logger\Monolog">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -291,6 +311,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Provider\InPostPayLockerIdProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\TransactionList">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -481,6 +511,31 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\PayDataProcessor">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\TransactionRefund">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\InPostRefundToArrayConverter">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Refund\SignatureGenerator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Gateway\Request\RefundDataBuilder">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Gateway\Response\RefundTransactionHandler">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
