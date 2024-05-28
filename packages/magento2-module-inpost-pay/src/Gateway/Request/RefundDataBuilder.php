@@ -87,6 +87,10 @@ class RefundDataBuilder implements BuilderInterface
             }
         }
 
+        if (empty($refundRequestData)) {
+            throw new LocalizedException(__('No transactions found to be refunded for Order #%1.', $orderId));
+        }
+
         return ['body' => ['refund_request_data' => $refundRequestData]];
     }
 
