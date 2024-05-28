@@ -5,20 +5,12 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface;
-use InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessDataFactory;
 use InPost\InPostPay\Api\Data\Merchant\RefundInterface;
 use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
 class Refund extends DataObject implements RefundInterface, ExtensibleDataInterface
 {
-    public function __construct(
-        private readonly AdditionalBusinessDataFactory $additionalBusinessDataFactory,
-        array $data = []
-    ) {
-        parent::__construct($data);
-    }
-
     public function getXCommandId(): string
     {
         $xCommandId = $this->getData(self::X_COMMAND_ID);
@@ -79,7 +71,7 @@ class Refund extends DataObject implements RefundInterface, ExtensibleDataInterf
         $this->setData(self::SIGNATURE, $signature);
     }
 
-    public function getAdditionalBusinessData(): AdditionalBusinessDataInterface
+    public function getAdditionalBusinessData(): ?AdditionalBusinessDataInterface
     {
         $additionalBusinessData = $this->getData(self::ADDITIONAL_BUSINESS_DATA);
 
@@ -87,10 +79,10 @@ class Refund extends DataObject implements RefundInterface, ExtensibleDataInterf
             return $additionalBusinessData;
         }
 
-        return $this->additionalBusinessDataFactory->create();
+        return null;
     }
 
-    public function setAdditionalBusinessData(AdditionalBusinessDataInterface $additionalBusinessData): void
+    public function setAdditionalBusinessData(?AdditionalBusinessDataInterface $additionalBusinessData): void
     {
         $this->setData(self::ADDITIONAL_BUSINESS_DATA, $additionalBusinessData);
     }

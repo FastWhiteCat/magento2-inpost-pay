@@ -30,7 +30,7 @@ class TransactionRefundClient implements ClientInterface
         try {
             $refundData = $body['refund_request_data'] ?? [];
 
-            $response[] = $this->refund->execute(
+            $response['body'] = $this->refund->execute(
                 $refundData[RefundInterface::TRANSACTION_ID] ?? null,
                 $refundData[RefundInterface::EXTERNAL_REFUND_ID] ?? null,
                 $refundData[RefundInterface::ADDITIONAL_BUSINESS_DATA] ?? null,

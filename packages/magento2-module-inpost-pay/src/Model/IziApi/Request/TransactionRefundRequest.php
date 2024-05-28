@@ -13,6 +13,7 @@ use Laminas\Http\Request as HttpRequest;
 class TransactionRefundRequest extends Request implements RequestInterface
 {
     public const X_COMMAND_ID = 'X-Command-ID';
+    public const X_COMMAND_ID_AS_PARAM = 'x_command_id';
     public const TRANSACTION_ID = 'transaction_id';
     public const EXTERNAL_REFUND_ID = 'external_refund_id';
     public const REFUND_AMOUNT = 'refund_amount';
@@ -49,15 +50,17 @@ class TransactionRefundRequest extends Request implements RequestInterface
         return $uri;
     }
 
-    public function getHeaders(): array
+    public function getHeaders(bool $keepParamsIntact = false): array
     {
-        $headers = parent::getHeaders();
+        $headers = parent::getHeaders($keepParamsIntact);
 
         $params = $this->getParams();
-        if (array_key_exists(self::X_COMMAND_ID, $params) && is_scalar($params[self::X_COMMAND_ID])) {
-            $headers[self::X_COMMAND_ID] = (string)$params[self::X_COMMAND_ID];
-            unset($params[self::X_COMMAND_ID]);
-            $this->setParams($params);
+        if (array_key_exists(self::X_COMMAND_ID_AS_PARAM, $params) && is_scalar($params[self::X_COMMAND_ID_AS_PARAM])) {
+            $headers[self::X_COMMAND_ID] = (string)$params[self::X_COMMAND_ID_AS_PARAM];
+            if (!$keepParamsIntact) {
+                unset($params[self::X_COMMAND_ID_AS_PARAM]);
+                $this->setParams($params);
+            }
         }
 
         return $headers;

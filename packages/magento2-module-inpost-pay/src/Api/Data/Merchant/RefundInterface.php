@@ -73,11 +73,11 @@ interface RefundInterface
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface
      */
-    public function getAdditionalBusinessData(): AdditionalBusinessDataInterface;
+    public function getAdditionalBusinessData(): ?AdditionalBusinessDataInterface;
 
     /**
      * @param \InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface $additionalBusinessData
      * @return void
      */
-    public function setAdditionalBusinessData(AdditionalBusinessDataInterface $additionalBusinessData): void;
+    public function setAdditionalBusinessData(?AdditionalBusinessDataInterface $additionalBusinessData): void;
 }

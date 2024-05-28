@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\ApiConnector;
 use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\RefundInterface;
 use InPost\InPostPay\Api\Data\Merchant\RefundInterfaceFactory;
 use InPost\InPostPay\Model\IziApi\Request\TransactionRefundRequest;
 use InPost\InPostPay\Model\IziApi\Request\TransactionRefundRequestFactory;
@@ -14,9 +15,13 @@ use InPost\InPostPay\Model\IziApi\Response\TransactionRefundResponse;
 use InPost\InPostPay\Model\IziApi\Response\TransactionRefundResponseFactory;
 use InPost\InPostPay\Service\Converter\InPostRefundToArrayConverter;
 use InPost\InPostPay\Service\Refund\SignatureGenerator;
+use InPost\InPostPay\Service\UuidGenerator;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class TransactionRefund
 {
     public function __construct(
@@ -27,6 +32,7 @@ class TransactionRefund
         private readonly TransactionRefundRequestFactory $transactionRefundRequestFactory,
         private readonly TransactionRefundResponseFactory $transactionRefundResponseFactory,
         private readonly InPostRefundToArrayConverter $inPostRefundToArrayConverter,
+        private readonly UuidGenerator $uuidGenerator,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -40,15 +46,13 @@ class TransactionRefund
         /** @var TransactionRefundRequest $request */
         $request = $this->transactionRefundRequestFactory->create();
 
-        $additionalBusinessData = $this->additionalBusinessDataFactory->create();
-        $additionalBusinessData->setAdditionalData($refundAdditionalInfo);
-
         $refund = $this->refundFactory->create();
-        $refund->setXCommandId(uniqid('', true));
+        $this->processAdditionalBusinessData($refund, $refundAdditionalInfo);
+
+        $refund->setXCommandId($this->uuidGenerator->uuidv4());
         $refund->setTransactionId($transactionId);
         $refund->setExternalRefundId($refundId);
         $refund->setRefundAmount($refundAmount);
-        $refund->setAdditionalBusinessData($additionalBusinessData);
         $refund->setSignature($this->signatureGenerator->generate($refund));
 
         $refundParams = $this->inPostRefundToArrayConverter->convert($refund);
@@ -82,5 +86,18 @@ class TransactionRefund
         $transactionRefundResponse->setRefundAmount($refundAmount);
 
         return $transactionRefundResponse;
+    }
+
+    private function processAdditionalBusinessData(
+        RefundInterface $refund,
+        ?string $refundAdditionalInfo
+    ): void {
+        if (!$refundAdditionalInfo) {
+            return;
+        }
+
+        $additionalBusinessData = $this->additionalBusinessDataFactory->create();
+        $additionalBusinessData->setAdditionalData($refundAdditionalInfo);
+        $refund->setAdditionalBusinessData($additionalBusinessData);
     }
 }

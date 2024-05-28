@@ -7,13 +7,13 @@ namespace InPost\InPostPay\Gateway\Request;
 use InPost\InPostPay\Api\Data\Merchant\RefundInterface;
 use InPost\InPostPay\Model\IziApi\Response\TransactionListResponse;
 use InPost\InPostPay\Service\ApiConnector\TransactionList;
+use InPost\InPostPay\Service\UuidGenerator;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
-use Magento\Sales\Api\Data\TransactionSearchResultInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
@@ -25,6 +25,7 @@ class RefundDataBuilder implements BuilderInterface
         private readonly TransactionList $transactionList,
         private readonly TransactionRepositoryInterface $transactionRepository,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        private readonly UuidGenerator $uuidGenerator,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -44,7 +45,7 @@ class RefundDataBuilder implements BuilderInterface
         /** @var Order $order */
         $order = $payment->getOrder();
 
-        $refundId = uniqid('', true);
+        $refundId = $this->uuidGenerator->uuidv4();
         $orderId = $order->getIncrementId();
         $refundAmount = (float)($buildSubject['amount']);
         $refundAdditionalInfo = null;
@@ -74,12 +75,16 @@ class RefundDataBuilder implements BuilderInterface
                 $this->logger->warning("Missing InPostPay Transaction: $inPostPayTransactionId for OrderId: $orderId.");
                 continue;
             }
-            $refundRequestData = [
-                RefundInterface::TRANSACTION_ID => $inPostPayTransactionId,
-                RefundInterface::EXTERNAL_REFUND_ID => $refundId,
-                RefundInterface::REFUND_AMOUNT => $refundAmount,
-                RefundInterface::ADDITIONAL_BUSINESS_DATA => $refundAdditionalInfo
-            ];
+
+            if ($inPostPayTransactionId) {
+                $refundRequestData = [
+                    RefundInterface::TRANSACTION_ID => $inPostPayTransactionId,
+                    RefundInterface::EXTERNAL_REFUND_ID => $refundId,
+                    RefundInterface::REFUND_AMOUNT => $refundAmount,
+                    RefundInterface::ADDITIONAL_BUSINESS_DATA => $refundAdditionalInfo
+                ];
+                break;
+            }
         }
 
         return ['body' => ['refund_request_data' => $refundRequestData]];
