@@ -31,7 +31,10 @@ class Request
         return (string)preg_replace('/{[a-zA-Z0-9_-]*}/', '', $uri);
     }
 
-    public function getHeaders(): array
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function getHeaders(bool $keepParamsIntact = false): array
     {
         $headers = [];
 

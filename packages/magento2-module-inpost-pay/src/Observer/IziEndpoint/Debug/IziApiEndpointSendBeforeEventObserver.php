@@ -27,7 +27,7 @@ class IziApiEndpointSendBeforeEventObserver extends IziApiEndpointEventObserver 
                         trim($request->getApiUrl(), '/'),
                         trim($request->getUri(true), '/')
                     ),
-                    'headers' => $request->getHeaders(),
+                    'headers' => $request->getHeaders(true),
                     'params' => $request->getParams()
                 ];
             }

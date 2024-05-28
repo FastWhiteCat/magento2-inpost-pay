@@ -33,7 +33,7 @@ class SignatureGenerator
     ): string {
         try {
             $merchantSecret = $this->authConfigProvider->getMerchantSecret();
-            $refundAdditionalBusinessData = $refund->getAdditionalBusinessData()->getAdditionalData();
+            $refundAdditionalBusinessData = $refund->getAdditionalBusinessData()?->getAdditionalData();
             $preparedAdditionalData = $this->getPreparedAdditionalData($refundAdditionalBusinessData);
 
             $intermediateSignature = sprintf(
@@ -60,17 +60,32 @@ class SignatureGenerator
 
     private function getPreparedAdditionalData(?string $additionalData): ?string
     {
-        $preparedData = $additionalData ? json_decode($additionalData, true) : null;
-        if (empty($preparedData) || !is_array($preparedData)) {
+        if (!$additionalData) {
             return null;
         }
 
-        return implode('', array_map(
-            static function ($key, $value) {
-                return sprintf('%s%s', $key, $value);
-            },
-            array_keys($preparedData),
-            $preparedData
-        ));
+        if ($this->isJson($additionalData)) {
+            $preparedData = json_decode($additionalData, true);
+            if (!is_array($preparedData)) {
+                return null;
+            }
+
+            return implode('', array_map(
+                static function ($key, $value) {
+                    return sprintf('%s%s', $key, $value);
+                },
+                array_keys($preparedData),
+                $preparedData
+            ));
+        }
+
+        return $additionalData;
+    }
+
+    private function isJson(string $string): bool
+    {
+        json_decode($string, true);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }
