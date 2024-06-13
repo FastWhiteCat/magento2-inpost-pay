@@ -136,7 +136,7 @@ class CartService
             $appliedCoupon = $quote->getCouponCode();
             try {
                 $this->couponManagement->set((int)$quote->getId(), $couponCode);
-                if (strtolower($appliedCoupon) === strtolower($couponCode)) {
+                if ($appliedCoupon && strtolower($appliedCoupon) === strtolower($couponCode)) {
                     $this->createBasketNotice->execute(
                         $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
                         InPostPayBasketNoticeInterface::ATTENTION,
