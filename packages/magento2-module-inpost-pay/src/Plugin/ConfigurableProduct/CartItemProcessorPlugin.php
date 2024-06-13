@@ -8,7 +8,7 @@ use Magento\Quote\Api\Data\CartItemInterface;
 
 class CartItemProcessorPlugin
 {
-    public function afterConvertToBuyRequest(CartItemProcessor $subject, $result, CartItemInterface $cartItem)
+    public function afterConvertToBuyRequest(CartItemProcessor $subject, $result, CartItemInterface $cartItem): void
     {
         if ($result
             && $cartItem->getProductOption()
