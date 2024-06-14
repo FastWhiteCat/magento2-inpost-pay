@@ -147,7 +147,7 @@ class ProductToInPostProductDataTransfer
                     } else {
                         continue;
                     }
-                    
+
                     if (strlen($cleanValue)) {
                         /** @var ProductAttributeInterface $inPostProductAttribute */
                         $inPostProductAttribute = $this->productAttributeFactory->create();
