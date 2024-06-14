@@ -31,8 +31,6 @@ class BasketPriceValidator implements OrderValidatorInterface
         $shippingMethod = $this->getSelectedShippingMethod($quote, $inPostOrder);
         $this->validateCurrency($quote, $inPostOrder);
         $this->validateGrossPrice($address, $shippingMethod, $inPostOrder->getOrderDetails()->getBasketPrice());
-        $this->validateNetPrice($address, $shippingMethod, $inPostOrder->getOrderDetails()->getBasketPrice());
-        $this->validateTaxPrice($address, $shippingMethod, $inPostOrder->getOrderDetails()->getBasketPrice());
     }
 
     /**
@@ -62,73 +60,6 @@ class BasketPriceValidator implements OrderValidatorInterface
                     'Order final Gross value is incorrect. Expected: %1 Received: %2',
                     $finalPriceInclTax,
                     $basketPrice->getGross()
-                )
-            );
-        }
-    }
-
-    /**
-     * @param Address $address
-     * @param ShippingMethodInterface $shippingMethod
-     * @param PriceInterface $basketPrice
-     * @return void
-     * @throws LocalizedException
-     */
-    private function validateNetPrice(
-        Address $address,
-        ShippingMethodInterface $shippingMethod,
-        PriceInterface $basketPrice
-    ): void {
-        $discountExclTax = DecimalCalculator::add(
-            (float)$address->getDiscountAmount(),
-            (float)$address->getDiscountTaxCompensationAmount()
-        );
-        $priceExclTaxWithShipping = DecimalCalculator::add(
-            (float)$address->getSubtotal(),
-            (float)$shippingMethod->getPriceExclTax()
-        );
-        $finalPriceExclTax = DecimalCalculator::round(
-            DecimalCalculator::add((float)$priceExclTaxWithShipping, $discountExclTax)
-        );
-
-        if ($basketPrice->getNet() !== $finalPriceExclTax) {
-            throw new LocalizedException(
-                __(
-                    'Order final Net value is incorrect. Expected: %1 Received: %2',
-                    $finalPriceExclTax,
-                    $basketPrice->getNet()
-                )
-            );
-        }
-    }
-
-    /**
-     * @param Address $address
-     * @param ShippingMethodInterface $shippingMethod
-     * @param PriceInterface $basketPrice
-     * @return void
-     * @throws LocalizedException
-     */
-    private function validateTaxPrice(
-        Address $address,
-        ShippingMethodInterface $shippingMethod,
-        PriceInterface $basketPrice
-    ): void {
-        $shippingPriceTax = DecimalCalculator::sub(
-            (float)$shippingMethod->getPriceInclTax(),
-            (float)$shippingMethod->getPriceExclTax()
-        );
-
-        $finalPriceTax = DecimalCalculator::round(
-            DecimalCalculator::add((float)$address->getTaxAmount(), $shippingPriceTax)
-        );
-
-        if ($basketPrice->getVat() !== $finalPriceTax) {
-            throw new LocalizedException(
-                __(
-                    'Order final Tax value is incorrect. Expected: %1 Received: %2',
-                    $finalPriceTax,
-                    $basketPrice->getVat()
                 )
             );
         }
