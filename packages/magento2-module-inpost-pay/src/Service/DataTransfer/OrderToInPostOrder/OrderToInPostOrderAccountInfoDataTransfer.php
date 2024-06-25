@@ -136,6 +136,5 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
         }
 
         return $lastname;
-
     }
 }
