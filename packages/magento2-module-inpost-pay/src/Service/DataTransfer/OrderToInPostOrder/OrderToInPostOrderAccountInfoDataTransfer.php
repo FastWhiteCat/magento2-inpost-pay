@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
+use InPost\InPostPay\Exception\InPostPayException;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Model\Order;
 
@@ -17,8 +18,10 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
     {
         $accountInfo = $inPostOrder->getAccountInfo();
         $accountInfo->setMail((string)$order->getCustomerEmail());
-        $accountInfo->setName((string)$order->getCustomerFirstname());
-        $accountInfo->setSurname((string)$order->getCustomerLastname());
+        $firstname = $this->extractFirstnameFromOrder($order);
+        $lastname = $this->extractLastnameFromOrder($order);
+        $accountInfo->setName($firstname);
+        $accountInfo->setSurname($lastname);
         $billingAddress = $order->getBillingAddress();
         if ($billingAddress) {
             $this->transferPhoneNumber($billingAddress, $accountInfo);
@@ -77,5 +80,62 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
         $addressDetails->setFlat($flat);
 
         $clientAddress->setAddressDetails($addressDetails);
+    }
+
+    /**
+     * @param Order $order
+     * @return string
+     * @throws InPostPayException
+     */
+    private function extractFirstnameFromOrder(Order $order): string
+    {
+        $firstname = (string)$order->getCustomerFirstname();
+
+        if (!empty($firstname)) {
+            return $firstname;
+        }
+
+        foreach ($order->getAddresses() as $orderAddress) {
+            if (!empty($orderAddress->getFirstname())) {
+                $firstname = $orderAddress->getFirstname();
+            }
+        }
+
+        if (empty($firstname)) {
+            throw new InPostPayException(
+                __('Failed to retrieve a non-empty customer firstname from order and order addresses.')
+            );
+        }
+
+        return $firstname;
+    }
+
+    /**
+     * @param Order $order
+     * @return string
+     * @throws InPostPayException
+     */
+    private function extractLastnameFromOrder(Order $order): string
+    {
+        $lastname = (string)$order->getCustomerLastname();
+
+        if (!empty($lastname)) {
+            return $lastname;
+        }
+
+        foreach ($order->getAddresses() as $orderAddress) {
+            if (!empty($orderAddress->getLastname())) {
+                $lastname = $orderAddress->getLastname();
+            }
+        }
+
+        if (empty($lastname)) {
+            throw new InPostPayException(
+                __('Failed to retrieve a non-empty customer lastname from order and order addresses.')
+            );
+        }
+
+        return $lastname;
+
     }
 }
