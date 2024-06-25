@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Validator;
 
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
+use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\InputException;
@@ -16,7 +17,11 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class QuoteItemQtyValidator
 {
     public function __construct(
@@ -24,6 +29,7 @@ class QuoteItemQtyValidator
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
+        private readonly ManageStockCondition $manageStockCondition
     ) {
     }
 
@@ -123,6 +129,10 @@ class QuoteItemQtyValidator
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
         } catch (InputException | LocalizedException $e) {
             $stockQuantity = $quantity;
+        }
+
+        if ($stockQuantity <= 0 && $this->manageStockCondition->execute($product->getSku(), $stockId)) {
+            $stockQuantity = ProductToInPostProductDataTransfer::UNMANAGED_STOCK_QUANTITY;
         }
 
         return (float)$stockQuantity;
