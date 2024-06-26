@@ -128,7 +128,7 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
     {
         $lastname = (string)$order->getCustomerLastname();
 
-        if (!empty($lastname)) {
+        if (!empty($lastname) && !$this->generalConfigProvider->isUsingAddressAsDataSourceEnabled()) {
             return $lastname;
         }
 
