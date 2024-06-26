@@ -35,6 +35,7 @@
                 <can_capture>1</can_capture>
                 <can_refund>1</can_refund>
                 <is_offline>1</is_offline>
+                <use_address_as_firstname_source>0</use_address_as_firstname_source>
             </inpost_pay>
         </payment>
     </default>
