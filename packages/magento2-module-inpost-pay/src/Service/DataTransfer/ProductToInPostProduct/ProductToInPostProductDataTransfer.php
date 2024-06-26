@@ -17,6 +17,7 @@ use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
+use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
@@ -32,6 +33,9 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
+
+    public const UNMANAGED_STOCK_QUANTITY = 9999;
+
     private ?MagentoProductInterface $product = null;
 
     public function __construct(
@@ -40,6 +44,7 @@ class ProductToInPostProductDataTransfer
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
+        private readonly ManageStockCondition $manageStockCondition,
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper
@@ -263,6 +268,11 @@ class ProductToInPostProductDataTransfer
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
         } catch (InputException | LocalizedException $e) {
             $stockQuantity = $quantity;
+        }
+
+        $manageStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
+        if ($stockQuantity <= 0 && $manageStock) {
+            $stockQuantity = self::UNMANAGED_STOCK_QUANTITY;
         }
 
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
