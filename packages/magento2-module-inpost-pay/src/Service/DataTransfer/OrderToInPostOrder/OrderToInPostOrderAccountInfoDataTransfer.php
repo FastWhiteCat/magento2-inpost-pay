@@ -9,11 +9,20 @@ use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
 use InPost\InPostPay\Exception\InPostPayException;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Model\Order;
 
 class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDataTransferInterface
 {
+    /**
+     * @param GeneralConfigProvider $generalConfigProvider
+     */
+    public function __construct(
+        private readonly GeneralConfigProvider $generalConfigProvider
+    ) {
+    }
+
     public function transfer(Order $order, OrderInterface $inPostOrder): void
     {
         $accountInfo = $inPostOrder->getAccountInfo();
@@ -91,7 +100,7 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
     {
         $firstname = (string)$order->getCustomerFirstname();
 
-        if (!empty($firstname)) {
+        if (!empty($firstname) && !$this->generalConfigProvider->isUsingAddressAsDataSourceEnabled()) {
             return $firstname;
         }
 
