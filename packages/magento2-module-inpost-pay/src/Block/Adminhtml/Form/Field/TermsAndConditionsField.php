@@ -71,7 +71,7 @@ class TermsAndConditionsField extends AbstractFieldArray
         if ($agreementId !== null) {
             $options[
                 'option_' . $this->getRenderer(TermsAndConditionsColumn::class)
-                    ->calcOptionHash($agreementId) // @phpstan-ignore-line
+                    ->calcOptionHash($agreementId) /** @phpstan-ignore-line */
             ] = 'selected="selected"';
         }
 
@@ -80,7 +80,7 @@ class TermsAndConditionsField extends AbstractFieldArray
         if ($parentAgreementId !== null) {
             $options[
                 'option_' . $this->getRenderer(ParentTermsAndConditionsColumn::class)
-                    ->calcOptionHash($parentAgreementId) // @phpstan-ignore-line
+                    ->calcOptionHash($parentAgreementId) /** @phpstan-ignore-line */
             ] = 'selected="selected"';
         }
 
@@ -89,7 +89,7 @@ class TermsAndConditionsField extends AbstractFieldArray
         if ($requirement !== null) {
             $options[
                 'option_' . $this->getRenderer(TermsAndConditionsRequirementsColumn::class)
-                    ->calcOptionHash($requirement) // @phpstan-ignore-line
+                    ->calcOptionHash($requirement) /** @phpstan-ignore-line */
             ] = 'selected="selected"';
         }
 

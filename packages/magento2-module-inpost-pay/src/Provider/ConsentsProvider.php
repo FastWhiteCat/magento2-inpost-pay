@@ -95,11 +95,8 @@ class ConsentsProvider
             );
         }
 
-        if (empty($consents)) {
-            return [];
-        }
-
-        return is_array($consents) ? $consents : $this->serializer->unserialize($consents);
+        /** @phpstan-ignore-next-line */
+        return is_array($consents) ? $consents : (array)$this->serializer->unserialize($consents);
     }
 
     /**
