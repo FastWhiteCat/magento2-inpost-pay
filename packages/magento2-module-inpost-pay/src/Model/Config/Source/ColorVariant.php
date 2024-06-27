@@ -10,6 +10,7 @@ class ColorVariant implements OptionSourceInterface
 {
     public const PRIMARY = 'primary';
     public const SECONDARY = 'secondary';
+    public const THIRD = 'third';
 
     public function toOptionArray(): array
     {
@@ -21,6 +22,10 @@ class ColorVariant implements OptionSourceInterface
             [
                 'value' => self::SECONDARY,
                 'label' => __('secondary')
+            ],
+            [
+                'value' => self::THIRD,
+                'label' => __('third')
             ]
         ];
     }
