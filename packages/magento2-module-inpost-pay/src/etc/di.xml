@@ -17,6 +17,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PromoCode"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent\AdditionalConsent"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface"

@@ -72,6 +72,44 @@ class Consent extends DataObject implements ConsentInterface, ExtensibleDataInte
     /**
      * @return string
      */
+    public function getLabelLink(): string
+    {
+        $labelLink = $this->getData(self::LABEL_LINK);
+
+        return is_scalar($labelLink) ? (string)$labelLink : '';
+    }
+
+    /**
+     * @param string $labelLink
+     * @return void
+     */
+    public function setLabelLink(string $labelLink): void
+    {
+        $this->setData(self::LABEL_LINK, $labelLink);
+    }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface[]
+     */
+    public function getAdditionalConsentLinks(): array
+    {
+        $additionalConsentLinks = $this->getData(self::ADDITIONAL_CONSENT_LINKS);
+
+        return is_array($additionalConsentLinks) ? $additionalConsentLinks : [];
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface[] $additionalConsentLinks
+     * @return void
+     */
+    public function setAdditionalConsentLinks(array $additionalConsentLinks): void
+    {
+        $this->setData(self::ADDITIONAL_CONSENT_LINKS, $additionalConsentLinks);
+    }
+
+    /**
+     * @return string
+     */
     public function getConsentVersion(): string
     {
         $consentVersion = $this->getData(self::CONSENT_VERSION);
