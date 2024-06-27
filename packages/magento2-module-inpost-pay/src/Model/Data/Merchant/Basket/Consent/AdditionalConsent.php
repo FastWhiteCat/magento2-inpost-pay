@@ -14,20 +14,20 @@ class AdditionalConsent extends DataObject implements AdditionalConsentInterface
     /**
      * @return string
      */
-    public function getConsentId(): string
+    public function getId(): string
     {
-        $consentId = $this->getData(self::CONSENT_ID);
+        $id = $this->getData(self::ID);
 
-        return is_scalar($consentId) ? (string)$consentId : '';
+        return is_scalar($id) ? (string)$id : '';
     }
 
     /**
-     * @param string $consentId
+     * @param string $id
      * @return void
      */
-    public function setConsentId(string $consentId): void
+    public function setId(string $id): void
     {
-        $this->setData(self::CONSENT_ID, $consentId);
+        $this->setData(self::ID, $id);
     }
 
     /**

@@ -35,7 +35,7 @@ class QuoteToBasketConsentsDataTransfer implements QuoteToBasketDataTransferInte
             foreach ($additionalConsents as $additionalConsent) {
                 /** @var AdditionalConsentInterface $additionalConsentLink */
                 $additionalConsentLink = $this->additionalConsentFactory->create();
-                $additionalConsentLink->setConsentId((string)$additionalConsent[ConsentInterface::CONSENT_ID]);
+                $additionalConsentLink->setId((string)$additionalConsent[ConsentInterface::CONSENT_ID]);
                 $additionalConsentLink->setConsentLink($additionalConsent[ConsentInterface::CONSENT_LINK]);
                 $additionalConsentLink->setLabelLink($additionalConsent[ConsentInterface::LABEL_LINK]);
                 $additionalConsentLinks[] = $additionalConsentLink;

@@ -6,20 +6,20 @@ namespace InPost\InPostPay\Api\Data\Merchant\Basket\Consent;
 
 interface AdditionalConsentInterface
 {
-    public const CONSENT_ID = 'consent_id';
+    public const ID = 'id';
     public const CONSENT_LINK = 'consent_link';
     public const LABEL_LINK = 'label_link';
 
     /**
      * @return string
      */
-    public function getConsentId(): string;
+    public function getId(): string;
 
     /**
-     * @param string $consentId
+     * @param string $id
      * @return void
      */
-    public function setConsentId(string $consentId): void;
+    public function setId(string $id): void;
 
     /**
      * @return string
