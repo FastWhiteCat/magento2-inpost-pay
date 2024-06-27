@@ -22,6 +22,9 @@ class QuoteToBasketConsentsDataTransfer implements QuoteToBasketDataTransferInte
     ) {
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $consents = [];

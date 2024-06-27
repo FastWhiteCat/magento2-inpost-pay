@@ -48,7 +48,6 @@ class TermsAndConditionsField extends AbstractFieldArray
             'class' => 'required-entry'
         ]);
 
-
         $this->addColumn(self::AGREEMENT_NAME_FIELD, [
             'label' => __('Link Label'),
             'class' => 'required-entry'
@@ -70,29 +69,27 @@ class TermsAndConditionsField extends AbstractFieldArray
         $agreementId = $row->getData(self::MAGENTO_AGREEMENT_ID_FIELD);
 
         if ($agreementId !== null) {
-            // @phpstan-ignore-next-line
             $options[
-                'option_' . $this->getRenderer(TermsAndConditionsColumn::class)->calcOptionHash($agreementId)
+                'option_' . $this->getRenderer(TermsAndConditionsColumn::class)
+                    ->calcOptionHash($agreementId) // @phpstan-ignore-line
             ] = 'selected="selected"';
         }
 
         $parentAgreementId = $row->getData(self::PARENT_MAGENTO_AGREEMENT_ID_FIELD);
 
         if ($parentAgreementId !== null) {
-            // @phpstan-ignore-next-line
             $options[
                 'option_' . $this->getRenderer(ParentTermsAndConditionsColumn::class)
-                    ->calcOptionHash($parentAgreementId)
+                    ->calcOptionHash($parentAgreementId) // @phpstan-ignore-line
             ] = 'selected="selected"';
         }
 
         $requirement = $row->getData(self::REQUIREMENT_FIELD);
 
         if ($requirement !== null) {
-            // @phpstan-ignore-next-line
             $options[
                 'option_' . $this->getRenderer(TermsAndConditionsRequirementsColumn::class)
-                    ->calcOptionHash($requirement)
+                    ->calcOptionHash($requirement) // @phpstan-ignore-line
             ] = 'selected="selected"';
         }
 

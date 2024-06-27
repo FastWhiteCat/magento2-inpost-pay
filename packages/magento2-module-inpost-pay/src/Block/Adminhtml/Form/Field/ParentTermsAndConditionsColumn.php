@@ -39,7 +39,7 @@ class ParentTermsAndConditionsColumn extends Select
      * Set "name" for <select> element
      *
      * @param string $value
-     * @return TermsAndConditionsColumn
+     * @return ParentTermsAndConditionsColumn
      */
     public function setInputName(string $value): ParentTermsAndConditionsColumn
     {

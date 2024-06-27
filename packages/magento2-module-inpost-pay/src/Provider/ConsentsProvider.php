@@ -43,7 +43,6 @@ class ConsentsProvider
     public function getConsents(): array
     {
         $consents = $this->cache->load(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
-        $consents = null;
 
         if (empty($consents)) {
             $termsAndConditionsMapping = $this->termsAndConditionsMappingConfigProvider->getTermsAndConditionsMapping();

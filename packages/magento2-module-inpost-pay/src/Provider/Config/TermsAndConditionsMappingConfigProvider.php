@@ -52,7 +52,7 @@ class TermsAndConditionsMappingConfigProvider
         $mainTermsAndConditions = [];
 
         foreach ($termsAndConditions as $termsAndCondition) {
-            $parentAgreementId = (int)$termsAndCondition[AgreementFields::PARENT_MAGENTO_AGREEMENT_ID_FIELD] ?? 0;
+            $parentAgreementId = (int)$termsAndCondition[AgreementFields::PARENT_MAGENTO_AGREEMENT_ID_FIELD];
 
             if ($parentAgreementId) {
                 continue;
@@ -73,7 +73,7 @@ class TermsAndConditionsMappingConfigProvider
         }
 
         foreach ($termsAndConditions as $termsAndCondition) {
-            $parentId = (int)$termsAndCondition[AgreementFields::PARENT_MAGENTO_AGREEMENT_ID_FIELD] ?? 0;
+            $parentId = (int)$termsAndCondition[AgreementFields::PARENT_MAGENTO_AGREEMENT_ID_FIELD];
 
             if (empty($parentId) || !isset($mainTermsAndConditions[$parentId])) {
                 continue;
