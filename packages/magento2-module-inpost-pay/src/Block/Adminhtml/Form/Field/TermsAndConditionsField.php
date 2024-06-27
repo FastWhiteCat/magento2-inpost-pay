@@ -69,28 +69,25 @@ class TermsAndConditionsField extends AbstractFieldArray
         $agreementId = $row->getData(self::MAGENTO_AGREEMENT_ID_FIELD);
 
         if ($agreementId !== null) {
-            $options[
-                'option_' . $this->getRenderer(TermsAndConditionsColumn::class)
-                    ->calcOptionHash($agreementId) /** @phpstan-ignore-line */
-            ] = 'selected="selected"';
+            /** @phpstan-ignore-next-line */
+            $hash = $this->getRenderer(TermsAndConditionsColumn::class)->calcOptionHash($agreementId);
+            $options['option_' . $hash] = 'selected="selected"';
         }
 
         $parentAgreementId = $row->getData(self::PARENT_MAGENTO_AGREEMENT_ID_FIELD);
 
         if ($parentAgreementId !== null) {
-            $options[
-                'option_' . $this->getRenderer(ParentTermsAndConditionsColumn::class)
-                    ->calcOptionHash($parentAgreementId) /** @phpstan-ignore-line */
-            ] = 'selected="selected"';
+            /** @phpstan-ignore-next-line */
+            $hash = $this->getRenderer(ParentTermsAndConditionsColumn::class)->calcOptionHash($parentAgreementId);
+            $options['option_' . $hash] = 'selected="selected"';
         }
 
         $requirement = $row->getData(self::REQUIREMENT_FIELD);
 
         if ($requirement !== null) {
-            $options[
-                'option_' . $this->getRenderer(TermsAndConditionsRequirementsColumn::class)
-                    ->calcOptionHash($requirement) /** @phpstan-ignore-line */
-            ] = 'selected="selected"';
+            /** @phpstan-ignore-next-line */
+            $hash = $this->getRenderer(TermsAndConditionsRequirementsColumn::class)->calcOptionHash($requirement);
+            $options['option_' . $hash] = 'selected="selected"';
         }
 
         $row->setData('option_extra_attrs', $options);
