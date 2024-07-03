@@ -11,6 +11,7 @@ class GeneralConfigProvider
 {
     private const XML_PATH_INPOST_PAY_ENABLED = 'payment/inpost_pay/active';
     private const XML_PATH_INPOST_PAY_NEW_ORDER_STATUS = 'payment/inpost_pay/order_status';
+    private const XML_PATH_ORDER_ADDRESS_SOURCE_FLAG = 'payment/inpost_pay/use_address_as_firstname_source';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -42,5 +43,10 @@ class GeneralConfigProvider
         );
 
         return is_scalar($orderStatus) ? (string)$orderStatus : 'pending';
+    }
+
+    public function isUsingAddressAsDataSourceEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_ORDER_ADDRESS_SOURCE_FLAG, ScopeInterface::SCOPE_WEBSITE);
     }
 }

@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2024-06-27
+
+### Added
+
+- Third color version option in configuration
+
+## [1.0.3] - 2024-06-26
+
+### Added
+
+- Configuration and priority for firstname and lastname data source for InPost Pay Order - Customer or Address.
+- Handling for products with disabled stock management
+
 ## [1.0.2] - 2024-06-19
 
 ### Fixed
