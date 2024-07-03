@@ -36,8 +36,8 @@
                 <can_refund>1</can_refund>
                 <is_offline>1</is_offline>
                 <use_address_as_firstname_source>0</use_address_as_firstname_source>
-                <pooling_time_for_inactive>10000</pooling_time_for_inactive>
-                <pooling_enabled_for_inactive>1</pooling_enabled_for_inactive>
+                <polling_time_for_inactive>10000</polling_time_for_inactive>
+                <polling_enabled_for_inactive>1</polling_enabled_for_inactive>
             </inpost_pay>
         </payment>
     </default>

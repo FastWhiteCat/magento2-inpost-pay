@@ -7,10 +7,10 @@ namespace InPost\InPostPay\Provider\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
-class PoolingConfigProvider
+class PollingConfigProvider
 {
-    private const XML_PATH_LONG_POOLING_TIME_FOR_INACTIVE_TAB = 'payment/inpost_pay/pooling_time_for_inactive';
-    private const XML_PATH_ENABLED_LONG_POOLING_FOR_INACTIVE_TAB = 'payment/inpost_pay/pooling_enabled_for_inactive';
+    private const XML_PATH_LONG_POLLING_TIME_FOR_INACTIVE_TAB = 'payment/inpost_pay/polling_time_for_inactive';
+    private const XML_PATH_ENABLED_LONG_POLLING_FOR_INACTIVE_TAB = 'payment/inpost_pay/polling_enabled_for_inactive';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -25,7 +25,7 @@ class PoolingConfigProvider
     public function getLongPollingTimeForInactiveTab(): int
     {
         $value = $this->scopeConfig->getValue(
-            self::XML_PATH_LONG_POOLING_TIME_FOR_INACTIVE_TAB,
+            self::XML_PATH_LONG_POLLING_TIME_FOR_INACTIVE_TAB,
             ScopeInterface::SCOPE_WEBSITE
         );
 
@@ -38,7 +38,7 @@ class PoolingConfigProvider
     public function isEnabledLongPollingForInactiveTab(): bool
     {
         return $this->scopeConfig->isSetFlag(
-            self::XML_PATH_ENABLED_LONG_POOLING_FOR_INACTIVE_TAB,
+            self::XML_PATH_ENABLED_LONG_POLLING_FOR_INACTIVE_TAB,
             ScopeInterface::SCOPE_STORE
         );
     }

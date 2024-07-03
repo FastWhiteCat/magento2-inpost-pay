@@ -545,7 +545,7 @@ define([
         },
 
         setTimerAndRunCallback: function (callback, resolve, reject, time) {
-            var poolingTime = document.hidden && getConfig().isEnabledLongPollingForInactiveTab
+            var pollingTime = document.hidden && getConfig().isEnabledLongPollingForInactiveTab
                 ? getConfig().longPollingTimeForInactiveTab
                 : time || LONG_POLLING_TIME;
             timeoutId = setTimeout(function () {
@@ -556,7 +556,7 @@ define([
                     .catch(function(error) {
                         reject(error);
                     });
-            }, poolingTime);
+            }, pollingTime);
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
