@@ -6,7 +6,7 @@
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="pooling_enabled_for_inactive" translate="label" type="select" sortOrder="10"
                showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Enable long pooling for inactive tab</label>
+            <label>Enable long pooling for inactive browser tab</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/inpost_pay/pooling_enabled_for_inactive</config_path>
         </field>
