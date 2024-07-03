@@ -45,7 +45,8 @@ $isEnabledLongPollingForInactiveTab = $widgetViewModel->isEnabledLongPollingForI
                         DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
                     "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
                     "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
-                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */ $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
+                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */
+        $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
                 }
             }
         }

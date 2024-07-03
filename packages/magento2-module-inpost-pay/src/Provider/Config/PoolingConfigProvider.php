@@ -15,9 +15,7 @@ class PoolingConfigProvider
     /**
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig,
-    )
+    public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
     }
 

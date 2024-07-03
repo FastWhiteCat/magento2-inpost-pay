@@ -55,7 +55,8 @@ if (!$widgetViewModel->canShowForWholeCart()) {
                     "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>",
                     "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
                     "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
-                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */ $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
+                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */
+        $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
                 }
             }
         }
