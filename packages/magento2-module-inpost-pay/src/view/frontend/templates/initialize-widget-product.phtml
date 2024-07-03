@@ -25,6 +25,8 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$longPollingTimeForInactiveTab = $widgetViewModel->getLongPollingTimeForInactiveTab();
+$isEnabledLongPollingForInactiveTab = $widgetViewModel->isEnabledLongPollingForInactiveTab();
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
@@ -49,7 +51,9 @@ $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
                     "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
                     "popupBindingPlace": "<?= /* @noEscape */
                         DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
-                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>"
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
+                    "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
+                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */ $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
                 }
             }
         }

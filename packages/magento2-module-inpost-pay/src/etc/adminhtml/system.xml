@@ -16,6 +16,7 @@
                 <include path="InPost_InPostPay::system/terms_and_conditions.xml"/>
                 <include path="InPost_InPostPay::system/izi_api.xml"/>
                 <include path="InPost_InPostPay::system/debugging.xml"/>
+                <include path="InPost_InPostPay::system/pooling.xml"/>
             </group>
         </section>
     </system>

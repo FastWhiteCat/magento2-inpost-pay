@@ -19,7 +19,10 @@ $maskedPhoneNumber = $widgetViewModel->getMaskedPhoneNumber();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$longPollingTimeForInactiveTab = $widgetViewModel->getLongPollingTimeForInactiveTab();
+$isEnabledLongPollingForInactiveTab = $widgetViewModel->isEnabledLongPollingForInactiveTab();
 ?>
+
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
         name=""
@@ -46,7 +49,9 @@ $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
                     "maskedPhoneNumber": "<?= /* @noEscape */ $maskedPhoneNumber ?>",
                     "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
                     "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>",
-                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>"
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
+                    "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
+                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */ $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
                 }
             }
         }

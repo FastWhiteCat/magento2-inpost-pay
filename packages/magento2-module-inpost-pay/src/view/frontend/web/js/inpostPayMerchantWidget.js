@@ -63,11 +63,13 @@ define([
                 return defaultConfig.popupBindingPlace ? defaultConfig : self.configuration;
             }
 
-            this.loadScript(config.scriptUrl, function() {
-                if (config && config.popupBindingPlace) {
-                    this.bindEvents(false);
-                }
-            }.bind(this));
+            if (config.scriptUrl) {
+                this.loadScript(config.scriptUrl, function() {
+                    if (config && config.popupBindingPlace) {
+                        this.bindEvents(false);
+                    }
+                }.bind(this));
+            }
         },
 
         disabledOnCheckoutPage: function(config = {}) {
@@ -84,9 +86,15 @@ define([
                 return;
             }
 
-            this.loadScript(this.configuration.scriptUrl, function() {
+            if (this.configuration.scriptUrl) {
+                this.loadScript(this.configuration.scriptUrl, function() {
+                    this.bindEvents(true);
+                }.bind(this));
+            } else {
                 this.bindEvents(true);
-            }.bind(this));
+            }
+
+
         },
 
         loadScript: function(url, callback) {
@@ -236,49 +244,53 @@ define([
                 abortRequest(xhrForBasketConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    xhrForBasketConfirmation = $.ajax({
-                        url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
-                            + '/form_key/'
-                            + $.mage.cookies.get('form_key')
-                        ),
-                        method: 'GET',
-                    })
-                        .done(function (data) {
-                            if (data.status) {
-                                if (timeoutId) {
-                                    clearTimeout(timeoutId);
-                                    abortRequest(xhrForBasketConfirmation)
-                                }
-
-                                switch (data.status) {
-                                    case 'REJECT':
-                                        reject({ message: new Error($.mage.__('Connection has been interrupted, please try again.')) });
-                                        break;
-                                    case 'PENDING':
-                                        setTimerAndRunCallback(checkIsBound, resolve, reject);
-                                        break;
-                                    case 'SUCCESS':
-                                        if (data.errorMessage){
-                                            reject({ message: data.errorMessage });
-                                        } else {
-                                            localStorage.setItem('browser_id', data.browser.browser_id);
-                                            delete data.basket_id;
-                                            resolve(data)
-                                        }
-
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            } else if (data.errorMessage){
-                                reject({ message: data.errorMessage });
-                            } else {
-                                setTimerAndRunCallback(checkIsBound, resolve, reject);
-                            }
+                    if (document.hidden && !getConfig().isEnabledLongPollingForInactiveTab) {
+                        setTimerAndRunCallback(checkIsBound, resolve, reject);
+                    } else {
+                        xhrForBasketConfirmation = $.ajax({
+                            url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                                + '/form_key/'
+                                + $.mage.cookies.get('form_key')
+                            ),
+                            method: 'GET',
                         })
-                        .fail(function () {
-                            reject(new Error($.mage.__('Network problem')));
-                        });
+                            .done(function (data) {
+                                if (data.status) {
+                                    if (timeoutId) {
+                                        clearTimeout(timeoutId);
+                                        abortRequest(xhrForBasketConfirmation)
+                                    }
+
+                                    switch (data.status) {
+                                        case 'REJECT':
+                                            reject({ message: new Error($.mage.__('Connection has been interrupted, please try again.')) });
+                                            break;
+                                        case 'PENDING':
+                                            setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                            break;
+                                        case 'SUCCESS':
+                                            if (data.errorMessage){
+                                                reject({ message: data.errorMessage });
+                                            } else {
+                                                localStorage.setItem('browser_id', data.browser.browser_id);
+                                                delete data.basket_id;
+                                                resolve(data)
+                                            }
+
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else if (data.errorMessage){
+                                    reject({ message: data.errorMessage });
+                                } else {
+                                    setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                }
+                            })
+                            .fail(function () {
+                                reject(new Error($.mage.__('Network problem')));
+                            });
+                    }
                 });
             }
         },
@@ -305,7 +317,9 @@ define([
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    if (globalOrderResetFlag) {
+                    if (document.hidden && !getConfig().isEnabledLongPollingForInactiveTab) {
+                        setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                    } else if (globalOrderResetFlag) {
                         resolve();
                     } else {
                         xhrForOrderConfirmation = $.ajax({
@@ -530,7 +544,10 @@ define([
             }
         },
 
-        setTimerAndRunCallback: function (callback, resolve, reject) {
+        setTimerAndRunCallback: function (callback, resolve, reject, time) {
+            var poolingTime = document.hidden && getConfig().isEnabledLongPollingForInactiveTab
+                ? getConfig().longPollingTimeForInactiveTab
+                : time || LONG_POLLING_TIME;
             timeoutId = setTimeout(function () {
                 callback()
                     .then((data) => {
@@ -539,7 +556,7 @@ define([
                     .catch(function(error) {
                         reject(error);
                     });
-            }, LONG_POLLING_TIME);
+            }, poolingTime);
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
