@@ -33,7 +33,9 @@ class InPostPayConfigurationModel implements ConfigProviderInterface
             'enabledOnCheckoutPage' => $this->widget->isEnabledOnCheckoutPage(),
             'maskedPhoneNumber' => $this->widget->getMaskedPhoneNumber(),
             'isEnabledMinicart' => $this->widget->isEnabledInMiniCart(),
-            'scriptUrl' => $scriptUrl
+            'scriptUrl' => $scriptUrl,
+            'longPollingTimeForInactiveTab' => $this->widget->getLongPollingTimeForInactiveTab(),
+            'isEnabledLongPollingForInactiveTab' => $this->widget->isEnabledLongPollingForInactiveTab(),
         ];
 
         return $config;
