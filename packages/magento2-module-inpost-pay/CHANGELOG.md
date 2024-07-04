@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2024-07-05
+
+### Added
+
+- Long Polling configuration for frontend widget
+
 ## [1.0.4] - 2024-06-27
 
 ### Added
