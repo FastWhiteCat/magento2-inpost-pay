@@ -6,8 +6,9 @@ namespace InPost\Restrictions\Service;
 
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Api\Data\RestrictionsRuleProductInterface;
-use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\DB\Select;
 
 class RestrictionsRuleProductMassActionService
 {
@@ -41,13 +42,44 @@ class RestrictionsRuleProductMassActionService
 
     /**
      * @param int $websiteId
-     * @param int $appliesTo
      * @return int[]
      */
-    public function getRuleProductsByWebsiteId(int $websiteId, int $appliesTo): array
+    public function getRuleProductsByWebsiteId(int $websiteId): array
     {
-        $appliesTo = array_unique([$appliesTo, RestrictionsRuleInterface::APPLIES_TO_BOTH]);
         $table = $this->connection->getTableName(RestrictionsRuleProductInterface::TABLE_NAME);
+        $ruleAppliedToCourierSql = sprintf('%s = %s',
+            RestrictionsRuleProductInterface::APPLIES_TO,
+            RestrictionsRuleInterface::APPLIES_TO_APM
+        );
+
+        $ruleAppliedToBothSql = sprintf('%s = %s',
+            RestrictionsRuleProductInterface::APPLIES_TO,
+            RestrictionsRuleInterface::APPLIES_TO_BOTH
+        );
+
+        $combinedCondition = sprintf(
+            '(%s %s %s (%s)) %s %s',
+            $ruleAppliedToCourierSql,
+            Select::SQL_AND,
+            RestrictionsRuleProductInterface::PRODUCT_ID . ' IN',
+            $this->formatAppliesToCondition(),
+            Select::SQL_OR,
+            $ruleAppliedToBothSql
+        );
+
+        $query = $this->connection->select()
+            ->from($table, [RestrictionsRuleProductInterface::PRODUCT_ID])
+            ->where(sprintf('%s IN (?)', RestrictionsRuleProductInterface::WEBSITE_ID), $websiteId)
+            ->where($combinedCondition)
+            ->distinct();
+
+        return $this->connection->fetchCol($query);
+    }
+
+    public function getRuleProductsByAppliesTo(int $websiteId, int $appliesTo): array
+    {
+        $table = $this->connection->getTableName(RestrictionsRuleProductInterface::TABLE_NAME);
+
         $query = $this->connection->select()
             ->from($table, [RestrictionsRuleProductInterface::PRODUCT_ID])
             ->where(sprintf('%s IN (?)', RestrictionsRuleProductInterface::WEBSITE_ID), $websiteId)
@@ -55,6 +87,17 @@ class RestrictionsRuleProductMassActionService
             ->distinct();
 
         return $this->connection->fetchCol($query);
+    }
+
+    private function formatAppliesToCondition(): string
+    {
+        $table = $this->connection->getTableName(RestrictionsRuleProductInterface::TABLE_NAME);
+        $query = $this->connection->select()
+            ->from($table, [RestrictionsRuleProductInterface::PRODUCT_ID])
+            ->where(sprintf('%s = ?', RestrictionsRuleProductInterface::APPLIES_TO), 1)
+            ->distinct();
+
+        return $query->__toString();
     }
 
     /**

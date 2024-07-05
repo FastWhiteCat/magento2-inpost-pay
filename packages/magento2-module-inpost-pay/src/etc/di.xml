@@ -97,6 +97,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessData"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\RefundInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
 
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"

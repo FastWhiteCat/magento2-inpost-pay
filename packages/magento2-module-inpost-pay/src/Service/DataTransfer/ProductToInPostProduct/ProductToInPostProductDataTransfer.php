@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Model\Utils\StringUtils;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Escaper;
@@ -36,10 +40,17 @@ class ProductToInPostProductDataTransfer
 
     public const UNMANAGED_STOCK_QUANTITY = 9999;
 
+    public const ALL_DELIVERY_TYPES = [
+        RestrictionsRuleInterface::APPLIES_TO_COURIER => InPostDeliveryType::COURIER,
+        RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM
+    ];
+
     private ?MagentoProductInterface $product = null;
 
     public function __construct(
+        private readonly DeliveryProductInterfaceFactory $deliveryProductFactory,
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
@@ -114,6 +125,7 @@ class ProductToInPostProductDataTransfer
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
+        $inPostProduct->setDeliveryProduct($this->getDeliveryProduct((int)$product->getId(), $websiteId));
     }
 
     private function getProductImageUrl(Product $product): string
@@ -276,5 +288,33 @@ class ProductToInPostProductDataTransfer
         }
 
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
+    }
+
+    private function getDeliveryProduct(int $productId, int $websiteId): array
+    {
+        $productRestricted = $this->isProductRestricted($productId, $websiteId);
+
+        $deliveryProductArr = [];
+        foreach (self::ALL_DELIVERY_TYPES as $key => $enum) {
+            $deliveryProduct = $this->deliveryProductFactory->create();
+            if ($productRestricted) {
+                $available = false;
+            } else {
+                $available = !$this->isProductRestricted($productId, $websiteId, $key);
+            }
+            $deliveryProduct->setDeliveryType($enum->value);
+            $deliveryProduct->setIfDeliveryAvailable($available);
+            $deliveryProductArr[] = $deliveryProduct;
+        }
+
+        return $deliveryProductArr;
+    }
+
+    private function isProductRestricted(int $productId, int $websiteId, int $appliesTo = 0): bool
+    {
+        return in_array(
+            $productId,
+            $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
+        );
     }
 }
