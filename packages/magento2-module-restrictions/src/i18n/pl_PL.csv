@@ -13,3 +13,9 @@
 "General Restrictions Rule Configuration","Ogólna konfiguracja reguły restrykcji",module,InPost_InPostPay
 "Delete Rule","Usuń Regułę",module,InPost_InPostPay
 "Save Rule","Zapisz Regułę",module,InPost_InPostPay
+"Rule","Reguła",module,InPost_InPostPay
+"Product ID","ID Produktu",module,InPost_InPostPay
+"InPost Restrictions Rule Products List","Lista Produktów Reguł Restrykcji InPost",module,InPost_InPostPay
+"InPost Restrictions","Restrykcje InPost",module,InPost_InPostPay
+"Restriction Rules","Reguły Restrykcji",module,InPost_InPostPay
+"Restricted Products","Ograniczone Produkty",module,InPost_InPostPay
