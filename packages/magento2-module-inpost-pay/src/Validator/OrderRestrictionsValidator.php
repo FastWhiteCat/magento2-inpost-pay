@@ -13,7 +13,7 @@ use Magento\Quote\Model\Quote;
 
 class OrderRestrictionsValidator
 {
-    private $deliveryTypes = [];
+    private array $deliveryTypes;
 
     public function __construct(
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,

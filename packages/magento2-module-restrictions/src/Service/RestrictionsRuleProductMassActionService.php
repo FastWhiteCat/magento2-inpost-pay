@@ -47,12 +47,14 @@ class RestrictionsRuleProductMassActionService
     public function getRuleProductsByWebsiteId(int $websiteId): array
     {
         $table = $this->connection->getTableName(RestrictionsRuleProductInterface::TABLE_NAME);
-        $ruleAppliedToCourierSql = sprintf('%s = %s',
+        $ruleAppliedToCourierSql = sprintf(
+            '%s = %s',
             RestrictionsRuleProductInterface::APPLIES_TO,
             RestrictionsRuleInterface::APPLIES_TO_APM
         );
 
-        $ruleAppliedToBothSql = sprintf('%s = %s',
+        $ruleAppliedToBothSql = sprintf(
+            '%s = %s',
             RestrictionsRuleProductInterface::APPLIES_TO,
             RestrictionsRuleInterface::APPLIES_TO_BOTH
         );

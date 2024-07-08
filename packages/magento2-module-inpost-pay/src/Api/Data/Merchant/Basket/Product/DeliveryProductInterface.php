@@ -23,7 +23,7 @@ interface DeliveryProductInterface
     /**
      * @return bool
      */
-    public function getIfDeliveryAvailable(): bool;
+    public function isIfDeliveryAvailable(): bool;
 
     /**
      * @param bool $ifDeliveryAvailable

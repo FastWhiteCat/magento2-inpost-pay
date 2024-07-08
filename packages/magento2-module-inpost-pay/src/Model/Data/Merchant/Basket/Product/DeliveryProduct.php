@@ -33,7 +33,7 @@ class DeliveryProduct extends DataObject implements DeliveryProductInterface, Ex
     /**
      * @return bool
      */
-    public function getIfDeliveryAvailable(): bool
+    public function isIfDeliveryAvailable(): bool
     {
         $ifDeliveryAvailable = $this->getData(self::IF_DELIVERY_AVAILABLE);
 

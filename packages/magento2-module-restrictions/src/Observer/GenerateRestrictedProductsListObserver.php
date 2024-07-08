@@ -12,10 +12,8 @@ use Magento\Framework\Event\ObserverInterface;
 
 class GenerateRestrictedProductsListObserver implements ObserverInterface
 {
-    public function __construct(
-        private readonly ReloadRestrictionRulesProducts $reloadRestrictionRulesProducts,
-        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider
-    ) {
+    public function __construct(private readonly ReloadRestrictionRulesProducts $reloadRestrictionRulesProducts)
+    {
     }
 
     public function execute(Observer $observer): void

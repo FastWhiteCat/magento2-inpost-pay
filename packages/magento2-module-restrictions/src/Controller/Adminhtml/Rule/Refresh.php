@@ -74,7 +74,8 @@ class Refresh extends RestrictionsController implements HttpGetActionInterface
             }
 
             $this->messageManager->addSuccessMessage(
-                __('You have refreshed the InPost Restriction Rules.')->render());
+                __('You have refreshed the InPost Restriction Rules.')->render()
+            );
 
             return $resultRedirect->setPath('*/*/');
         } catch (LocalizedException $e) {

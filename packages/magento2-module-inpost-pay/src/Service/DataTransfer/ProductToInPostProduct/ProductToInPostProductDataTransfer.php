@@ -47,6 +47,9 @@ class ProductToInPostProductDataTransfer
 
     private ?MagentoProductInterface $product = null;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly DeliveryProductInterfaceFactory $deliveryProductFactory,
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
