@@ -128,7 +128,7 @@ class ProductToInPostProductDataTransfer
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
-        $inPostProduct->setDeliveryProduct($this->getDeliveryProduct((int)$product->getId(), $websiteId));
+        $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
     }
 
     private function getProductImageUrl(Product $product): string
@@ -293,9 +293,13 @@ class ProductToInPostProductDataTransfer
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
     }
 
-    private function getDeliveryProduct(int $productId, int $websiteId): array
+    private function getDeliveryProduct(Product $product, int $websiteId): array
     {
+        $productId = (int)$product->getId();
+        $simpleProductId = (int)$this->extractProductId($product);
+
         $productRestricted = $this->isProductRestricted($productId, $websiteId);
+        $productRestricted = $productRestricted || $this->isProductRestricted($simpleProductId, $websiteId);
 
         $deliveryProductArr = [];
         foreach (self::ALL_DELIVERY_TYPES as $key => $enum) {
@@ -303,7 +307,10 @@ class ProductToInPostProductDataTransfer
             if ($productRestricted) {
                 $available = false;
             } else {
-                $available = !$this->isProductRestricted($productId, $websiteId, $key);
+                $available = !(
+                    $this->isProductRestricted($productId, $websiteId, $key)
+                    || $this->isProductRestricted($simpleProductId, $websiteId, $key)
+                );
             }
             $deliveryProduct->setDeliveryType($enum->value);
             $deliveryProduct->setIfDeliveryAvailable($available);

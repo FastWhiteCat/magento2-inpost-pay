@@ -9,7 +9,10 @@ use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\Option;
 
 class OrderRestrictionsValidator
 {
@@ -33,9 +36,8 @@ class OrderRestrictionsValidator
         $restrictedProduct = null;
         foreach ($quote->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
-            $productId = (int)$product->getId();
             $appliesTo =  $this->deliveryTypes[$inPostOrder->getDelivery()->getDeliveryType()];
-            if ($this->isProductRestricted($productId, $websiteId, $appliesTo)) {
+            if ($this->isProductRestricted($item, $websiteId, $appliesTo)) {
                 if ($everyOccurenceMode) {
                     $this->createExceptionForRestrictedProduct((string)$product->getName());
                 } else {
@@ -59,14 +61,30 @@ class OrderRestrictionsValidator
         throw new InPostPayRestrictedProductException($errorPhrase);
     }
 
-    private function isProductRestricted(int $productId, int $websiteId, int $appliesTo): bool
+    private function isProductRestricted(Item $item, int $websiteId, int $appliesTo): bool
     {
+        $product = $item->getProduct();
+        $productId = (int)$product->getId();
+        $simpleProductId = $productId;
+        if ($item->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
+            $option = $item->getOptionByCode('simple_product');
+            if ($option instanceof Option) {
+                $simpleProductId = (int)$option->getProduct()->getId();
+            }
+        }
+
         return in_array(
             $productId,
             $this->restrictedProductIdsProvider->getList($websiteId)
-        ) || in_array(
-            $productId,
-            $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
-        );
+            ) || in_array(
+                $productId,
+                $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
+            ) || in_array(
+                $simpleProductId,
+                $this->restrictedProductIdsProvider->getList($websiteId)
+            ) || in_array(
+                $simpleProductId,
+                $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
+            );
     }
 }
