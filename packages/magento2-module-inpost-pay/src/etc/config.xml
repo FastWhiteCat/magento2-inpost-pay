@@ -38,6 +38,7 @@
                 <use_address_as_firstname_source>0</use_address_as_firstname_source>
                 <polling_time_for_inactive>10000</polling_time_for_inactive>
                 <polling_enabled_for_inactive>1</polling_enabled_for_inactive>
+                <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
             </inpost_pay>
         </payment>
     </default>

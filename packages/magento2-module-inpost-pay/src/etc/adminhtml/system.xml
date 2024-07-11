@@ -17,6 +17,7 @@
                 <include path="InPost_InPostPay::system/izi_api.xml"/>
                 <include path="InPost_InPostPay::system/debugging.xml"/>
                 <include path="InPost_InPostPay::system/polling.xml"/>
+                <include path="InPost_InPostPay::system/omnibus.xml"/>
             </group>
         </section>
     </system>
