@@ -45,7 +45,7 @@ class OmnibusConfigProvider
     /**
      * @return string|null
      */
-    public function getOmnibusProductAttributeCode(): ?string
+    public function getOmnibusProductLowestPriceAttributeCode(): ?string
     {
         $configValue = $this->scopeConfig->getValue(
             self::XML_PATH_OMNIBUS_LOWEST_PRICE_ATTR,
