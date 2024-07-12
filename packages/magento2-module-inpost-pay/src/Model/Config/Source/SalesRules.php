@@ -30,14 +30,12 @@ class SalesRules implements OptionSourceInterface
         $salesRulesOptions = [];
 
         foreach ($salesRules as $salesRule) {
-            if ($salesRule instanceof Rule) {
-                $label = (string)$salesRule->getName();
-                $value = (int)$salesRule->getRuleId();
-                $salesRulesOptions[] = [
-                    'value' => $value,
-                    'label' => $label
-                ];
-            }
+            $label = (string)$salesRule->getName();
+            $value = (int)$salesRule->getRuleId();
+            $salesRulesOptions[] = [
+                'value' => $value,
+                'label' => $label
+            ];
         }
 
         return $salesRulesOptions;
