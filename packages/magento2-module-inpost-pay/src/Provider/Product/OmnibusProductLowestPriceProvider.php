@@ -89,6 +89,7 @@ class OmnibusProductLowestPriceProvider
         }
 
         try {
+            /** @var Product $product */
             $product = $this->productRepository->get($product->getSku());
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
@@ -120,9 +121,8 @@ class OmnibusProductLowestPriceProvider
         $lowestPrice->setVat(round($gross - $net, 2));
 
         $this->eventManager->dispatch(
-            self::INPOST_PAY_OMNIBUS_LOWEST_PRICE_EVENT, [
-                ProductInterface::LOWEST_PRICE => $lowestPrice
-            ]
+            self::INPOST_PAY_OMNIBUS_LOWEST_PRICE_EVENT,
+            [ProductInterface::LOWEST_PRICE => $lowestPrice]
         );
 
         return $lowestPrice;
