@@ -9,6 +9,7 @@ use Magento\Framework\Data\Collection;
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection as AttributeCollection;
+
 class ProductAttributes implements OptionSourceInterface
 {
     public const NOT_SELECTED_ATTRIBUTE_VALUE = 'none';

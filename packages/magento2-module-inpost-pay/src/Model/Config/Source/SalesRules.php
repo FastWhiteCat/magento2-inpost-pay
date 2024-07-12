@@ -30,23 +30,25 @@ class SalesRules implements OptionSourceInterface
         $salesRulesOptions = [];
 
         foreach ($salesRules as $salesRule) {
-            $label = (string)$salesRule->getName();
-            $value = (int)$salesRule->getRuleId();
-            $salesRulesOptions[] = [
-                'value' => $value,
-                'label' => $label
-            ];
+            if ($salesRule instanceof Rule) {
+                $label = (string)$salesRule->getName();
+                $value = (int)$salesRule->getRuleId();
+                $salesRulesOptions[] = [
+                    'value' => $value,
+                    'label' => $label
+                ];
+            }
         }
 
         return $salesRulesOptions;
     }
 
     /**
-     * @return Rule[]
+     * @return array
      */
     private function getSalesRules(): array
     {
-        /** @var SalesRuleCollection $attributeCollection */
+        /** @var SalesRuleCollection $salesRuleCollection */
         $salesRuleCollection = $this->salesRuleCollectionFactory->create();
         $salesRuleCollection->addFieldToFilter(
             Rule::KEY_COUPON_TYPE,

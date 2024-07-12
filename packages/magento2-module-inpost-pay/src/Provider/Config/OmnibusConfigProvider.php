@@ -33,10 +33,8 @@ class OmnibusConfigProvider
         $ruleIdsCombined = explode(',', is_scalar($configValue) ? (string)$configValue : '');
         $ruleIds = [];
 
-        if ($ruleIdsCombined) {
-            foreach ($ruleIdsCombined as $ruleId) {
-                $ruleIds[] = (int)$ruleId;
-            }
+        foreach ($ruleIdsCombined as $ruleId) {
+            $ruleIds[] = (int)$ruleId;
         }
 
         return $ruleIds;
