@@ -13,6 +13,7 @@ class LayoutConfigProvider
     private const XML_PATH_DARK_MODE = 'payment/inpost_pay/widget_dark_mode';
 
     private const XML_PATH_MAX_WIDTH = 'payment/inpost_pay/widget_max_width';
+    private const XML_PATH_MIN_HEIGHT = 'payment/inpost_pay/widget_min_height';
 
     private const XML_PATH_FRAME_STYLE = 'payment/inpost_pay/widget_frame_style';
 
@@ -54,6 +55,19 @@ class LayoutConfigProvider
     {
         $value = $this->scopeConfig->getValue(
             self::XML_PATH_MAX_WIDTH,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        return is_scalar($value) ? (int)$value : 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinHeight(): int
+    {
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_MIN_HEIGHT,
             ScopeInterface::SCOPE_WEBSITE
         );
 
