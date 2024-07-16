@@ -18,6 +18,7 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Filesystem;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -41,6 +42,11 @@ class ProductToInPostProductDataTransfer
 
     private ?MagentoProductInterface $product = null;
 
+    private $mediaDirectory;
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
@@ -52,9 +58,10 @@ class ProductToInPostProductDataTransfer
         private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper,
         private readonly GeneralConfigProvider $generalConfigProvider,
-        private readonly DirectoryList $directoryList,
-        private readonly Emulation $emulation
+        private readonly Emulation $emulation,
+        Filesystem $filesystem
     ) {
+        $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
 
     public function transfer(
@@ -128,12 +135,15 @@ class ProductToInPostProductDataTransfer
 
         $imageRole = $this->generalConfigProvider->getImageRole();
 
+        $image = is_scalar($product->getData($imageRole)) ? (string)$product->getData($imageRole) : '';
+
         $imgPath = $product->getMediaConfig()->getMediaPath($product->getData($imageRole));
-        if (!file_exists($this->directoryList->getPath(DirectoryList::MEDIA) . '/' . $imgPath)) {
+
+        if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
             return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
 
-        $imgUrl = $product->getMediaConfig()->getMediaUrl($product->getData($imageRole));
+        $imgUrl = $product->getMediaConfig()->getMediaUrl($image);
 
         $this->emulation->stopEnvironmentEmulation();
 
