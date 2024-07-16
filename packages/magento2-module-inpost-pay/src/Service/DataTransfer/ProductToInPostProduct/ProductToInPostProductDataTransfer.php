@@ -19,6 +19,7 @@ use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -42,7 +43,7 @@ class ProductToInPostProductDataTransfer
 
     private ?MagentoProductInterface $product = null;
 
-    private $mediaDirectory;
+    private WriteInterface $mediaDirectory;
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
