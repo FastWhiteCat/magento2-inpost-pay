@@ -4,6 +4,7 @@
     <type name="Magento\StoreGraphQl\Model\Resolver\Store\StoreConfigDataProvider">
         <arguments>
             <argument name="extendedConfigData" xsi:type="array">
+                <item name="inpost_pay_widget_enabled" xsi:type="string">payment/inpost_pay/widget_enabled</item>
                 <item name="inpost_pay_show_on_product_cart" xsi:type="string">payment/inpost_pay/show_on_product_cart</item>
                 <item name="inpost_pay_show_on_cart" xsi:type="string">payment/inpost_pay/show_on_cart</item>
                 <item name="inpost_pay_show_on_checkout_page" xsi:type="string">payment/inpost_pay/show_on_checkout</item>
@@ -15,6 +16,8 @@
                 <item name="inpost_pay_widget_dark_mode" xsi:type="string">payment/inpost_pay/widget_dark_mode</item>
                 <item name="inpost_pay_widget_max_width" xsi:type="string">payment/inpost_pay/widget_max_width</item>
                 <item name="inpost_pay_widget_frame_style" xsi:type="string">payment/inpost_pay/widget_frame_style</item>
+                <item name="inpost_pay_polling_enabled_for_inactive" xsi:type="string">payment/inpost_pay/polling_enabled_for_inactive</item>
+                <item name="inpost_pay_polling_time_for_inactive" xsi:type="string">payment/inpost_pay/polling_time_for_inactive</item>
             </argument>
         </arguments>
     </type>

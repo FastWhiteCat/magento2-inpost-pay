@@ -4,6 +4,7 @@
         <payment>
             <inpost_pay>
                 <active>0</active>
+                <widget_enabled>1</widget_enabled>
                 <can_use_checkout>1</can_use_checkout>
                 <model>InPostPayPaymentFacade</model>
                 <title>InPost Pay</title>

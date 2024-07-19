@@ -69,7 +69,7 @@ class Widget implements ArgumentInterface
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled();
+        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
     }
 
     /**
