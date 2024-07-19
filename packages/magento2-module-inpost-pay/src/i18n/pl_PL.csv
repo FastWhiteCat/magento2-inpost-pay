@@ -149,3 +149,5 @@
 "InPost Pay API returned transaction refund status: failed. External Refund ID: %1 Description: %2","Otrzymani z API InPost Pay status zwrotu środków to: nieudany: %1. Zwenętrzny ID Zwrotu: %1 Opis: %2",module,InPost_InPostPay
 "Enable removing special characters and HTML code from product attributes sent to InPost Pay Mobile App.","Włącz usuwanie znaków specjalnych i kodu HTML z atrybutów produktowych wysyłanych do Aplikacji Mobilnej InPost Pay",module,InPost_InPostPay
 "No transactions found to be refunded for Order #%1.","Nie znaleziono transakcji do zwrotu dla Zamówienia #%1.",module,InPost_InPostPay
+"Use order address firstname and lastname instead of customer firstname and lastname","Użyj imienia i nazwiska z adresu zamiast imienia i nazwiska klienta",module,InPost_InPostPay
+"Image role sended to InPost Pay","Rola obrazu wysyłana do InPost Pay",module,InPost_InPostPay
