@@ -37,6 +37,7 @@ if (!$widgetViewModel->canShowForWholeCart()) {
         basket="true"
         dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
         max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
+        min_height="<?= /* @noEscape */ $layoutConfig['minHeight'] ?: '' ?>"
         frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
         count="<?= /* @noEscape */ $cartItemsCount ?>"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">

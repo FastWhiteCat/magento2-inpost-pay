@@ -9,13 +9,17 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceF
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Model\Utils\StringUtils;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Type;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -25,6 +29,7 @@ use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\Store\Model\App\Emulation;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -38,6 +43,11 @@ class ProductToInPostProductDataTransfer
 
     private ?MagentoProductInterface $product = null;
 
+    private WriteInterface $mediaDirectory;
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
@@ -47,8 +57,12 @@ class ProductToInPostProductDataTransfer
         private readonly ManageStockCondition $manageStockCondition,
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
-        private readonly ImageHelper $imageHelper
+        private readonly ImageHelper $imageHelper,
+        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly Emulation $emulation,
+        Filesystem $filesystem
     ) {
+        $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
 
     public function transfer(
@@ -118,15 +132,23 @@ class ProductToInPostProductDataTransfer
 
     private function getProductImageUrl(Product $product): string
     {
-        $imageUrl = '';
-        $smallImageAttrValue = $product->getData('small_image');
-        if (is_scalar($smallImageAttrValue)) {
-            $imageUrl = $this->imageHelper->init($product, 'product_page_image_small')
-                ->setImageFile((string)$smallImageAttrValue)
-                ->getUrl();
+        $this->emulation->startEnvironmentEmulation((int)$product->getStoreId(), 'frontend', true);
+
+        $imageRole = $this->generalConfigProvider->getImageRole();
+
+        $image = is_scalar($product->getData($imageRole)) ? (string)$product->getData($imageRole) : '';
+
+        $imgPath = $product->getMediaConfig()->getMediaPath($product->getData($imageRole));
+
+        if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
+            return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
 
-        return $imageUrl;
+        $imgUrl = $product->getMediaConfig()->getMediaUrl($image);
+
+        $this->emulation->stopEnvironmentEmulation();
+
+        return $imgUrl;
     }
 
     private function getProductAttributes(Product $product, array $selectedOptions = []): array

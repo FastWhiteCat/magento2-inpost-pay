@@ -33,6 +33,7 @@ class Widget implements ArgumentInterface
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
     private const MAX_WIDTH = 'maxWidth';
+    private const MIN_HEIGHT = 'minHeight';
     private const FRAME_STYLE = 'frameStyle';
 
     /**
@@ -69,7 +70,7 @@ class Widget implements ArgumentInterface
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled();
+        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
     }
 
     /**
@@ -91,12 +92,14 @@ class Widget implements ArgumentInterface
         $variant = $this->layoutConfigProvider->getColorVariant();
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
         $maxWidth = $this->layoutConfigProvider->getMaxWidth();
+        $minHeight = $this->layoutConfigProvider->getMinHeight();
         $frameStyle = $this->layoutConfigProvider->getFrameStyle();
 
         return [
             self::VARIANT => $variant,
             self::DARK_MODE => $darkMode,
             self::MAX_WIDTH => $maxWidth,
+            self::MIN_HEIGHT => $minHeight,
             self::FRAME_STYLE => $frameStyle
         ];
     }

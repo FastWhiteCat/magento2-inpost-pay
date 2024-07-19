@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6] - 2024-07-19
+
+### Added
+
+- Widget display toggle switch configuration per store
+- Widget Min Height parameter configuration
+- Configuration that allows to set which product image roles will be displayed in InPost Pay Mobile app
+
+### Fixed
+
+- Mass Action cancel status sending to InPost Pay API
+
 ## [1.0.5] - 2024-07-05
 
 ### Added

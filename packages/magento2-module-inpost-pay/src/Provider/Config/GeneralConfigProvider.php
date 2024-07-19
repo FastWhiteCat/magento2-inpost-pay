@@ -12,6 +12,7 @@ class GeneralConfigProvider
     private const XML_PATH_INPOST_PAY_ENABLED = 'payment/inpost_pay/active';
     private const XML_PATH_INPOST_PAY_NEW_ORDER_STATUS = 'payment/inpost_pay/order_status';
     private const XML_PATH_ORDER_ADDRESS_SOURCE_FLAG = 'payment/inpost_pay/use_address_as_firstname_source';
+    private const XML_PATH_INPOST_PAY_IMAGE_ROLE = 'payment/inpost_pay/image_role';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -48,5 +49,15 @@ class GeneralConfigProvider
     public function isUsingAddressAsDataSourceEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_ORDER_ADDRESS_SOURCE_FLAG, ScopeInterface::SCOPE_WEBSITE);
+    }
+
+    public function getImageRole(): string
+    {
+        $orderStatus = $this->scopeConfig->getValue(
+            self::XML_PATH_INPOST_PAY_IMAGE_ROLE,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        return is_scalar($orderStatus) ? (string)$orderStatus : 'small_image';
     }
 }
