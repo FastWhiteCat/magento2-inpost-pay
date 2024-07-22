@@ -8,9 +8,11 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
+use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition;
 use Magento\InventorySalesApi\Model\GetSalableQtyInterface;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -28,6 +30,7 @@ class StockValidator implements OrderValidatorInterface
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
         private readonly IsSalableWithReservationsCondition $isSalableWithReservationsCondition,
         private readonly GetSalableQtyInterface $getSalableQty,
+        private readonly ManageStockCondition $manageStockCondition,
         private readonly LoggerInterface$logger
     ) {
     }
@@ -62,6 +65,11 @@ class StockValidator implements OrderValidatorInterface
         $name = (string)$item->getName();
         $sku = (string)$item->getSku();
         $qty = (float)$item->getQty();
+
+        if ($this->manageStockCondition->execute($sku, $stockId)) {
+            return;
+        }
+
         $stockValidationResult = $this->isSalableWithReservationsCondition->execute($sku, $stockId, $qty);
         $errors = $stockValidationResult->getErrors();
 

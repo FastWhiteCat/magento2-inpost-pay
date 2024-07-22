@@ -9,14 +9,19 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceF
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Model\Utils\StringUtils;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Type;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
+use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
@@ -24,6 +29,7 @@ use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\Store\Model\App\Emulation;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -32,18 +38,31 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
+
+    public const UNMANAGED_STOCK_QUANTITY = 9999;
+
     private ?MagentoProductInterface $product = null;
 
+    private WriteInterface $mediaDirectory;
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
+        private readonly ManageStockCondition $manageStockCondition,
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
-        private readonly ImageHelper $imageHelper
+        private readonly ImageHelper $imageHelper,
+        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly Emulation $emulation,
+        Filesystem $filesystem
     ) {
+        $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
 
     public function transfer(
@@ -87,7 +106,9 @@ class ProductToInPostProductDataTransfer
         $productId = $this->extractProductId($product);
 
         $inPostProduct->setProductId($productId);
-        $inPostProduct->setProductCategory((string)max($product->getCategoryIds()));
+        $inPostProduct->setProductCategory(
+            $product->getCategoryIds() ? (string)max($product->getCategoryIds()) : ''
+        );
         $inPostProduct->setEan((string)$product->getSku());
         $inPostProduct->setProductName((string)$product->getName());
         $inPostProduct->setProductDescription($description);
@@ -111,15 +132,23 @@ class ProductToInPostProductDataTransfer
 
     private function getProductImageUrl(Product $product): string
     {
-        $imageUrl = '';
-        $smallImageAttrValue = $product->getData('small_image');
-        if (is_scalar($smallImageAttrValue)) {
-            $imageUrl = $this->imageHelper->init($product, 'product_page_image_small')
-                ->setImageFile((string)$smallImageAttrValue)
-                ->getUrl();
+        $this->emulation->startEnvironmentEmulation((int)$product->getStoreId(), 'frontend', true);
+
+        $imageRole = $this->generalConfigProvider->getImageRole();
+
+        $image = is_scalar($product->getData($imageRole)) ? (string)$product->getData($imageRole) : '';
+
+        $imgPath = $product->getMediaConfig()->getMediaPath($product->getData($imageRole));
+
+        if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
+            return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
 
-        return $imageUrl;
+        $imgUrl = $product->getMediaConfig()->getMediaUrl($image);
+
+        $this->emulation->stopEnvironmentEmulation();
+
+        return $imgUrl;
     }
 
     private function getProductAttributes(Product $product, array $selectedOptions = []): array
@@ -140,12 +169,18 @@ class ProductToInPostProductDataTransfer
             foreach ($attributes as $attribute) {
                 if ($attribute->getIsVisibleOnFront()) {
                     $value = $attribute->getFrontend()->getValue($product);
-                    if (is_string($value) && strlen(trim($value))) {
+                    if (is_string($value)) {
+                        $cleanValue = trim($this->stringUtils->cleanUpString($value));
+                    } else {
+                        continue;
+                    }
+
+                    if (strlen($cleanValue)) {
                         /** @var ProductAttributeInterface $inPostProductAttribute */
                         $inPostProductAttribute = $this->productAttributeFactory->create();
                         $storeLabel = $attribute->getStoreLabel((int)$product->getStoreId());
                         $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($storeLabel));
-                        $inPostProductAttribute->setAttributeValue($this->stringUtils->cleanUpString($value));
+                        $inPostProductAttribute->setAttributeValue($cleanValue);
                         $productAttributesData[] = $inPostProductAttribute;
                     }
                 }
@@ -255,6 +290,11 @@ class ProductToInPostProductDataTransfer
             $stockQuantity = $this->getProductSalableQty->execute($product->getSku(), $stockId);
         } catch (InputException | LocalizedException $e) {
             $stockQuantity = $quantity;
+        }
+
+        $manageStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
+        if ($stockQuantity <= 0 && $manageStock) {
+            $stockQuantity = self::UNMANAGED_STOCK_QUANTITY;
         }
 
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;

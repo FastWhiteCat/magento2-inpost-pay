@@ -44,5 +44,17 @@
             <validate>validate-number validate-zero-or-greater</validate>
             <config_path>payment/inpost_pay/max_order_total</config_path>
         </field>
+        <field id="use_address_as_firstname_source" translate="label" type="select" sortOrder="80"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Use order address firstname and lastname instead of customer firstname and lastname</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/use_address_as_firstname_source</config_path>
+        </field>
+        <field id="image_role" translate="label" type="select" sortOrder="90"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Image role sended to InPost Pay</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ImageType</source_model>
+            <config_path>payment/inpost_pay/image_role</config_path>
+        </field>
     </group>
 </include>

@@ -9,6 +9,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class DisplayConfigProvider
 {
+    private const XML_PATH_WIDGET_ENABLED = 'payment/inpost_pay/widget_enabled';
     private const XML_PATH_ENABLED_ON_PRODUCT_CART = 'payment/inpost_pay/show_on_product_cart';
     private const XML_PATH_ENABLED_ON_CART = 'payment/inpost_pay/show_on_cart';
     private const XML_PATH_ENABLED_ON_CHECKOUT = 'payment/inpost_pay/show_on_checkout';
@@ -30,6 +31,17 @@ class DisplayConfigProvider
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
     ) {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWidgetEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_WIDGET_ENABLED,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**

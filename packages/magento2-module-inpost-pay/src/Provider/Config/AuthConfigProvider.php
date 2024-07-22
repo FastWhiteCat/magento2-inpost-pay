@@ -12,6 +12,7 @@ class AuthConfigProvider
 {
     private const XML_PATH_CLIENT_ID = 'payment/inpost_pay/%sclient_id';
     private const XML_PATH_CLIENT_SECRET = 'payment/inpost_pay/%sclient_secret';
+    private const XML_PATH_MERCHANT_SECRET = 'payment/inpost_pay/%smerchant_secret';
     private const XML_PATH_AUTH_TOKEN_URL = 'payment/inpost_pay/%sauth_token_url';
     private const XML_PATH_POS_ID = 'payment/inpost_pay/%spos_id';
 
@@ -69,6 +70,23 @@ class AuthConfigProvider
         }
 
         return (string)$clientSecret;
+    }
+
+    public function getMerchantSecret(): string
+    {
+        $merchantSecret = $this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_MERCHANT_SECRET,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            ),
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        if (empty($merchantSecret) || !is_scalar($merchantSecret)) {
+            throw new InPostPayInternalException(__('Empty Merchant Secret'));
+        }
+
+        return (string)$merchantSecret;
     }
 
     /**

@@ -6,6 +6,7 @@ namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Provider\Config\PollingConfigProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
@@ -32,12 +33,14 @@ class Widget implements ArgumentInterface
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
     private const MAX_WIDTH = 'maxWidth';
+    private const MIN_HEIGHT = 'minHeight';
     private const FRAME_STYLE = 'frameStyle';
 
     /**
      * @param SandboxConfigProvider $sandboxConfigProvider
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
+     * @param PollingConfigProvider $pollingConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
      * @param GeneralConfigProvider $generalConfigProvider
@@ -51,6 +54,7 @@ class Widget implements ArgumentInterface
         private readonly SandboxConfigProvider             $sandboxConfigProvider,
         private readonly LayoutConfigProvider              $layoutConfigProvider,
         private readonly DisplayConfigProvider             $displayConfigProvider,
+        private readonly PollingConfigProvider             $pollingConfigProvider,
         private readonly ResolverInterface                 $localeResolver,
         private readonly CheckoutSession                   $checkoutSession,
         private readonly GeneralConfigProvider             $generalConfigProvider,
@@ -66,7 +70,7 @@ class Widget implements ArgumentInterface
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled();
+        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
     }
 
     /**
@@ -88,12 +92,14 @@ class Widget implements ArgumentInterface
         $variant = $this->layoutConfigProvider->getColorVariant();
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
         $maxWidth = $this->layoutConfigProvider->getMaxWidth();
+        $minHeight = $this->layoutConfigProvider->getMinHeight();
         $frameStyle = $this->layoutConfigProvider->getFrameStyle();
 
         return [
             self::VARIANT => $variant,
             self::DARK_MODE => $darkMode,
             self::MAX_WIDTH => $maxWidth,
+            self::MIN_HEIGHT => $minHeight,
             self::FRAME_STYLE => $frameStyle
         ];
     }
@@ -160,6 +166,22 @@ class Widget implements ArgumentInterface
     public function isEnabledOnCheckoutPage(): bool
     {
         return $this->displayConfigProvider->isEnabledOnCheckoutPage();
+    }
+
+    /**
+     * @return int
+     */
+    public function getLongPollingTimeForInactiveTab(): int
+    {
+        return $this->pollingConfigProvider->getLongPollingTimeForInactiveTab();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledLongPollingForInactiveTab(): bool
+    {
+        return $this->pollingConfigProvider->isEnabledLongPollingForInactiveTab();
     }
 
     /**
