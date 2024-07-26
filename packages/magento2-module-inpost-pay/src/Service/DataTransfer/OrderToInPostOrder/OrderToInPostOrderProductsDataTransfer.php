@@ -12,6 +12,7 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
+use InPost\InPostPay\Service\Order\Item\OrderItemProductExtractor;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
@@ -26,7 +27,8 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
     public function __construct(
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly ProductInterfaceFactory $productFactory,
-        private readonly PriceInterfaceFactory $priceFactory
+        private readonly PriceInterfaceFactory $priceFactory,
+        private readonly OrderItemProductExtractor $orderItemProductExtractor
     ) {
     }
 
@@ -75,7 +77,23 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
                 }
             }
 
-            $this->productToInPostProductDataTransfer->transfer($product, $inPostProduct, $websiteId, $qty, $options);
+            if ($product->getTypeId() === Configurable::TYPE_CODE) {
+                $this->productToInPostProductDataTransfer->transfer(
+                    $this->orderItemProductExtractor->extractProductFromOrderItem($orderItem),
+                    $inPostProduct,
+                    $websiteId,
+                    $qty,
+                    $options
+                );
+            } else {
+                $this->productToInPostProductDataTransfer->transfer(
+                    $product,
+                    $inPostProduct,
+                    $websiteId,
+                    $qty,
+                    $options
+                );
+            }
 
             if ($product->getTypeId() === Type::TYPE_BUNDLE) {
                 $basePriceExclTax = DecimalCalculator::round((float)$orderItem->getBasePrice());
