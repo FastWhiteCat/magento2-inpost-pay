@@ -19,11 +19,13 @@ class QuoteItemProductExtractor
 
     public function extractProductFromQuoteItem(Item $quoteItem): Product
     {
+        /** @var Product $product */
         $product = $quoteItem->getProduct();
 
         if ($quoteItem->getProductType() === Configurable::TYPE_CODE) {
             foreach ($quoteItem->getChildren() as $childItem) {
                 try {
+                    /** @var Product $product */
                     $product = $this->productRepository->get(
                         (string)$childItem->getProduct()->getSku(),
                         false,
