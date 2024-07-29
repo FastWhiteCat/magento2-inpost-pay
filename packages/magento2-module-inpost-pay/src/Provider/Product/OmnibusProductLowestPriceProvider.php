@@ -55,7 +55,7 @@ class OmnibusProductLowestPriceProvider
     public function canSendLowestPrice(Item $quoteItem): bool
     {
         $quoteAppliedRuleIds = $quoteItem->getQuote()->getAppliedRuleIds();
-        $appliedRuleIds = $quoteItem->getAppliedRuleIds();
+        $appliedRuleIds = $quoteItem->getAppliedRuleIds() ?? [];
 
         if (is_string($appliedRuleIds)) {
             $appliedRuleIds = explode(',', $appliedRuleIds);
