@@ -82,7 +82,7 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         }
 
         if (!$hasStreet && !$hasBuilding) {
-            $addressArray = explode(' ', $deliveryAddress->getAddress(), 3);
+            $addressArray[] = $deliveryAddress->getAddress();
         }
 
         return $addressArray;
@@ -110,7 +110,7 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         }
 
         if (!$hasStreet && !$hasBuilding) {
-            $addressArray = explode(' ', $clientAddress->getAddress(), 3);
+            $addressArray[] = $clientAddress->getAddress();
         }
 
         return $addressArray;

@@ -91,7 +91,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         }
 
         if (!$hasStreet && !$hasBuilding) {
-            $addressArray = explode(' ', $clientAddress->getAddress(), 3);
+            $addressArray[] = $clientAddress->getAddress();
         }
 
         return $addressArray;
