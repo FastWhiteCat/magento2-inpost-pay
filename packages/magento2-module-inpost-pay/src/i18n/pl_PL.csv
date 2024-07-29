@@ -109,6 +109,12 @@
 "Invalid mail format in: ""%1""","Niepoprawny format adresu mailoweg    o: ""%1""",module,InPost_InPostPay
 "Incomplete delivery address data.","Niekompletne dane adresu dostawy.",module,InPost_InPostPay
 "Incomplete billing address data.","Niekompletne dane adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete billing address city data.","Niekompletne dane miasta adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete billing address country data.","Niekompletne dane kraju adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete billing address postal code data.","Niekompletne dane kodu pocztowego adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete delivery address city data.","Niekompletne dane miasta adresu dostawy.",module,InPost_InPostPay
+"Incomplete delivery address country data.","Niekompletne dane kraju adresu dostawy.",module,InPost_InPostPay
+"Incomplete delivery address postal code data.","Niekompletne dane kodu pocztowego adresu dostawy.",module,InPost_InPostPay
 "Incomplete invoice address data.","Niekompletne dane adresu do faktury.",module,InPost_InPostPay
 "Consents validation failed. Reason: %1","Weryfikacja zgód nie przebiegła pomyślnie. Powód: %1",module,InPost_InPostPay
 "Consent %1 version is not up to date. Expected: %2 Received: %3","Wersja zgody %1 jest nieaktualna. Oczekiwana: %2 Otrzymana: %3",module,InPost_InPostPay

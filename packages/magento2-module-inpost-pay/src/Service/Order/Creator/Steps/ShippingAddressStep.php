@@ -6,6 +6,8 @@ namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
@@ -39,13 +41,13 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $shippingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getDelivery()->getPhoneNumber()));
         if ($inPostOrder->getDelivery()->getDeliveryType() === InPostDeliveryType::APM->name) {
             $clientAddress = $inPostOrder->getAccountInfo()->getClientAddress();
-            $shippingAddress->setStreet($this->combineAddressArray($clientAddress->getAddressDetails()));
+            $shippingAddress->setStreet($this->combineClientAddressArray($clientAddress));
             $shippingAddress->setCity($clientAddress->getCity());
             $shippingAddress->setPostcode($clientAddress->getPostalCode());
             $shippingAddress->setCountryId($clientAddress->getCountryCode());
         } else {
             $deliveryAddress = $inPostOrder->getDelivery()->getDeliveryAddress();
-            $shippingAddress->setStreet($this->combineAddressArray($deliveryAddress->getAddressDetails()));
+            $shippingAddress->setStreet($this->combineDeliveryAddressArray($deliveryAddress));
             $shippingAddress->setCity($deliveryAddress->getCity());
             $shippingAddress->setPostcode($deliveryAddress->getPostalCode());
             $shippingAddress->setCountryId($deliveryAddress->getCountryCode());
@@ -58,19 +60,57 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $this->createLog(sprintf('Shipping address has been applied to quote ID: %s', $quoteId));
     }
 
-    private function combineAddressArray(AddressDetailsInterface $addressDetails): array
+    private function combineDeliveryAddressArray(DeliveryAddressInterface $deliveryAddress): array
     {
+        $addressDetails =  $deliveryAddress->getAddressDetails();
+        $hasStreet = false;
+        $hasBuilding = false;
         $addressArray = [];
+
         if ($addressDetails->getStreet()) {
             $addressArray[] = $addressDetails->getStreet();
+            $hasStreet = true;
         }
 
         if ($addressDetails->getBuilding()) {
             $addressArray[] = $addressDetails->getBuilding();
+            $hasBuilding = true;
         }
 
         if ($addressDetails->getFlat()) {
             $addressArray[] = $addressDetails->getFlat();
+        }
+
+        if (!$hasStreet && !$hasBuilding) {
+            $addressArray = explode(' ', $deliveryAddress->getAddress(), 3);
+        }
+
+        return $addressArray;
+    }
+
+    private function combineClientAddressArray(ClientAddressInterface $clientAddress): array
+    {
+        $addressDetails = $clientAddress->getAddressDetails();
+        $hasStreet = false;
+        $hasBuilding = false;
+        $addressArray = [];
+
+        if ($addressDetails->getStreet()) {
+            $addressArray[] = $addressDetails->getStreet();
+            $hasStreet = true;
+        }
+
+        if ($addressDetails->getBuilding()) {
+            $addressArray[] = $addressDetails->getBuilding();
+            $hasBuilding = true;
+        }
+
+        if ($addressDetails->getFlat()) {
+            $addressArray[] = $addressDetails->getFlat();
+        }
+
+        if (!$hasStreet && !$hasBuilding) {
+            $addressArray = explode(' ', $clientAddress->getAddress(), 3);
         }
 
         return $addressArray;

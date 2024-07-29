@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
+use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
@@ -54,7 +55,7 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         } else {
             $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
             $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
-            $billingAddress->setStreet($this->combineAddressArray($accountAddress->getAddressDetails()));
+            $billingAddress->setStreet($this->combineBillingAddressArray($accountAddress));
             $billingAddress->setCity($accountAddress->getCity());
             $billingAddress->setPostcode($accountAddress->getPostalCode());
             $billingAddress->setCountryId($accountAddress->getCountryCode());
@@ -68,19 +69,29 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
         $this->createLog(sprintf('Billing address has been applied to quote ID: %s', $quoteId));
     }
 
-    private function combineAddressArray(AddressDetailsInterface $addressDetails): array
+    private function combineBillingAddressArray(ClientAddressInterface $clientAddress): array
     {
+        $addressDetails =  $clientAddress->getAddressDetails();
+        $hasStreet = false;
+        $hasBuilding = false;
         $addressArray = [];
+
         if ($addressDetails->getStreet()) {
             $addressArray[] = $addressDetails->getStreet();
+            $hasStreet = true;
         }
 
         if ($addressDetails->getBuilding()) {
             $addressArray[] = $addressDetails->getBuilding();
+            $hasBuilding = true;
         }
 
         if ($addressDetails->getFlat()) {
             $addressArray[] = $addressDetails->getFlat();
+        }
+
+        if (!$hasStreet && !$hasBuilding) {
+            $addressArray = explode(' ', $clientAddress->getAddress(), 3);
         }
 
         return $addressArray;
