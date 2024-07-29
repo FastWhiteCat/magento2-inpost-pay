@@ -27,6 +27,14 @@ class DeliveryValidator implements OrderValidatorInterface
     ) {
     }
 
+    /**
+     * @param Quote $quote
+     * @param InPostPayQuoteInterface $inPostPayQuote
+     * @param OrderInterface $inPostOrder
+     * @return void
+     * @throws LocalizedException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         if ($inPostOrder->getDelivery()->getDeliveryType() !== InPostDeliveryType::APM->name) {
