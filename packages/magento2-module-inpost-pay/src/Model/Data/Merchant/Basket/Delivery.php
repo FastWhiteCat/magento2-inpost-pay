@@ -104,13 +104,13 @@ class Delivery extends DataObject implements DeliveryInterface, ExtensibleDataIn
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getFreeDeliveryMinimumGrossPrice(): float
+    public function getFreeDeliveryMinimumGrossPrice(): ?float
     {
         $freeDeliveryMinimumGrossPrice = $this->getData(self::FREE_DELIVERY_MINIMUM_GROSS_PRICE);
 
-        return is_scalar($freeDeliveryMinimumGrossPrice) ? (float)$freeDeliveryMinimumGrossPrice : 0.00;
+        return is_float($freeDeliveryMinimumGrossPrice) ? (float)$freeDeliveryMinimumGrossPrice : null;
     }
 
     /**
