@@ -132,13 +132,14 @@ class ProductToInPostProductDataTransfer
 
     private function getProductImageUrl(Product $product): string
     {
-        $this->emulation->startEnvironmentEmulation((int)$product->getStoreId(), 'frontend', true);
+        $storeId = (int)$product->getStoreId();
+        $product = $this->productRepository->get((string)$product->getSku(), false, $storeId);
+        $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();
-
-        $image = is_scalar($product->getData($imageRole)) ? (string)$product->getData($imageRole) : '';
-
-        $imgPath = $product->getMediaConfig()->getMediaPath($product->getData($imageRole));
+        $productImageRole = $product->getData($imageRole);
+        $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
+        $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
             return $this->imageHelper->getDefaultPlaceholderUrl('image');
