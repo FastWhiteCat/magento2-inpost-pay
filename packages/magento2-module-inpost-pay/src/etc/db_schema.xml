@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="inpost_pay_order" resource="default" engine="innodb">
+        <column xsi:type="int" name="inpost_pay_order_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="basket_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="payment_type" length="255" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="locker_id" nullable="true"/>
+        <column xsi:type="varchar" name="order_status" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="country_prefix" length="4" nullable="true"/>
+        <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="courier_note" length="255" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
+        <column xsi:type="varchar" length="500" name="accepted_consents" nullable="true"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="inpost_pay_order_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="INPOST_PAY_ORDER_ORDER_ID_SALES_ORDER_ENTITY_ID"
+                    table="inpost_pay_order" column="order_id"
+                    referenceTable="sales_order" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_ORDER_ORDER_ID">
+            <column name="order_id"/>
+        </constraint>
+    </table>
+    <table name="inpost_pay_quote" resource="default" engine="innodb">
+        <column name="inpost_pay_quote_id" xsi:type="int" unsigned="true" nullable="false" identity="true" comment="Entity id"/>
+        <column xsi:type="int" name="quote_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="basket_id" length="255" nullable="false"/>
+        <column xsi:type="varchar" name="inpost_basket_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="status" length="32" nullable="false" default="PENDING"/>
+        <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="country_prefix" length="12" nullable="true"/>
+        <column xsi:type="varchar" name="masked_phone_number" length="12" nullable="true"/>
+        <column xsi:type="tinyint" name="browser_trusted" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="browser_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="surname" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="cart_version" length="255" nullable="true" />
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="inpost_pay_quote_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="INPOST_PAY_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID"
+                    table="inpost_pay_quote" column="quote_id"
+                    referenceTable="quote" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="INPOST_PAY_QUOTE_QUOTE_ID">
+            <column name="quote_id"/>
+        </constraint>
+        <index referenceId="INPOST_PAY_QUOTE_INPOST_BASKET_ID" indexType="btree">
+            <column name="inpost_basket_id"/>
+        </index>
+        <index referenceId="INPOST_PAY_QUOTE_BASKET_ID" indexType="btree">
+            <column name="basket_id"/>
+        </index>
+    </table>
+    <table name="inpost_pay_checkout_agreement_version" resource="default" engine="innodb">
+        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="version" length="255" nullable="false"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="agreement_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CHKT_AGRT_VER_AGRT_ID_CHKT_AGRT_AGRT_ID" table="checkout_agreement_version"
+                    column="agreement_id" referenceTable="checkout_agreement" referenceColumn="agreement_id"
+                    onDelete="CASCADE"/>
+    </table>
+    <table name="inpost_pay_basket_notice" resource="default" engine="innodb">
+        <column xsi:type="int" name="basket_notice_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="inpost_pay_quote_id" unsigned="true" nullable="false" identity="false"/>
+        <column xsi:type="varchar" name="type" length="255" nullable="false"/>
+        <column xsi:type="varchar" name="description" length="255" nullable="false"/>
+        <column xsi:type="tinyint" name="is_sent" nullable="false" default="0"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="basket_notice_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID_INPOST_PAY_QUOTE_INPOST_PAY_QUOTE_ID"
+                    table="inpost_pay_basket_notice" column="inpost_pay_quote_id"
+                    referenceTable="inpost_pay_quote" referenceColumn="inpost_pay_quote_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID">
+            <column name="basket_notice_id"/>
+        </constraint>
+        <index referenceId="INPOST_PAY_BASKET_NOTICE_INPOST_PAY_QUOTE_ID" indexType="btree">
+            <column name="inpost_pay_quote_id"/>
+        </index>
+        <index referenceId="INPOST_PAY_BASKET_NOTICE_IS_SENT" indexType="btree">
+            <column name="is_sent"/>
+        </index>
+    </table>
+</schema>

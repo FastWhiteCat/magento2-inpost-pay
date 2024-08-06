@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Cache/etc/cache.xsd">
+    <type name="inpost_pay_public_key" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\PublicKey\Type">
+        <label>InPost Pay Public Key Version Cache</label>
+        <description>Public key used to generate signature for InPost Pay incoming request validations.</description>
+    </type>
+    <type name="inpost_pay_temrms_and_conditions" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\TermsAndConditions\Type">
+        <label>Terms And Conditions Versions Cache</label>
+        <description>Terms and conditions needed in communication with InPost Pay API.</description>
+    </type>
+</config>

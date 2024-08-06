@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_shipment_apm" translate="label" type="text" sortOrder="30"
+           showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Shipment Mapping Settings for Pickup Delivery</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="inpost_apm_standard_mapping" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Standard Pickup Point Delivery</label>
+            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
+            <config_path>payment/inpost_pay/inpost_apm_standard_mapping</config_path>
+        </field>
+        <field id="inpost_apm_pww_mapping" translate="label" type="select" sortOrder="15"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Pickup Point Weekend Delivery</label>
+            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
+            <config_path>payment/inpost_pay/inpost_apm_pww_mapping</config_path>
+        </field>
+        <field id="inpost_apm_cod_mapping" translate="label" type="select" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Pickup Point Delivery - Cash on Delivery</label>
+            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
+            <config_path>payment/inpost_pay/inpost_apm_cod_mapping</config_path>
+        </field>
+        <field id="inpost_apm_codpww_mapping" translate="label" type="select" sortOrder="25"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Pickup Point Weekend Delivery - Cash on Delivery</label>
+            <source_model>Magento\Shipping\Model\Config\Source\Allmethods</source_model>
+            <config_path>payment/inpost_pay/inpost_apm_codpww_mapping</config_path>
+        </field>
+    </group>
+</include>

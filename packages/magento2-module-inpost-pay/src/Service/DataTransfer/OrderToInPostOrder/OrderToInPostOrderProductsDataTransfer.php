@@ -1,0 +1,105 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
+
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
+use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Item;
+
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ */
+class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTransferInterface
+{
+    public function __construct(
+        private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
+        private readonly ProductInterfaceFactory $productFactory,
+        private readonly PriceInterfaceFactory $priceFactory
+    ) {
+    }
+
+    public function transfer(Order $order, OrderInterface $inPostOrder): void
+    {
+        $orderedProducts = [];
+        $websiteId = (int)$order->getStore()->getWebsiteId();
+        foreach ($order->getAllVisibleItems() as $orderItem) {
+            if ($orderItem instanceof Item) {
+                $inPostProduct = $this->productFactory->create();
+                $this->transferProductData($orderItem, $inPostProduct, $websiteId, (float)$orderItem->getQtyOrdered());
+                $orderedProducts[] = $inPostProduct;
+            }
+        }
+
+        $inPostOrder->setProducts($orderedProducts);
+    }
+
+    private function transferProductData(
+        Item $orderItem,
+        ProductInterface $inPostProduct,
+        int $websiteId,
+        float $qty
+    ): void {
+        $product = $orderItem->getProduct();
+        if ($product instanceof  Product) {
+            $options = [];
+            if ($product->getTypeId() === Configurable::TYPE_CODE) {
+                $productOptions = $orderItem->getProductOptions();
+                if ($productOptions && $productOptions['attributes_info']) {
+                    $options = $productOptions['attributes_info'];
+                }
+            } elseif ($product->getTypeId() === Type::TYPE_BUNDLE) {
+                $product->setData('children', []);
+
+                $productOptions = $orderItem->getProductOptions();
+                if ($productOptions && $productOptions['bundle_options']) {
+                    foreach ($productOptions['bundle_options'] as $option) {
+                        $options[] = [
+                            'label' => $option['label'],
+                            'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title']
+                                . ' ' . DecimalCalculator::round((float)$option['value'][0]['price'])
+                                . ' ' . $orderItem->getOrder()->getOrderCurrency()->getCurrencySymbol()
+                        ];
+                    }
+                }
+            }
+
+            $this->productToInPostProductDataTransfer->transfer($product, $inPostProduct, $websiteId, $qty, $options);
+
+            if ($product->getTypeId() === Type::TYPE_BUNDLE) {
+                $basePriceExclTax = DecimalCalculator::round((float)$orderItem->getBasePrice());
+                $basePriceInclTax = DecimalCalculator::round((float)$orderItem->getBasePriceInclTax());
+                $baseTaxValue = DecimalCalculator::sub($basePriceInclTax, $basePriceExclTax);
+
+                /** @var PriceInterface $basePrice */
+                $basePrice = $this->priceFactory->create();
+                $basePrice->setNet($basePriceExclTax);
+                $basePrice->setGross($basePriceInclTax);
+                $basePrice->setVat($baseTaxValue);
+                $inPostProduct->setBasePrice($basePrice);
+            }
+
+            $priceExclTax = DecimalCalculator::round((float)$orderItem->getPrice());
+            $priceInclTax = DecimalCalculator::round((float)$orderItem->getPriceInclTax());
+            $taxValue = DecimalCalculator::sub($priceInclTax, $priceExclTax);
+
+            /** @var PriceInterface $promoPrice */
+            $promoPrice = $this->priceFactory->create();
+            $promoPrice->setNet($priceExclTax);
+            $promoPrice->setGross($priceInclTax);
+            $promoPrice->setVat($taxValue);
+            $inPostProduct->setPromoPrice($promoPrice);
+        }
+    }
+}

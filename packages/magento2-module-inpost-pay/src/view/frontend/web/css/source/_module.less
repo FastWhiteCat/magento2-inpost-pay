@@ -1,0 +1,41 @@
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .inpay-widget-wrapper {
+        margin-bottom: 20px;
+    }
+
+    ._keyfocus .inpay-widget-wrapper:focus,
+    ._keyfocus .inpay-widget-wrapper inpost-izi-button:focus {
+        box-shadow: unset;
+    }
+
+    a.inpostizi-thank-you-button:visited {
+        color: inherit;
+    }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .login-container .block:nth-child(2) + .inpay-login-wrapper {
+        clear: none;
+    }
+
+    .inpay-login-wrapper {
+        width: 48%;
+        float: right;
+
+        .inpay-widget-wrapper {
+            max-width: 220px;
+        }
+    }
+
+    .inpay-widget-wrapper.REGISTERFORM_PAGE {
+        max-width: 220px;
+    }
+}

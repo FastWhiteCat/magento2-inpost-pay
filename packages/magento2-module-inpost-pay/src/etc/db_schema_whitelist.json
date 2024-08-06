@@ -1,0 +1,85 @@
+{
+    "inpost_pay_order": {
+        "column": {
+            "inpost_pay_order_id": true,
+            "order_id": true,
+            "locker_id": true,
+            "created_at": true,
+            "updated_at": true,
+            "order_status": true,
+            "prefix": true,
+            "phone_number": true,
+            "basket_id": true,
+            "payment_type": true,
+            "country_prefix": true,
+            "phone": true,
+            "courier_note": true,
+            "delivery_options": true,
+            "accepted_consents": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_ORDER_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "INPOST_PAY_ORDER_ORDER_ID": true
+        }
+    },
+    "inpost_pay_quote": {
+        "column": {
+            "inpost_pay_quote_id": true,
+            "quote_id": true,
+            "basket_id": true,
+            "inpost_basket_id": true,
+            "status": true,
+            "phone_number": true,
+            "masked_phone_number": true,
+            "browser_trusted": true,
+            "browser_id": true,
+            "name": true,
+            "surname": true,
+            "created_at": true,
+            "updated_at": true,
+            "phone": true,
+            "country_prefix": true,
+            "cart_version": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
+            "INPOST_PAY_QUOTE_QUOTE_ID": true
+        },
+        "index": {
+            "INPOST_PAY_QUOTE_INPOST_BASKET_ID": true,
+            "INPOST_PAY_QUOTE_BASKET_ID": true
+        }
+    },
+    "inpost_pay_checkout_agreement_version": {
+        "column": {
+            "agreement_id": true,
+            "version": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_CHKT_AGRT_VERSION_AGRT_ID_CHKT_AGRT_AGRT_ID": true
+        }
+    },
+    "inpost_pay_basket_notice": {
+        "column": {
+            "basket_notice_id": true,
+            "inpost_pay_quote_id": true,
+            "type": true,
+            "description": true,
+            "is_sent": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "INPOST_PAY_BASKET_NOTICE_INPOST_PAY_QUOTE_ID": true,
+            "INPOST_PAY_BASKET_NOTICE_IS_SENT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_FAAB0B769017A18DA32E88ABB704AA2E": true,
+            "INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID": true
+        }
+    }
+}

@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ * @var Magento\Framework\Escaper $escaper
+ */
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled()
+    || !$widgetViewModel->isInPostPayOrder()
+    || !$widgetViewModel->isEnabledOnSuccessPage()) {
+    return;
+}
+$widgetWrapperClass = "inpay-widget-wrapper";
+$sandboxMode = $widgetViewModel->isSandboxEnabled();
+$scriptUrl = $sandboxMode ? "https://izi-sandbox.inpost.pl/inpostizi.js" : "https://izi.inpost.pl/inpostizi.js";
+?>
+
+<script src="<?= $escaper->escapeUrl($scriptUrl) ?>"></script>
+
+<div class="<?= /* @noEscape */ $widgetWrapperClass ?>">
+    <inpost-thank-you/>
+</div>

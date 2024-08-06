@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <inpost_pay>
+                <active>0</active>
+                <widget_enabled>1</widget_enabled>
+                <can_use_checkout>1</can_use_checkout>
+                <model>InPostPayPaymentFacade</model>
+                <title>InPost Pay</title>
+                <order_status>pending</order_status>
+                <allowspecific>0</allowspecific>
+                <image_role>small_image</image_role>
+                <sort_order>5</sort_order>
+                <min_order_total>0</min_order_total>
+                <max_order_total>99999</max_order_total>
+                <delivery_deadline_in_days>7</delivery_deadline_in_days>
+                <basket_lifetime>604800</basket_lifetime>
+                <client_id></client_id>
+                <client_secret></client_secret>
+                <auth_token_url>https://login.inpost.pl/</auth_token_url>
+                <product_cart_enabled>1</product_cart_enabled>
+                <cart_enabled>1</cart_enabled>
+                <success_page_enabled>1</success_page_enabled>
+                <widget_color_variant>primary</widget_color_variant>
+                <widget_dark_mode>0</widget_dark_mode>
+                <izi_api_url>https://api.inpost.pl/</izi_api_url>
+                <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
+                <async_basket_export>0</async_basket_export>
+                <remove_html_and_special_chars_from_attributes>1</remove_html_and_special_chars_from_attributes>
+                <sandbox_enabled>0</sandbox_enabled>
+                <sandbox_client_id></sandbox_client_id>
+                <sandbox_client_secret></sandbox_client_secret>
+                <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
+                <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
+                <min_log_level>100</min_log_level>
+                <can_capture>1</can_capture>
+                <can_refund>1</can_refund>
+                <is_offline>1</is_offline>
+                <use_address_as_firstname_source>0</use_address_as_firstname_source>
+                <polling_time_for_inactive>10000</polling_time_for_inactive>
+                <polling_enabled_for_inactive>1</polling_enabled_for_inactive>
+            </inpost_pay>
+        </payment>
+    </default>
+</config>
