@@ -130,15 +130,25 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
     }
 
-    private function getProductImageUrl(Product $product): string
+    private function getProductImageUrl(Product $originalProduct): string
     {
-        $storeId = (int)$product->getStoreId();
-        $product = $this->productRepository->get((string)$product->getSku(), false, $storeId);
+        $storeId = (int)$originalProduct->getStoreId();
+        $originalProductSku = (string)$originalProduct->getSku();
+        $product = $this->productRepository->get($originalProductSku, false, $storeId);
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();
         $productImageRole = $product->getData($imageRole);
         $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
+
+        if (empty($image) && (int)$product->getId() !== (int)$originalProduct->getId()) {
+            //If this product comes from quoteItem than SKU belongs to simple but ID remains to parent,
+            //In case of no image for simple product, image will be loaded from parent configurable product
+            $product = $this->productRepository->getById((int)$originalProduct->getId(), false, $storeId);
+            $productImageRole = $product->getData($imageRole);
+            $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
+        }
+
         $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
