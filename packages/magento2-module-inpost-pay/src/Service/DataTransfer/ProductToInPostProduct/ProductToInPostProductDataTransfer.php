@@ -149,12 +149,14 @@ class ProductToInPostProductDataTransfer
             $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
         }
 
+        // @phpstan-ignore-next-line
         $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
             return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
 
+        // @phpstan-ignore-next-line
         $imgUrl = $product->getMediaConfig()->getMediaUrl($image);
 
         $this->emulation->stopEnvironmentEmulation();
