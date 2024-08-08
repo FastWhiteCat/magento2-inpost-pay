@@ -145,6 +145,10 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+     */
     private function getProductImageUrl(Product $originalProduct): string
     {
         $storeId = (int)$originalProduct->getStoreId();

@@ -134,33 +134,39 @@ class CartService
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
             $appliedCoupon = $quote->getCouponCode();
+            // @phpstan-ignore-next-line
+            $basketId = (string)$quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID);
+            
             try {
                 $this->couponManagement->set((int)$quote->getId(), $couponCode);
+
                 if ($appliedCoupon && strtolower($appliedCoupon) === strtolower($couponCode)) {
                     $this->createBasketNotice->execute(
-                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        $basketId,
                         InPostPayBasketNoticeInterface::ATTENTION,
                         __('Coupon code is already activated')->render()
                     );
                 } elseif ($appliedCoupon) {
                     $this->createBasketNotice->execute(
-                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        $basketId,
                         InPostPayBasketNoticeInterface::ATTENTION,
                         __('Coupon code has been updated')->render()
                     );
                 } else {
                     $this->createBasketNotice->execute(
-                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        $basketId,
                         InPostPayBasketNoticeInterface::ATTENTION,
                         __('Coupon code has been applied')->render()
                     );
                 }
             } catch (CouldNotSaveException | NoSuchEntityException $e) {
+                $msg = 'Coupon code has been removed. The code entered is incorrect. Please enter the correct code';
+
                 if ($appliedCoupon) {
                     $this->createBasketNotice->execute(
-                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        $basketId,
                         InPostPayBasketNoticeInterface::ATTENTION,
-                        __('Coupon code has been removed. The code entered is incorrect. Please enter the correct code')->render()
+                        __($msg)->render()
                     );
                 } else {
                     throw new InvalidPromoCodeException(__('Promo code "%1" is invalid.', $couponCode));

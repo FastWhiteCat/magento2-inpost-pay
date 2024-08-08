@@ -73,18 +73,12 @@ class OrderRestrictionsValidator
             }
         }
 
-        return in_array(
-            $productId,
-            $this->restrictedProductIdsProvider->getList($websiteId)
-            ) || in_array(
-                $productId,
-                $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
-            ) || in_array(
-                $simpleProductId,
-                $this->restrictedProductIdsProvider->getList($websiteId)
-            ) || in_array(
-                $simpleProductId,
-                $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
-            );
+        $websiteRestrictedProductIds = $this->restrictedProductIdsProvider->getList($websiteId);
+        $websiteRestrictedProductIdsAppliesTo = $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo);
+
+        return in_array($productId, $websiteRestrictedProductIds)
+            || in_array($productId, $websiteRestrictedProductIdsAppliesTo)
+            || in_array($simpleProductId, $websiteRestrictedProductIds)
+            || in_array($simpleProductId, $websiteRestrictedProductIdsAppliesTo);
     }
 }
