@@ -84,11 +84,11 @@
                 </item>
             </argument>
         </field>
-        <field name="applies_to" formElement="hidden">
+        <field name="applies_to">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\RestrictionsRule\AppliesTo</item>
                 <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="number">2</item>
+                    <item name="default" xsi:type="number">3</item>
                     <item name="label" xsi:type="string" translate="true">Applies To</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="formElement" xsi:type="string">select</item>
@@ -97,9 +97,6 @@
                     </item>
                 </item>
             </argument>
-            <settings>
-                <visible>false</visible>
-            </settings>
         </field>
 	</fieldset>
     <htmlContent name="block_inpostrestrictions_rule_edit_tab_conditions" sortOrder="20">

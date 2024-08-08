@@ -27,6 +27,14 @@ class DeliveryValidator implements OrderValidatorInterface
     ) {
     }
 
+    /**
+     * @param Quote $quote
+     * @param InPostPayQuoteInterface $inPostPayQuote
+     * @param OrderInterface $inPostOrder
+     * @return void
+     * @throws LocalizedException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         if ($inPostOrder->getDelivery()->getDeliveryType() !== InPostDeliveryType::APM->name) {
@@ -42,13 +50,19 @@ class DeliveryValidator implements OrderValidatorInterface
      */
     private function validateDeliveryAddress(DeliveryAddressInterface $deliveryAddress): void
     {
-        $addressDetails = $deliveryAddress->getAddressDetails();
-        if (empty($deliveryAddress->getCity())
-            || empty($deliveryAddress->getCountryCode())
-            || empty($deliveryAddress->getPostalCode())
-            || empty($addressDetails->getStreet())
-            || (empty($addressDetails->getBuilding()) && empty($addressDetails->getFlat()))
-        ) {
+        if (empty($deliveryAddress->getCity())) {
+            throw new LocalizedException(__('Incomplete delivery address city data.'));
+        }
+
+        if (empty($deliveryAddress->getCountryCode())) {
+            throw new LocalizedException(__('Incomplete delivery address country data.'));
+        }
+
+        if (empty($deliveryAddress->getPostalCode())) {
+            throw new LocalizedException(__('Incomplete delivery address postal code data.'));
+        }
+
+        if (empty($deliveryAddress->getAddress())) {
             throw new LocalizedException(__('Incomplete delivery address data.'));
         }
     }
