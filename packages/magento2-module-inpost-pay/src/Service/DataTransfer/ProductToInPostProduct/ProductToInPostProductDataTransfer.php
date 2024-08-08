@@ -34,6 +34,7 @@ use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Store\Model\App\Emulation;
+use Magento\Swatches\Helper\Data as SwatchesHelper;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -142,20 +143,35 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
     }
 
-    private function getProductImageUrl(Product $product): string
+    private function getProductImageUrl(Product $originalProduct): string
     {
-        $this->emulation->startEnvironmentEmulation((int)$product->getStoreId(), 'frontend', true);
+        $storeId = (int)$originalProduct->getStoreId();
+        $originalProductSku = (string)$originalProduct->getSku();
+        $product = $this->productRepository->get($originalProductSku, false, $storeId);
+        $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();
+        $productImageRole = $product->getData($imageRole);
+        $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
 
-        $image = is_scalar($product->getData($imageRole)) ? (string)$product->getData($imageRole) : '';
+        if ((empty($image) || $image === SwatchesHelper::EMPTY_IMAGE_VALUE)
+            && (int)$product->getId() !== (int)$originalProduct->getId()
+        ) {
+            //If this product comes from quoteItem than SKU belongs to simple but ID remains to parent,
+            //In case of no image for simple product, image will be loaded from parent configurable product
+            $product = $this->productRepository->getById((int)$originalProduct->getId(), false, $storeId);
+            $productImageRole = $product->getData($imageRole);
+            $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
+        }
 
-        $imgPath = $product->getMediaConfig()->getMediaPath($product->getData($imageRole));
+        // @phpstan-ignore-next-line
+        $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
             return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
 
+        // @phpstan-ignore-next-line
         $imgUrl = $product->getMediaConfig()->getMediaUrl($image);
 
         $this->emulation->stopEnvironmentEmulation();
