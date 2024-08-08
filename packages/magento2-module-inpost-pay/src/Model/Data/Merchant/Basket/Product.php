@@ -271,4 +271,23 @@ class Product extends DataObject implements ProductInterface, ExtensibleDataInte
     {
         $this->setData(self::PRODUCT_ATTRIBUTES, $productAttributes);
     }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[]
+     */
+    public function getDeliveryProduct(): array
+    {
+        $deliveryProduct = $this->getData(self::DELIVERY_PRODUCT);
+
+        return is_array($deliveryProduct) ? $deliveryProduct : [];
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[] $deliveryProduct
+     * @return void
+     */
+    public function setDeliveryProduct(array $deliveryProduct): void
+    {
+        $this->setData(self::DELIVERY_PRODUCT, $deliveryProduct);
+    }
 }

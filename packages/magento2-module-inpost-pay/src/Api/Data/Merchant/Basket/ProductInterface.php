@@ -20,6 +20,7 @@ interface ProductInterface
     public const LOWEST_PRICE = 'lowest_price';
     public const QUANTITY = 'quantity';
     public const PRODUCT_ATTRIBUTES = 'product_attributes';
+    public const DELIVERY_PRODUCT = 'delivery_product';
 
     /**
      * @return string
@@ -152,4 +153,15 @@ interface ProductInterface
      * @return void
      */
     public function setProductAttributes(array $productAttributes): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[]
+     */
+    public function getDeliveryProduct(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[] $deliveryProduct
+     * @return void
+     */
+    public function setDeliveryProduct(array $deliveryProduct): void;
 }

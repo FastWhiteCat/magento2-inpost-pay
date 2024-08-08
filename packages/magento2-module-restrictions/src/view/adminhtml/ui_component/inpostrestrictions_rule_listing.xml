@@ -11,6 +11,11 @@
 			<dep>inpostrestrictions_rule_listing.inpostrestrictions_rule_listing_listing_data_source</dep>
 		</deps>
 		<buttons>
+            <button name="refresh">
+                <url path="*/*/refresh"/>
+                <class>primary</class>
+                <label translate="true">Refresh All Rules</label>
+            </button>
 			<button name="add">
 				<url path="*/*/new"/>
 				<class>primary</class>
