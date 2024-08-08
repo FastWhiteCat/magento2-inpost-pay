@@ -136,7 +136,7 @@ class CartService
             $appliedCoupon = $quote->getCouponCode();
             // @phpstan-ignore-next-line
             $basketId = (string)$quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID);
-            
+
             try {
                 $this->couponManagement->set((int)$quote->getId(), $couponCode);
 
