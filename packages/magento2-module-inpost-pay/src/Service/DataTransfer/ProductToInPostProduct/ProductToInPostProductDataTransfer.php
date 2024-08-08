@@ -30,6 +30,7 @@ use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Store\Model\App\Emulation;
+use Magento\Swatches\Helper\Data as SwatchesHelper;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -141,7 +142,9 @@ class ProductToInPostProductDataTransfer
         $productImageRole = $product->getData($imageRole);
         $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
 
-        if (empty($image) && (int)$product->getId() !== (int)$originalProduct->getId()) {
+        if ((empty($image) || $image === SwatchesHelper::EMPTY_IMAGE_VALUE)
+            && (int)$product->getId() !== (int)$originalProduct->getId()
+        ) {
             //If this product comes from quoteItem than SKU belongs to simple but ID remains to parent,
             //In case of no image for simple product, image will be loaded from parent configurable product
             $product = $this->productRepository->getById((int)$originalProduct->getId(), false, $storeId);
