@@ -3,11 +3,18 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service;
 
+use InPost\InPostPay\Service\Cart\Item\QuoteItemProductExtractor;
 use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Model\Quote;
 
 class PrepareQuoteProductsQuantity
 {
+    public function __construct(
+        private readonly QuoteItemProductExtractor $quoteItemProductExtractor
+    ) {
+    }
+
     public function execute(Quote $quote): array
     {
         $quoteItemsQuantity = [];
@@ -17,6 +24,10 @@ class PrepareQuoteProductsQuantity
                     $qty = $child->getQty() * $quoteItem->getQty();
                     $this->setQuoteItemQuantity((int)$child->getProduct()->getId(), $qty, $quoteItemsQuantity);
                 }
+            } elseif ($quoteItem->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
+                $qty = $quoteItem->getQty();
+                $product = $this->quoteItemProductExtractor->extractProductFromQuoteItem($quoteItem);
+                $this->setQuoteItemQuantity((int)$product->getId(), $qty, $quoteItemsQuantity);
             } else {
                 $qty = $quoteItem->getQty();
                 $this->setQuoteItemQuantity((int)$quoteItem->getProduct()->getId(), $qty, $quoteItemsQuantity);

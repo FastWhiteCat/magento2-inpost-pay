@@ -12,6 +12,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\Cart\Item\QuoteItemProductExtractor;
 use InPost\InPostPay\Service\CreateBasketNotice;
 use InPost\InPostPay\Service\PrepareQuoteProductsQuantity;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
@@ -37,6 +38,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly PrepareQuoteProductsQuantity $prepareQuoteProductsQuantity,
+        private readonly QuoteItemProductExtractor $quoteItemProductExtractor,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -49,7 +51,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             /** @var ProductInterface $inPostProduct */
             /** @var Item $quoteItem */
             $inPostProduct = $this->productFactory->create();
-            $product = $quoteItem->getProduct();
+            $product = $this->quoteItemProductExtractor->extractProductFromQuoteItem($quoteItem);
             $websiteId = (int)$quote->getStore()->getWebsiteId();
             $qty = (float)$quoteItem->getQty();
             $options = [];
