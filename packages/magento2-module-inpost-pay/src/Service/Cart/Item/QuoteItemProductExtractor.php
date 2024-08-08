@@ -32,6 +32,10 @@ class QuoteItemProductExtractor
                         (int)$quoteItem->getStoreId()
                     );
 
+                    // @phpstan-ignore-next-line
+                    $parentItemProductId = (int)$childItem->getParentItem()->getProduct()->getId();
+                    $product->setData('configurable_product_id', $parentItemProductId);
+
                     break;
                 } catch (NoSuchEntityException $e) {
                     continue;
