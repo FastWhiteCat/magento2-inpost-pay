@@ -13,15 +13,15 @@ class AppliesTo implements OptionSourceInterface
     {
         return [
             [
-                'label' => __('InPost Delivery')->render(),
-                'value' => RestrictionsRuleInterface::APPLIES_TO_DELIVERY,
+                'label' => __('Courier')->render(),
+                'value' => RestrictionsRuleInterface::APPLIES_TO_COURIER,
             ],
             [
-                'label' => __('InPost Pay')->render(),
-                'value' => RestrictionsRuleInterface::APPLIES_TO_PAYMENT,
+                'label' => __('APM')->render(),
+                'value' => RestrictionsRuleInterface::APPLIES_TO_APM,
             ],
             [
-                'label' => __('InPost Delivery & InPost Pay')->render(),
+                'label' => __('Courier & APM')->render(),
                 'value' => RestrictionsRuleInterface::APPLIES_TO_BOTH,
             ]
         ];

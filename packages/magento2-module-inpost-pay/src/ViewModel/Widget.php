@@ -12,7 +12,6 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
-use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
@@ -226,7 +225,7 @@ class Widget implements ArgumentInterface
 
         return in_array(
             $productId,
-            $this->restrictedProductIdsProvider->getList($websiteId, RestrictionsRuleInterface::APPLIES_TO_PAYMENT)
+            $this->restrictedProductIdsProvider->getList($websiteId)
         );
     }
 

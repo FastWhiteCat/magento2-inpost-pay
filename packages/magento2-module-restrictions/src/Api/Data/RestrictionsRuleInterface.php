@@ -19,8 +19,8 @@ interface RestrictionsRuleInterface
     public const CONDITIONS_SERIALIZED = 'conditions_serialized';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
-    public const APPLIES_TO_DELIVERY = 1;
-    public const APPLIES_TO_PAYMENT = 2;
+    public const APPLIES_TO_COURIER = 1;
+    public const APPLIES_TO_APM = 2;
     public const APPLIES_TO_BOTH = 3;
 
     public function getRuleId(): ?int;

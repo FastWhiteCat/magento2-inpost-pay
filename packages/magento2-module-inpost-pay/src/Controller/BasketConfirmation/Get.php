@@ -75,13 +75,14 @@ class Get implements HttpGetActionInterface
                         'surname' => $inpostPayQuote->getSurname(),
                         'masked_phone_number' => $inpostPayQuote->getMaskedPhoneNumber()
                     ];
+
+                    $this->quoteRestrictionsValidator->validate($quote, true);
                 } else {
                     $data = [
                         'action' => 'retry'
                     ];
                 }
             }
-            $this->quoteRestrictionsValidator->validate($quote, true);
         } catch (InPostPayRestrictedProductException $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
             $this->messageManager->addWarningMessage($e->getMessage());
