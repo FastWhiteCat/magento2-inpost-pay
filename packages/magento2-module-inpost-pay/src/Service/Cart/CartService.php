@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Cart;
 
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Exception\InvalidPromoCodeException;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
+use InPost\InPostPay\Service\CreateBasketNotice;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
@@ -30,6 +33,7 @@ class CartService
         private readonly ProductRepositoryInterface $productRepository,
         private readonly CartRepositoryInterface $cartRepository,
         private readonly CouponManagementInterface $couponManagement,
+        private readonly CreateBasketNotice $createBasketNotice,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -129,10 +133,38 @@ class CartService
         if (is_scalar($quote->getId())) {
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
+            $appliedCoupon = $quote->getCouponCode();
             try {
                 $this->couponManagement->set((int)$quote->getId(), $couponCode);
+                if ($appliedCoupon && strtolower($appliedCoupon) === strtolower($couponCode)) {
+                    $this->createBasketNotice->execute(
+                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        InPostPayBasketNoticeInterface::ATTENTION,
+                        __('Coupon code is already activated')->render()
+                    );
+                } elseif ($appliedCoupon) {
+                    $this->createBasketNotice->execute(
+                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        InPostPayBasketNoticeInterface::ATTENTION,
+                        __('Coupon code has been updated')->render()
+                    );
+                } else {
+                    $this->createBasketNotice->execute(
+                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        InPostPayBasketNoticeInterface::ATTENTION,
+                        __('Coupon code has been applied')->render()
+                    );
+                }
             } catch (CouldNotSaveException | NoSuchEntityException $e) {
-                throw new InvalidPromoCodeException(__('Promo code "%1" is invalid.', $couponCode));
+                if ($appliedCoupon) {
+                    $this->createBasketNotice->execute(
+                        $quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID),
+                        InPostPayBasketNoticeInterface::ATTENTION,
+                        __('Coupon code has been removed. The code entered is incorrect. Please enter the correct code')->render()
+                    );
+                } else {
+                    throw new InvalidPromoCodeException(__('Promo code "%1" is invalid.', $couponCode));
+                }
             }
             $this->logger->debug(
                 sprintf('Coupon code: %s has been applied to quote ID %s', $couponCode, (int)$quote->getId())
