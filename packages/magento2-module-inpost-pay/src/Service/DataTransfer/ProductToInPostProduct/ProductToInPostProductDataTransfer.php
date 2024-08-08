@@ -153,6 +153,7 @@ class ProductToInPostProductDataTransfer
     {
         $storeId = (int)$originalProduct->getStoreId();
         $originalProductSku = (string)$originalProduct->getSku();
+        /** @var Product $product */
         $product = $this->productRepository->get($originalProductSku, false, $storeId);
         $productId = (int)$product->getId();
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
@@ -166,6 +167,7 @@ class ProductToInPostProductDataTransfer
             && is_scalar($product->getData('configurable_product_id'))
         ) {
             $configurableProductId = (int)$product->getData('configurable_product_id');
+            /** @var Product $product */
             $product = $this->productRepository->getById($configurableProductId, false, $storeId);
             $productImageRole = $product->getData($imageRole);
             $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
