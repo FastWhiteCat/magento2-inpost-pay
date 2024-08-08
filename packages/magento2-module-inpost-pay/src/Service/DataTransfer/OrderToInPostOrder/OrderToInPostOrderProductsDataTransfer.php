@@ -77,29 +77,16 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
 
             $this->productToInPostProductDataTransfer->transfer($product, $inPostProduct, $websiteId, $qty, $options);
 
-            if ($product->getTypeId() === Type::TYPE_BUNDLE) {
-                $basePriceExclTax = DecimalCalculator::round((float)$orderItem->getBasePrice());
-                $basePriceInclTax = DecimalCalculator::round((float)$orderItem->getBasePriceInclTax());
-                $baseTaxValue = DecimalCalculator::sub($basePriceInclTax, $basePriceExclTax);
-
-                /** @var PriceInterface $basePrice */
-                $basePrice = $this->priceFactory->create();
-                $basePrice->setNet($basePriceExclTax);
-                $basePrice->setGross($basePriceInclTax);
-                $basePrice->setVat($baseTaxValue);
-                $inPostProduct->setBasePrice($basePrice);
-            }
-
             $priceExclTax = DecimalCalculator::round((float)$orderItem->getPrice());
             $priceInclTax = DecimalCalculator::round((float)$orderItem->getPriceInclTax());
             $taxValue = DecimalCalculator::sub($priceInclTax, $priceExclTax);
 
-            /** @var PriceInterface $promoPrice */
-            $promoPrice = $this->priceFactory->create();
-            $promoPrice->setNet($priceExclTax);
-            $promoPrice->setGross($priceInclTax);
-            $promoPrice->setVat($taxValue);
-            $inPostProduct->setPromoPrice($promoPrice);
+            /** @var PriceInterface $basePrice */
+            $basePrice = $this->priceFactory->create();
+            $basePrice->setNet($priceExclTax);
+            $basePrice->setGross($priceInclTax);
+            $basePrice->setVat($taxValue);
+            $inPostProduct->setBasePrice($basePrice);
         }
     }
 }
