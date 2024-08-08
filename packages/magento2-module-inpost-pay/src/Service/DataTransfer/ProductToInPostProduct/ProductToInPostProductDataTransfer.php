@@ -35,6 +35,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Store\Model\App\Emulation;
 use Magento\Swatches\Helper\Data as SwatchesHelper;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -72,6 +73,7 @@ class ProductToInPostProductDataTransfer
         private readonly ImageHelper $imageHelper,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
+        private readonly LoggerInterface $logger,
         Filesystem $filesystem
     ) {
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
@@ -148,6 +150,7 @@ class ProductToInPostProductDataTransfer
         $storeId = (int)$originalProduct->getStoreId();
         $originalProductSku = (string)$originalProduct->getSku();
         $product = $this->productRepository->get($originalProductSku, false, $storeId);
+        $productId = (int)$product->getId();
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();
@@ -155,11 +158,11 @@ class ProductToInPostProductDataTransfer
         $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
 
         if ((empty($image) || $image === SwatchesHelper::EMPTY_IMAGE_VALUE)
-            && (int)$product->getId() !== (int)$originalProduct->getId()
+            && $product->hasData('configurable_product_id')
+            && is_scalar($product->getData('configurable_product_id'))
         ) {
-            //If this product comes from quoteItem than SKU belongs to simple but ID remains to parent,
-            //In case of no image for simple product, image will be loaded from parent configurable product
-            $product = $this->productRepository->getById((int)$originalProduct->getId(), false, $storeId);
+            $configurableProductId = (int)$product->getData('configurable_product_id');
+            $product = $this->productRepository->getById($configurableProductId, false, $storeId);
             $productImageRole = $product->getData($imageRole);
             $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
         }
@@ -168,6 +171,21 @@ class ProductToInPostProductDataTransfer
         $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
+            if (isset($configurableProductId)) {
+                $this->logger->debug(
+                    sprintf(
+                        'Image (%s) not found for simple product ID: %s and its parent product ID: %s',
+                        $image,
+                        $productId,
+                        $configurableProductId
+                    )
+                );
+            } else {
+                $this->logger->debug(
+                    sprintf('Image (%s) not found for simple product ID: %s', $image, (int)$product->getId())
+                );
+            }
+
             return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
 
