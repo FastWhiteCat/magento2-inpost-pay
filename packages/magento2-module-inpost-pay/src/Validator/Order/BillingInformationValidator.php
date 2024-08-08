@@ -101,13 +101,19 @@ class BillingInformationValidator implements OrderValidatorInterface
      */
     private function validateBillingAddress(ClientAddressInterface $clientAddress): void
     {
-        $addressDetails = $clientAddress->getAddressDetails();
-        if (empty($clientAddress->getCity())
-            || empty($clientAddress->getCountryCode())
-            || empty($clientAddress->getPostalCode())
-            || empty($addressDetails->getStreet())
-            || (empty($addressDetails->getBuilding()) && empty($addressDetails->getFlat()))
-        ) {
+        if (empty($clientAddress->getCity())) {
+            throw new LocalizedException(__('Incomplete billing address city data.'));
+        }
+
+        if (empty($clientAddress->getCountryCode())) {
+            throw new LocalizedException(__('Incomplete billing address country data.'));
+        }
+
+        if (empty($clientAddress->getPostalCode())) {
+            throw new LocalizedException(__('Incomplete billing address postal code data.'));
+        }
+
+        if (empty($clientAddress->getAddress())) {
             throw new LocalizedException(__('Incomplete billing address data.'));
         }
     }
