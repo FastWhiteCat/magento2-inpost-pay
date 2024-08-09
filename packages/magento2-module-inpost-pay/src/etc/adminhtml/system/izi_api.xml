@@ -14,6 +14,10 @@
             <config_path>payment/inpost_pay/basket_lifetime</config_path>
             <comment>InPost basket lifetime in seconds.</comment>
         </field>
+        <field id="button" translate="label comment" type="button" sortOrder="45"
+               showInDefault="1" showInWebsite="1" showInStore="1">
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\SynchronizePaymentMethodsButton</frontend_model>
+        </field>
         <field id="accepted_payment_types" translate="label comment" type="multiselect" sortOrder="50" showInDefault="1"
                canRestore="1">
             <label>Accepted Payment Types in InPost Basket</label>

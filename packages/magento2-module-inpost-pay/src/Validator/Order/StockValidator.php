@@ -8,7 +8,6 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
-use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;

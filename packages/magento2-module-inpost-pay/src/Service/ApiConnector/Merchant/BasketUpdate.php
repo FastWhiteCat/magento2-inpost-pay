@@ -93,6 +93,7 @@ class BasketUpdate implements BasketUpdateInterface
 
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+            $quote->setData(InPostPayQuoteInterface::INPOST_BASKET_ID, $basketId);
 
             try {
                 $this->updateQuote(

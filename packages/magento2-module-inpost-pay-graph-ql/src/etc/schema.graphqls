@@ -96,6 +96,9 @@ type InPostPayBasketBrowser {
 }
 
 type StoreConfig {
+    inpost_pay_widget_enabled : String
+    @doc(description: "Indicates whether widget should be displayed or not. Possible values: 1 (Yes) and 0 (No).")
+
     inpost_pay_show_on_product_cart : String
     @doc(description: "Indicates whether widget should be displayed on product page or not. Possible values: 1 (Yes) and 0 (No).")
 
@@ -129,6 +132,12 @@ type StoreConfig {
     inpost_pay_widget_frame_style : InPostPayWidgetFrameStyleEnum
     @doc(description: "InPost Pay widget frame corner style.")
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayWidgetFrameStyleResolver")
+
+    inpost_pay_polling_enabled_for_inactive : String
+    @doc(description: "Indicates whether widget should refresh inactive browser page or not. Possible values: 1 (Yes) and 0 (No).")
+
+    inpost_pay_polling_time_for_inactive : String
+    @doc(description: "InPost Pay widget refreshing time (in milliseconds) for inactive browser page.")
 }
 
 enum InPostPayAction @doc(description: "Defines action that should be taken as a result of processing request") {

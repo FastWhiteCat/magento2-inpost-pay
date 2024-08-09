@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Validator;
 
 use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
-use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Quote\Model\Quote;
 
@@ -54,7 +53,7 @@ class QuoteRestrictionsValidator
     {
         return in_array(
             $productId,
-            $this->restrictedProductIdsProvider->getList($websiteId, RestrictionsRuleInterface::APPLIES_TO_PAYMENT)
+            $this->restrictedProductIdsProvider->getList($websiteId)
         );
     }
 }

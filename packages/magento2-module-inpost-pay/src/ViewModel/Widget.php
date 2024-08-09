@@ -12,7 +12,6 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
-use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
@@ -33,6 +32,7 @@ class Widget implements ArgumentInterface
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
     private const MAX_WIDTH = 'maxWidth';
+    private const MIN_HEIGHT = 'minHeight';
     private const FRAME_STYLE = 'frameStyle';
 
     /**
@@ -69,7 +69,7 @@ class Widget implements ArgumentInterface
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled();
+        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
     }
 
     /**
@@ -91,12 +91,14 @@ class Widget implements ArgumentInterface
         $variant = $this->layoutConfigProvider->getColorVariant();
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
         $maxWidth = $this->layoutConfigProvider->getMaxWidth();
+        $minHeight = $this->layoutConfigProvider->getMinHeight();
         $frameStyle = $this->layoutConfigProvider->getFrameStyle();
 
         return [
             self::VARIANT => $variant,
             self::DARK_MODE => $darkMode,
             self::MAX_WIDTH => $maxWidth,
+            self::MIN_HEIGHT => $minHeight,
             self::FRAME_STYLE => $frameStyle
         ];
     }
@@ -223,7 +225,7 @@ class Widget implements ArgumentInterface
 
         return in_array(
             $productId,
-            $this->restrictedProductIdsProvider->getList($websiteId, RestrictionsRuleInterface::APPLIES_TO_PAYMENT)
+            $this->restrictedProductIdsProvider->getList($websiteId)
         );
     }
 

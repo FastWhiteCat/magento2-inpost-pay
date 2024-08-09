@@ -13,10 +13,10 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Provider\Product\OmnibusProductLowestPriceProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\Cart\Item\QuoteItemProductExtractor;
 use InPost\InPostPay\Service\CreateBasketNotice;
 use InPost\InPostPay\Service\PrepareQuoteProductsQuantity;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
-use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
@@ -38,6 +38,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly PrepareQuoteProductsQuantity $prepareQuoteProductsQuantity,
+        private readonly QuoteItemProductExtractor $quoteItemProductExtractor,
         private readonly OmnibusProductLowestPriceProvider $omnibusProductLowestPriceProvider,
         private readonly LoggerInterface $logger
     ) {
@@ -51,7 +52,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             /** @var ProductInterface $inPostProduct */
             /** @var Item $quoteItem */
             $inPostProduct = $this->productFactory->create();
-            $product = $quoteItem->getProduct();
+            $product = $this->quoteItemProductExtractor->extractProductFromQuoteItem($quoteItem);
             $websiteId = (int)$quote->getStore()->getWebsiteId();
             $qty = (float)$quoteItem->getQty();
             $options = [];
@@ -145,10 +146,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
 
     private function isRestricted(int $productId, int $websiteId): bool
     {
-        $restrictedProductIds = $this->restrictedProductIdsProvider->getList(
-            $websiteId,
-            RestrictionsRuleInterface::APPLIES_TO_PAYMENT
-        );
+        $restrictedProductIds = $this->restrictedProductIdsProvider->getList($websiteId);
 
         return in_array($productId, $restrictedProductIds);
     }

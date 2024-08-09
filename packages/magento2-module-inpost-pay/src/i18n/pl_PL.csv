@@ -109,6 +109,12 @@
 "Invalid mail format in: ""%1""","Niepoprawny format adresu mailoweg    o: ""%1""",module,InPost_InPostPay
 "Incomplete delivery address data.","Niekompletne dane adresu dostawy.",module,InPost_InPostPay
 "Incomplete billing address data.","Niekompletne dane adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete billing address city data.","Niekompletne dane miasta adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete billing address country data.","Niekompletne dane kraju adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete billing address postal code data.","Niekompletne dane kodu pocztowego adresu rozliczeniowego.",module,InPost_InPostPay
+"Incomplete delivery address city data.","Niekompletne dane miasta adresu dostawy.",module,InPost_InPostPay
+"Incomplete delivery address country data.","Niekompletne dane kraju adresu dostawy.",module,InPost_InPostPay
+"Incomplete delivery address postal code data.","Niekompletne dane kodu pocztowego adresu dostawy.",module,InPost_InPostPay
 "Incomplete invoice address data.","Niekompletne dane adresu do faktury.",module,InPost_InPostPay
 "Consents validation failed. Reason: %1","Weryfikacja zgód nie przebiegła pomyślnie. Powód: %1",module,InPost_InPostPay
 "Consent %1 version is not up to date. Expected: %2 Received: %3","Wersja zgody %1 jest nieaktualna. Oczekiwana: %2 Otrzymana: %3",module,InPost_InPostPay
@@ -149,3 +155,14 @@
 "InPost Pay API returned transaction refund status: failed. External Refund ID: %1 Description: %2","Otrzymani z API InPost Pay status zwrotu środków to: nieudany: %1. Zwenętrzny ID Zwrotu: %1 Opis: %2",module,InPost_InPostPay
 "Enable removing special characters and HTML code from product attributes sent to InPost Pay Mobile App.","Włącz usuwanie znaków specjalnych i kodu HTML z atrybutów produktowych wysyłanych do Aplikacji Mobilnej InPost Pay",module,InPost_InPostPay
 "No transactions found to be refunded for Order #%1.","Nie znaleziono transakcji do zwrotu dla Zamówienia #%1.",module,InPost_InPostPay
+"Use order address firstname and lastname instead of customer firstname and lastname","Użyj imienia i nazwiska z adresu zamiast imienia i nazwiska klienta",module,InPost_InPostPay
+"Image role sended to InPost Pay","Rola obrazu wysyłana do InPost Pay",module,InPost_InPostPay
+"Synchronize payment methods","Zsynchronizuj dostępne metody płatności",module,InPost_InPostPay
+"Error occurred in payment method synchronization.","Wystąpił błąd podczas synronizacji metod płatności",module,InPost_InPostPay
+"Payment methods synchronization complete.","Synchronizacja metod płatności została ukończona",module,InPost_InPostPay
+"There was a problem with getting payment methods. Details: %1","Wystąpił problem z uzyskaniem metod płatności. Szczegóły %1 ",module,InPost_InPostPay
+"Enable removing special characters and HTML code from product attributes sent to InPost Pay Mobile App.","Włącz usuwanie znaków specjalnych i kodu HTML z atrybutów produktowych wysyłanych do Aplikacji Mobilnej InPost Pay",module,InPost_InPostPay
+"Coupon code has been applied","Kod został aktywowany",module,InPost_InPostPay
+"Coupon code is already activated","Kod jest już aktywowany",module,InPost_InPostPay
+"Coupon code has been removed. The code entered is incorrect. Please enter the correct code","Usunięto kod rabatowy. W prowadzony kod jest niepoprawny. Wpisz poprawny kod",module,InPost_InPostPay
+"Coupon code has been updated","Kod został zaktualizowany",module,InPost_InPostPay

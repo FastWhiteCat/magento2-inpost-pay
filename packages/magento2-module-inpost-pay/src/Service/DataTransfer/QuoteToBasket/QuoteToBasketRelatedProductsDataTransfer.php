@@ -7,7 +7,6 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
-use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Catalog\Model\Product;
@@ -87,8 +86,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                 )->addFieldToFilter(
                     $productsCollection->getProductEntityMetadata()->getLinkField(),
                     ['nin' => $this->restrictedProductIdsProvider->getList(
-                        $websiteId,
-                        RestrictionsRuleInterface::APPLIES_TO_PAYMENT
+                        $websiteId
                     )]
                 );
 
