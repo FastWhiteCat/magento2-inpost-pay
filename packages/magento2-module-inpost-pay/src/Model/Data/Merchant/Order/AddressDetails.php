@@ -11,9 +11,9 @@ use Magento\Framework\DataObject;
 class AddressDetails extends DataObject implements AddressDetailsInterface, ExtensibleDataInterface
 {
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStreet(): string
+    public function getStreet(): ?string
     {
         $street = $this->getData(self::STREET);
 
@@ -21,18 +21,18 @@ class AddressDetails extends DataObject implements AddressDetailsInterface, Exte
     }
 
     /**
-     * @param string $street
+     * @param string|null $street
      * @return void
      */
-    public function setStreet(string $street): void
+    public function setStreet(?string $street): void
     {
         $this->setData(self::STREET, $street);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBuilding(): string
+    public function getBuilding(): ?string
     {
         $building = $this->getData(self::BUILDING);
 
@@ -40,18 +40,18 @@ class AddressDetails extends DataObject implements AddressDetailsInterface, Exte
     }
 
     /**
-     * @param string $building
+     * @param string|null $building
      * @return void
      */
-    public function setBuilding(string $building): void
+    public function setBuilding(?string $building): void
     {
         $this->setData(self::BUILDING, $building);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFlat(): string
+    public function getFlat(): ?string
     {
         $flat = $this->getData(self::FLAT);
 
@@ -59,10 +59,10 @@ class AddressDetails extends DataObject implements AddressDetailsInterface, Exte
     }
 
     /**
-     * @param string $flat
+     * @param string|null $flat
      * @return void
      */
-    public function setFlat(string $flat): void
+    public function setFlat(?string $flat): void
     {
         $this->setData(self::FLAT, $flat);
     }
