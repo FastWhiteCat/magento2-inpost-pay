@@ -11,6 +11,7 @@ use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Provider\Product\OmnibusProductLowestPriceProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\Cart\Item\QuoteItemProductExtractor;
 use InPost\InPostPay\Service\CreateBasketNotice;
@@ -38,6 +39,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly PrepareQuoteProductsQuantity $prepareQuoteProductsQuantity,
         private readonly QuoteItemProductExtractor $quoteItemProductExtractor,
+        private readonly OmnibusProductLowestPriceProvider $omnibusProductLowestPriceProvider,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -102,6 +104,14 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 $options,
                 $quoteItemsQuantity
             );
+
+            if ($this->omnibusProductLowestPriceProvider->canSendLowestPrice($quoteItem)) {
+                $lowestPrice = $this->omnibusProductLowestPriceProvider->getLowestPrice($product);
+
+                if ($lowestPrice) {
+                    $inPostProduct->setLowestPrice($lowestPrice);
+                }
+            }
 
             if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
                 $inPostProduct->setProductId($inPostProduct->getProductId() . '_' . $quoteItem->getId());

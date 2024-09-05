@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.8] - 2024-09-05
+
+### Added
+
+- Configuration that allows to set up CRON process for refreshing restricted products list
+- CRON job that deletes and regenerates all products restricted by configured restriction rules
+
 ## [1.0.7] - 2024-08-08
 
 ### Added

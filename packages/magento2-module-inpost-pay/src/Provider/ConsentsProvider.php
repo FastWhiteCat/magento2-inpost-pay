@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider;
 
+use InPost\InPostPay\Block\Adminhtml\Form\Field\TermsAndConditionsField;
 use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
 use InPost\InPostPay\Provider\Config\TermsAndConditionsMappingConfigProvider;
 use InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface;
@@ -15,8 +16,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 class ConsentsProvider
 {
     private const CONSENT_DESCRIPTION_MAX_LENGTH = 150;
-
-    public const MAGENTO_AGREEMENT_ID_FIELD = 'magento_agreement_id';
 
     /**
      * @param TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider
@@ -52,23 +51,37 @@ class ConsentsProvider
                 return [];
             }
 
-            $ids = array_column($termsAndConditionsMapping, self::MAGENTO_AGREEMENT_ID_FIELD);
+            $ids = array_column($termsAndConditionsMapping, TermsAndConditionsField::MAGENTO_AGREEMENT_ID_FIELD);
 
             $checkoutAgreementsArray = $this->getCheckoutAgreementsList($ids);
             $checkoutAgreementsVersion = $this->getCheckoutAgreementsVersion($ids);
 
             $consents = [];
             foreach ($termsAndConditionsMapping as $item) {
+                $additionalConsentLinks = [];
+
+                foreach ($item[TermsAndConditionsField::ADDITIONAL_LINKS_FIELD] ?? [] as $additionalConsentLink) {
+                    $additionalConsentLinks[] = [
+                        'consent_id' => $additionalConsentLink[TermsAndConditionsField::MAGENTO_AGREEMENT_ID_FIELD],
+                        'consent_link' => $additionalConsentLink[TermsAndConditionsField::AGREEMENT_URL_FIELD],
+                        'label_link' => $additionalConsentLink[TermsAndConditionsField::LINK_LABEL_FIELD] ?? null,
+                    ];
+                }
+
                 $consents[] = [
-                    'consent_id' => $item[self::MAGENTO_AGREEMENT_ID_FIELD],
-                    'consent_link' => $item['agreement_url'],
+                    'consent_id' => $item[TermsAndConditionsField::MAGENTO_AGREEMENT_ID_FIELD],
+                    'consent_link' => $item[TermsAndConditionsField::AGREEMENT_URL_FIELD],
+                    'label_link' => $item[TermsAndConditionsField::LINK_LABEL_FIELD] ?? null,
+                    'additional_consent_links' => $additionalConsentLinks,
                     'consent_description' => substr(
-                        $checkoutAgreementsArray[$item[self::MAGENTO_AGREEMENT_ID_FIELD]]['name'],
+                        $checkoutAgreementsArray[$item[TermsAndConditionsField::MAGENTO_AGREEMENT_ID_FIELD]]['name'],
                         0,
                         self::CONSENT_DESCRIPTION_MAX_LENGTH
                     ),
-                    'consent_version' => $checkoutAgreementsVersion[$item[self::MAGENTO_AGREEMENT_ID_FIELD]],
-                    'requirement_type' => $item['requirement']
+                    'consent_version' => $checkoutAgreementsVersion[
+                        $item[TermsAndConditionsField::MAGENTO_AGREEMENT_ID_FIELD]
+                    ] ?? '1',
+                    'requirement_type' => $item[TermsAndConditionsField::REQUIREMENT_FIELD]
                 ];
             }
 
@@ -82,11 +95,8 @@ class ConsentsProvider
             );
         }
 
-        if (empty($consents)) {
-            return [];
-        }
-
-        return is_array($consents) ? $consents : $this->serializer->unserialize($consents);
+        /** @phpstan-ignore-next-line */
+        return is_array($consents) ? $consents : (array)$this->serializer->unserialize($consents);
     }
 
     /**
