@@ -25,6 +25,8 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$longPollingTimeForInactiveTab = $widgetViewModel->getLongPollingTimeForInactiveTab();
+$isEnabledLongPollingForInactiveTab = $widgetViewModel->isEnabledLongPollingForInactiveTab();
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
@@ -37,6 +39,7 @@ $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
         basket="false"
         dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
         max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
+        min_height="<?= /* @noEscape */ $layoutConfig['minHeight'] ?: '' ?>"
         frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
         count="0"
         binding_place="<?= /* @noEscape */ $bindingPlace ?>">
@@ -49,7 +52,10 @@ $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
                     "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
                     "popupBindingPlace": "<?= /* @noEscape */
                         DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
-                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>"
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
+                    "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
+                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */
+                    $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
                 }
             }
         }

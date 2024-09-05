@@ -19,7 +19,7 @@ class RestrictedProductIdsProvider
     ) {
     }
 
-    public function getList(int $websiteId, int $appliesTo): array
+    public function getList(int $websiteId, int $appliesTo = 0): array
     {
         $cacheKey = $this->getCacheKey($websiteId, $appliesTo);
         if (isset($this->cachedRestrictedProductIds[$cacheKey])
@@ -30,9 +30,16 @@ class RestrictedProductIdsProvider
 
         $encodedRestrictedProductsList = (string)$this->restrictedProductsCache->load($cacheKey);
         if (empty($encodedRestrictedProductsList)) {
-            $encodedRestrictedProductsList = (string)$this->serializer->serialize(
-                $this->restrictionRuleProductMassActionService->getRuleProductsByWebsiteId($websiteId, $appliesTo)
-            );
+            if ($appliesTo !== 0) {
+                $encodedRestrictedProductsList = (string)$this->serializer->serialize(
+                    $this->restrictionRuleProductMassActionService->getRuleProductsByAppliesTo($websiteId, $appliesTo)
+                );
+            } else {
+                $encodedRestrictedProductsList = (string)$this->serializer->serialize(
+                    $this->restrictionRuleProductMassActionService->getRuleProductsByWebsiteId($websiteId)
+                );
+            }
+
             $this->restrictedProductsCache->save(
                 $encodedRestrictedProductsList,
                 $cacheKey,

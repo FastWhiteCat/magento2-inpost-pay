@@ -5,17 +5,25 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Model\Utils\StringUtils;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Type;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
 use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
@@ -25,6 +33,9 @@ use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\Store\Model\App\Emulation;
+use Magento\Swatches\Helper\Data as SwatchesHelper;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -36,10 +47,22 @@ class ProductToInPostProductDataTransfer
 
     public const UNMANAGED_STOCK_QUANTITY = 9999;
 
+    public const ALL_DELIVERY_TYPES = [
+        RestrictionsRuleInterface::APPLIES_TO_COURIER => InPostDeliveryType::COURIER,
+        RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM
+    ];
+
     private ?MagentoProductInterface $product = null;
 
+    private WriteInterface $mediaDirectory;
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
+        private readonly DeliveryProductInterfaceFactory $deliveryProductFactory,
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
@@ -47,8 +70,13 @@ class ProductToInPostProductDataTransfer
         private readonly ManageStockCondition $manageStockCondition,
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
-        private readonly ImageHelper $imageHelper
+        private readonly ImageHelper $imageHelper,
+        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly Emulation $emulation,
+        private readonly LoggerInterface $logger,
+        Filesystem $filesystem
     ) {
+        $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
 
     public function transfer(
@@ -114,19 +142,65 @@ class ProductToInPostProductDataTransfer
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
+        $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
     }
 
-    private function getProductImageUrl(Product $product): string
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+     */
+    private function getProductImageUrl(Product $originalProduct): string
     {
-        $imageUrl = '';
-        $smallImageAttrValue = $product->getData('small_image');
-        if (is_scalar($smallImageAttrValue)) {
-            $imageUrl = $this->imageHelper->init($product, 'product_page_image_small')
-                ->setImageFile((string)$smallImageAttrValue)
-                ->getUrl();
+        $storeId = (int)$originalProduct->getStoreId();
+        $originalProductSku = (string)$originalProduct->getSku();
+        /** @var Product $product */
+        $product = $this->productRepository->get($originalProductSku, false, $storeId);
+        $productId = (int)$product->getId();
+        $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
+
+        $imageRole = $this->generalConfigProvider->getImageRole();
+        $productImageRole = $product->getData($imageRole);
+        $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
+
+        if ((empty($image) || $image === SwatchesHelper::EMPTY_IMAGE_VALUE)
+            && $product->hasData('configurable_product_id')
+            && is_scalar($product->getData('configurable_product_id'))
+        ) {
+            $configurableProductId = (int)$product->getData('configurable_product_id');
+            /** @var Product $product */
+            $product = $this->productRepository->getById($configurableProductId, false, $storeId);
+            $productImageRole = $product->getData($imageRole);
+            $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
         }
 
-        return $imageUrl;
+        // @phpstan-ignore-next-line
+        $imgPath = $product->getMediaConfig()->getMediaPath($image);
+
+        if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
+            if (isset($configurableProductId)) {
+                $this->logger->debug(
+                    sprintf(
+                        'Image (%s) not found for simple product ID: %s and its parent product ID: %s',
+                        $image,
+                        $productId,
+                        $configurableProductId
+                    )
+                );
+            } else {
+                $this->logger->debug(
+                    sprintf('Image (%s) not found for simple product ID: %s', $image, (int)$product->getId())
+                );
+            }
+
+            return $this->imageHelper->getDefaultPlaceholderUrl('image');
+        }
+
+        // @phpstan-ignore-next-line
+        $imgUrl = $product->getMediaConfig()->getMediaUrl($image);
+
+        $this->emulation->stopEnvironmentEmulation();
+
+        return $imgUrl;
     }
 
     private function getProductAttributes(Product $product, array $selectedOptions = []): array
@@ -276,5 +350,40 @@ class ProductToInPostProductDataTransfer
         }
 
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
+    }
+
+    private function getDeliveryProduct(Product $product, int $websiteId): array
+    {
+        $productId = (int)$product->getId();
+        $simpleProductId = (int)$this->extractProductId($product);
+
+        $productRestricted = $this->isProductRestricted($productId, $websiteId);
+        $productRestricted = $productRestricted || $this->isProductRestricted($simpleProductId, $websiteId);
+
+        $deliveryProductArr = [];
+        foreach (self::ALL_DELIVERY_TYPES as $key => $enum) {
+            $deliveryProduct = $this->deliveryProductFactory->create();
+            if ($productRestricted) {
+                $available = false;
+            } else {
+                $available = !(
+                    $this->isProductRestricted($productId, $websiteId, $key)
+                    || $this->isProductRestricted($simpleProductId, $websiteId, $key)
+                );
+            }
+            $deliveryProduct->setDeliveryType($enum->value);
+            $deliveryProduct->setIfDeliveryAvailable($available);
+            $deliveryProductArr[] = $deliveryProduct;
+        }
+
+        return $deliveryProductArr;
+    }
+
+    private function isProductRestricted(int $productId, int $websiteId, int $appliesTo = 0): bool
+    {
+        return in_array(
+            $productId,
+            $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
+        );
     }
 }

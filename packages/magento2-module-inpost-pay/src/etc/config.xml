@@ -4,11 +4,13 @@
         <payment>
             <inpost_pay>
                 <active>0</active>
+                <widget_enabled>1</widget_enabled>
                 <can_use_checkout>1</can_use_checkout>
                 <model>InPostPayPaymentFacade</model>
                 <title>InPost Pay</title>
                 <order_status>pending</order_status>
                 <allowspecific>0</allowspecific>
+                <image_role>small_image</image_role>
                 <sort_order>5</sort_order>
                 <min_order_total>0</min_order_total>
                 <max_order_total>99999</max_order_total>
@@ -36,6 +38,8 @@
                 <can_refund>1</can_refund>
                 <is_offline>1</is_offline>
                 <use_address_as_firstname_source>0</use_address_as_firstname_source>
+                <polling_time_for_inactive>10000</polling_time_for_inactive>
+                <polling_enabled_for_inactive>1</polling_enabled_for_inactive>
             </inpost_pay>
         </payment>
     </default>
