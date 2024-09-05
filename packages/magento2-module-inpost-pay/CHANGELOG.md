@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.8] - 2024-09-05
+
+### Added
+
+- Omnibus - configuration that allows to mark rules with Omnibus flag and select which attribute contains lowest price
+
+### Changed
+
+- Mapping for terms and condition. It now allows to create a tree structure with sub links
+
+### Fixed
+
+- Zero quantity on place order from mobile App will now trigger notices and warnings 
+
 ## [1.0.7] - 2024-08-08
 
 ### Changed
