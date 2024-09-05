@@ -184,6 +184,10 @@
         <plugin name="InPost_InPostPay::CartItemProcessorPlugin"
                 type="InPost\InPostPay\Plugin\ConfigurableProduct\CartItemProcessorPlugin" />
     </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer">
+        <plugin name="InPost_InPostPay::zeroQuantityWhenOutOfStockPlugin"
+                type="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ZeroQuantityWhenOutOfStockPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
@@ -556,6 +560,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ZeroQuantityWhenOutOfStockPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
