@@ -11,7 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class TermsAndConditionsMappingConfigProvider
 {
-    private const XML_PATH_TERMS_AND_CONDITIONS_MAPPING = 'payment/inpost_pay/terms_and_conditions_mapping';
+    private const XML_PATH_TERMS_AND_CONDITIONS_MAPPING = 'payment/inpost_pay/terms_and_conditions_new_mapping';
 
     /**
      * @param ScopeConfigInterface $scopeConfig

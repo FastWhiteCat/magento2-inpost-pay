@@ -80,7 +80,7 @@ class ConsentsProvider
                     ),
                     'consent_version' => $checkoutAgreementsVersion[
                         $item[TermsAndConditionsField::MAGENTO_AGREEMENT_ID_FIELD]
-                    ],
+                    ] ?? '1',
                     'requirement_type' => $item[TermsAndConditionsField::REQUIREMENT_FIELD]
                 ];
             }

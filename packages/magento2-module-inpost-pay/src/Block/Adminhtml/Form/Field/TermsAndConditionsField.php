@@ -49,8 +49,7 @@ class TermsAndConditionsField extends AbstractFieldArray
         ]);
 
         $this->addColumn(self::AGREEMENT_NAME_FIELD, [
-            'label' => __('Link Label'),
-            'class' => 'required-entry'
+            'label' => __('Link Label')
         ]);
 
         $this->_addAfter = false;
