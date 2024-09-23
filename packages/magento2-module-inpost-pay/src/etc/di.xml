@@ -576,4 +576,14 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Observer\Quote\UpdateInPostBasketBeforeQuoteMergeEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>
