@@ -15,5 +15,29 @@
             <source_model>InPost\InPostPay\Model\Config\Source\SalesRules</source_model>
             <config_path>payment/inpost_pay/omnibus_salesrules</config_path>
         </field>
+        <field id="enable_custom_promo_price_for_customer_group" translate="label" type="select" sortOrder="50"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Enable Custom Promo Price For Specific Customer Groups</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/enable_custom_promo_price_for_customer_group</config_path>
+        </field>
+        <field id="custom_promo_price_attribute_for_customer_group" translate="label" type="select" sortOrder="55"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Custom Promo Price Attribute For Specific Customer Groups</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ProductAttributes</source_model>
+            <config_path>payment/inpost_pay/custom_promo_price_attribute_for_customer_group</config_path>
+            <depends>
+                <field id="enable_custom_promo_price_for_customer_group">1</field>
+            </depends>
+        </field>
+        <field id="custom_promo_price_customer_groups" translate="label" type="multiselect" sortOrder="60"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Custom Promo Price Customer Groups</label>
+            <source_model>Magento\Customer\Model\Customer\Source\Group</source_model>
+            <config_path>payment/inpost_pay/custom_promo_price_customer_groups</config_path>
+            <depends>
+                <field id="enable_custom_promo_price_for_customer_group">1</field>
+            </depends>
+        </field>
     </group>
 </include>

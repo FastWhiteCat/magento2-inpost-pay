@@ -27,7 +27,7 @@ class ZeroQuantityWhenOutOfStockPlugin
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function afterTransfer(
+    public function afterTransfer( //@phpstan-ignore-line
         QuoteToBasketProductsDataTransfer $subject,
         $result,
         Quote $quote,

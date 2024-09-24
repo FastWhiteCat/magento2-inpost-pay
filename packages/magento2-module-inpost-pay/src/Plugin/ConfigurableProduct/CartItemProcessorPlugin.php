@@ -8,8 +8,18 @@ use Magento\Quote\Api\Data\CartItemInterface;
 
 class CartItemProcessorPlugin
 {
-    public function afterConvertToBuyRequest(CartItemProcessor $subject, $result, CartItemInterface $cartItem): void
-    {
+    /**
+     * @param CartItemProcessor $subject
+     * @param $result
+     * @param CartItemInterface $cartItem
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function afterConvertToBuyRequest( //@phpstan-ignore-line
+        CartItemProcessor $subject,
+        $result,
+        CartItemInterface $cartItem
+    ): void {
         if ($result
             && $cartItem->getProductOption()
             && $cartItem->getProductOption()->getExtensionAttributes()
