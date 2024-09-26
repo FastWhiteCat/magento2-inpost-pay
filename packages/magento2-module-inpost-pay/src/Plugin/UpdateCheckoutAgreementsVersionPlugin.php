@@ -53,7 +53,7 @@ class UpdateCheckoutAgreementsVersionPlugin
             $data['version'] = uniqid();
 
             $this->checkoutAgreementsVersionRepository->save($data);
-            $this->cache->clean(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
+            $this->cache->clean([TermsAndConditionsCacheType::TYPE_IDENTIFIER]);
         }
     }
 }

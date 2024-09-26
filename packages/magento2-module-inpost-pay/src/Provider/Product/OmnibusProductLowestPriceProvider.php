@@ -38,13 +38,13 @@ class OmnibusProductLowestPriceProvider
      * @param LoggerInterface $logger
      */
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly OmnibusConfigProvider $omnibusConfigProvider,
-        private readonly TaxConfig $taxConfig,
-        private readonly TaxCalculation $taxCalculation,
-        private readonly PriceInterfaceFactory $priceFactory,
-        private readonly EventManager $eventManager,
-        private readonly LoggerInterface $logger
+        protected readonly ProductRepositoryInterface $productRepository,
+        protected readonly OmnibusConfigProvider $omnibusConfigProvider,
+        protected readonly TaxConfig $taxConfig,
+        protected readonly TaxCalculation $taxCalculation,
+        protected readonly PriceInterfaceFactory $priceFactory,
+        protected readonly EventManager $eventManager,
+        protected readonly LoggerInterface $logger
     ) {
     }
 
@@ -129,6 +129,21 @@ class OmnibusProductLowestPriceProvider
     }
 
     /**
+     * @param Product $product
+     * @return float
+     */
+    protected function getProductTaxRate(Product $product): float
+    {
+        // @phpstan-ignore-next-line
+        $productTaxClassId = $product->getTaxClassId();
+        $request = $this->taxCalculation->getRateRequest(null, null, null, $product->getStore());
+        // @phpstan-ignore-next-line
+        $request->setProductClassId($productTaxClassId);
+
+        return $this->taxCalculation->getRate($request);
+    }
+
+    /**
      * @return array
      */
     private function getOmnibusRuleIds(): array
@@ -154,20 +169,5 @@ class OmnibusProductLowestPriceProvider
         }
 
         return $this->omnibusLowestPriceAttributeCode;
-    }
-
-    /**
-     * @param Product $product
-     * @return float
-     */
-    private function getProductTaxRate(Product $product): float
-    {
-        // @phpstan-ignore-next-line
-        $productTaxClassId = $product->getTaxClassId();
-        $request = $this->taxCalculation->getRateRequest(null, null, null, $product->getStore());
-        // @phpstan-ignore-next-line
-        $request->setProductClassId($productTaxClassId);
-
-        return $this->taxCalculation->getRate($request);
     }
 }
