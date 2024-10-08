@@ -202,7 +202,7 @@ class InitBasket implements InitBasketInterface
         ?string $basketId = null
     ): InPostPayQuoteInterface {
         $tempBasketId = $this->getBasketId->get((int)$quote->getId(), true); //@phpstan-ignore-line
-        $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId($tempBasketId);
+        $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$tempBasketId);
 
         if ($basketId) {
             $inPostPayQuote->setBasketId($basketId);
@@ -220,7 +220,7 @@ class InitBasket implements InitBasketInterface
 
         $this->inPostPayQuoteRepository->save($inPostPayQuote);
 
-        return $this->inPostPayQuoteRepository->getByBasketId($basketId);
+        return $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
     }
 
     /**

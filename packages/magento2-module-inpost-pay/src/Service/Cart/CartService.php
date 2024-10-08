@@ -50,7 +50,7 @@ class CartService
     {
         $quoteId = $this->cartManagement->createEmptyCart();
 
-        return $this->cartRepository->get($quoteId);
+        return $this->cartRepository->get($quoteId); //@phpstan-ignore-line
     }
 
     /**
