@@ -101,11 +101,15 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
-
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
     <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface"
+                type="InPost\InPostPay\Model\InPostPayBestsellerProduct"/>
+    <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayBestsellerProductRepository"/>
+
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
