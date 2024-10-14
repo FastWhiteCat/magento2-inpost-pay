@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Controller\Bestsellers;
+namespace InPost\InPostPay\Controller\Adminhtml\Bestsellers;
 
 use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Framework\Controller\Result\RedirectFactory;
 
 class BestsellersController
 {

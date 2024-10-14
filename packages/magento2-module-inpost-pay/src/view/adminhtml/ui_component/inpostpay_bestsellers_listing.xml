@@ -6,15 +6,32 @@
 		</item>
 	</argument>
 	<settings>
-		<spinner>inpostrestrictions_bestsellers_columns</spinner>
+		<spinner>inpostpay_bestsellers_columns</spinner>
 		<deps>
 			<dep>inpostpay_bestsellers_listing.inpostpay_bestsellers_listing_listing_data_source</dep>
 		</deps>
+        <buttons>
+            <button name="upload">
+                <url path="*/*/upload"/>
+                <class>primary</class>
+                <label translate="true">Upload Products to InPost Pay</label>
+            </button>
+            <button name="download">
+                <url path="*/*/download"/>
+                <class>primary</class>
+                <label translate="true">Download Products from InPost Pay</label>
+            </button>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Bestseller Product</label>
+            </button>
+        </buttons>
 	</settings>
 	<dataSource name="inpostpay_bestsellers_listing_listing_data_source" component="Magento_Ui/js/grid/provider">
 		<settings>
 			<storageConfig>
-				<param name="indexField" xsi:type="string">rule_id</param>
+				<param name="indexField" xsi:type="string">bestseller_product_id</param>
 			</storageConfig>
 			<updateUrl path="mui/index/render"/>
 		</settings>
@@ -35,11 +52,11 @@
 		<filters name="listing_filters"/>
 		<paging name="listing_paging"/>
 	</listingToolbar>
-	<columns name="inpostrestrictions_bestsellers_columns">
+	<columns name="inpostpay_bestsellers_columns">
 		<settings>
 			<childDefaults>
 				<param name="fieldAction" xsi:type="array">
-					<item name="provider" xsi:type="string">inpostpay_bestsellers_listing.inpostpay_bestsellers_listing.inpostrestrictions_bestsellers_columns</item>
+					<item name="provider" xsi:type="string">inpostpay_bestsellers_listing.inpostpay_bestsellers_listing.inpostpay_bestsellers_columns</item>
 					<item name="target" xsi:type="string">startEdit</item>
 					<item name="params" xsi:type="array">
 						<item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
@@ -66,15 +83,21 @@
                 <label translate="true">SKU</label>
             </settings>
         </column>
-        <column name="is_enabled" component="Magento_Ui/js/grid/columns/select">
+        <column name="product_name" class="InPost\InPostPay\Ui\Component\Listing\Column\ProductName">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="label" xsi:type="string" translate="true">Product Name</item>
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                </item>
+            </argument>
             <settings>
-                <options class="Magento\Config\Model\Config\Source\Yesno"/>
-                <filter>select</filter>
-                <dataType>select</dataType>
-                <label translate="true">Is Enabled</label>
+                <filter>text</filter>
+                <label translate="true">Product Name</label>
+                <sortable>false</sortable>
             </settings>
         </column>
-        <column name="website_id" class="InPost\Restrictions\Ui\Component\Listing\Column\WebsiteOptions">
+        <column name="website_id" class="InPost\InPostPay\Ui\Component\Listing\Column\WebsiteOptions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">select</item>
@@ -83,17 +106,58 @@
                     <item name="sortable" xsi:type="boolean">false</item>
                     <item name="label" xsi:type="string" translate="true">Website</item>
                 </item>
-                <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\Store\Website</item>
+                <item name="options" xsi:type="object">InPost\InPostPay\Model\Source\Store\Website</item>
             </argument>
             <settings>
                 <filter>text</filter>
                 <label translate="true">Website</label>
             </settings>
         </column>
-
-        <actionsColumn name="actions" class="InPost\Restrictions\Ui\Component\Listing\Column\RestrictionsRuleActions">
+        <column name="is_enabled" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <indexField>rule_id</indexField>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Is Enabled</label>
+            </settings>
+        </column>
+        <column name="available_start_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Available Start Date</label>
+            </settings>
+        </column>
+        <column name="available_end_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Available End Date</label>
+            </settings>
+        </column>
+        <column name="priority">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Priority</label>
+            </settings>
+        </column>
+        <column name="synchronized_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Synchronized At</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Created At</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="InPost\InPostPay\Ui\Component\Listing\Column\BestsellerProductActions">
+            <settings>
+                <indexField>bestseller_product_id</indexField>
             </settings>
         </actionsColumn>
 	</columns>

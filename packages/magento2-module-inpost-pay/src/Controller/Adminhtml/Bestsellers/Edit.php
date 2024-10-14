@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Controller\Bestsellers;
+namespace InPost\InPostPay\Controller\Adminhtml\Bestsellers;
 
+use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
+use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterfaceFactory;
+use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
-use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
-use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterfaceFactory;
-use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
-use Magento\Framework\App\RequestInterface;
 
 class Edit extends BestsellersController implements HttpGetActionInterface
 {

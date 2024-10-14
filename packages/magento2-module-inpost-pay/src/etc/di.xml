@@ -110,6 +110,23 @@
     <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayBestsellerProductRepository"/>
 
+    <!-- Grid data source and collections -->
+    <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_pay_bestseller_product</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostpay_bestsellers_listing_listing_data_source"
+                      xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />

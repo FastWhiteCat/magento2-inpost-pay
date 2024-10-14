@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Controller\Bestsellers;
+namespace InPost\InPostPay\Controller\Adminhtml\Bestsellers;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultInterface;

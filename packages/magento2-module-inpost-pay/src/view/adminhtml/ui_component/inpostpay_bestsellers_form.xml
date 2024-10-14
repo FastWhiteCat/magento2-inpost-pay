@@ -2,24 +2,24 @@
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
 	<argument name="data" xsi:type="array">
 		<item name="js_config" xsi:type="array">
-			<item name="provider" xsi:type="string">inpostrestrictions_rule_form.inpostrestrictions_rule_form_data_source</item>
+			<item name="provider" xsi:type="string">inpostpay_bestsellers_form.inpostpay_bestsellers_form_data_source</item>
 		</item>
 		<item name="label" xsi:type="string" translate="true">General Information</item>
 		<item name="template" xsi:type="string">templates/form/collapsible</item>
 	</argument>
 	<settings>
 		<buttons>
-			<button name="back" class="InPost\Restrictions\Block\Adminhtml\RestrictionsRule\Edit\BackButton"/>
-			<button name="delete" class="InPost\Restrictions\Block\Adminhtml\RestrictionsRule\Edit\DeleteButton"/>
-			<button name="save" class="InPost\Restrictions\Block\Adminhtml\RestrictionsRule\Edit\SaveButton"/>
+			<button name="back" class="InPost\InPostPay\Block\Adminhtml\Bestsellers\Edit\BackButton"/>
+			<button name="delete" class="InPost\InPostPay\Block\Adminhtml\Bestsellers\Edit\DeleteButton"/>
+			<button name="save" class="InPost\InPostPay\Block\Adminhtml\Bestsellers\Edit\SaveButton"/>
 		</buttons>
-		<namespace>inpostrestrictions_rule_form</namespace>
+		<namespace>inpostpay_bestsellers_form</namespace>
 		<dataScope>data</dataScope>
 		<deps>
-			<dep>inpostrestrictions_rule_form.inpostrestrictions_rule_form_data_source</dep>
+			<dep>inpostpay_bestsellers_form.inpostpay_bestsellers_form_data_source</dep>
 		</deps>
 	</settings>
-	<dataSource name="inpostrestrictions_rule_form_data_source">
+	<dataSource name="inpostpay_bestsellers_form_data_source">
 		<argument name="data" xsi:type="array">
 			<item name="js_config" xsi:type="array">
 				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
@@ -28,28 +28,28 @@
 		<settings>
 			<submitUrl path="*/*/save"/>
 		</settings>
-		<dataProvider name="inpostrestrictions_rule_form_data_source"
-                      class="InPost\Restrictions\Ui\Component\Form\DataSource\RestrictionsRuleDataProvider">
+		<dataProvider name="inpostpay_bestsellers_form_data_source"
+                      class="InPost\InPostPay\Ui\Component\Form\DataSource\BestsellerProductDataProvider">
 			<settings>
-				<requestFieldName>rule_id</requestFieldName>
-				<primaryFieldName>rule_id</primaryFieldName>
+				<requestFieldName>bestseller_product_id</requestFieldName>
+				<primaryFieldName>bestseller_product_id</primaryFieldName>
 			</settings>
 		</dataProvider>
 	</dataSource>
 	<fieldset name="general">
 		<settings>
-			<label>General Restrictions Rule Configuration</label>
+			<label>General Configuration</label>
 		</settings>
-        <field name="name" formElement="input" sortOrder="10">
+        <field name="sku" formElement="input" sortOrder="10">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">RestrictionsRule</item>
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
                 </item>
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Name</label>
-                <dataScope>name</dataScope>
+                <label translate="true">SKU</label>
+                <dataScope>sku</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
@@ -70,7 +70,7 @@
         </field>
         <field name="website_id">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\Store\Website</item>
+                <item name="options" xsi:type="object">InPost\InPostPay\Model\Source\Store\Website</item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">int</item>
                     <item name="label" xsi:type="string" translate="true">Website</item>
@@ -84,12 +84,11 @@
                 </item>
             </argument>
         </field>
-        <field name="applies_to">
+        <field name="priority">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\RestrictionsRule\AppliesTo</item>
+                <item name="options" xsi:type="object">InPost\InPostPay\Model\Source\Store\BestsellerProductPriority</item>
                 <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="number">3</item>
-                    <item name="label" xsi:type="string" translate="true">Applies To</item>
+                    <item name="label" xsi:type="string" translate="true">Priority</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="validation" xsi:type="array">
@@ -98,22 +97,54 @@
                 </item>
             </argument>
         </field>
+        <field name="available_start_date" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Available From Date</label>
+                <visible>true</visible>
+                <dataScope>available_start_date</dataScope>
+            </settings>
+        </field>
+        <field name="available_end_date" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Available End Date</label>
+                <visible>true</visible>
+                <dataScope>available_end_date</dataScope>
+            </settings>
+        </field>
+        <field name="synchronized_at" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="disabled" xsi:type="boolean">true</item>
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Synchronized At</label>
+                <visible>true</visible>
+                <dataScope>synchronized_at</dataScope>
+            </settings>
+        </field>
 	</fieldset>
-    <htmlContent name="block_inpostrestrictions_rule_edit_tab_conditions" sortOrder="20">
-        <argument name="data" xsi:type="array">
-            <item name="wrapper" xsi:type="array">
-                <item name="label" xsi:type="string" translate="true">Conditions</item>
-                <item name="collapsible" xsi:type="boolean">true</item>
-                <item name="opened" xsi:type="boolean">false</item>
-            </item>
-        </argument>
-        <settings>
-            <wrapper>
-                <canShow>true</canShow>
-                <componentType>fieldset</componentType>
-            </wrapper>
-        </settings>
-        <block class="InPost\Restrictions\Block\Adminhtml\RestrictionsRule\Edit\Tab\ConditionsSerialized"
-               name="inpostrestrictions_rule_edit_tab"/>
-    </htmlContent>
 </form>

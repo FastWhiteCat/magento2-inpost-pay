@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace InPost\InPostPay\Controller\Bestsellers;
+namespace InPost\InPostPay\Controller\Adminhtml\Bestsellers;
 
 use Exception;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
-use Magento\Framework\Controller\Result\RedirectFactory;
+use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\AuthorizationInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
-use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
 
