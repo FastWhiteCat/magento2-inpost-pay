@@ -47,7 +47,7 @@ class BillingInformationValidator implements OrderValidatorInterface
      */
     private function validateName(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
     {
-        if ($accountInfo->getName() !== $inPostPayQuote->getName()) {
+        if ($inPostPayQuote->getName() && $accountInfo->getName() !== $inPostPayQuote->getName()) {
             throw new LocalizedException(__('Invalid name.'));
         }
     }
@@ -60,7 +60,7 @@ class BillingInformationValidator implements OrderValidatorInterface
      */
     private function validateSurname(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
     {
-        if ($accountInfo->getSurname() !== $inPostPayQuote->getSurname()) {
+        if ($inPostPayQuote->getSurname() && $accountInfo->getSurname() !== $inPostPayQuote->getSurname()) {
             throw new LocalizedException(__('Invalid surname.'));
         }
     }
