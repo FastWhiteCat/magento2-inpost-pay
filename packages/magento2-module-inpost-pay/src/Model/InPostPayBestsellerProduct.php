@@ -11,13 +11,14 @@ class InPostPayBestsellerProduct extends AbstractModel implements InPostPayBests
 {
     protected $_eventPrefix = InPostPayBestsellerProductInterface::ENTITY_NAME;
     protected $_eventObject = InPostPayBestsellerProductInterface::ENTITY_NAME;
+    protected $_idFieldName = InPostPayBestsellerProductInterface::BESTSELLER_PRODUCT_ID;
 
     /**
      * @return void
      */
     public function _construct(): void
     {
-        $this->_init(ResourceModel\InPostPayAvailablePaymentMethod::class);
+        $this->_init(ResourceModel\InPostPayBestsellerProduct::class);
     }
 
     /**
