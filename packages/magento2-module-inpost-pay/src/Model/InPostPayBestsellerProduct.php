@@ -79,25 +79,6 @@ class InPostPayBestsellerProduct extends AbstractModel implements InPostPayBests
     }
 
     /**
-     * @return bool
-     */
-    public function isEnabled(): bool
-    {
-        $isEnabled = $this->getData(self::IS_ENABLED);
-
-        return ($isEnabled && is_scalar($isEnabled)) ? (bool)$isEnabled : false;
-    }
-
-    /**
-     * @param bool $isEnabled
-     * @return InPostPayBestsellerProductInterface
-     */
-    public function setIsEnabled(bool $isEnabled): InPostPayBestsellerProductInterface
-    {
-        return $this->setData(self::IS_ENABLED, $isEnabled);
-    }
-
-    /**
      * @return string|null
      */
     public function getAvailableStartDate(): ?string
@@ -191,5 +172,26 @@ class InPostPayBestsellerProduct extends AbstractModel implements InPostPayBests
         $date = $this->getData(self::UPDATED_AT);
 
         return ($date && is_scalar($date)) ? (string)$date : '';
+    }
+
+    /**
+     * Flag that is not saved in database. Used only to flag object not to be updated in this process.
+     * @return bool
+     */
+    public function isSkipUpdateFlag(): bool
+    {
+        $skipUpdate = $this->getData(self::SKIP_UPDATE_FLAG);
+
+        return (is_bool($skipUpdate)) ? $skipUpdate : false;
+    }
+
+    /**
+     * Flag that is not saved in database. Used only to flag object not to be updated in this process.
+     * @param bool $skipUpdate
+     * @return void
+     */
+    public function setSkipUpdateFlag(bool $skipUpdate): void
+    {
+        $this->setData(self::SKIP_UPDATE_FLAG, $skipUpdate);
     }
 }

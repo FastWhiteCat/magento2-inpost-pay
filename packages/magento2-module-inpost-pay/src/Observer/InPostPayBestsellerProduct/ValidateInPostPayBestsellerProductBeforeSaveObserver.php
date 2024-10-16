@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\InPostPayBestsellerProduct;
 
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Exception\InvalidBestsellerProductDataException;
+use InPost\InPostPay\Model\InPostPayBestsellerProductRepository;
 use InPost\InPostPay\Model\Source\Store\BestsellerProductPriority;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
@@ -21,10 +22,12 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
     /**
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
+     * @param InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository
     ) {
     }
 
@@ -40,6 +43,8 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
         if ($bestsellerProduct instanceof InPostPayBestsellerProductInterface) {
             $this->validatePriority($bestsellerProduct);
             $this->validateSku($bestsellerProduct);
+            $this->validatePriorityAndWebsiteConflict($bestsellerProduct);
+            $this->validateSkuAndWebsiteConflict($bestsellerProduct);
         }
     }
 
@@ -90,6 +95,60 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
             throw new InvalidBestsellerProductDataException(
                 __('Product "%1" is currently not available for sale.', $product->getName())
             );
+        }
+    }
+
+    /**
+     * @param InPostPayBestsellerProductInterface $bestsellerProduct
+     * @return void
+     * @throws InvalidBestsellerProductDataException
+     */
+    private function validatePriorityAndWebsiteConflict(InPostPayBestsellerProductInterface $bestsellerProduct): void
+    {
+        try {
+            $existingRecord = $this->inPostPayBestsellerProductRepository->getByWebsiteIdAndPriority(
+                $bestsellerProduct->getWebsiteId(),
+                $bestsellerProduct->getPriority()
+            );
+
+            $errorMsg = __(
+                'Bestseller with Priority:%1 for Website ID:%2 already exists. Remove or edit that record.',
+                $existingRecord->getPriority(),
+                $existingRecord->getWebsiteId()
+            );
+        } catch (NoSuchEntityException $e) {
+            $errorMsg = null;
+        }
+
+        if ($errorMsg) {
+            throw new InvalidBestsellerProductDataException($errorMsg);
+        }
+    }
+
+    /**
+     * @param InPostPayBestsellerProductInterface $bestsellerProduct
+     * @return void
+     * @throws InvalidBestsellerProductDataException
+     */
+    private function validateSkuAndWebsiteConflict(InPostPayBestsellerProductInterface $bestsellerProduct): void
+    {
+        try {
+            $existingRecord = $this->inPostPayBestsellerProductRepository->getBySkuAndWebsiteId(
+                $bestsellerProduct->getSku(),
+                $bestsellerProduct->getWebsiteId()
+            );
+
+            $errorMsg = __(
+                'Bestseller with SKU:%1 for Website ID:%2 already exists. Remove or edit that record.',
+                $existingRecord->getSku(),
+                $existingRecord->getWebsiteId()
+            );
+        } catch (NoSuchEntityException $e) {
+            $errorMsg = null;
+        }
+
+        if ($errorMsg) {
+            throw new InvalidBestsellerProductDataException($errorMsg);
         }
     }
 }

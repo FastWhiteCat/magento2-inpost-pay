@@ -51,6 +51,16 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\QuantityChange"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\AdditionalProductImage"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellersInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Bestsellers"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\ProductAvailable"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\BestsellerQuantity"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
                 type="InPost\InPostPay\Model\InPostPayOrder"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"

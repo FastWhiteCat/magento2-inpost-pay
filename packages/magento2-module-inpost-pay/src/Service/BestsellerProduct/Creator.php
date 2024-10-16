@@ -1,0 +1,76 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Service\BestsellerProduct;
+
+use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
+use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
+use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Stdlib\DateTime;
+
+class Creator
+{
+    /**
+     * @param ProductRepositoryInterface $productRepository
+     * @param InPostPayBestsellerProductInterfaceFactory $inPostPayBestsellerProductFactory
+     * @param InPostPayBestsellerProductRepositoryInterface $inPostPayBestsellerProductRepository
+     */
+    public function __construct(
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly InPostPayBestsellerProductInterfaceFactory $inPostPayBestsellerProductFactory,
+        private readonly InPostPayBestsellerProductRepositoryInterface $inPostPayBestsellerProductRepository
+    ) {
+    }
+
+    /**
+     * @param int $websiteId
+     * @param BestsellerProductInterface $inPostBestseller
+     * @param int $priority
+     * @return InPostPayBestsellerProductInterface
+     * @throws NoSuchEntityException
+     * @throws CouldNotSaveException
+     */
+    public function createMagentoBestsellerProduct(
+        int $websiteId,
+        BestsellerProductInterface $inPostBestseller,
+        int $priority
+    ): InPostPayBestsellerProductInterface {
+        $product = $this->getProductById((int)$inPostBestseller->getProductId());
+        $productAvailable = $inPostBestseller->getProductAvailable();
+        $availableStartDate = null;
+        $availableEndDate = null;
+
+        /** @var InPostPayBestsellerProductInterface $bestsellerProduct */
+        $bestsellerProduct = $this->inPostPayBestsellerProductFactory->create();
+        $bestsellerProduct->setWebsiteId($websiteId);
+        $bestsellerProduct->setSku($product->getSku());
+        $bestsellerProduct->setPriority($priority);
+
+        if ($productAvailable) {
+            $availableStartDate = $productAvailable->getStartDate();
+            $availableEndDate = $productAvailable->getEndDate();
+        }
+
+        $bestsellerProduct->setAvailableStartDate($availableStartDate);
+        $bestsellerProduct->setAvailableEndDate($availableEndDate);
+        $bestsellerProduct->setSynchronizedAt(date(DateTime::DATETIME_PHP_FORMAT));
+
+        return $this->inPostPayBestsellerProductRepository->save($bestsellerProduct);
+    }
+
+    /**
+     * @param int $productId
+     * @return ProductInterface
+     * @throws NoSuchEntityException
+     */
+    private function getProductById(int $productId): ProductInterface
+    {
+        return $this->productRepository->getById($productId);
+    }
+}

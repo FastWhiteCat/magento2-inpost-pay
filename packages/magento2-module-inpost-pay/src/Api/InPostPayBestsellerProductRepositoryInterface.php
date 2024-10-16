@@ -29,6 +29,22 @@ interface InPostPayBestsellerProductRepositoryInterface
     public function get(int $id): InPostPayBestsellerProductInterface;
 
     /**
+     * @param string $sku
+     * @param int $websiteId
+     * @return InPostPayBestsellerProductInterface
+     * @throws NoSuchEntityException
+     */
+    public function getBySkuAndWebsiteId(string $sku, int $websiteId): InPostPayBestsellerProductInterface;
+
+    /**
+     * @param int $websiteId
+     * @param int $priority
+     * @return InPostPayBestsellerProductInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByWebsiteIdAndPriority(int $websiteId, int $priority): InPostPayBestsellerProductInterface;
+
+    /**
      * @param SearchCriteriaInterface $searchCriteria
      * @return SearchResults
      */

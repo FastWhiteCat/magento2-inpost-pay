@@ -17,6 +17,7 @@ use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterfaceFactory;
 use Magento\Framework\Api\SearchResultsFactory;
 use InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct as InPostPayBestsellerProductResource;
+use InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Collection;
 use InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\CollectionFactory;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 
@@ -63,7 +64,6 @@ class InPostPayBestsellerProductRepository implements InPostPayBestsellerProduct
         $criteria = $searchCriteriaBuilder
             ->addFilter(InPostPayBestsellerProductInterface::SKU, $inPostPayBestsellerProduct->getSku())
             ->addFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, $inPostPayBestsellerProduct->getWebsiteId())
-            ->addFilter(InPostPayBestsellerProductInterface::IS_ENABLED, $inPostPayBestsellerProduct->isEnabled())
             ->create();
 
         $bestsellerProducts = $this->getList($criteria)->getItems();
@@ -105,6 +105,72 @@ class InPostPayBestsellerProductRepository implements InPostPayBestsellerProduct
         }
 
         $this->instances[$inPostPayBestsellerProduct->getBestsellerProductId()] = $inPostPayBestsellerProduct;
+
+        return $inPostPayBestsellerProduct;
+    }
+
+    /**
+     * @param string $sku
+     * @param int $websiteId
+     * @return InPostPayBestsellerProductInterface
+     * @throws NoSuchEntityException
+     */
+    public function getBySkuAndWebsiteId(string $sku, int $websiteId): InPostPayBestsellerProductInterface
+    {
+        /** @var Collection $collection */
+        $collection = $this->inPostPayBestsellerProductCollectionFactory->create();
+        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, (string)$websiteId);
+        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::SKU, $sku);
+        $items = $collection->getItems();
+
+        if (!empty($items)) {
+            $inPostPayBestsellerProduct = current($items);
+        }
+
+        if (!isset($inPostPayBestsellerProduct)
+            || !$inPostPayBestsellerProduct instanceof InPostPayBestsellerProductInterface
+        ) {
+            throw new NoSuchEntityException(
+                __(
+                    'InPost Pay Bestseller Product with SKU "%1" for Website ID:%2 does not exist.',
+                    $sku,
+                    $websiteId
+                )
+            );
+        }
+
+        return $inPostPayBestsellerProduct;
+    }
+
+    /**
+     * @param int $websiteId
+     * @param int $priority
+     * @return InPostPayBestsellerProductInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByWebsiteIdAndPriority(int $websiteId, int $priority): InPostPayBestsellerProductInterface
+    {
+        /** @var Collection $collection */
+        $collection = $this->inPostPayBestsellerProductCollectionFactory->create();
+        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, (string)$websiteId);
+        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::PRIORITY, (string)$priority);
+        $items = $collection->getItems();
+
+        if (!empty($items)) {
+            $inPostPayBestsellerProduct = current($items);
+        }
+
+        if (!isset($inPostPayBestsellerProduct)
+            || !$inPostPayBestsellerProduct instanceof InPostPayBestsellerProductInterface
+        ) {
+            throw new NoSuchEntityException(
+                __(
+                    'InPost Pay Bestseller Product with Priority:%1 and Website ID:%2 does not exist.',
+                    $priority,
+                    $websiteId
+                )
+            );
+        }
 
         return $inPostPayBestsellerProduct;
     }

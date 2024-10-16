@@ -107,7 +107,6 @@
         <column xsi:type="int" name="bestseller_product_id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="varchar" name="sku" length="255" nullable="false"/>
         <column xsi:type="smallint" name="website_id" nullable="false" unsigned="true" identity="false" default="0"/>
-        <column xsi:type="boolean" name="is_enabled" nullable="false" default="0"/>
         <column xsi:type="timestamp" name="available_start_date" nullable="true"/>
         <column xsi:type="timestamp" name="available_end_date" nullable="true"/>
         <column xsi:type="int" name="priority" unsigned="true" nullable="false" identity="false"/>
@@ -117,15 +116,13 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="bestseller_product_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID_IS_ENABLED">
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID">
             <column name="sku"/>
             <column name="website_id"/>
-            <column name="is_enabled"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_PRIORITY_WEBSITE_ID_IS_ENABLED">
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_PRIORITY_WEBSITE_ID">
             <column name="priority"/>
             <column name="website_id"/>
-            <column name="is_enabled"/>
         </constraint>
     </table>
 </schema>
