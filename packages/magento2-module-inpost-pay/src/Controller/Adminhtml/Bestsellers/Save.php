@@ -115,14 +115,12 @@ class Save extends BestsellersController implements HttpPostActionInterface
         }
 
         $sku = (string)($data[InPostPayBestsellerProductInterface::SKU] ?? '');
-        $isEnabled = (bool)($data[InPostPayBestsellerProductInterface::IS_ENABLED] ?? 0);
         $websiteId = (int)($data[InPostPayBestsellerProductInterface::WEBSITE_ID] ?? 0);
         $availableStartDate = (string)($data[InPostPayBestsellerProductInterface::AVAILABLE_START_DATE] ?? '');
         $availableEndDate = (string)($data[InPostPayBestsellerProductInterface::AVAILABLE_END_DATE] ?? '');
         $priority = (int)($data[InPostPayBestsellerProductInterface::PRIORITY] ?? 1);
 
         $bestsellerProduct->setSku($sku);
-        $bestsellerProduct->setIsEnabled($isEnabled);
         $bestsellerProduct->setWebsiteId($websiteId);
         $bestsellerProduct->setPriority($priority);
         $bestsellerProduct->setSynchronizedAt(null);

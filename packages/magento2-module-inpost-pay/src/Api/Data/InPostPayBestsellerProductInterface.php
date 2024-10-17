@@ -10,13 +10,13 @@ interface InPostPayBestsellerProductInterface
     public const BESTSELLER_PRODUCT_ID = 'bestseller_product_id';
     public const SKU = 'sku';
     public const WEBSITE_ID = 'website_id';
-    public const IS_ENABLED = 'is_enabled';
     public const AVAILABLE_START_DATE = 'available_start_date';
     public const AVAILABLE_END_DATE = 'available_end_date';
     public const PRIORITY = 'priority';
     public const SYNCHRONIZED_AT = 'synchronized_at';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
+    public const SKIP_UPDATE_FLAG = 'skip_update_flag';
 
     /**
      * @return int|null
@@ -50,17 +50,6 @@ interface InPostPayBestsellerProductInterface
      * @return InPostPayBestsellerProductInterface
      */
     public function setWebsiteId(int $websiteId): InPostPayBestsellerProductInterface;
-
-    /**
-     * @return bool
-     */
-    public function isEnabled(): bool;
-
-    /**
-     * @param bool $isEnabled
-     * @return InPostPayBestsellerProductInterface
-     */
-    public function setIsEnabled(bool $isEnabled): InPostPayBestsellerProductInterface;
 
     /**
      * @return string|null
@@ -115,4 +104,15 @@ interface InPostPayBestsellerProductInterface
      * @return string
      */
     public function getUpdatedAt(): string;
+
+    /**
+     * @return bool
+     */
+    public function isSkipUpdateFlag(): bool;
+
+    /**
+     * @param bool $skipUpdate
+     * @return void
+     */
+    public function setSkipUpdateFlag(bool $skipUpdate): void;
 }
