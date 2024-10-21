@@ -30,8 +30,9 @@ class Cleaner
     {
         $collection = $this->bestsellersCollectionFactory->create();
         $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, ['eq' => $websiteId]);
+        $items = $collection->getItems();
 
-        foreach ($collection->getItems() as $bestsellerProduct) {
+        foreach ($items as $bestsellerProduct) {
             if ($bestsellerProduct instanceof InPostPayBestsellerProductInterface) {
                 $bestsellerProduct->setSkipUpdateFlag(true);
                 $this->inPostPayBestsellerProductRepository->delete($bestsellerProduct);

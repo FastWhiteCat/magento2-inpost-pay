@@ -40,10 +40,11 @@
 		<settings>
 			<label>General Configuration</label>
 		</settings>
-        <field name="sku" formElement="input" sortOrder="10">
+        <field name="sku" sortOrder="10">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
                 </item>
             </argument>
             <settings>
@@ -55,7 +56,7 @@
                 </validation>
             </settings>
         </field>
-        <field name="website_id">
+        <field name="website_id" sortOrder="20">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">InPost\InPostPay\Model\Source\Store\Website</item>
                 <item name="config" xsi:type="array">
@@ -71,7 +72,7 @@
                 </item>
             </argument>
         </field>
-        <field name="priority">
+        <field name="priority" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">InPost\InPostPay\Model\Source\Store\BestsellerProductPriority</item>
                 <item name="config" xsi:type="array">
@@ -84,10 +85,11 @@
                 </item>
             </argument>
         </field>
-        <field name="available_start_date" formElement="date">
+        <field name="available_start_date" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">date</item>
                 </item>
             </argument>
             <settings>
@@ -100,10 +102,11 @@
                 <dataScope>available_start_date</dataScope>
             </settings>
         </field>
-        <field name="available_end_date" formElement="date">
+        <field name="available_end_date" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">date</item>
                 </item>
             </argument>
             <settings>
@@ -116,21 +119,64 @@
                 <dataScope>available_end_date</dataScope>
             </settings>
         </field>
-        <field name="synchronized_at" formElement="date">
+        <field name="synchronized_at" sortOrder="60">
             <argument name="data" xsi:type="array">
-                <item name="disabled" xsi:type="boolean">true</item>
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
                 </item>
             </argument>
             <settings>
-                <validation>
-                    <rule name="validate-date" xsi:type="boolean">true</rule>
-                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Synchronized At</label>
                 <visible>true</visible>
                 <dataScope>synchronized_at</dataScope>
+            </settings>
+        </field>
+        <field name="deep_link" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Deep Link</label>
+                <visible>true</visible>
+                <dataScope>deep_link</dataScope>
+            </settings>
+        </field>
+        <field name="qr_code" sortOrder="80">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">QR Code</label>
+                <visible>true</visible>
+                <dataScope>qr_code</dataScope>
+            </settings>
+        </field>
+        <field name="error" sortOrder="90">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">BestsellerProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Error</label>
+                <visible>true</visible>
+                <dataScope>error</dataScope>
             </settings>
         </field>
 	</fieldset>

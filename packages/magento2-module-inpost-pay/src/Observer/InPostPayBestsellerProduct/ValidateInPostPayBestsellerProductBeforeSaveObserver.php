@@ -111,11 +111,15 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
                 $bestsellerProduct->getPriority()
             );
 
-            $errorMsg = __(
-                'Bestseller with Priority:%1 for Website ID:%2 already exists. Remove or edit that record.',
-                $existingRecord->getPriority(),
-                $existingRecord->getWebsiteId()
-            );
+            if ($bestsellerProduct->getBestsellerProductId() !== $existingRecord->getBestsellerProductId()) {
+                $errorMsg = __(
+                    'Bestseller with Priority:%1 for Website ID:%2 already exists. Remove or edit that record.',
+                    $existingRecord->getPriority(),
+                    $existingRecord->getWebsiteId()
+                );
+            } else {
+                $errorMsg = null;
+            }
         } catch (NoSuchEntityException $e) {
             $errorMsg = null;
         }
@@ -138,11 +142,15 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
                 $bestsellerProduct->getWebsiteId()
             );
 
-            $errorMsg = __(
-                'Bestseller with SKU:%1 for Website ID:%2 already exists. Remove or edit that record.',
-                $existingRecord->getSku(),
-                $existingRecord->getWebsiteId()
-            );
+            if ($bestsellerProduct->getBestsellerProductId() !== $existingRecord->getBestsellerProductId()) {
+                $errorMsg = __(
+                    'Bestseller with SKU:%1 for Website ID:%2 already exists. Remove or edit that record.',
+                    $existingRecord->getSku(),
+                    $existingRecord->getWebsiteId()
+                );
+            } else {
+                $errorMsg = null;
+            }
         } catch (NoSuchEntityException $e) {
             $errorMsg = null;
         }

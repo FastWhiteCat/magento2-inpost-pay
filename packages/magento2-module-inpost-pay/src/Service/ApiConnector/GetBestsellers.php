@@ -41,7 +41,7 @@ class GetBestsellers
         try {
             return $this->getAllBestsellerProducts();
         } catch (Exception $e) {
-            $errorMsg = __('There was a problem with getting payment methods. Details: %1', $e->getMessage());
+            $errorMsg = __('There was a problem with downloading bestsellers. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
 
             throw new LocalizedException($errorMsg);
@@ -77,8 +77,8 @@ class GetBestsellers
                         [
                             'product_id' => '9',
                             'ean' => '24-WB02',
-                            'qr_code' => '',
-                            'deep_link' => '',
+                            'qr_code' => 'qr_code_test_123',
+                            'deep_link' => 'https://mage.localhost/compete-track-tote.html?deep_link=1',
                             'product_available' => [
                                 'start_date' => '2024-10-02',
                                 'end_date' => '2024-10-30'
@@ -108,7 +108,7 @@ class GetBestsellers
                             'product_id' => '14',
                             'ean' => '24-WB04',
                             'qr_code' => '',
-                            'deep_link' => '',
+                            'deep_link' => 'https://mage.localhost/push-it-messenger-bag.html?deep_link=1',
                             'product_available' => [
                                 'start_date' => '2024-10-03',
                                 'end_date' => '2024-10-29'

@@ -1,0 +1,77 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Service\ApiConnector;
+
+use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
+use InPost\InPostPay\Model\IziApi\Request\PostBestsellersRequest;
+use InPost\InPostPay\Model\IziApi\Request\PostBestsellersRequestFactory;
+use InPost\InPostPay\Service\Converter\InPostBestsellerProductToArrayConverter;
+use Magento\Framework\Exception\LocalizedException;
+use Psr\Log\LoggerInterface;
+
+class PostBestsellers
+{
+    /**
+     * @param ConnectorInterface $connector
+     * @param PostBestsellersRequestFactory $postBestsellersRequestFactory
+     * @param InPostBestsellerProductToArrayConverter $inPostBestsellerProductToArrayConverter
+     * @param LoggerInterface $logger
+     */
+    public function __construct(
+        private readonly ConnectorInterface $connector,
+        private readonly PostBestsellersRequestFactory $postBestsellersRequestFactory,
+        private readonly InPostBestsellerProductToArrayConverter $inPostBestsellerProductToArrayConverter,
+        private readonly LoggerInterface $logger
+    ) {
+    }
+
+    /**
+     * @return array
+     * @throws LocalizedException
+     */
+    public function execute(array $bestsellerProducts): array
+    {
+        /** @var PostBestsellersRequest $postBestsellersRequest */
+        $postBestsellersRequest = $this->postBestsellersRequestFactory->create();
+        $params = [];
+
+        foreach ($bestsellerProducts as $bestsellerProduct) {
+            $bestsellerProductData = $this->inPostBestsellerProductToArrayConverter->convert($bestsellerProduct);
+
+            if ($bestsellerProductData) {
+                $params[] = $bestsellerProductData;
+            }
+        }
+
+        $postBestsellersRequest->setParams($params);
+
+        try {
+            return $this->connector->sendRequest($postBestsellersRequest);
+        } catch (LocalizedException $e) {
+            $errorMsg = __('There was a problem with uploading bestsellers. Details: %1', $e->getMessage());
+            $this->logger->critical($errorMsg->render());
+
+//            throw new LocalizedException($errorMsg);
+
+            //TODO::remove this after API handles those requests
+            return [
+                'success' => [
+                    [
+                        'product_id' => '9',
+                        'qr_code' => 'TEST_QR_CODE_0123456789',
+                        'deep_link' => 'https://mage.localhost/compete-track-tote.html?deep_link=1'
+                    ]
+                ],
+                'error' => [
+                    [
+                        'product_id' => '14',
+                        'reason' => 'Some InPost Pay Error Test Message.'
+                    ]
+                ],
+            ];
+        }
+    }
+}

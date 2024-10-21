@@ -156,6 +156,7 @@ class ProductToInPostProductDataTransfer
         /** @var Product $product */
         $product = $this->productRepository->get($originalProductSku, false, $storeId);
         $productId = (int)$product->getId();
+//        $this->emulation->
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();

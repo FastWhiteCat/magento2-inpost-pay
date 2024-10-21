@@ -18,7 +18,7 @@ interface BestsellerProductInterface
     public const PRODUCT_NAME = 'product_name';
     public const PRODUCT_DESCRIPTION = 'product_description';
     public const PRODUCT_IMAGE = 'product_image';
-    public const PRODUCT_ADDITIONAL_IMAGES = 'product_additional_images';
+    public const ADDITIONAL_PRODUCT_IMAGES = 'additional_product_images';
     public const PRICE = 'price';
     public const CURRENCY = 'currency';
     public const QUANTITY = 'quantity';

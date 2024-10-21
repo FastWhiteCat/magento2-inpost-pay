@@ -294,6 +294,14 @@
             </argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\BestsellerProductDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="core_bestseller_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\CoreProductDataTransferInPostPay</item>
+                <item name="bestseller_price" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerPriceDataTransfer</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Validator\OrderValidator">
         <arguments>
             <argument name="orderValidators" xsi:type="array">
@@ -624,6 +632,26 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\InitBasket">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\BestsellerProduct\Upload">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\BestsellerProduct\Download">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\PostBestsellers">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\BestsellerProduct\UploadResponseHandler">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

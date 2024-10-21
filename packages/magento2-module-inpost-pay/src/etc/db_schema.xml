@@ -111,6 +111,9 @@
         <column xsi:type="timestamp" name="available_end_date" nullable="true"/>
         <column xsi:type="int" name="priority" unsigned="true" nullable="false" identity="false"/>
         <column xsi:type="timestamp" name="synchronized_at" nullable="true"/>
+        <column xsi:type="text" name="qr_code" nullable="true"/>
+        <column xsi:type="varchar" name="deep_link" length="512" nullable="false"/>
+        <column xsi:type="varchar" name="error" length="512" nullable="false"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

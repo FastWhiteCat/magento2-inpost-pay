@@ -85,7 +85,7 @@ class ArrayToBestsellersResultConverter
         $productName = $productData[BestsellerProductInterface::PRODUCT_NAME] ?? '';
         $productDescription = $productData[BestsellerProductInterface::PRODUCT_DESCRIPTION] ?? '';
         $productImage = $productData[BestsellerProductInterface::PRODUCT_IMAGE] ?? '';
-        $productAdditionalImagesData = $productData[BestsellerProductInterface::PRODUCT_ADDITIONAL_IMAGES] ?? [];
+        $additionalProductImagesData = $productData[BestsellerProductInterface::ADDITIONAL_PRODUCT_IMAGES] ?? [];
         $priceData = $productData[BestsellerProductInterface::PRICE] ?? [];
         $currency = $productData[BestsellerProductInterface::CURRENCY] ?? BestsellerProductInterface::DEFAULT_CURRENCY;
         $quantityData = $productData[BestsellerProductInterface::QUANTITY] ?? [];
@@ -101,7 +101,7 @@ class ArrayToBestsellersResultConverter
         $bestsellerProduct->setCurrency($currency);
         $bestsellerProduct->setProductAvailable($this->convertAvailability((array)$productAvailableData));
         $bestsellerProduct->setAdditionalProductImages(
-            $this->convertAdditionalProductImages((array)$productAdditionalImagesData)
+            $this->convertAdditionalProductImages((array)$additionalProductImagesData)
         );
         $bestsellerProduct->setProductAttributes(
             $this->convertProductAttributes((array)$productAttributesData)
