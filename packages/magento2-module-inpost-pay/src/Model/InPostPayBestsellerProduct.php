@@ -155,6 +155,63 @@ class InPostPayBestsellerProduct extends AbstractModel implements InPostPayBests
     }
 
     /**
+     * @return string|null
+     */
+    public function getQrCode(): ?string
+    {
+        $qrCode = ($this->hasData(self::QR_CODE)) ? $this->getData(self::QR_CODE) : null;
+
+        return ($qrCode && is_scalar($qrCode)) ? (string)$qrCode : null;
+    }
+
+    /**
+     * @param string|null $qrCode
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setQrCode(?string $qrCode = null): InPostPayBestsellerProductInterface
+    {
+        return $this->setData(self::QR_CODE, $qrCode);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDeepLink(): ?string
+    {
+        $deepLink = ($this->hasData(self::DEEP_LINK)) ? $this->getData(self::DEEP_LINK) : null;
+
+        return ($deepLink && is_scalar($deepLink)) ? (string)$deepLink : null;
+    }
+
+    /**
+     * @param string|null $deepLink
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setDeepLink(?string $deepLink = null): InPostPayBestsellerProductInterface
+    {
+        return $this->setData(self::DEEP_LINK, $deepLink);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getError(): ?string
+    {
+        $error = ($this->hasData(self::ERROR)) ? $this->getData(self::ERROR) : null;
+
+        return ($error && is_scalar($error)) ? (string)$error : null;
+    }
+
+    /**
+     * @param string|null $error
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setError(?string $error = null): InPostPayBestsellerProductInterface
+    {
+        return $this->setData(self::ERROR, $error);
+    }
+
+    /**
      * @return string
      */
     public function getCreatedAt(): string

@@ -14,6 +14,9 @@ interface InPostPayBestsellerProductInterface
     public const AVAILABLE_END_DATE = 'available_end_date';
     public const PRIORITY = 'priority';
     public const SYNCHRONIZED_AT = 'synchronized_at';
+    public const QR_CODE = 'qr_code';
+    public const DEEP_LINK = 'deep_link';
+    public const ERROR = 'error';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
     public const SKIP_UPDATE_FLAG = 'skip_update_flag';
@@ -94,6 +97,39 @@ interface InPostPayBestsellerProductInterface
      * @return InPostPayBestsellerProductInterface
      */
     public function setSynchronizedAt(?string $synchronizedAt = null): InPostPayBestsellerProductInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getQrCode(): ?string;
+
+    /**
+     * @param string|null $qrCode
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setQrCode(?string $qrCode = null): InPostPayBestsellerProductInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getDeepLink(): ?string;
+
+    /**
+     * @param string|null $deepLink
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setDeepLink(?string $deepLink = null): InPostPayBestsellerProductInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getError(): ?string;
+
+    /**
+     * @param string|null $error
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setError(?string $error = null): InPostPayBestsellerProductInterface;
 
     /**
      * @return string

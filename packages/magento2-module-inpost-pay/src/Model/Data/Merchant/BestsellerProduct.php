@@ -189,7 +189,7 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
      */
     public function getAdditionalProductImages(): array
     {
-        $additionalImages = $this->getData(self::PRODUCT_ADDITIONAL_IMAGES);
+        $additionalImages = $this->getData(self::ADDITIONAL_PRODUCT_IMAGES);
 
         return is_array($additionalImages) ? $additionalImages : [];
     }
@@ -200,7 +200,7 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
      */
     public function setAdditionalProductImages(array $additionalImages): void
     {
-        $this->setData(self::PRODUCT_ADDITIONAL_IMAGES, $additionalImages);
+        $this->setData(self::ADDITIONAL_PRODUCT_IMAGES, $additionalImages);
     }
 
     /**

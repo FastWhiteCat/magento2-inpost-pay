@@ -45,6 +45,8 @@ class Creator
         $productAvailable = $inPostBestseller->getProductAvailable();
         $availableStartDate = null;
         $availableEndDate = null;
+        $qrCode = $inPostBestseller->getQrCode();
+        $deepLink = $inPostBestseller->getDeepLink();
 
         /** @var InPostPayBestsellerProductInterface $bestsellerProduct */
         $bestsellerProduct = $this->inPostPayBestsellerProductFactory->create();
@@ -60,6 +62,8 @@ class Creator
         $bestsellerProduct->setAvailableStartDate($availableStartDate);
         $bestsellerProduct->setAvailableEndDate($availableEndDate);
         $bestsellerProduct->setSynchronizedAt(date(DateTime::DATETIME_PHP_FORMAT));
+        $bestsellerProduct->setQrCode($qrCode);
+        $bestsellerProduct->setDeepLink($deepLink);
 
         return $this->inPostPayBestsellerProductRepository->save($bestsellerProduct);
     }

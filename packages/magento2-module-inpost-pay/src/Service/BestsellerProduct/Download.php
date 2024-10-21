@@ -11,10 +11,9 @@ use Magento\Framework\App\Area;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\App\Emulation as StoreEmulator;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Store\Model\Website;
 use Psr\Log\LoggerInterface;
 
-class Download
+class Download extends BestsellerProductService
 {
     /**
      * @param Cleaner $cleaner
@@ -28,10 +27,11 @@ class Download
         private readonly Cleaner $cleaner,
         private readonly Creator $creator,
         private readonly GetBestsellers $getBestsellers,
-        private readonly StoreManagerInterface $storeManager,
-        private readonly StoreEmulator $storeEmulator,
-        private readonly LoggerInterface $logger
+        StoreManagerInterface $storeManager,
+        StoreEmulator $storeEmulator,
+        LoggerInterface $logger
     ) {
+        parent::__construct($storeManager, $storeEmulator, $logger);
     }
 
     /**
@@ -40,26 +40,27 @@ class Download
      */
     public function execute(): void
     {
-        foreach ($this->storeManager->getWebsites() as $website) {
-            if (!$website instanceof Website) {
-                continue;
-            }
-
-            $store = $website->getDefaultStore();
+        foreach ($this->getDefaultStoresForWebsites() as $store) {
             $websiteId = (int)$store->getWebsiteId();
             $this->storeEmulator->startEnvironmentEmulation((int)$store->getId(), Area::AREA_FRONTEND, true);
-            $inPostBestsellers = $this->getBestsellers->execute();
-            $this->cleanBestsellersByWebsiteId($websiteId);
-            $priority = BestsellerProductPriority::MIN_PRIORITY;
 
-            foreach ($inPostBestsellers as $inPostBestseller) {
-                $this->createBestsellerProductForWebsiteId($websiteId, $inPostBestseller, $priority);
-                $priority++;
+            try {
+                $inPostBestsellers = $this->getBestsellers->execute();
+                $this->cleanBestsellersByWebsiteId($websiteId);
+                $priority = BestsellerProductPriority::MIN_PRIORITY;
 
-                if ($priority > BestsellerProductPriority::MAX_PRIORITY) {
-                    break;
+                foreach ($inPostBestsellers as $inPostBestseller) {
+                    $this->createBestsellerProductForWebsiteId($websiteId, $inPostBestseller, $priority);
+                    $priority++;
                 }
+            } catch (LocalizedException $e) {
+                $this->storeEmulator->stopEnvironmentEmulation();
+                $this->logger->error(sprintf('Could not download bestseller products. Reason: %s', $e->getMessage()));
+
+                throw $e;
             }
+
+            $this->storeEmulator->stopEnvironmentEmulation();
         }
     }
 
