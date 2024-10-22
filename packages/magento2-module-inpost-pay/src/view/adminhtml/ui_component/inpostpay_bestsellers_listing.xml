@@ -65,11 +65,6 @@
 				</param>
 			</childDefaults>
 		</settings>
-		<selectionsColumn name="ids">
-			<settings>
-				<indexField>bestseller_product_id</indexField>
-			</settings>
-		</selectionsColumn>
 		<column name="bestseller_product_id">
 			<settings>
 				<filter>text</filter>

@@ -60,7 +60,7 @@ class Delete extends BestsellersController implements HttpGetActionInterface
             $this->messageManager->addErrorMessage($e->getMessage());
 
             return $resultRedirect->setPath(
-                '*/*/edit',
+                '*/*/index',
                 [InPostPayBestsellerProductInterface::BESTSELLER_PRODUCT_ID => $bestsellerProductId]
             );
         }
