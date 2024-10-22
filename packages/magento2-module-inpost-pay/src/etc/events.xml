@@ -27,6 +27,9 @@
     <event name="inpost_pay_bestseller_product_save_before">
         <observer name="InPost_InPostPay::validateInPostPayBestsellerProductBeforeSaveObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\ValidateInPostPayBestsellerProductBeforeSaveObserver" />
     </event>
+    <event name="inpost_pay_bestseller_product_delete_after">
+        <observer name="InPost_InPostPay::inPostPayBestsellerProductAfterDeleteObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\InPostPayBestsellerProductAfterDeleteObserver" />
+    </event>
     <!-- Events triggered when sending requests to IZI API Endpoints -->
     <event name="izi_api_send_request_before">
         <observer name="InPost_InPostPay::iziApiEndpointSendBeforeEventObserver" instance="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointSendBeforeEventObserver" />
