@@ -91,6 +91,8 @@
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\InitBasketInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\InitBasket"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BestsellerProductsGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BestsellerProductsGet"/>
     <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\InPostPayBasketNoticeRepositoryInterface"
@@ -662,6 +664,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\BestsellerProduct\Delete">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BestsellerProductsGet">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
