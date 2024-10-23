@@ -80,4 +80,10 @@
     <event name="izi_basket_confirmation_after">
         <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
     </event>
+    <event name="izi_bestseller_products_get_before">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetBeforeEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_after">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetAfterEventObserver" />
+    </event>
 </config>

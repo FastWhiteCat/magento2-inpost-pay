@@ -10,6 +10,9 @@ use Psr\Log\LoggerInterface;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Monolog\Logger;
 
+/**
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ */
 class MerchantEndpointEventObserver
 {
     protected string $eventDescription = 'INCOMING: Merchant Event';
