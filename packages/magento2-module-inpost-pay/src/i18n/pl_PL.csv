@@ -166,3 +166,51 @@
 "Coupon code is already activated","Kod jest już aktywowany",module,InPost_InPostPay
 "Coupon code has been removed. The code entered is incorrect. Please enter the correct code","Usunięto kod rabatowy. W prowadzony kod jest niepoprawny. Wpisz poprawny kod",module,InPost_InPostPay
 "Coupon code has been updated","Kod został zaktualizowany",module,InPost_InPostPay
+"Delete Bestseller Product","Usuń Produkt Bestsellerowy",module,InPost_InPostPay
+"Are you sure?","Czy jesteś pewny?",module,InPost_InPostPay
+"Back","Powrót",module,InPost_InPostPay
+"New","Nowy",module,InPost_InPostPay
+"Edit","Edytuj",module,InPost_InPostPay
+"Delete","Usuń",module,InPost_InPostPay
+"Select","Wybierz",module,InPost_InPostPay
+"Save Bestseller Product","Zapisz Produkt Bestsellerowy",module,InPost_InPostPay
+"InPost Pay Bestseller Products","Produkty Bestsellerowe InPost Pay",module,InPost_InPostPay
+"You are not allowed to view this page. Please contact Administrators.","Nie masz uprawnień do podglądu tej strony. Prosimy o kontakt z Administratorami.",module,InPost_InPostPay
+"You have deleted InPost Pay Bestseller Product with ID %1.","Bestseller InPost Pay o I %1 został usunięty.",module,InPost_InPostPay
+"Bestseller Products configured in InPost Pay have been downloaded into Magento.","Bestsellery skonfigurowane po stronie InPost Pay zostały pobrane do Magento.",module,InPost_InPostPay
+"There was a problem with downloading bestseller products from InPost Pay to Magento. Reason: %1","Wystąpił problem podczas pobierania bestselleróow z InPost Pay do Magento. Powód: %1",module,InPost_InPostPay
+"InPost Pay Bestseller Product","Produkt Bestsellerowy InPost Pay",module,InPost_InPostPay
+"Edit InPost Pay Bestseller Product %1","Edytuj Produkt Bestsellerowy InPost Pay %1",module,InPost_InPostPay
+"New InPost Pay Bestseller Product","Nowy Produkt Bestsellerowy InPost Pay",module,InPost_InPostPay
+"InPost Pay Bestseller Products List","Lista Produktów Bestsellerowych InPost Pay",module,InPost_InPostPay
+"You have saved the InPost Pay Bestseller Product [ID:%1].","Produkt Bestsellerowy InPost Pay [ID:%1] został zapisany.",module,InPost_InPostPay
+"Something went wrong while saving InPost Pay Bestseller Product.","Wystąpił błąd podczas zapisu Produktu Bestsellerowego InPost Pay.",module,InPost_InPostPay
+"Bestseller Products configured in Magento have been uploaded into InPost Pay.","Produkty Bestsellerowe skonfigurowane w Magento zostały wysłane do InPost Pay.",module,InPost_InPostPay
+"There was a problem with uploading bestseller products from Magento to InPost Pay. Reason: %1","Wystąpił problem z wysyłaniem produktów bestsellerowych z Magento do InPost Pay. Powód: %1",module,InPost_InPostPay
+"Could not save InPost Pay Bestseller Product: %1","Nie udało się zapisać Produktu Bestsellerowego InPost Pay: %1",module,InPost_InPostPay
+"Saving InPost Pay Bestseller Product failed.","Zapis Produktu Bestsellerowego InPost Pay nie powiódł się.",module,InPost_InPostPay
+"InPost Pay Bestseller Product with ID ""%1"" does not exist.","Produkt Bestsellerowy InPost Pay o ID ""%1"" nie istnieje.",module,InPost_InPostPay
+"InPost Pay Bestseller Product with SKU ""%1"" for Website ID:%2 does not exist.","Produkt Bestsellerowy InPost Pay o SKU ""%1"" dla Webstite o ID:%2 nie istnieje.",module,InPost_InPostPay
+"InPost Pay Bestseller Product with Priority:%1 and Website ID:%2 does not exist.","Produkt Bestsellerowy InPost Pay o Priorytecie:%1 dla Website o ID:%2 nie istnieje.",module,InPost_InPostPay
+"Could not delete InPost Pay Bestseller Product: %1","Nie udało się usunąć Produktu Bestsellerowego InPost Pay: %1",module,InPost_InPostPay
+"InPost Pay Bestseller Product must have a priority value between 1 and 5. %1 given.","Produkt Bestsellerowy InPost Pay musi mieć priorytet o wartości pomiędzy 1 a 5. Otrzymano: %1.",module,InPost_InPostPay
+"Product with SKU:%1 does not exist.","Produkt o SKU:%1 nie istnieje.",module,InPost_InPostPay
+"Product ""%1"" is currently not available for sale.","Produkt ""%1"" nie jest obecnie dostępny w sprzedaży.",module,InPost_InPostPay
+"Bestseller with Priority:%1 for Website ID:%2 already exists. Remove or edit that record.","Bestseller o Priorytecie:%1 dla Website o ID:%2 już istnieje. Usuń tamten rekord lub go edytuj.",module,InPost_InPostPay
+"Could not delete Bestseller [Product ID:%1] from InPost Pay API. Reason: %2.","Nie udało się usunąć Produktu Bestsellerowego [ID Produktu:%1] z API InPost Pay. Powód: %2",module,InPost_InPostPay
+"Please log in to InPost Pay Panel and delete this Bestseller Product manually.","Prosimy o zalogowanie się do Panelu InPost Pay i usunięcie Produktu Bestsellerowego manualnie.",module,InPost_InPostPay
+"There was a problem with downloading bestsellers. Details: %1","Wystąpił problem z pobieraniem bestsellerów. Szczegóły: %1",module,InPost_InPostPay
+"Quote with ID %1 is invalid.","Koszyk o ID %1 jest nieprawidłowy.",module,InPost_InPostPay
+"There was a problem with uploading bestsellers. Details: %1","Wystąpił problem z wysyłaniem bestsellerów. Szczegóły: %1",module,InPost_InPostPay
+"Uploading Bestsellers to InPost Pay was completed but some products have errors.","Proces wysyłania Produktów Bestsellerowych do InPost Pay zakończył się, lecz niektóre produkty zawierają błędy.",module,InPost_InPostPay
+"Deleting Bestseller Product ""%1"","Usuwanie Produktu Bestsellerowego ""%1""",module,InPost_InPostPay
+"Are you sure you want to delete ""%1"" bestseller?","Czy jesteś pewien, że chcesz usunąć produkt bestsellerowy ""%1""?",module,InPost_InPostPay
+"Upload Products to InPost Pay","Wyślij Produkty do InPost Pay",module,InPost_InPostPay
+"Remove All And Download Products from InPost Pay","Usuń Wszystkie Oraz Pobierz Produkty z InPost Pay",module,InPost_InPostPay
+"Add New Bestseller Product","Dodaj Nowy Produkt Bestsellerowy",module,InPost_InPostPay
+"InPost Pay Bestsellers Settings","Ustawienia Bestsellerów InPost Pay",module,InPost_InPostPay
+"Enabled Bestsellers Synchronize CRON","Włącz Synchronizacje Bestsellerów",module,InPost_InPostPay
+"Synchronization Mode","Tryb Synchronizacji",module,InPost_InPostPay
+"Synchronize Bestsellers Cron Schedule","Harmonogram CRON Synchronizacji Bestsellerów",module,InPost_InPostPay
+"Download and replace Magento Bestsellers with InPost Pay Configured Bestsellers.","Pobieraj i podmieniaj Produkty Bestsellerowe skonfigurowane w InPost Pay do Magento.",module,InPost_InPostPay
+"Upload Magento Bestsellers into InPost Pay API.","Wysyłaj Produkty Bestsellerowe z Magento do InPost Pay API",module,InPost_InPostPay

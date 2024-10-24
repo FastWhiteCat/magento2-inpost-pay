@@ -6,5 +6,9 @@
              instance="InPost\InPostPay\Cron\SynchronizePaymentMethods" method="execute">
             <schedule>0 3 * * *</schedule>
         </job>
+        <job name="inpostpay_synchronize_bestsellers"
+             instance="InPost\InPostPay\Cron\Bestsellers\SynchronizeBestsellers" method="execute">
+            <config_path>payment/inpost_pay/bestsellers_synchronize_cron_schedule</config_path>
+        </job>
     </group>
 </config>
