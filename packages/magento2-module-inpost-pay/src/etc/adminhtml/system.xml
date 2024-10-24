@@ -18,6 +18,7 @@
                 <include path="InPost_InPostPay::system/debugging.xml"/>
                 <include path="InPost_InPostPay::system/polling.xml"/>
                 <include path="InPost_InPostPay::system/omnibus.xml"/>
+                <include path="InPost_InPostPay::system/bestsellers.xml"/>
             </group>
         </section>
     </system>

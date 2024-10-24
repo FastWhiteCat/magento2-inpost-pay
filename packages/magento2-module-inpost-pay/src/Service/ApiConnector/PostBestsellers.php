@@ -54,24 +54,7 @@ class PostBestsellers
             $errorMsg = __('There was a problem with uploading bestsellers. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
 
-//            throw new LocalizedException($errorMsg);
-
-            //TODO::remove this after API handles those requests
-            return [
-                'success' => [
-                    [
-                        'product_id' => '9',
-                        'qr_code' => 'TEST_QR_CODE_0123456789',
-                        'deep_link' => 'https://mage.localhost/compete-track-tote.html?deep_link=1'
-                    ]
-                ],
-                'error' => [
-                    [
-                        'product_id' => '14',
-                        'reason' => 'Some InPost Pay Error Test Message.'
-                    ]
-                ],
-            ];
+            throw new LocalizedException($errorMsg);
         }
     }
 }

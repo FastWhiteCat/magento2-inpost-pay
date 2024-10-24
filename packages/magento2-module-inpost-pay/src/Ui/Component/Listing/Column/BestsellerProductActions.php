@@ -70,7 +70,7 @@ class BestsellerProductActions extends Column
                                     (string)($item[InPostPayBestsellerProductInterface::SKU] ?? '')
                                 ),
                                 'message' => __(
-                                    'Are you sure you wan\'t to delete "%1" bestseller?',
+                                    'Are you sure you want to delete "%1" bestseller?',
                                     (string)($item[InPostPayBestsellerProductInterface::SKU] ?? '')
                                 )
                             ]
