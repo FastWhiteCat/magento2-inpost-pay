@@ -10,7 +10,6 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 class Bestsellers extends DataObject implements BestsellersInterface, ExtensibleDataInterface
 {
-
     /**
      * @return int|null
      */

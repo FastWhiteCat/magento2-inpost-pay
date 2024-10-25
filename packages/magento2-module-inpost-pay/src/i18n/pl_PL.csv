@@ -176,9 +176,9 @@
 "Save Bestseller Product","Zapisz Produkt Bestsellerowy",module,InPost_InPostPay
 "InPost Pay Bestseller Products","Produkty Bestsellerowe InPost Pay",module,InPost_InPostPay
 "You are not allowed to view this page. Please contact Administrators.","Nie masz uprawnień do podglądu tej strony. Prosimy o kontakt z Administratorami.",module,InPost_InPostPay
-"You have deleted InPost Pay Bestseller Product with ID %1.","Bestseller InPost Pay o I %1 został usunięty.",module,InPost_InPostPay
+"You have deleted InPost Pay Bestseller Product with ID %1.","Bestseller InPost Pay o ID %1 został usunięty.",module,InPost_InPostPay
 "Bestseller Products configured in InPost Pay have been downloaded into Magento.","Bestsellery skonfigurowane po stronie InPost Pay zostały pobrane do Magento.",module,InPost_InPostPay
-"There was a problem with downloading bestseller products from InPost Pay to Magento. Reason: %1","Wystąpił problem podczas pobierania bestselleróow z InPost Pay do Magento. Powód: %1",module,InPost_InPostPay
+"There was a problem with downloading bestseller products from InPost Pay to Magento. Reason: %1","Wystąpił problem podczas pobierania bestsellerów z InPost Pay do Magento. Powód: %1",module,InPost_InPostPay
 "InPost Pay Bestseller Product","Produkt Bestsellerowy InPost Pay",module,InPost_InPostPay
 "Edit InPost Pay Bestseller Product %1","Edytuj Produkt Bestsellerowy InPost Pay %1",module,InPost_InPostPay
 "New InPost Pay Bestseller Product","Nowy Produkt Bestsellerowy InPost Pay",module,InPost_InPostPay
@@ -209,8 +209,18 @@
 "Remove All And Download Products from InPost Pay","Usuń Wszystkie Oraz Pobierz Produkty z InPost Pay",module,InPost_InPostPay
 "Add New Bestseller Product","Dodaj Nowy Produkt Bestsellerowy",module,InPost_InPostPay
 "InPost Pay Bestsellers Settings","Ustawienia Bestsellerów InPost Pay",module,InPost_InPostPay
-"Enabled Bestsellers Synchronize CRON","Włącz Synchronizacje Bestsellerów",module,InPost_InPostPay
+"Enabled Bestsellers Synchronize CRON","Włącz Synchronizacje Bestsellerów w CRON",module,InPost_InPostPay
 "Synchronization Mode","Tryb Synchronizacji",module,InPost_InPostPay
 "Synchronize Bestsellers Cron Schedule","Harmonogram CRON Synchronizacji Bestsellerów",module,InPost_InPostPay
 "Download and replace Magento Bestsellers with InPost Pay Configured Bestsellers.","Pobieraj i podmieniaj Produkty Bestsellerowe skonfigurowane w InPost Pay do Magento.",module,InPost_InPostPay
 "Upload Magento Bestsellers into InPost Pay API.","Wysyłaj Produkty Bestsellerowe z Magento do InPost Pay API",module,InPost_InPostPay
+"Product Name","Nazwa Produktu",module,InPost_InPostPay
+"Available Start Date","Dostępny Od",module,InPost_InPostPay
+"Available End Date","Dostępny Do",module,InPost_InPostPay
+"Synchronized At","Data Synchronizacji",module,InPost_InPostPay
+"Created At","Data Utworzenia",module,InPost_InPostPay
+"General Information","Ogólne Informacje",module,InPost_InPostPay
+"General Configuration","Ogólna Konfiguracja",module,InPost_InPostPay
+"Priority","Priorytet",module,InPost_InPostPay
+"Synchronization Error","Błąd Synchronizacji",module,InPost_InPostPay
+"QR Code","Kod QR",module,InPost_InPostPay
