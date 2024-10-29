@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_restrictions" translate="label" type="text" sortOrder="300" showInDefault="1">
+        <label>Restrictions Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="enable_restrictions_refresh_cron" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+            <label>Enable Restrictions Refresh CRON</label>
+            <comment>When enabled CRON will perform restriction rules products list refreshing.</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/enable_restrictions_refresh_cron</config_path>
+        </field>
+        <field id="restrictions_refresh_cron_schedule" translate="label" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+            <label>Restrictions Refresh CRON Schedule</label>
+            <comment>30 1,7,13,19 * * * for example causes this CRON to run every day, at 1:30 AM, 7:30 AM, 1:30 PM and 7:30 PM</comment>
+            <config_path>payment/inpost_pay/restrictions_refresh_cron_schedule</config_path>
+            <depends>
+                <field id="enable_restrictions_refresh_cron">1</field>
+            </depends>
+        </field>
+    </group>
+</include>

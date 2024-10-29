@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="inpostpay">
+        <job name="inpostpay_restrictions_refresh"
+             instance="InPost\Restrictions\Cron\RefreshRestrictionRulesCron"
+             method="execute">
+            <config_path>payment/inpost_pay/restrictions_refresh_cron_schedule</config_path>
+        </job>
+    </group>
+</config>

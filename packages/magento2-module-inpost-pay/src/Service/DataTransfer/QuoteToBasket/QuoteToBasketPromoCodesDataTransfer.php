@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
+use InPost\InPostPay\Provider\Config\OmnibusConfigProvider;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Quote\Model\Quote;
@@ -25,6 +26,7 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
 
     public function __construct(
         private readonly PromoCodeInterfaceFactory $promoCodeFactory,
+        private readonly OmnibusConfigProvider $omnibusConfigProvider,
         private readonly ResourceConnection $resourceConnection,
         private readonly LoggerInterface $logger
     ) {
@@ -44,6 +46,7 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
                     $promoCode = $this->promoCodeFactory->create();
                     $promoCode->setPromoCodeValue($promoCodeData[PromoCodeInterface::PROMO_CODE_VALUE]);
                     $promoCode->setName($promoCodeData[PromoCodeInterface::NAME]);
+                    $promoCode->setRegulationType($promoCodeData[PromoCodeInterface::REGULATION_TYPE] ?? null);
                     $promoCodes[] = $promoCode;
                 }
             }
@@ -69,7 +72,7 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
 
         $query = $this->getConnection()->select()->from(
             ['s' => $this->getConnection()->getTableName(self::SALESRULE_TABLE)],
-            []
+            ['rule_id']
         );
 
         $query->joinLeft(
@@ -86,15 +89,28 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
 
         $query->where('s.rule_id IN (?)', $ruleIds);
 
-        $salesRuleData = [];
+        $salesRulesData = [];
         foreach ($this->getConnection()->fetchAll($query) as $row) {
-            $salesRuleData[] = [
-                'name' => (string)($row['rule_label'] ?? ''),
-                'promo_code_value' => !empty($row['rule_coupon']) ? (string)$row['rule_coupon'] : ''
+            $salesRuleData = [
+                PromoCodeInterface::NAME => (string)($row['rule_label'] ?? ''),
+                PromoCodeInterface::PROMO_CODE_VALUE => !empty($row['rule_coupon']) ? (string)$row['rule_coupon'] : ''
             ];
+
+            if ($this->isOmnibusCartPriceRule((int)($row['rule_id'] ?? 0))) {
+                $salesRuleData[PromoCodeInterface::REGULATION_TYPE] = PromoCodeInterface::REGULATION_TYPE_OMNIBUS;
+            }
+
+            $salesRulesData[] = $salesRuleData;
         }
 
-        return $salesRuleData;
+        return $salesRulesData;
+    }
+
+    private function isOmnibusCartPriceRule(int $cartPriceRuleId): bool
+    {
+        $omnibusRuleIds = $this->omnibusConfigProvider->getOmnibusCartPriceRuleIds();
+
+        return !empty($omnibusRuleIds) && $cartPriceRuleId && in_array($cartPriceRuleId, $omnibusRuleIds);
     }
 
     private function getConnection(): AdapterInterface

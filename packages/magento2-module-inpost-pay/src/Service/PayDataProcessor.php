@@ -10,6 +10,7 @@ use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCheck;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingCreate;
 use InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -66,7 +67,7 @@ class PayDataProcessor
         return is_array($result->getData()) ? $result->getData() : [];
     }
 
-    private function prepareBrowserData(array $browser, RequestInterface $request): array
+    public function prepareBrowserData(array $browser, RequestInterface $request): array
     {
         // @phpstan-ignore-next-line
         $customerIPAddress = current(explode(',', str_replace(' ', '', $request->getClientIp())));
@@ -80,7 +81,7 @@ class PayDataProcessor
             "location" => "-",
             "customer_ip" => $customerIPAddress,
             // @phpstan-ignore-next-line
-            "port" => $request->getServer('SERVER_PORT')
+            "port" => $request->getServer('SERVER_PORT', Http::DEFAULT_HTTPS_PORT)
         ];
     }
 
