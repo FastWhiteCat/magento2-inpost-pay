@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <inpost_pay>
+                <enable_restrictions_refresh_cron>1</enable_restrictions_refresh_cron>
+                <restrictions_refresh_cron_schedule>30 1,7,13,19 * * *</restrictions_refresh_cron_schedule>
+            </inpost_pay>
+        </payment>
+    </default>
+</config>

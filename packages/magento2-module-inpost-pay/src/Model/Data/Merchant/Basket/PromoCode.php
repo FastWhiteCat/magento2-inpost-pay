@@ -29,6 +29,9 @@ class PromoCode extends DataObject implements PromoCodeInterface, ExtensibleData
         $this->setData(self::NAME, $name);
     }
 
+    /**
+     * @return string
+     */
     public function getPromoCodeValue(): string
     {
         $promoCodeValue = $this->getData(self::PROMO_CODE_VALUE);
@@ -43,5 +46,24 @@ class PromoCode extends DataObject implements PromoCodeInterface, ExtensibleData
     public function setPromoCodeValue(string $promoCodeValue): void
     {
         $this->setData(self::PROMO_CODE_VALUE, $promoCodeValue);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRegulationType(): ?string
+    {
+        $regulationType = $this->getData(self::REGULATION_TYPE);
+
+        return is_scalar($regulationType) ? (string)$regulationType : null;
+    }
+
+    /**
+     * @param string|null $regulationType
+     * @return void
+     */
+    public function setRegulationType(?string $regulationType): void
+    {
+        $this->setData(self::REGULATION_TYPE, $regulationType);
     }
 }

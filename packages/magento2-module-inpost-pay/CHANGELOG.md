@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.9] - 2024-09-26
+
+### Added
+
+- Custom Promo Price - configuration that allows to select customer groups and product attribute that contains custom promo price
+- In case of a logged in customer with group selected in configuration price from attribute will be sent
+- In above case, cart total is unchanged from what Magento calculates. It is only used to display custom promo price.
+
+### Changed
+
+- Change method that provides browser and server data to public
+- In case of no SERVER_PORT, 443 as default will be used
+
+### Fixed
+
+- InPost Pay Baskets merging in scenario when guest with connected cart logs in to an account with another Basket 
+
+## [1.0.8] - 2024-09-05
+
+### Added
+
+- Omnibus - configuration that allows to mark rules with Omnibus flag and select which attribute contains lowest price
+
+### Changed
+
+- Mapping for terms and condition. It now allows to create a tree structure with sub links
+
+### Fixed
+
+- Zero quantity on place order from mobile App will now trigger notices and warnings 
+
 ## [1.0.7] - 2024-08-08
 
 ### Changed

@@ -17,13 +17,18 @@ class TermsAndConditions implements OptionSourceInterface
     }
 
     /**
+     * @param bool $withNone
      * @return array
      */
-    public function toOptionArray(): array
+    public function toOptionArray(bool $withNone = false): array
     {
         $result = [];
         $agreementCollection = $this->agreementCollectionFactory->create();
         $agreementCollection->addFieldToFilter('is_active', ['eq' => 1]);
+
+        if ($withNone) {
+            $result[] = ['label' =>  __('None'), 'value' => 0];
+        }
 
         /** @var Agreement $agreement */
         foreach ($agreementCollection as $agreement) {

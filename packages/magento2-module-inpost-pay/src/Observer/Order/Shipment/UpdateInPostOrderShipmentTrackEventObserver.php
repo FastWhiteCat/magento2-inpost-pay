@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 
 class UpdateInPostOrderShipmentTrackEventObserver implements ObserverInterface
 {
-    private ?InPostPayOrderInterface $inPostPayOrder = null;
+    private array $inPostPayOrders = [];
 
     public function __construct(
         private readonly UpdateOrder $updateOrder,
@@ -87,16 +87,16 @@ class UpdateInPostOrderShipmentTrackEventObserver implements ObserverInterface
 
     private function getInPostPayOrderByOrderId(int $orderId): ?InPostPayOrderInterface
     {
-        if ($this->inPostPayOrder === null) {
+        if (!isset($this->inPostPayOrders[$orderId])) {
             try {
                 $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
             } catch (NoSuchEntityException) {
                 $inPostPayOrder = null;
             }
 
-            $this->inPostPayOrder = $inPostPayOrder;
+            $this->inPostPayOrders[$orderId] = $inPostPayOrder;
         }
 
-        return $this->inPostPayOrder;
+        return $this->inPostPayOrders[$orderId];
     }
 }

@@ -111,37 +111,37 @@ interface InvoiceDetailsInterface
     public function setCity(string $city): void;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStreet(): string;
+    public function getStreet(): ?string;
 
     /**
-     * @param string $street
+     * @param string|null $street
      * @return void
      */
-    public function setStreet(string $street): void;
+    public function setStreet(?string $street): void;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBuilding(): string;
+    public function getBuilding(): ?string;
 
     /**
-     * @param string $building
+     * @param string|null $building
      * @return void
      */
-    public function setBuilding(string $building): void;
+    public function setBuilding(?string $building): void;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFlat(): string;
+    public function getFlat(): ?string;
 
     /**
-     * @param string $flat
+     * @param string|null $flat
      * @return void
      */
-    public function setFlat(string $flat): void;
+    public function setFlat(?string $flat): void;
 
     /**
      * @return string
