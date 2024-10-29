@@ -10,12 +10,14 @@ use InPost\InPostPay\Model\Config\Payment\TitleMapper;
 use InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep;
 use Magento\Payment\Model\Method\Substitution;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment\Repository as OrderPaymentRepository;
 use Psr\Log\LoggerInterface;
 
 class UpdatePaymentTitleStep extends OrderProcessingStep implements OrderPostProcessingStepInterface
 {
     public function __construct(
         protected readonly TitleMapper $titleMapper,
+        protected readonly OrderPaymentRepository $orderPaymentRepository,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -27,13 +29,18 @@ class UpdatePaymentTitleStep extends OrderProcessingStep implements OrderPostPro
         $additionalInformation = $order->getPayment()->getAdditionalInformation();
         if (isset($additionalInformation[Substitution::INFO_KEY_TITLE])) {
             $oldTitle = $additionalInformation[Substitution::INFO_KEY_TITLE];
-            $additionalInformation[Substitution::INFO_KEY_TITLE] = $this->getMappedTitle(
+            $newTitle = $this->getMappedTitle(
                 $additionalInformation[Substitution::INFO_KEY_TITLE],
                 $paymentType
             );
+            if ($oldTitle === $newTitle) {
+                return;
+            }
+            $additionalInformation[Substitution::INFO_KEY_TITLE] = $newTitle;
             $order->getPayment()->setAdditionalInformation(
                 $additionalInformation
             );
+            $this->orderPaymentRepository->save($order->getPayment());
             $this->createLog(
                 sprintf(
                     'Payment title %s has been updated to %s for Order #%s',
