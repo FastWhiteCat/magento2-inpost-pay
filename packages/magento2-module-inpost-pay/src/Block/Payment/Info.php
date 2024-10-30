@@ -15,12 +15,13 @@ class Info extends \Magento\Payment\Block\Info
             return $this->_paymentSpecificInformation;
         }
         $transport = parent::_prepareSpecificInformation($transport);
-        $data = [];
         $additionalInformation = $this->getInfo()->getAdditionalInformation();
-        $methodTitle = $additionalInformation['method_title'] ?? '';
-        if ($methodTitle) {
-            $data[(string)__('Payment Type')] = __($methodTitle);
+        if (is_array($additionalInformation) && isset($additionalInformation['method_title'])) {
+            $methodTitle = $additionalInformation['method_title'];
+            if ($methodTitle) {
+                $transport->setData((string)__('Payment Type'), __($methodTitle));
+            }
         }
-        return $transport->setData(array_merge($data, $transport->getData()));
+        return $transport;
     }
 }

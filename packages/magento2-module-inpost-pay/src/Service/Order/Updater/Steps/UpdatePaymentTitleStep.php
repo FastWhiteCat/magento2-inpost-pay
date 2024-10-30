@@ -26,7 +26,12 @@ class UpdatePaymentTitleStep extends OrderProcessingStep implements OrderPostPro
     public function process(Order $order, InPostOrderInterface $inPostOrder): void
     {
         $paymentType = $inPostOrder->getOrderDetails()->getPaymentType();
-        $additionalInformation = $order->getPayment()->getAdditionalInformation();
+        /** @var \Magento\Sales\Api\Data\OrderPaymentInterface $payment */
+        $payment = $order->getPayment();
+        if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)) {
+            return;
+        }
+        $additionalInformation = $payment->getAdditionalInformation();
         if (isset($additionalInformation[Substitution::INFO_KEY_TITLE])) {
             $oldTitle = $additionalInformation[Substitution::INFO_KEY_TITLE];
             $newTitle = $this->getMappedTitle(
@@ -37,10 +42,10 @@ class UpdatePaymentTitleStep extends OrderProcessingStep implements OrderPostPro
                 return;
             }
             $additionalInformation[Substitution::INFO_KEY_TITLE] = $newTitle;
-            $order->getPayment()->setAdditionalInformation(
+            $payment->setAdditionalInformation(
                 $additionalInformation
             );
-            $this->orderPaymentRepository->save($order->getPayment());
+            $this->orderPaymentRepository->save($payment);
             $this->createLog(
                 sprintf(
                     'Payment title %s has been updated to %s for Order #%s',
