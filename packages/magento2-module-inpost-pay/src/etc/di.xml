@@ -101,6 +101,10 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable\Details"/>
 
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
@@ -245,6 +249,7 @@
                 <item name="products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer</item>
                 <item name="related_products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer</item>
+                <item name="promotions_available" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromotionsAvailableDataTransfer</item>
             </argument>
         </arguments>
     </type>

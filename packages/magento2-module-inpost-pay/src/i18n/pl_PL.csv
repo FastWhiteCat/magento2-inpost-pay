@@ -166,3 +166,4 @@
 "Coupon code is already activated","Kod jest już aktywowany",module,InPost_InPostPay
 "Coupon code has been removed. The code entered is incorrect. Please enter the correct code","Usunięto kod rabatowy. W prowadzony kod jest niepoprawny. Wpisz poprawny kod",module,InPost_InPostPay
 "Coupon code has been updated","Kod został zaktualizowany",module,InPost_InPostPay
+"Magento cart rule with coupon","Reguła koszykowa Magento z kodem",module,InPost_InPostPay

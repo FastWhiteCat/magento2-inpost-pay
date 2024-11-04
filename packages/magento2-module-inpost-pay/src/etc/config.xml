@@ -42,6 +42,7 @@
                 <polling_enabled_for_inactive>1</polling_enabled_for_inactive>
                 <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
+                <promotions_enabled>0</promotions_enabled>
             </inpost_pay>
         </payment>
     </default>

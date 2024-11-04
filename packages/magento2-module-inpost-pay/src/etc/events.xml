@@ -74,4 +74,7 @@
     <event name="izi_basket_confirmation_after">
         <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
     </event>
+    <event name="salesrule_rule_save_after">
+        <observer name="InPost_InPostPay::cleanPromotionsCacheAfterRuleSave" instance="InPost\InPostPay\Observer\SalesRule\SalesRuleSaveEventObserver" />
+    </event>
 </config>

@@ -11,4 +11,9 @@
         <label>Terms And Conditions Versions Cache</label>
         <description>Terms and conditions needed in communication with InPost Pay API.</description>
     </type>
+    <type name="inpost_pay_promotions" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\Promotions\Type">
+        <label>Available In-app Promotions Cache</label>
+        <description>Cache for Promotions sent to InPost Pay API.</description>
+    </type>
 </config>
