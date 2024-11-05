@@ -126,18 +126,12 @@ type StoreConfig {
     inpost_pay_widget_dark_mode : String
     @doc(description: "Indicates whether dark mode is enabled or not. Possible values: 1 (Yes) and 0 (No).")
 
-    inpost_pay_widget_max_width : String
-    @doc(description: "Widget max width value in range between 220 and 600.")
+    inpost_pay_widget_size : InPostPayWidgetSizeEnum
+    @doc(description: "InPost Pay Widget size variant.")
 
     inpost_pay_widget_frame_style : InPostPayWidgetFrameStyleEnum
     @doc(description: "InPost Pay widget frame corner style.")
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayWidgetFrameStyleResolver")
-
-    inpost_pay_polling_enabled_for_inactive : String
-    @doc(description: "Indicates whether widget should refresh inactive browser page or not. Possible values: 1 (Yes) and 0 (No).")
-
-    inpost_pay_polling_time_for_inactive : String
-    @doc(description: "InPost Pay widget refreshing time (in milliseconds) for inactive browser page.")
 }
 
 enum InPostPayAction @doc(description: "Defines action that should be taken as a result of processing request") {
@@ -156,4 +150,12 @@ enum InPostPayWidgetFrameStyleEnum @doc(description: "Defines InPost Pay Widget 
     classic
     rounded
     round
+}
+
+enum InPostPayWidgetSizeEnum @doc(description: "Defines InPost Pay Widget sizes.") {
+    size-xs
+    size-sm
+    size-md
+    size-lg
+    size-xl
 }
