@@ -72,9 +72,6 @@
 "No Coupon is required.","Kod Rabatowy nie jest wymagany.",module,InPost_InPostPay
 "There was a problem with basket request. Details: %1","Wystąpił problem z żądaniem synchronizacji koszyka InPost Pay. Szczegóły: %1",module,InPost_InPostPay
 "No delivery method is allowed for this basket.","Brak metod dostawy dostępnych dla tego koszyka InPost Pay",module,InPost_InPostPay
-"Polling Settings","Ustawienia odpytywania Long Polling",module,InPost_InPostPay
-"Enable long polling for inactive browser tab","Włącz odpytywanie long polling dla nieaktywnej karty przeglądarki",module,InPost_InPostPay
-"Long Polling time for inactive tab (in milliseconds)","Czas odpytywania dla nieaktywnej karty (w milisekundach)",module,InPost_InPostPay
 "Show on register page","Pokaż na stronie rejestracji",module,InPost_InPostPay
 "Show on login page","Pokaż na stronie logowania",module,InPost_InPostPay
 "Show on checkout","Pokaż na stronie finalizacji zamówienia (checkout)",module,InPost_InPostPay
