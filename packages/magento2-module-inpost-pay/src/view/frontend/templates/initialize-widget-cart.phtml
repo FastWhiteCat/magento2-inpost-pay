@@ -16,6 +16,7 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$apiBaseUrl = $widgetViewModel->getApiBaseUrl();
 
 if (!$widgetViewModel->canShowForWholeCart()) {
     return;
@@ -35,7 +36,8 @@ if (!$widgetViewModel->canShowForWholeCart()) {
                     "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
                     "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
                     "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
-                    "language": "<?= /* @noEscape */ $language ?>"
+                    "language": "<?= /* @noEscape */ $language ?>",
+                    "apiBaseUrl": "<?= /* @noEscape */ $apiBaseUrl ?>"
                 }
             }
         }

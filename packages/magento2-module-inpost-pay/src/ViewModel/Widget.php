@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
+use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
@@ -254,8 +255,16 @@ class Widget implements ArgumentInterface
         return $scriptUrl;
     }
 
+    public function getApiBaseUrl(): string
+    {
+        $sandboxMode = $this->isSandboxEnabled();
+
+        return $sandboxMode ? 'https://sandbox-api.inpost.pl' : 'https://api.inpost.pl';
+    }
+
     /**
      * @return string
+     * @throws InPostPayInternalException
      */
     public function getClientMerchantId(): string
     {
