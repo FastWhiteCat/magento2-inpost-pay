@@ -149,7 +149,6 @@ define([
                 console.error(err);
             })
 
-            // TODO dodać kontroler do dodawania do koszyka tak by zwracał basketBindingApiKey
             function ajaxSubmit($form) {
                 return new Promise(function (resolve, reject) {
                     $.ajax({
@@ -160,8 +159,17 @@ define([
                         cache: false,
                         contentType: false,
                         processData: false,
-                        success: function (data) {
-                            resolve(data.basketBindingApiKey)
+                        success: function () {
+                            $.ajax({
+                                url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
+                                method: 'GET',
+                            })
+                                .done(function (data) {
+                                    resolve(data.basketBindingApiKey)
+                                })
+                                .fail(function () {
+                                    reject();
+                                });
                         },
                         error: function () {
                             reject()
@@ -169,6 +177,7 @@ define([
                     });
                 });
             }
+
         },
 
         /**
@@ -180,6 +189,7 @@ define([
          * @return {undefined|string|promise<string>}
          */
         retrieveBasketBindingApiKey: function (apiKey = undefined) {
+            var self = this;
             if (apiKey || apiKey === undefined) return apiKey;
 
             return new Promise(function (resolve, reject) {
@@ -188,6 +198,7 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
+                        self.basketBindingApiKey = data;
                         resolve(data)
                     })
                     .fail(function () {
@@ -208,15 +219,25 @@ define([
         handleBasketEvent: function (widgetBasketEvent) {
             if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) return false;
 
+            var self = this;
+
+            //TODO dodany basketBindingApiKey - na ten moment nie wiadomo czy jest dostępny i jak zadziała - do przetestowania
             return new Promise(function (resolve, reject) {
                 $.ajax({
-                    url: urlBuilder.build('inpostizi/OrderCreated/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
+                    url: urlBuilder.build('inpostizi/OrderComplete/Get'
+                            + '/form_key/'
+                            + $.mage.cookies.get('form_key'))
+                            + '/?basketBindingApiKey='
+                            + self.basketBindingApiKey,
                     method: 'GET',
                 })
                     .done(function (data) {
-                        resolve(true);
-                        //TODO get url to success page
-                        window.location.replace(data.redirectUrl);
+                        if (data.redirect) {
+                            resolve(true);
+                            window.location.replace(data.redirect);
+                        } else {
+                            reject();
+                        }
                     })
                     .fail(function () {
                         reject(new Error($.mage.__('Network problem')));
