@@ -30,5 +30,10 @@
             <label>POS ID</label>
             <config_path>payment/inpost_pay/pos_id</config_path>
         </field>
+        <field id="client_merchant_id" translate="label" type="text" sortOrder="35"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Client Merchant ID</label>
+            <config_path>payment/inpost_pay/client_merchant_id</config_path>
+        </field>
     </group>
 </include>
