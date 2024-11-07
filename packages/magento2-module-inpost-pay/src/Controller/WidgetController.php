@@ -37,7 +37,7 @@ class WidgetController
         protected readonly Validator $formKeyValidator,
         protected readonly JsonFactory $jsonFactory,
         protected readonly LoggerInterface $logger
-    ){
+    ) {
         $this->messageManager = $context->getMessageManager();
         $this->request = $context->getRequest();
     }
