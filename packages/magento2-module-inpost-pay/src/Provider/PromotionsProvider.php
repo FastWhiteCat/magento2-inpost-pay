@@ -16,7 +16,6 @@ use Magento\SalesRule\Model\Data\Rule;
 use Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory as SalesRuleCollectionFactory;
 use Magento\SalesRule\Model\Rule as RuleModel;
 
-
 class PromotionsProvider
 {
     private const PROMOTION_DESCRIPTION_MAX_LENGTH = 60;
@@ -55,38 +54,7 @@ class PromotionsProvider
 
             $ids = array_column($promotionsMapping, PromotionsField::MAGENTO_CART_RULE_ID_FIELD);
             $promotionsArray = $this->getPromotionsList($ids, $customerGroupId);
-            $promotions = [];
-            foreach ($promotionsMapping as $item) {
-                if (!isset($promotionsArray[$item[PromotionsField::MAGENTO_CART_RULE_ID_FIELD]])) {
-                    continue;
-                }
-
-                /** @var RuleModel $salesRule */
-                $salesRule = $promotionsArray[$item[PromotionsField::MAGENTO_CART_RULE_ID_FIELD]];
-
-                if ($salesRule->getUsesPerCoupon() && $salesRule->getTimesUsed() >= $salesRule->getUsesPerCoupon()) {
-                    continue;
-                }
-
-                $fromDate = $salesRule->getFromDate() ? $this->formatInPostDate($salesRule->getFromDate()) : '';
-                $toDate = $salesRule->getToDate() ? $this->formatInPostDate($salesRule->getToDate()) : '';
-
-                $promotions[] = [
-                    'type' => 'MERCHANT',
-                    'promo_code_value' => $salesRule->getCode(),
-                    'description' => substr(
-                        $salesRule->getDescription(),
-                        0,
-                        self::PROMOTION_DESCRIPTION_MAX_LENGTH
-                    ),
-                    'start_date' => $fromDate,
-                    'end_date' => $toDate,
-                    'priority' => $salesRule->getSortOrder(),
-                    'details' => [
-                        'link' => $item[PromotionsField::PROMOTION_URL_FIELD]
-                    ]
-                ];
-            }
+            $promotions = $this->preparePromotionsData($promotionsMapping, $promotionsArray);
 
             $encodedPromotionsData = (string)$this->serializer->serialize($promotions);
             $this->cache->save(
@@ -101,6 +69,44 @@ class PromotionsProvider
         return is_array($promotions) ? $promotions : (array)$this->serializer->unserialize($promotions);
     }
 
+    private function preparePromotionsData(array $promotionsMapping, array $promotionsArray): array
+    {
+        $promotions = [];
+        foreach ($promotionsMapping as $item) {
+            if (!isset($promotionsArray[$item[PromotionsField::MAGENTO_CART_RULE_ID_FIELD]])) {
+                continue;
+            }
+
+            /** @var RuleModel $salesRule */
+            $salesRule = $promotionsArray[$item[PromotionsField::MAGENTO_CART_RULE_ID_FIELD]];
+
+            if ($salesRule->getUsesPerCoupon() && $salesRule->getTimesUsed() >= $salesRule->getUsesPerCoupon()) {
+                continue;
+            }
+
+            $fromDate = $salesRule->getFromDate() ? $this->formatInPostDate($salesRule->getFromDate()) : '';
+            $toDate = $salesRule->getToDate() ? $this->formatInPostDate($salesRule->getToDate()) : '';
+
+            $promotions[] = [
+                'type' => 'MERCHANT',
+                'promo_code_value' => $salesRule->getCode(),
+                'description' => substr(
+                    $salesRule->getDescription(),
+                    0,
+                    self::PROMOTION_DESCRIPTION_MAX_LENGTH
+                ),
+                'start_date' => $fromDate,
+                'end_date' => $toDate,
+                'priority' => $salesRule->getSortOrder(),
+                'details' => [
+                    'link' => $item[PromotionsField::PROMOTION_URL_FIELD]
+                ]
+            ];
+        }
+
+        return $promotions;
+    }
+
     /**
      * @param array $ids
      * @param int $customerGroupId
@@ -113,7 +119,7 @@ class PromotionsProvider
         $currentDateTime = $currentDateTime->format('Y-m-d');
 
         $salesRuleCollection
-            ->addFieldToFilter(Rule::KEY_IS_ACTIVE, 1)
+            ->addFieldToFilter(Rule::KEY_IS_ACTIVE, '1')
             ->addFieldToFilter(Rule::KEY_COUPON_TYPE, ['eq' => RuleModel::COUPON_TYPE_SPECIFIC])
             ->addFieldToFilter(Rule::KEY_RULE_ID, ['in' => $ids])
             ->addFieldToFilter(Rule::KEY_FROM_DATE, [['lteq' => $currentDateTime], ['null' => true]])

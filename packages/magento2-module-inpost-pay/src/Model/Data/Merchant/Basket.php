@@ -206,7 +206,7 @@ class Basket extends DataObject implements BasketInterface, ExtensibleDataInterf
     }
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface[] $consents
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface[] $promotionsAvailable
      * @return void
      */
     public function setPromotionsAvailable(array $promotionsAvailable): void
