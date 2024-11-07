@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Provider;
 
 use DateTime;
 use DateTimeZone;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Block\Adminhtml\Form\Field\PromotionsField;
 use InPost\InPostPay\Model\Cache\Promotions\Type as PromotionsCacheType;
 use InPost\InPostPay\Provider\Config\PromotionsMappingConfigProvider;
@@ -67,6 +68,9 @@ class PromotionsProvider
                     continue;
                 }
 
+                $fromDate = $salesRule->getFromDate() ? $this->formatInPostDate($salesRule->getFromDate()) : '';
+                $toDate = $salesRule->getToDate() ? $this->formatInPostDate($salesRule->getToDate()) : '';
+
                 $promotions[] = [
                     'type' => 'MERCHANT',
                     'promo_code_value' => $salesRule->getCode(),
@@ -75,8 +79,8 @@ class PromotionsProvider
                         0,
                         self::PROMOTION_DESCRIPTION_MAX_LENGTH
                     ),
-                    'start_date' => $salesRule->getFromDate(),
-                    'end_date' => $salesRule->getToDate(),
+                    'start_date' => $fromDate,
+                    'end_date' => $toDate,
                     'priority' => $salesRule->getSortOrder(),
                     'details' => [
                         'link' => $item[PromotionsField::PROMOTION_URL_FIELD]
@@ -127,5 +131,14 @@ class PromotionsProvider
         }
 
         return $salesRules;
+    }
+
+    /**
+     * @param string $date
+     * @return string
+     */
+    private function formatInPostDate(string $date): string
+    {
+        return (new DateTime($date))->format(BasketInterface::INPOST_DATE_FORMAT);
     }
 }
