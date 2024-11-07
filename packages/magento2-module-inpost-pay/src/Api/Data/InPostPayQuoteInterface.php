@@ -10,6 +10,7 @@ interface InPostPayQuoteInterface
     public const INPOST_PAY_QUOTE_ID = 'inpost_pay_quote_id';
     public const QUOTE_ID = 'quote_id';
     public const BASKET_ID = 'basket_id';
+    public const BASKET_BINDING_API_KEY = 'basket_binding_api_key';
     public const INPOST_BASKET_ID = 'inpost_basket_id';
     public const STATUS = 'status';
     public const PHONE_NUMBER = 'phone_number';
@@ -32,6 +33,9 @@ interface InPostPayQuoteInterface
 
     public function getBasketId(): string;
     public function setBasketId(string $basketId): InPostPayQuoteInterface;
+
+    public function getBasketBindingApiKey(): ?string;
+    public function setBasketBindingApiKey(?string $basketBindingApiKey): InPostPayQuoteInterface;
 
     public function getInpostBasketId(): ?string;
     public function setInpostBasketId(string $inpostBasketId): InPostPayQuoteInterface;
