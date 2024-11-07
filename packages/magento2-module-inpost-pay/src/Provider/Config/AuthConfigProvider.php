@@ -15,7 +15,7 @@ class AuthConfigProvider
     private const XML_PATH_MERCHANT_SECRET = 'payment/inpost_pay/%smerchant_secret';
     private const XML_PATH_AUTH_TOKEN_URL = 'payment/inpost_pay/%sauth_token_url';
     private const XML_PATH_POS_ID = 'payment/inpost_pay/%spos_id';
-    private const XML_PATH_CLIENT_MERCHANT_ID = 'payment/inpost_pay/client_merchant_id';
+    private const XML_PATH_CLIENT_MERCHANT_ID = 'payment/inpost_pay/%sclient_merchant_id';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -145,7 +145,10 @@ class AuthConfigProvider
     public function getClientMerchantId(): string
     {
         $clientMerchantId = $this->scopeConfig->getValue(
-            self::XML_PATH_CLIENT_MERCHANT_ID,
+            sprintf(
+                self::XML_PATH_CLIENT_MERCHANT_ID,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            ),
             ScopeInterface::SCOPE_WEBSITE
         );
 

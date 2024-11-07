@@ -6,6 +6,7 @@ namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
+use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
@@ -44,23 +45,26 @@ class Widget implements ArgumentInterface
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
+     * @param RestrictedProductIdsProvider $restrictedProductIdsProvider
      * @param LoggerInterface $logger
      * @param AuthConfigProvider $authConfigProvider
+     * @param IziApiConfigProvider $iziApiConfigProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        private readonly SandboxConfigProvider             $sandboxConfigProvider,
-        private readonly LayoutConfigProvider              $layoutConfigProvider,
-        private readonly DisplayConfigProvider             $displayConfigProvider,
-        private readonly ResolverInterface                 $localeResolver,
-        private readonly CheckoutSession                   $checkoutSession,
-        private readonly GeneralConfigProvider             $generalConfigProvider,
+        private readonly SandboxConfigProvider $sandboxConfigProvider,
+        private readonly LayoutConfigProvider $layoutConfigProvider,
+        private readonly DisplayConfigProvider $displayConfigProvider,
+        private readonly ResolverInterface $localeResolver,
+        private readonly CheckoutSession $checkoutSession,
+        private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly ProductRepositoryInterface        $productRepository,
-        private readonly StoreManagerInterface             $storeManager,
-        private readonly RestrictedProductIdsProvider      $restrictedProductIdsProvider,
-        private readonly LoggerInterface                   $logger,
-        private readonly AuthConfigProvider                $authConfigProvider,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
+        private readonly LoggerInterface $logger,
+        private readonly AuthConfigProvider $authConfigProvider,
+        private readonly IziApiConfigProvider $iziApiConfigProvider,
     ) {
     }
 
@@ -257,9 +261,7 @@ class Widget implements ArgumentInterface
 
     public function getApiBaseUrl(): string
     {
-        $sandboxMode = $this->isSandboxEnabled();
-
-        return $sandboxMode ? 'https://sandbox-api.inpost.pl' : 'https://api.inpost.pl';
+        return trim($this->iziApiConfigProvider->getIziApiUrl(), '/');
     }
 
     /**
