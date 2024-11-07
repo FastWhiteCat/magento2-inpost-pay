@@ -165,7 +165,7 @@ define([
                                 method: 'GET',
                             })
                                 .done(function (data) {
-                                    resolve(data.basketBindingApiKey)
+                                    resolve(data.basket_binding_api_key)
                                 })
                                 .fail(function () {
                                     reject();
