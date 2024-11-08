@@ -39,13 +39,10 @@ class QuoteToBasketPromotionsAvailableDataTransfer implements QuoteToBasketDataT
                 break;
             }
 
-            $details = (array)($promotionData[PromotionAvailableInterface::DETAILS] ?? []);
-            $detailsArr = [];
-            foreach ($details as $link) {
-                /** @var DetailsInterface $details */
-                $detailsObject = $this->detailsInterfaceFactory->create();
-                $detailsObject->setLink((string)$link);
-                $detailsArr[] = $detailsObject;
+            $details = $this->detailsInterfaceFactory->create();
+            if ($promotionData[PromotionAvailableInterface::DETAILS]) {
+                $link = $promotionData[PromotionAvailableInterface::DETAILS][DetailsInterface::LINK];
+                $details->setLink((string)$link);
             }
 
             $priority = (int)$promotionData[PromotionAvailableInterface::PRIORITY];
@@ -60,7 +57,7 @@ class QuoteToBasketPromotionsAvailableDataTransfer implements QuoteToBasketDataT
             $promo->setStartDate((string)$promotionData[PromotionAvailableInterface::START_DATE]);
             $promo->setEndDate((string)$promotionData[PromotionAvailableInterface::END_DATE]);
             $promo->setPriority($priority);
-            $promo->setDetails($detailsArr);
+            $promo->setDetails($details);
 
             $promotions[] = $promo;
         }

@@ -11,7 +11,8 @@ use Magento\Framework\Event\ObserverInterface;
 
 class SalesRuleSaveEventObserver implements ObserverInterface
 {
-    public function __construct(private readonly CacheInterface $cache) {
+    public function __construct(private readonly CacheInterface $cache)
+    {
     }
 
     /**

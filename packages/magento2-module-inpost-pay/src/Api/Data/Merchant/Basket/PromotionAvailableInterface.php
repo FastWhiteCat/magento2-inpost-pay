@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\Data\Merchant\Basket;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface;
+
 interface PromotionAvailableInterface
 {
     public const TYPE = 'type';
@@ -81,13 +83,13 @@ interface PromotionAvailableInterface
     public function setPriority(int $priority): void;
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface
      */
-    public function getDetails(): array;
+    public function getDetails(): DetailsInterface;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface[] $details
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface $details
      * @return void
      */
-    public function setDetails(array $details): void;
+    public function setDetails(DetailsInterface $details): void;
 }

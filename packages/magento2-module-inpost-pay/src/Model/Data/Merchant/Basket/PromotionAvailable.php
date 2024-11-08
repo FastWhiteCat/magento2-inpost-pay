@@ -5,11 +5,19 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant\Basket;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterfaceFactory;
 use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
 class PromotionAvailable extends DataObject implements PromotionAvailableInterface, ExtensibleDataInterface
 {
+    public function __construct(
+        private readonly DetailsInterfaceFactory $detailsInterfaceFactory,
+        array $data = []
+    ) {
+        parent::__construct($data);
+    }
 
     /**
      * @return string
@@ -126,20 +134,24 @@ class PromotionAvailable extends DataObject implements PromotionAvailableInterfa
     }
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface
      */
-    public function getDetails(): array
+    public function getDetails(): DetailsInterface
     {
         $details = $this->getData(self::DETAILS);
 
-        return is_array($details) ? $details : [];
+        if ($details instanceof DetailsInterface) {
+            return $details;
+        }
+
+        return $this->detailsInterfaceFactory->create();
     }
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface[] $details
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface $details
      * @return void
      */
-    public function setDetails(array $details): void
+    public function setDetails(DetailsInterface $details): void
     {
         $this->setData(self::DETAILS, $details);
     }
