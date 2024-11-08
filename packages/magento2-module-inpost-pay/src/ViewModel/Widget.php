@@ -29,10 +29,6 @@ use Psr\Log\LoggerInterface;
  */
 class Widget implements ArgumentInterface
 {
-    private const VARIANT = 'variant';
-    private const DARK_MODE = 'darkMode';
-    private const SIZE = 'size';
-    private const FRAME_STYLE = 'frameStyle';
     private const CHECKOUT_DESCRIPTOR = 'checkout_index_index';
 
     /**
@@ -89,19 +85,7 @@ class Widget implements ArgumentInterface
      */
     public function getLayoutConfig(): string
     {
-        $variant = $this->layoutConfigProvider->getColorVariant();
-        $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
-        $size = $this->layoutConfigProvider->getSize();
-        $frameStyle = $this->layoutConfigProvider->getFrameStyle();
-
-        $configArray = [
-            self::DARK_MODE => $darkMode,
-            self::VARIANT => $variant,
-            self::SIZE => $size,
-            self::FRAME_STYLE => $frameStyle
-        ];
-
-        return implode(" ", $configArray);
+        return $this->layoutConfigProvider->getWidgetStyles();
     }
 
     /**
