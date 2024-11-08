@@ -19,23 +19,23 @@ class Sizes implements OptionSourceInterface
         return [
             [
                 'value' => self::SIZE_XS,
-                'label' => __('size xs')
+                'label' => __('Size XS')
             ],
             [
                 'value' => self::SIZE_SM,
-                'label' => __('size sm')
+                'label' => __('Size SM')
             ],
             [
                 'value' => self::SIZE_MD,
-                'label' => __('size md')
+                'label' => __('Size MD')
             ],
             [
                 'value' => self::SIZE_LG,
-                'label' => __('size lg')
+                'label' => __('Size LG')
             ],
             [
                 'value' => self::SIZE_XL,
-                'label' => __('size xl')
+                'label' => __('Size XL')
             ]
         ];
     }

@@ -100,16 +100,7 @@ type StoreConfig {
     inpost_pay_show_on_checkout_page : String
     @doc(description: "Indicates whether widget should be displayed on checkout page or not. Possible values: 1 (Yes) and 0 (No).")
 
-    inpost_pay_widget_color_variant : InPostPayWidgetColorVariantEnum
-    @doc(description: "InPost Pay Widget color variant.")
-
-    inpost_pay_widget_dark_mode : String
-    @doc(description: "Indicates whether dark mode is enabled or not. Possible values: 1 (Yes) and 0 (No).")
-
-    inpost_pay_widget_size : InPostPayWidgetSizeEnum
-    @doc(description: "InPost Pay Widget size variant.")
-
-    inpost_pay_widget_frame_style : InPostPayWidgetFrameStyleEnum
+    inpost_pay_widget_styles : String
     @doc(description: "InPost Pay widget frame corner style.")
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayWidgetFrameStyleResolver")
 }
@@ -119,23 +110,4 @@ enum InPostPayAction @doc(description: "Defines action that should be taken as a
     reject
     refresh
     redirect
-}
-
-enum InPostPayWidgetColorVariantEnum @doc(description: "Defines InPost Pay Widget color variants.") {
-    primary
-    secondary
-}
-
-enum InPostPayWidgetFrameStyleEnum @doc(description: "Defines InPost Pay Widget frame corner styles.") {
-    classic
-    rounded
-    round
-}
-
-enum InPostPayWidgetSizeEnum @doc(description: "Defines InPost Pay Widget sizes.") {
-    size-xs
-    size-sm
-    size-md
-    size-lg
-    size-xl
 }
