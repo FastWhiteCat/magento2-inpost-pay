@@ -15,7 +15,6 @@
                 <item name="inpost_pay_widget_color_variant" xsi:type="string">payment/inpost_pay/widget_color_variant</item>
                 <item name="inpost_pay_widget_dark_mode" xsi:type="string">payment/inpost_pay/widget_dark_mode</item>
                 <item name="inpost_pay_widget_size" xsi:type="string">payment/inpost_pay/widget_size</item>
-                <item name="inpost_pay_widget_frame_style" xsi:type="string">payment/inpost_pay/widget_frame_style</item>
             </argument>
         </arguments>
     </type>

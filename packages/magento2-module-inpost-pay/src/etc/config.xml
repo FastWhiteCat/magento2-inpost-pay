@@ -22,9 +22,8 @@
                 <product_cart_enabled>1</product_cart_enabled>
                 <cart_enabled>1</cart_enabled>
                 <success_page_enabled>1</success_page_enabled>
-                <widget_color_variant>primary</widget_color_variant>
-                <widget_dark_mode>0</widget_dark_mode>
                 <widget_size>size-md</widget_size>
+                <widget_frame_style>primary</widget_frame_style>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
                 <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
                 <async_basket_export>0</async_basket_export>
