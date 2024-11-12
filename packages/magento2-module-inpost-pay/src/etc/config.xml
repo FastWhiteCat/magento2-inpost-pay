@@ -22,6 +22,7 @@
                 <product_cart_enabled>1</product_cart_enabled>
                 <cart_enabled>1</cart_enabled>
                 <success_page_enabled>1</success_page_enabled>
+                <success_page_url>checkout/onepage/success</success_page_url>
                 <widget_size>size-md</widget_size>
                 <widget_frame_style>primary</widget_frame_style>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>

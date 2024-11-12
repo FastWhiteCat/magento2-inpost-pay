@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Controller\OrderComplete;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Controller\WidgetController;
+use InPost\InPostPay\Provider\Config\SuccessPageUrlConfigProvider;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -13,7 +14,6 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
@@ -27,9 +27,9 @@ class Get extends WidgetController implements HttpGetActionInterface
      * @param Validator $formKeyValidator
      * @param JsonFactory $jsonFactory
      * @param LoggerInterface $logger
-     * @param UrlInterface $urlBuilder
      * @param OrderRepositoryInterface $orderRepository
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
+     * @param SuccessPageUrlConfigProvider $successPageUrlConfigProvider
      */
     public function __construct(
         Context $context,
@@ -37,9 +37,9 @@ class Get extends WidgetController implements HttpGetActionInterface
         Validator $formKeyValidator,
         JsonFactory $jsonFactory,
         LoggerInterface $logger,
-        private readonly UrlInterface $urlBuilder,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
+        private readonly SuccessPageUrlConfigProvider $successPageUrlConfigProvider
     ) {
         parent::__construct($context, $checkoutSession, $formKeyValidator, $jsonFactory, $logger);
     }
@@ -62,7 +62,7 @@ class Get extends WidgetController implements HttpGetActionInterface
 
                 $result = [
                     self::SUCCESS_RESULT_KEY => true,
-                    self::REDIRECT_RESULT_KEY => $this->urlBuilder->getUrl('checkout/onepage/success/')
+                    self::REDIRECT_RESULT_KEY => $this->successPageUrlConfigProvider->getOrderSuccessPageUrl($order)
                 ];
             } else {
                 $result = [
