@@ -134,6 +134,7 @@ define([
                 return Promise.reject('Product id not found');
             }
 
+            var self = this;
             var $productInput = $('[name="product"][value="' + productId + '"]');
             var $productForm = $productInput.parent('#product_addtocart_form');
 
@@ -165,7 +166,12 @@ define([
                                 method: 'GET',
                             })
                                 .done(function (data) {
-                                    resolve(data.basket_binding_api_key)
+                                    if (!data || !data.basket_binding_api_key) {
+                                        resolve(undefined)
+                                    } else {
+                                        self.basketBindingApiKey = data.basket_binding_api_key;
+                                        resolve(data.basket_binding_api_key)
+                                    }
                                 })
                                 .fail(function () {
                                     reject();
@@ -177,7 +183,6 @@ define([
                     });
                 });
             }
-
         },
 
         /**
@@ -190,7 +195,7 @@ define([
          */
         retrieveBasketBindingApiKey: function (apiKey = undefined) {
             var self = this;
-            if (apiKey || apiKey === undefined) return apiKey;
+            if (apiKey) return apiKey;
 
             return new Promise(function (resolve, reject) {
                 $.ajax({
@@ -198,8 +203,12 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        self.basketBindingApiKey = data;
-                        resolve(data)
+                        if (!data || !data.basket_binding_api_key) {
+                            resolve(undefined)
+                        } else {
+                            self.basketBindingApiKey = data.basket_binding_api_key;
+                            resolve(data.basket_binding_api_key)
+                        }
                     })
                     .fail(function () {
                         reject(new Error($.mage.__('Network problem')));
@@ -217,11 +226,14 @@ define([
          * @return {boolean}
          */
         handleBasketEvent: function (widgetBasketEvent) {
-            if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) return false;
+            if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
+                customerData.invalidate(['cart', 'messages']);
+
+                return false;
+            }
 
             var self = this;
 
-            //TODO dodany basketBindingApiKey - na ten moment nie wiadomo czy jest dostępny i jak zadziała - do przetestowania
             return new Promise(function (resolve, reject) {
                 $.ajax({
                     url: urlBuilder.build('inpostizi/OrderComplete/Get'
@@ -232,11 +244,11 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        if (data.redirect) {
+                        if (data && data.redirect) {
                             resolve(true);
                             window.location.replace(data.redirect);
                         } else {
-                            reject();
+                            reject(data.error);
                         }
                     })
                     .fail(function () {
