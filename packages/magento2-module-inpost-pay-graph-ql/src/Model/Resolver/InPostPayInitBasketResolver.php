@@ -32,8 +32,7 @@ class InPostPayInitBasketResolver implements ResolverInterface
      */
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
     {
-        $inputData = $args && isset($args['input']) ? (array)$args['input'] : [];
-        $cartMaskId = $this->extractCartMaskId($inputData);
+        $cartMaskId = $this->extractCartMaskId($args ?? []);
 
         try {
             $quote = $this->getQuoteFromCartMaskIdAndContext($cartMaskId, $context);
@@ -42,13 +41,15 @@ class InPostPayInitBasketResolver implements ResolverInterface
 
             return [
                 self::SUCCESS_RESULT_KEY => true,
-                InPostPayQuoteInterface::BASKET_BINDING_API_KEY => $inPostPayQuote->getBasketBindingApiKey()
+                InPostPayQuoteInterface::BASKET_BINDING_API_KEY => $inPostPayQuote->getBasketBindingApiKey(),
+                self::ERROR_RESULT_KEY => null
             ];
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage(), ['cart_mask_id' => $cartMaskId]);
 
             return [
                 self::SUCCESS_RESULT_KEY => false,
+                InPostPayQuoteInterface::BASKET_BINDING_API_KEY => '',
                 self::ERROR_RESULT_KEY => $e->getMessage()
             ];
         }
