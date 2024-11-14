@@ -1,78 +1,30 @@
 type Mutation {
-    inPostPayInitBasket(input: InPostPayBrowserData!): InPostPayBasketData
+    inPostPayInitBasket (
+        cart_id: String! @doc(description: "Cart ID.")
+    ): InPostPayBasketData
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayInitBasketResolver")
     @doc(description:"Initiate InPost Pay basket.")
 }
 
 type Query {
     inPostPayGetPlacedOrderData (
-        basket_id: String! @doc(description: "InPost Pay Basket ID.")
+        basket_binding_api_key: String! @doc(description: "InPost Pay Basket Binding API Key.")
     ): InPostPayPlacedOrderData
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayGetPlacedOrderDataResolver")
-    @doc(description: "This query is used to receive placed order data using basket ID.")
-}
-
-input InPostPayBrowserData {
-    binding_place: String! @doc(description: "Type of place in service where binding was initiated.")
-    browser: String! @doc(description: "Browser hash.")
-    cart_id: String! @doc(description: "Cart ID.")
-    number: String @doc(description: "Phone number.")
-    prefix: String @doc(description: "Phone number prefix.")
+    @doc(description: "This query is used to receive placed order data using basket binding API key.")
 }
 
 type InPostPayBasketData {
-    basket_id: String @doc(description: "Basket ID.")
-    qr_code: String @doc(description: "QR code hash.")
-    deep_link: String @doc(description: "Android and iOS deep link.")
-    deep_link_hms: String @doc(description: "HMS system deep link.")
-    error_message: String @doc(description: "Error details.")
-    action: InPostPayAction @doc(description: "Action to be taken.")
-}
-
-type InPostPayBrowserBindingDeleteResult {
-    success: Boolean @doc(description: "True if browser binding was successfully deleted in InPost Pay API.")
-    error_message: String @doc(description: "Error details.")
-}
-
-type InPostPayBasketBindingDeleteResult {
-    success: Boolean @doc(description: "True if basket binding was successfully deleted in InPost Pay API.")
-    error_message: String @doc(description: "Error details.")
+    success: Boolean! @doc(description: "Success")
+    basket_binding_api_key: String! @doc(description: "Basket Binding API Key.")
+    error: String @doc(description: "Optional error in case of success false.")
 }
 
 type InPostPayPlacedOrderData {
-    action: InPostPayAction @doc(description: "Action to be taken.")
-    cart_version: String @doc(description: "Cart Version.")
-    order_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
-    status: String @doc(description: "Status of placed order in InPost Pay Mobile App.")
-    status_label: String @doc(description: "Status label of placed order in InPost Pay Mobile App.")
-    error_message: String @doc(description: "Error details.")
-}
-
-type InPostPayBasketConfirmationData {
-    basket_id: String @doc(description: "Basket ID.")
-    status: String @doc(description: "Basket status.")
-    phone_number: InPostPayBasketPhoneNumber @doc(description: "Basket Phone Number object.")
-    browser: InPostPayBasketBrowser @doc(description: "Basket Browser object.")
-    name: String @doc(description: "User name.")
-    surname: String @doc(description: "User surname.")
-    masked_phone_number: String @doc(description: "Phone number mask.")
-    error_message: String @doc(description: "Error details.")
-    action: InPostPayAction @doc(description: "Action to be taken.")
-}
-
-type InPostPayBasketMobileLinkData {
-    link: String @doc(description: "Deep link for Basket binding.")
-    error_message: String @doc(description: "Error details.")
-}
-
-type InPostPayBasketPhoneNumber {
-    country_prefix: String @doc(description: "Country prefix.")
-    phone: String @doc(description: "Phone number.")
-}
-
-type InPostPayBasketBrowser {
-    browser_id: String @doc(description: "Browser ID.")
-    browser_trusted: Boolean @doc(description: "Browser trusted flag.")
+    success: Boolean! @doc(description: "Success.")
+    redirect: String! @doc(description: "Success Page redirect URL.")
+    increment_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
+    error: String @doc(description: "Error details.")
 }
 
 type StoreConfig {
@@ -103,11 +55,4 @@ type StoreConfig {
     inpost_pay_widget_styles : String
     @doc(description: "InPost Pay widget frame corner style.")
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayWidgetFrameStyleResolver")
-}
-
-enum InPostPayAction @doc(description: "Defines action that should be taken as a result of processing request") {
-    retry
-    reject
-    refresh
-    redirect
 }

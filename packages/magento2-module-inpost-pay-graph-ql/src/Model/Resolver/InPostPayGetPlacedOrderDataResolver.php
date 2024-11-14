@@ -7,12 +7,11 @@ namespace InPost\InPostPayGraphQl\Model\Resolver;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\BasketNotFoundException;
+use InPost\InPostPay\Provider\Config\SuccessPageUrlConfigProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
-use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
-use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
@@ -20,19 +19,20 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
 {
     public const SUCCESS_RESULT_KEY = 'success';
     public const ERROR_RESULT_KEY = 'error';
+    public const ORDER_INCREMENT_ID_RESULT_KEY = 'increment_id';
     public const REDIRECT_RESULT_KEY = 'redirect';
 
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly CheckoutSession $checkoutSession
+        private readonly CheckoutSession $checkoutSession,
+        private readonly SuccessPageUrlConfigProvider $successPageUrlConfigProvider
     ) {
     }
 
@@ -50,7 +50,9 @@ class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
 
             return [
                 self::SUCCESS_RESULT_KEY => true,
-                self::REDIRECT_RESULT_KEY => '' //TODO:: get from config
+                self::ORDER_INCREMENT_ID_RESULT_KEY => $order->getIncrementId(),
+                self::REDIRECT_RESULT_KEY => $this->successPageUrlConfigProvider->getOrderSuccessPageUrl($order),
+                self::ERROR_RESULT_KEY => null
             ];
         } catch (BasketNotFoundException | LocalizedException $e) {
             $this->logger->error(
@@ -60,6 +62,8 @@ class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
 
             return [
                 self::SUCCESS_RESULT_KEY => false,
+                self::ORDER_INCREMENT_ID_RESULT_KEY => '',
+                self::REDIRECT_RESULT_KEY => '',
                 self::ERROR_RESULT_KEY => $e->getMessage()
             ];
         }
