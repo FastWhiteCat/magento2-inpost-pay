@@ -14,9 +14,9 @@ class BasketBindingRequest extends Request implements RequestInterface
 {
     private const BASKET_ID_PARAM = 'basket_id';
 
-    protected string $uri = '/v1/izi/basket/{basket_id}/binding';
+    protected string $uri = '/v2/izi/basket/{basket_id}/binding';
 
-    protected string $method = HttpRequest::METHOD_POST;
+    protected string $method = HttpRequest::METHOD_PUT;
 
     protected ?string $contentType = 'application/json';
 

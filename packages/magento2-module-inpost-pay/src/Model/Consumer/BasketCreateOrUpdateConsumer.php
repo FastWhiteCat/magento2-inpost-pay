@@ -61,7 +61,7 @@ class BasketCreateOrUpdateConsumer
         }
 
         if ($quote instanceof Quote && $inPostPayQuote->getBrowserId()) {
-            $this->createOrUpdateBasket->execute($quote, $inPostPayQuote->getBrowserId(), $basketId);
+            $this->createOrUpdateBasket->execute($quote, $basketId);
         } else {
             throw new LocalizedException(__(sprintf('Missing basket data for Basket ID: %s.', $basketId)));
         }
