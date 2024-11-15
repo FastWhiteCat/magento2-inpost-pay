@@ -1,0 +1,8 @@
+{
+    "inpost_restrictions_rule_product": {
+        "constraint": {
+            "INPOST_RESTRICTIONS_RULE_PRD_PRD_ID_SEQUENCE_PRD_SEQUENCE_VAL": true,
+            "INPOST_RESTRICTIONS_RULE_PRD_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true
+        }
+    }
+}

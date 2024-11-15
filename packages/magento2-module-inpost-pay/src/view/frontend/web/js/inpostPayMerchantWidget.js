@@ -2,13 +2,12 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Customer/js/customer-data',
-    'Magento_Customer/js/model/customer',
     'Magento_Checkout/js/model/step-navigator',
     'mage/url',
     'underscore',
     'ko',
     'mage/validation',
-], function (Component, $, customerData, customer, stepNavigator, urlBuilder, _, ko) {
+], function (Component, $, customerData, stepNavigator, urlBuilder, _, ko) {
     'use strict';
 
     /**
@@ -48,7 +47,7 @@ define([
                 stepNavigator.steps.subscribe(function (steps) {
                     var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
                     var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
-                    self.isVisible(!customer.isLoggedIn() && self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
+                    self.isVisible(self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
                 })
             }
 
@@ -92,7 +91,7 @@ define([
                 merchantClientId: config.merchantClientId,
                 basketBindingApiKey: this.retrieveBasketBindingApiKey(config.basketBindingApiKey),
                 unboundWidgetClicked: this.unboundWidgetClicked,
-                handleBasketEvent: this.handleBasketEvent,
+                handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
                 language: config.language ? config.language : undefined,
                 apiBaseUrl: config.apiBaseUrl ? config.apiBaseUrl : undefined,
@@ -226,33 +225,34 @@ define([
          * @return {boolean}
          */
         handleBasketEvent: function (widgetBasketEvent) {
+            var self = this;
+
             if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
                 customerData.invalidate(['cart', 'messages']);
 
                 return false;
             }
 
-            var self = this;
-
             return new Promise(function (resolve, reject) {
                 $.ajax({
                     url: urlBuilder.build('inpostizi/OrderComplete/Get'
                             + '/form_key/'
                             + $.mage.cookies.get('form_key'))
-                            + '/?basketBindingApiKey='
-                            + self.basketBindingApiKey,
+                        + '/?basket_binding_api_key='
+                        + self.basketBindingApiKey,
                     method: 'GET',
                 })
                     .done(function (data) {
                         if (data && data.redirect) {
+                            customerData.invalidate(['cart', 'messages']);
                             resolve(true);
                             window.location.replace(data.redirect);
                         } else {
-                            reject(data.error);
+                            reject(false);
                         }
                     })
                     .fail(function () {
-                        reject(new Error($.mage.__('Network problem')));
+                        reject(false);
                     });
             });
         }
