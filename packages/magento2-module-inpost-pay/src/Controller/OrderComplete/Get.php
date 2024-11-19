@@ -7,6 +7,7 @@ use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Provider\TestModeProvider;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -33,7 +34,8 @@ class Get implements HttpGetActionInterface
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly TestModeProvider $testModeProvider
     ) {
         $this->request = $context->getRequest();
     }
@@ -59,6 +61,15 @@ class Get implements HttpGetActionInterface
                         'action' => 'redirect',
                         'redirect' => $this->urlBuilder->getUrl('checkout/onepage/success/')
                     ];
+
+                    if ($this->testModeProvider->isTestModeEnabled()
+                        && $this->testModeProvider->isTestModeRequested()
+                    ) {
+                        $data['redirect'] = $this->urlBuilder->getUrl(
+                            'checkout/onepage/success/',
+                            [TestModeProvider::URL_PARAMETER_NAME => TestModeProvider::VALID_VALUE]
+                        );
+                    }
 
                     $order = $this->orderRepository->get($inPostPayData[InPostPayOrderInterface::ORDER_ID]);
 

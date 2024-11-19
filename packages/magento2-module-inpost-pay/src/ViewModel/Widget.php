@@ -6,6 +6,7 @@ namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Provider\TestModeProvider;
 use InPost\InPostPay\Provider\Config\PollingConfigProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
@@ -46,7 +47,11 @@ class Widget implements ArgumentInterface
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
+     * @param RestrictedProductIdsProvider $restrictedProductIdsProvider
      * @param LoggerInterface $logger
+     * @param InPostPayQuote $inPostPayQuote
+     * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
+     * @param TestModeProvider $testModeProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -64,12 +69,26 @@ class Widget implements ArgumentInterface
         private readonly LoggerInterface                   $logger,
         private readonly InPostPayQuote                    $inPostPayQuote,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly TestModeProvider                  $testModeProvider
     ) {
     }
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
+        return $this->generalConfigProvider->isEnabled()
+            && $this->displayConfigProvider->isWidgetEnabled()
+            && $this->isDisplayAllowed();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isDisplayAllowed(): bool
+    {
+        if ($this->testModeProvider->isTestModeEnabled()) {
+            return $this->testModeProvider->isTestModeRequested();
+        }
+        return true;
     }
 
     /**
