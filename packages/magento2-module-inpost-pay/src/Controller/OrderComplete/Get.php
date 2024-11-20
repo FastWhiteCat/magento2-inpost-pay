@@ -62,9 +62,7 @@ class Get implements HttpGetActionInterface
                         'redirect' => $this->urlBuilder->getUrl('checkout/onepage/success/')
                     ];
 
-                    if ($this->testModeProvider->isTestModeEnabled()
-                        && $this->testModeProvider->isTestModeRequested()
-                    ) {
+                    if ($this->testModeProvider->isTestModeEnabled()) {
                         $data['redirect'] = $this->urlBuilder->getUrl(
                             'checkout/onepage/success/',
                             [TestModeProvider::URL_PARAMETER_NAME => TestModeProvider::VALID_VALUE]
