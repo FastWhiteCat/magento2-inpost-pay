@@ -163,3 +163,6 @@
 "Coupon code is already activated","Kod jest już aktywowany",module,InPost_InPostPay
 "Coupon code has been removed. The code entered is incorrect. Please enter the correct code","Usunięto kod rabatowy. W prowadzony kod jest niepoprawny. Wpisz poprawny kod",module,InPost_InPostPay
 "Coupon code has been updated","Kod został zaktualizowany",module,InPost_InPostPay
+"If enabled cart session cookie will be sent to InPost Pay API allowing customer to edit cart in mobile browser.","Po włączeniu ciastko sesji koszyka będzie wysyłane do API InPost Pay aby umożliwić klientom edycję produktów w koszyku przeglądarki mobilnej.",module,InPost_InPostPay
+"Send Merchant Store Session Cookie","Wysyłaj Ciastko Sesji Koszyka Sklepu",module,InPost_InPostPay
+"Cart URL","Adres URL Koszyka",module,InPost_InPostPay

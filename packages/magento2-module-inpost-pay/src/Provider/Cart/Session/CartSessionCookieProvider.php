@@ -45,8 +45,7 @@ class CartSessionCookieProvider
      */
     public function getCookieDomain(): string
     {
-//        return $this->sessionConfig->getCookieDomain();
-        return 'mage.localhost';
+        return $this->sessionConfig->getCookieDomain();
     }
 
     /**
