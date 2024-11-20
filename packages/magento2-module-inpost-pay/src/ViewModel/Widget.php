@@ -7,6 +7,7 @@ namespace InPost\InPostPay\ViewModel;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
+use InPost\InPostPay\Provider\TestModeProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
@@ -45,6 +46,7 @@ class Widget implements ArgumentInterface
      * @param LoggerInterface $logger
      * @param AuthConfigProvider $authConfigProvider
      * @param IziApiConfigProvider $iziApiConfigProvider
+     * @param TestModeProvider $testModeProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -61,12 +63,26 @@ class Widget implements ArgumentInterface
         private readonly LoggerInterface $logger,
         private readonly AuthConfigProvider $authConfigProvider,
         private readonly IziApiConfigProvider $iziApiConfigProvider,
+        private readonly TestModeProvider $testModeProvider
     ) {
     }
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
+        return $this->generalConfigProvider->isEnabled()
+            && $this->displayConfigProvider->isWidgetEnabled()
+            && $this->isDisplayAllowed();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isDisplayAllowed(): bool
+    {
+        if ($this->testModeProvider->isTestModeEnabled()) {
+            return $this->testModeProvider->isTestModeRequested();
+        }
+        return true;
     }
 
     /**
