@@ -16,6 +16,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 class ConsentsProvider
 {
     private const CONSENT_DESCRIPTION_MAX_LENGTH = 150;
+    private const CONSENT_LIMIT = 10;
 
     /**
      * @param TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider
@@ -57,7 +58,9 @@ class ConsentsProvider
             $checkoutAgreementsVersion = $this->getCheckoutAgreementsVersion($ids);
 
             $consents = [];
+            $i = 0;
             foreach ($termsAndConditionsMapping as $item) {
+                $i++;
                 $additionalConsentLinks = [];
 
                 foreach ($item[TermsAndConditionsField::ADDITIONAL_LINKS_FIELD] ?? [] as $additionalConsentLink) {
@@ -83,6 +86,10 @@ class ConsentsProvider
                     ] ?? '1',
                     'requirement_type' => $item[TermsAndConditionsField::REQUIREMENT_FIELD]
                 ];
+
+                if ($i >= self::CONSENT_LIMIT) {
+                    break;
+                }
             }
 
             $encodedConsentsData = (string)$this->serializer->serialize($consents);
