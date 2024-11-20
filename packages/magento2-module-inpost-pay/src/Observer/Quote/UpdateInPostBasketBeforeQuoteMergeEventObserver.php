@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -17,10 +18,12 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
 {
     /**
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
+     * @param CartSessionCookieProvider $cartSessionCookieProvider
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly CartSessionCookieProvider $cartSessionCookieProvider,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -79,6 +82,7 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         }
 
         $finalBasket->setCartVersion(uniqid());
+        $finalBasket->setSessionCookie($this->cartSessionCookieProvider->getCookieSession());
         $this->inPostPayQuoteRepository->save($finalBasket);
     }
 

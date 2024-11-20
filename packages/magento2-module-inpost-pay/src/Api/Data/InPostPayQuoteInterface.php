@@ -22,6 +22,7 @@ interface InPostPayQuoteInterface
     public const NAME = 'name';
     public const SURNAME = 'surname';
     public const CART_VERSION = 'cart_version';
+    public const SESSION_COOKIE = 'session_cookie';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -66,6 +67,8 @@ interface InPostPayQuoteInterface
 
     public function getCartVersion(): string;
     public function setCartVersion(string $cartVersion): InPostPayQuoteInterface;
+    public function getSessionCookie(): ?string;
+    public function setSessionCookie(?string $sessionCookie): InPostPayQuoteInterface;
 
     public function getCreatedAt(): string;
     public function getUpdatedAt(): string;

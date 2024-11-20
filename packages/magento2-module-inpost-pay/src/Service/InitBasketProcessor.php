@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Service;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
 use InPost\InPostPay\Service\ApiConnector\GetBasketBindingApiKey;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
@@ -20,6 +21,7 @@ class InitBasketProcessor
         private readonly GetBasketBindingApiKey $getBasketBindingApiKey,
         private readonly GetBasketId $getBasketId,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly CartSessionCookieProvider $cartSessionCookieProvider,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -36,6 +38,8 @@ class InitBasketProcessor
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
             $basketBindingApiKey = $this->getBasketBindingApiKey->execute($quoteId);
             $inPostPayQuote->setBasketBindingApiKey($basketBindingApiKey);
+            $cookieSession = $this->cartSessionCookieProvider->getCookieSession();
+            $inPostPayQuote->setSessionCookie($cookieSession);
             $this->inPostPayQuoteRepository->save($inPostPayQuote);
         } catch (CouldNotSaveException | NoSuchEntityException | LocalizedException $e) {
             $errorMessage = __('Could not initiate InPost Pay Quote. Reason: %1', $e->getMessage());
