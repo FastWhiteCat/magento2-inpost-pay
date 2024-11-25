@@ -91,7 +91,7 @@ class PromotionsProvider
                 'type' => 'MERCHANT',
                 'promo_code_value' => $salesRule->getCode(),
                 'description' => substr(
-                    $salesRule->getDescription(),
+                    $salesRule->getDescription() ?: $salesRule->getName(),
                     0,
                     self::PROMOTION_DESCRIPTION_MAX_LENGTH
                 ),
