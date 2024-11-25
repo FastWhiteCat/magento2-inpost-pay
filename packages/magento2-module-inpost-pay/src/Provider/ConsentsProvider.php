@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Provider;
 
 use InPost\InPostPay\Block\Adminhtml\Form\Field\TermsAndConditionsField;
 use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
+use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
 use InPost\InPostPay\Provider\Config\TermsAndConditionsMappingConfigProvider;
 use InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface;
 use Magento\CheckoutAgreements\Api\CheckoutAgreementsListInterface;
@@ -17,6 +18,12 @@ class ConsentsProvider
 {
     private const CONSENT_DESCRIPTION_MAX_LENGTH = 150;
     private const CONSENT_LIMIT = 10;
+    private const SORT_ORDER = [
+        TermsAndConditionsRequirements::ALWAYS => 1,
+        TermsAndConditionsRequirements::ONLY_IN_NEW_VERSION => 2,
+        TermsAndConditionsRequirements::OPTIONAL => 3,
+        TermsAndConditionsRequirements::ADDITIONAL_LINK => 4
+    ];
 
     /**
      * @param TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider
@@ -56,6 +63,7 @@ class ConsentsProvider
 
             $checkoutAgreementsArray = $this->getCheckoutAgreementsList($ids);
             $checkoutAgreementsVersion = $this->getCheckoutAgreementsVersion($ids);
+            $termsAndConditionsMapping = $this->sortTermsAndConditions($termsAndConditionsMapping);
 
             $consents = [];
             $i = 0;
@@ -140,5 +148,25 @@ class ConsentsProvider
     private function getCheckoutAgreementsVersion(array $ids): array
     {
         return $this->checkoutAgreementsVersionRepository->getList($ids);
+    }
+
+    /**
+     * @param array $termsAndConditionsMapping
+     * @return array
+     */
+    private function sortTermsAndConditions(array $termsAndConditionsMapping): array
+    {
+        $termsAndConditions = [];
+        foreach ($termsAndConditionsMapping as $key =>  $item) {
+            $termsAndConditions[$key] = self::SORT_ORDER[$item[TermsAndConditionsField::REQUIREMENT_FIELD]];
+        }
+        asort($termsAndConditions);
+
+        $sortedTermsAndConditions = [];
+        foreach ($termsAndConditions as $key =>  $item) {
+            $sortedTermsAndConditions[] = $termsAndConditionsMapping[$key];
+        }
+
+        return $sortedTermsAndConditions;
     }
 }
