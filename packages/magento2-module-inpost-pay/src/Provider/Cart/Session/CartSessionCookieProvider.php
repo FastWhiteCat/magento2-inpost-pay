@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Provider\Cart\Session;
 
 use Magento\Framework\Session\Config\ConfigInterface as SessionConfig;
 use Magento\Framework\Stdlib\Cookie\CookieReaderInterface;
+use Magento\Customer\Model\Session;
 
 /**
  * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
@@ -17,10 +18,12 @@ class CartSessionCookieProvider
     /**
      * @param CookieReaderInterface $cookieReader
      * @param SessionConfig $sessionConfig
+     * @param Session $session
      */
     public function __construct(
         private readonly CookieReaderInterface $cookieReader,
-        private readonly SessionConfig $sessionConfig
+        private readonly SessionConfig $sessionConfig,
+        private readonly Session $session
     ) {
     }
 
@@ -29,7 +32,13 @@ class CartSessionCookieProvider
      */
     public function getCookieSession(): ?string
     {
-        return $this->cookieReader->getCookie($this->getCookieSessionName());
+        if ($this->session->isLoggedIn()) {
+            $sessionId = $this->session->getSessionId();
+        } else {
+            $sessionId = $this->cookieReader->getCookie($this->getCookieSessionName());
+        }
+
+        return $sessionId;
     }
 
     /**
