@@ -33,7 +33,7 @@ class LogFileContentByDateProvider
         $path = sprintf(
             '/%s/log/%s/%s.log',
             trim($varDir, '/'),
-            Handler::LOGS_CATALOG,
+            Handler::INPOST_PAY_LOG_CATALOG,
             $date
         );
 
