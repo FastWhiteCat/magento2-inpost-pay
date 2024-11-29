@@ -6,18 +6,15 @@ namespace InPost\InPostPay\Service\Order\Updater\Steps;
 
 use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface as InPostOrderInterface;
-use InPost\InPostPay\Model\Config\Payment\TitleMapper;
+use InPost\InPostPay\Model\Config\Payment\TitleUpdater;
 use InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep;
-use Magento\Payment\Model\Method\Substitution;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment\Repository as OrderPaymentRepository;
 use Psr\Log\LoggerInterface;
 
 class UpdatePaymentTitleStep extends OrderProcessingStep implements OrderPostProcessingStepInterface
 {
     public function __construct(
-        protected readonly TitleMapper $titleMapper,
-        protected readonly OrderPaymentRepository $orderPaymentRepository,
+        protected readonly TitleUpdater $titleUpdater,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -31,35 +28,7 @@ class UpdatePaymentTitleStep extends OrderProcessingStep implements OrderPostPro
         if (!($payment instanceof \Magento\Sales\Api\Data\OrderPaymentInterface)) {
             return;
         }
-        $additionalInformation = $payment->getAdditionalInformation();
-        if (isset($additionalInformation[Substitution::INFO_KEY_TITLE])) {
-            $oldTitle = $additionalInformation[Substitution::INFO_KEY_TITLE];
-            $newTitle = $this->getMappedTitle(
-                $additionalInformation[Substitution::INFO_KEY_TITLE],
-                $paymentType
-            );
-            if ($oldTitle === $newTitle) {
-                return;
-            }
-            $additionalInformation[Substitution::INFO_KEY_TITLE] = $newTitle;
-            $payment->setAdditionalInformation(
-                $additionalInformation
-            );
-            $this->orderPaymentRepository->save($payment);
-            $this->createLog(
-                sprintf(
-                    'Payment title %s has been updated to %s for Order #%s',
-                    $oldTitle,
-                    $additionalInformation[Substitution::INFO_KEY_TITLE],
-                    (string)$order->getIncrementId()
-                )
-            );
-        }
-    }
 
-    private function getMappedTitle(string $title, string $code): string
-    {
-        $mappedTitle = $this->titleMapper->getTitle($code);
-        return $mappedTitle ?? $title;
+        $this->titleUpdater->updatePaymentTitleByType($payment, $order, $paymentType);
     }
 }
