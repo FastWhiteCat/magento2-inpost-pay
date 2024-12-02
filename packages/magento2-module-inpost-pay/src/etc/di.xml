@@ -101,11 +101,14 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
-
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
     <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\InPostPayLogsByDate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Logs\InPostPayLogInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Logs\InPostPayLog"/>
     <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
         <plugin name="update_checkout_agreement_version"
                 type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
@@ -323,6 +326,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\InPostPayLogsByDate">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
