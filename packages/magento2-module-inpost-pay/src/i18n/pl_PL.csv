@@ -163,3 +163,12 @@
 "Coupon code is already activated","Kod jest już aktywowany",module,InPost_InPostPay
 "Coupon code has been removed. The code entered is incorrect. Please enter the correct code","Usunięto kod rabatowy. W prowadzony kod jest niepoprawny. Wpisz poprawny kod",module,InPost_InPostPay
 "Coupon code has been updated","Kod został zaktualizowany",module,InPost_InPostPay
+"Card (InPost Pay)","Karta (InPost Pay)"
+"Apple Pay (InPost Pay)","Apple Pay (InPost Pay)"
+"BLIK (InPost Pay)","BLIK (InPost Pay)"
+"Pay by Link (InPost Pay)","Pay by Link (InPost Pay)"
+"Shopping Limit (InPost Pay)","Limit zakupów (InPost Pay)"
+"Deferred Payment (InPost Pay)","Płatność odroczona (InPost Pay)"
+"Google Pay (InPost Pay)","Google Pay (InPost Pay)"
+"Cash on delivery (InPost Pay)","Za pobraniem (InPost Pay)"
+"Payment Type","Rodzaj płatności"
