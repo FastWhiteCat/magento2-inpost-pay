@@ -165,7 +165,7 @@ class Widget implements ArgumentInterface
      */
     public function isEnabledOnCheckoutPage(): bool
     {
-        return $this->displayConfigProvider->isEnabledOnCheckoutPage();
+        return $this->displayConfigProvider->isEnabledOnCheckoutPage() && $this->isEnabled();
     }
 
     public function isProductRestricted(int $productId): bool
