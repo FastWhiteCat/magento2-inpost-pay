@@ -213,7 +213,7 @@ define([
         unboundWidgetClicked: function (productId) {
             var self = this;
 
-            if (this.sectionData().summary_count > 0) {
+            if (this.sectionData().summary_count > 0 && !productId) {
                 return new Promise(function (resolve, reject) {
                     self.getBasketBindingApiKey(resolve, reject)
                         .then((data) => {
