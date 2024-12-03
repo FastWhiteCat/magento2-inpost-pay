@@ -23,7 +23,7 @@ class ConsentsValidator implements OrderValidatorInterface
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         $acceptedConsents = $inPostOrder->getConsents();
-        foreach ($this->consentsProvider->getConsents() as $configConsent) {
+        foreach ($this->consentsProvider->getConsents($quote->getStoreId()) as $configConsent) {
             $consentId = (string)($configConsent[AcceptedConsentInterface::CONSENT_ID] ?? '');
             $consentVersion = (string)($configConsent[AcceptedConsentInterface::CONSENT_VERSION] ?? '');
             $requirementType = $configConsent[AcceptedConsentInterface::REQUIREMENT_TYPE] ?? '';
