@@ -20,6 +20,15 @@ define([
         ORDER_CREATED: 'orderCreated'
     }
 
+    var PRODUCT_TYPES = {
+        CONFIGURABLE: 'configurable',
+        SIMPLE: 'simple',
+        GROUPED: 'grouped',
+        VIRTUAL: 'virtual',
+        DOWNLOADABLE: 'downloadable',
+        BUNDLE: 'bundle'
+    };
+
     var CHECKOUT_BINDING_PLACE = 'CHECKOUT_PAGE'
 
     return Component.extend({
@@ -42,6 +51,12 @@ define([
             this.configuration = config.bindingPlace && config.bindingPlace !== CHECKOUT_BINDING_PLACE
                 ? config
                 : (window.checkoutConfig ? window.checkoutConfig.inPostConfig : {});
+            this.checkIfProductIsAdded = this.checkIfProductIsAdded.bind(this);
+            this.sectionData = customerData.get("cart")
+
+            if (!this.sectionData.hasOwnProperty('summary_count')) {
+                customerData.reload(['cart'])
+            }
 
             if (this.configuration) {
                 stepNavigator.steps.subscribe(function (steps) {
@@ -90,7 +105,7 @@ define([
             var widgetOptions = $.extend({
                 merchantClientId: config.merchantClientId,
                 basketBindingApiKey: this.retrieveBasketBindingApiKey(config.basketBindingApiKey),
-                unboundWidgetClicked: this.unboundWidgetClicked,
+                unboundWidgetClicked: this.unboundWidgetClicked.bind(this),
                 handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
                 language: config.language ? config.language : undefined,
@@ -103,6 +118,51 @@ define([
 
         getConfiguration: function() {
             return this.checkoutConfiguration;
+        },
+
+        checkIfProductIsAdded: function (id, cartData, $productForm) {
+            if (!cartData.items) return false;
+
+            if (cartData.items
+                && cartData.items.some((item) => item.product_id === id && item.product_type === PRODUCT_TYPES.SIMPLE))
+                return true;
+
+            var $configurableProductOptions = $productForm.find('[data-attribute-code]')
+
+            if ($configurableProductOptions.length) {
+                var configurableProducts = cartData.items.filter(function (item) {
+                    return item.product_id === id;
+                })
+                var productOptions = 0;
+
+                return configurableProducts.some(function (item) {
+                    _.each(item.options, function (option, index) {
+                        if (option.option_id.toString() === $configurableProductOptions[index].dataset.attributeId
+                            && option.option_value === $configurableProductOptions[index].dataset.optionSelected)
+                            productOptions++;
+                    })
+
+                    var isAddedProduct = productOptions === $configurableProductOptions.length;
+                    productOptions = 0;
+
+                    return isAddedProduct
+                })
+            }
+
+            var $groupedProductElements = $productForm.find('[name*="super_group"]')
+            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
+                return this.value > 0;
+            })
+
+            if (simpleProductsInGrouped.length) {
+                var addedSimpleProducts = 0;
+                _.each(simpleProductsInGrouped, function (item) {
+                    if (cartData.items.some(function (cartItem) {
+                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
+                    })) addedSimpleProducts++
+                })
+                return addedSimpleProducts === simpleProductsInGrouped.length;
+            }
         },
 
         initAfterRender: function() {
@@ -121,6 +181,28 @@ define([
             }
         },
 
+        getBasketBindingApiKey: function() {
+            var self = this;
+
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
+                    method: 'GET',
+                })
+                    .done(function (data) {
+                        if (!data || !data.basket_binding_api_key) {
+                            resolve(undefined)
+                        } else {
+                            self.basketBindingApiKey = data.basket_binding_api_key;
+                            resolve(data.basket_binding_api_key)
+                        }
+                    })
+                    .fail(function () {
+                        reject();
+                    });
+            })
+        },
+
         /**
          * Handle user clicks on the unbound basket
          *
@@ -129,13 +211,39 @@ define([
          * @return {promise<string>}
          */
         unboundWidgetClicked: function (productId) {
+            var self = this;
+
+            if (this.sectionData().summary_count > 0) {
+                return new Promise(function (resolve, reject) {
+                    self.getBasketBindingApiKey(resolve, reject)
+                        .then((data) => {
+                            resolve(data)
+                        })
+                        .catch(function(error) {
+                            reject(error)
+                        });
+                });
+            }
+
             if (!productId) {
                 return Promise.reject('Product id not found');
             }
 
-            var self = this;
             var $productInput = $('[name="product"][value="' + productId + '"]');
             var $productForm = $productInput.parent('#product_addtocart_form');
+            var isProductAdded = this.checkIfProductIsAdded(productId, customerData.get("cart")(), $productForm)
+
+            if (isProductAdded) {
+                return new Promise(function (resolve, reject) {
+                    self.getBasketBindingApiKey(resolve, reject)
+                        .then((data) => {
+                            resolve(data)
+                        })
+                        .catch(function(error) {
+                            reject(error)
+                        });
+                });
+            }
 
             if (!$productForm.length) {
                 return Promise.reject('Problem with product configuration');
@@ -197,20 +305,12 @@ define([
             if (apiKey) return apiKey;
 
             return new Promise(function (resolve, reject) {
-                $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (!data || !data.basket_binding_api_key) {
-                            resolve(undefined)
-                        } else {
-                            self.basketBindingApiKey = data.basket_binding_api_key;
-                            resolve(data.basket_binding_api_key)
-                        }
+                self.getBasketBindingApiKey(resolve, reject)
+                    .then((data) => {
+                        resolve(data)
                     })
-                    .fail(function () {
-                        reject(new Error($.mage.__('Network problem')));
+                    .catch(function(error) {
+                        reject(error)
                     });
             });
         },
