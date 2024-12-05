@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.10] - 2024-12-05
+
+### Fixed
+
+- InPost Pay Terms And Conditions Cache will now keep configured values for each store separately instead of one single cached record.
+- InPost Pay Public Key for API requests Signature validation Cache will now keep Public Key versions for each store separately instead of one single cached record.
+
 ## [1.0.9] - 2024-09-26
 
 ### Added
