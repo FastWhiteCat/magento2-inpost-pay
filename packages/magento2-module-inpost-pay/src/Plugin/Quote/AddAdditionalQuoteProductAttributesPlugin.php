@@ -18,6 +18,7 @@ class AddAdditionalQuoteProductAttributesPlugin
      * @param Config $subject
      * @param array $result
      * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterGetProductAttributes(Config $subject, array $result): array
     {

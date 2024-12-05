@@ -28,7 +28,7 @@ class InPostPayProductAttributesProvider
         if ($this->inPostPayProductAttributes === null) {
             /** @var EavAttributeCollection $collection */
             $collection = $this->eavAttributeCollectionFactory->create();
-            $collection->addFieldToFilter(EavAttributeInterface::IS_VISIBLE_ON_FRONT, 1);
+            $collection->addFieldToFilter(EavAttributeInterface::IS_VISIBLE_ON_FRONT, ['eq' => 1]);
             $collection->setEntityTypeFilter($this->productFactory->create()->getTypeId());
             $visibleOnFrontAttributes = [
                 'description',

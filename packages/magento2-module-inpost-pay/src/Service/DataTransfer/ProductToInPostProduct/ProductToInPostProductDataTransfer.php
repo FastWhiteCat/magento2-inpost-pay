@@ -40,6 +40,8 @@ use Psr\Log\LoggerInterface;
 class ProductToInPostProductDataTransfer
 {
     public const CONFIGURABLE_PARENT_PRODUCT = 'configurable_parent_product';
+    public const CONFIGURABLE_CHILD_PRODUCT = 'configurable_child_product';
+    public const BUNDLE_CHILD_PRODUCTS = 'bundle_child_products';
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
 
@@ -146,7 +148,6 @@ class ProductToInPostProductDataTransfer
     private function prepareProductImageUrl(Product $product): string
     {
         $storeId = (int)$product->getStoreId();
-        $productId = (int)$product->getId();
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();
@@ -167,20 +168,7 @@ class ProductToInPostProductDataTransfer
         $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
-            if (isset($configurableProductId)) {
-                $this->logger->debug(
-                    sprintf(
-                        'Image (%s) not found for simple product ID: %s and its parent product ID: %s',
-                        $image,
-                        $productId,
-                        $configurableProductId
-                    )
-                );
-            } else {
-                $this->logger->debug(
-                    sprintf('Image (%s) not found for simple product ID: %s', $image, (int)$product->getId())
-                );
-            }
+            $this->logger->debug(sprintf('Image (%s) not found for product ID: %s', $image, (int)$product->getId()));
 
             return $this->imageHelper->getDefaultPlaceholderUrl('image');
         }
@@ -221,6 +209,12 @@ class ProductToInPostProductDataTransfer
             $productAttributesData[] = $inPostProductAttribute;
         }
 
+        if ($product->hasData(self::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(self::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
+        ) {
+            $product = $product->getData(self::CONFIGURABLE_PARENT_PRODUCT);
+        }
+
         $attributes = $product->getAttributes();
         foreach ($attributes as $attribute) {
             if (!$attribute->getIsVisibleOnFront()) {
@@ -257,6 +251,15 @@ class ProductToInPostProductDataTransfer
         $description = $product->getData('short_description') ?? $product->getData('description');
         $description = is_scalar($description) ? (string)$description : '';
 
+        if (empty($description)
+            && $product->hasData(self::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(self::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
+        ) {
+            $product = $product->getData(self::CONFIGURABLE_PARENT_PRODUCT);
+            $description = $product->getData('short_description') ?? $product->getData('description');
+            $description = is_scalar($description) ? (string)$description : '';
+        }
+
         return $this->stringUtils->cleanUpString($description);
     }
 
@@ -269,7 +272,7 @@ class ProductToInPostProductDataTransfer
         $maxBundleQuantity = null;
         $bundleStockQuantity = null;
         /** @var AbstractItem[] $children */
-        $children = $product->getData('children');
+        $children = $product->getData(self::BUNDLE_CHILD_PRODUCTS);
         $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
 
         foreach ($children as $child) {
@@ -305,8 +308,10 @@ class ProductToInPostProductDataTransfer
 
     private function extractProductId(Product $product): string
     {
-        if ($product->getData('simple_product_id') && is_scalar($product->getData('simple_product_id'))) {
-            return (string)$product->getData('simple_product_id');
+        if ($product->getData(self::CONFIGURABLE_CHILD_PRODUCT)
+            && is_scalar($product->getData(self::CONFIGURABLE_CHILD_PRODUCT))
+        ) {
+            return (string)$product->getData(self::CONFIGURABLE_CHILD_PRODUCT);
         }
 
         return (string)$product->getId();
