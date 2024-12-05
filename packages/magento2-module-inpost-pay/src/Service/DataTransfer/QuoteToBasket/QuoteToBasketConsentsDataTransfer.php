@@ -28,7 +28,7 @@ class QuoteToBasketConsentsDataTransfer implements QuoteToBasketDataTransferInte
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $consents = [];
-        foreach ($this->consentsProvider->getConsents() as $consentData) {
+        foreach ($this->consentsProvider->getConsents($quote->getStoreId()) as $consentData) {
             $additionalConsents = (array)($consentData[ConsentInterface::ADDITIONAL_CONSENT_LINKS] ?? []);
             $additionalConsentLinks = [];
 
