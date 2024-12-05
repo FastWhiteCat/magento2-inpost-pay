@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.11] - 2024-12-05
+
+### Fixed
+
+- Widget will now be displayed if configured in Checkout for logged in customers.
+
 ## [1.0.10] - 2024-12-05
 
 ### Fixed
