@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
+use InPost\InPostPay\Provider\Product\Attribute\InPostPayProductAttributesProvider;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Config as CatalogConfig;
@@ -34,6 +35,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         private readonly ProductLinkCollectionFactory $productLinkCollectionFactory,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
+        private readonly InPostPayProductAttributesProvider $inPostPayProductAttributesProvider,
         private readonly CatalogConfig $catalogConfig,
         private readonly StatusFactory $stockStatusFactory
     ) {
@@ -77,7 +79,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         if ($linkedProductIds) {
             /** @var ProductCollection $productsCollection */
             $productsCollection = $this->productCollectionFactory->create();
-            $productsCollection->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            $productsCollection->addAttributeToSelect($this->prepareProductAttributesList())
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
                 ->addFieldToFilter(
@@ -131,5 +133,15 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         }
 
         return $linkedProductIds;
+    }
+
+    private function prepareProductAttributesList(): array
+    {
+        return array_unique(
+            array_merge(
+                $this->catalogConfig->getProductAttributes(),
+                $this->inPostPayProductAttributesProvider->getProductAttributeCodes()
+            )
+        );
     }
 }

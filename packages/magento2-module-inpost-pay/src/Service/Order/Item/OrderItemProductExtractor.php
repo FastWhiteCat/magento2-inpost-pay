@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Item;
 
+use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
@@ -33,8 +34,11 @@ class OrderItemProductExtractor
                     );
 
                     // @phpstan-ignore-next-line
-                    $parentItemProductId = (int)$childItem->getParentItem()->getProduct()->getId();
-                    $product->setData('configurable_product_id', $parentItemProductId);
+                    $parentItemProduct = $childItem->getParentItem()->getProduct();
+                    $product->setData(
+                        ProductToInPostProductDataTransfer::CONFIGURABLE_PARENT_PRODUCT,
+                        $parentItemProduct
+                    );
 
                     break;
                 } catch (NoSuchEntityException $e) {
