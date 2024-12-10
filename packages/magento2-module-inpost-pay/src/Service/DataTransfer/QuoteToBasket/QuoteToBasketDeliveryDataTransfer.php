@@ -23,8 +23,9 @@ use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
-use Magento\Quote\Api\ShippingMethodManagementInterface;
+use Magento\Quote\Model\Cart\ShippingMethodConverter;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Address;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,18 +40,16 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
-        private readonly ShippingMethodManagementInterface $shippingManager,
         private readonly AddressRepositoryInterface $addressRepository,
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
+        private readonly ShippingMethodConverter $shippingMethodConverter,
         private readonly LoggerInterface $logger
     ) {
     }
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $shippingAddress = $this->getShippingAddress($quote);
-
         if ($quote->isVirtual()) {
             $this->logger->error('Quote is virtual. Setting empty delivery.');
             $basket->setDelivery([]);
@@ -81,8 +80,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             }
         }
 
-        // @phpstan-ignore-next-line
-        $shippingMethods = $this->shippingManager->estimateByExtendedAddress((int)$quote->getId(), $shippingAddress);
+        $shippingMethods = $this->getShippingMethodsForQuote($quote);
         $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods);
 
         if (empty($deliveries)) {
@@ -97,7 +95,29 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     }
 
     /**
-     * @param DeliveryInterface[] $quoteAvailableShippingMethods
+     * @param Quote $quote
+     * @return ShippingMethodInterface[]
+     */
+    private function getShippingMethodsForQuote(Quote $quote): array
+    {
+        $output = [];
+        /** @var Address $shippingAddress */
+        $shippingAddress = $this->getShippingAddress($quote);
+        $shippingAddress->setCollectShippingRates(true);
+        $shippingAddress->collectShippingRates();
+        $shippingRates = $shippingAddress->getGroupedAllShippingRates();
+
+        foreach ($shippingRates as $carrierRates) {
+            foreach ($carrierRates as $rate) {
+                $output[] = $this->shippingMethodConverter->modelToDataObject($rate, $quote->getQuoteCurrencyCode());
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param ShippingMethodInterface[] $quoteAvailableShippingMethods
      * @return array
      */
     private function prepareMappedShippingMethodsData(array $quoteAvailableShippingMethods): array
