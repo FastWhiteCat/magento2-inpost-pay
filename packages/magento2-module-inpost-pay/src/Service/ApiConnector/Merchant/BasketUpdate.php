@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Exception\InvalidPromoCodeException;
 use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
+use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\CreateBasketNotice;
 use InPost\InPostPay\Service\PrepareQuoteProductsQuantity;
 use Throwable;
@@ -93,6 +94,7 @@ class BasketUpdate implements BasketUpdateInterface
 
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+            $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
             $quote->setData(InPostPayQuoteInterface::INPOST_BASKET_ID, $basketId);
 
             try {
@@ -169,9 +171,7 @@ class BasketUpdate implements BasketUpdateInterface
 
         if ($promoCodesEventData) {
             foreach ($promoCodesEventData as $promoCode) {
-                $reloadedQuote = $this->getQuoteById((int)$quote->getId());
-                $reloadedQuote->setData($quote->getData());
-                $this->cartService->applyPromo($reloadedQuote, $promoCode->getPromoCodeValue());
+                $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
             }
         } elseif ($eventType === self::PROMO_CODES_EVENT) {
             $this->cartService->removePromosFromQuote($quote);
