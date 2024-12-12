@@ -34,9 +34,12 @@ class InitBasketProcessor
         try {
             $basketId = $this->getBasketId->get($quoteId, true);
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
-            $basketBindingApiKey = $this->getBasketBindingApiKey->execute($quoteId);
-            $inPostPayQuote->setBasketBindingApiKey($basketBindingApiKey);
-            $this->inPostPayQuoteRepository->save($inPostPayQuote);
+
+            if (empty($inPostPayQuote->getBasketBindingApiKey())) {
+                $basketBindingApiKey = $this->getBasketBindingApiKey->execute($quoteId);
+                $inPostPayQuote->setBasketBindingApiKey($basketBindingApiKey);
+                $this->inPostPayQuoteRepository->save($inPostPayQuote);
+            }
         } catch (CouldNotSaveException | NoSuchEntityException | LocalizedException $e) {
             $errorMessage = __('Could not initiate InPost Pay Quote. Reason: %1', $e->getMessage());
             $this->logger->error($errorMessage->getText());

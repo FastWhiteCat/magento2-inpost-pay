@@ -231,6 +231,15 @@ define([
 
             var $productInput = $('[name="product"][value="' + productId + '"]');
             var $productForm = $productInput.parent('#product_addtocart_form');
+
+            if (!$productForm.length) {
+                return Promise.reject('Problem with product configuration');
+            }
+
+            if (!$productForm.validation('isValid')) {
+                return Promise.reject('Product is invalid');
+            }
+
             var isProductAdded = this.checkIfProductIsAdded(productId, customerData.get("cart")(), $productForm)
 
             if (isProductAdded) {
@@ -243,14 +252,6 @@ define([
                             reject(error)
                         });
                 });
-            }
-
-            if (!$productForm.length) {
-                return Promise.reject('Problem with product configuration');
-            }
-
-            if (!$productForm.validation('isValid')) {
-                return Promise.reject('Product is invalid');
             }
 
             return ajaxSubmit($productForm).then().catch(function (err) {
