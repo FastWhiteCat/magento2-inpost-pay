@@ -170,9 +170,8 @@ class BasketUpdate implements BasketUpdateInterface
         }
 
         if ($promoCodesEventData) {
-            foreach ($promoCodesEventData as $promoCode) {
-                $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
-            }
+            $promoCode = end($promoCodesEventData);
+            $this->cartService->applyPromo($quote, $promoCode->getPromoCodeValue());
         } elseif ($eventType === self::PROMO_CODES_EVENT) {
             $this->cartService->removePromosFromQuote($quote);
         }
