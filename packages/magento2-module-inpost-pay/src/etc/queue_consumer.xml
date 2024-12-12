@@ -3,5 +3,5 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
     <consumer name="inpost_pay.basket.create_or_update"
               queue="inpost_pay.basket.create_or_update"
-              connection="db"/>
+              connection="amqp"/>
 </config>
