@@ -27,7 +27,7 @@ class BasketRequest extends Request implements RequestInterface
      */
     public function __construct(
         private readonly IziApiConfigProvider $iziApiConfigProvider,
-        private readonly TokenGenerator $tokenGenerator,
+        private readonly TokenGenerator $tokenGenerator
     ) {
     }
 
