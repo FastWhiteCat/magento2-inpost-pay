@@ -1,5 +1,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="sales_quote_save_after">
+    <event name="sales_quote_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostBasketEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver" />
     </event>
     <event name="checkout_cart_save_after">
@@ -11,7 +11,7 @@
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
     </event>
-    <event name="sales_order_save_after">
+    <event name="sales_order_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
     <event name="sales_order_shipment_track_save_after">

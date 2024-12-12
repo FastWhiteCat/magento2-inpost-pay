@@ -6,7 +6,6 @@ namespace InPost\InPostPay\Provider\Config;
 
 use InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Service\SynchronizePaymentMethods as SynchronizePaymentMethodsService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -21,12 +20,12 @@ class IziApiConfigProvider
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param SandboxConfigProvider $sandboxConfigProvider
+     * @param InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly SandboxConfigProvider $sandboxConfigProvider,
-        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository,
-        private readonly SynchronizePaymentMethodsService $synchronizePaymentMethods
+        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository
     ) {
     }
 
@@ -94,13 +93,6 @@ class IziApiConfigProvider
     private function getAvailablePaymentMethodsCodes(): array
     {
         $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
-
-        if (empty($availablePaymentTypes)
-            || strtotime($availablePaymentTypes[0]['created_at']) < strtotime("-1 day")
-        ) {
-            $this->synchronizePaymentMethods->execute();
-            $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
-        }
 
         return !empty($availablePaymentTypes) ? array_column($availablePaymentTypes, 'payment_code') : [];
     }
