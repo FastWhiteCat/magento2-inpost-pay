@@ -191,7 +191,7 @@ define([
                 })
                     .done(function (data) {
                         if (!data || !data.basket_binding_api_key) {
-                            resolve(undefined)
+                            reject();
                         } else {
                             self.basketBindingApiKey = data.basket_binding_api_key;
                             resolve(data.basket_binding_api_key)
