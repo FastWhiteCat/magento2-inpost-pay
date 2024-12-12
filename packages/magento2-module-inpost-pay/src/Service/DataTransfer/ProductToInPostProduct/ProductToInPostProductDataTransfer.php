@@ -170,7 +170,10 @@ class ProductToInPostProductDataTransfer
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
             $this->logger->debug(sprintf('Image (%s) not found for product ID: %s', $image, (int)$product->getId()));
 
-            return $this->imageHelper->getDefaultPlaceholderUrl('image');
+            $placeholderImageUrl = $this->imageHelper->getDefaultPlaceholderUrl('image');
+            $this->emulation->stopEnvironmentEmulation();
+
+            return $placeholderImageUrl;
         }
 
         // @phpstan-ignore-next-line

@@ -27,7 +27,7 @@ class BasketRequest extends Request implements RequestInterface
      */
     public function __construct(
         private readonly IziApiConfigProvider $iziApiConfigProvider,
-        private readonly TokenGenerator $tokenGenerator
+        private readonly TokenGenerator $tokenGenerator,
     ) {
     }
 
@@ -56,6 +56,8 @@ class BasketRequest extends Request implements RequestInterface
 
     public function getBearerToken(): ?string
     {
-        return $this->tokenGenerator->generate()->getAccessToken();
+        $isAsync = $this->iziApiConfigProvider->isAsyncBasketExportEnabled();
+
+        return $this->tokenGenerator->generate($isAsync)->getAccessToken();
     }
 }

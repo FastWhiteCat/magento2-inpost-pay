@@ -36,13 +36,13 @@ class TokenGenerator
     }
 
     /**
+     * @param bool|null $forceNew
      * @return TokenResponse
-     * @throws InPostPayInternalException
      * @throws LocalizedException
      */
-    public function generate(): TokenResponse
+    public function generate(?bool $forceNew = false): TokenResponse
     {
-        if ($this->tokenResponse === null) {
+        if ($this->tokenResponse === null || $forceNew) {
             try {
                 /** @var TokenRequest $request */
                 $request = $this->tokenRequestFactory->create();
