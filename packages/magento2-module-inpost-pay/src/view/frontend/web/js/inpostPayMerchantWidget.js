@@ -104,7 +104,7 @@ define([
              */
             var widgetOptions = $.extend({
                 merchantClientId: config.merchantClientId,
-                basketBindingApiKey: this.retrieveBasketBindingApiKey(config.basketBindingApiKey),
+                basketBindingApiKey: config.basketBindingApiKey || undefined,
                 unboundWidgetClicked: this.unboundWidgetClicked.bind(this),
                 handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
@@ -295,29 +295,6 @@ define([
         },
 
         /**
-         * Handle retrieving basketBindingApiKey
-         * Return true if widget should not refresh the page
-         *
-         * @callback retrieveApiKey
-         * @param {undefined|string} apiKey
-         * @return {undefined|string|promise<string>}
-         */
-        retrieveBasketBindingApiKey: function (apiKey = undefined) {
-            var self = this;
-            if (apiKey) return apiKey;
-
-            return new Promise(function (resolve, reject) {
-                self.getBasketBindingApiKey(resolve, reject)
-                    .then((data) => {
-                        resolve(data)
-                    })
-                    .catch(function(error) {
-                        reject(error)
-                    });
-            });
-        },
-
-        /**
          * Callback function to reflect basket updates.
          * If not provided or returning false - widget will refresh the entire page.
          * @return 'true' if widget should not refresh the page
@@ -331,7 +308,6 @@ define([
 
             if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
                 customerData.invalidate(['cart', 'messages']);
-
                 return false;
             }
 
@@ -346,6 +322,7 @@ define([
                 })
                     .done(function (data) {
                         if (data && data.redirect) {
+                            //wyczysc ciastko z kluczem basketBindingApiKey
                             customerData.invalidate(['cart', 'messages']);
                             resolve(true);
                             window.location.replace(data.redirect);
