@@ -226,18 +226,19 @@ define([
             }
 
             if (!productId) {
-                return Promise.reject('Product id not found');
+                return Promise.reject(new Error('Product id not found'));
             }
 
             var $productInput = $('[name="product"][value="' + productId + '"]');
             var $productForm = $productInput.parent('#product_addtocart_form');
 
             if (!$productForm.length) {
-                return Promise.reject('Problem with product configuration');
+                return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'))
+
             }
 
             if (!$productForm.validation('isValid')) {
-                return Promise.reject('Product is invalid');
+                return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'))
             }
 
             var isProductAdded = this.checkIfProductIsAdded(productId, customerData.get("cart")(), $productForm)
