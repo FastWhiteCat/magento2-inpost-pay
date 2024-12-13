@@ -101,6 +101,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\AdditionalImage"/>
 
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
