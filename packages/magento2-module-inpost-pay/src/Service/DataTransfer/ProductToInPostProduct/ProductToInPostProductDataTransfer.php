@@ -47,6 +47,7 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
+    public const MAX_ADDITIONAL_IMAGES_COUNT = 10;
 
     public const UNMANAGED_STOCK_QUANTITY = 9999;
 
@@ -420,9 +421,10 @@ class ProductToInPostProductDataTransfer
         }
 
         $images = [];
+        $totalImages = 0;
         foreach ($mediaGalleryImages as $galleryImage) {
             $file = $galleryImage->getFile();
-            if ($file) {
+            if ($file && $totalImages < self::MAX_ADDITIONAL_IMAGES_COUNT) {
                 $normalImage = $smallImage = $galleryImage->getUrl();
                 if ($normalImage === $inpostProduct->getProductImage()) {
                     continue;
@@ -454,6 +456,7 @@ class ProductToInPostProductDataTransfer
                 $additionalImage->setSmallSize($smallImage ?? '');
                 $additionalImage->setNormalSize($normalImage ?? '');
                 $images[] = $additionalImage;
+                $totalImages++;
             }
         }
 
