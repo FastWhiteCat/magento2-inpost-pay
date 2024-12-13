@@ -322,7 +322,6 @@ define([
                 })
                     .done(function (data) {
                         if (data && data.redirect) {
-                            //wyczysc ciastko z kluczem basketBindingApiKey
                             customerData.invalidate(['cart', 'messages']);
                             resolve(true);
                             window.location.replace(data.redirect);
