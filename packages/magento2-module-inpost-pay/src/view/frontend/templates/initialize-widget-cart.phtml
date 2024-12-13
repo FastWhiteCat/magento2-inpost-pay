@@ -1,7 +1,5 @@
 <?php
 
-use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
-
 /**
  * @var Magento\Framework\View\Element\Template $block
  * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
@@ -12,15 +10,13 @@ if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnCart()) {
     return;
 }
 
+$merchantClientId = $widgetViewModel->getClientMerchantId();
 $bindingPlace = $block->getBindingPlace();
 $language = $widgetViewModel->getCurrentLanguageCode();
-$cartItemsCount = $widgetViewModel->getCartItemsCount();
-$maskedPhoneNumber = $widgetViewModel->getMaskedPhoneNumber();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
-$longPollingTimeForInactiveTab = $widgetViewModel->getLongPollingTimeForInactiveTab();
-$isEnabledLongPollingForInactiveTab = $widgetViewModel->isEnabledLongPollingForInactiveTab();
+$apiBaseUrl = $widgetViewModel->getApiBaseUrl();
 
 if (!$widgetViewModel->canShowForWholeCart()) {
     return;
@@ -29,35 +25,19 @@ if (!$widgetViewModel->canShowForWholeCart()) {
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
-        name=""
-        masked_phone_number="<?= /* @noEscape */ $maskedPhoneNumber ?>"
-        data-product-id=""
-        language="<?= /* @noEscape */ $language ?>"
-        variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
-        basket="true"
-        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
-        max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
-        min_height="<?= /* @noEscape */ $layoutConfig['minHeight'] ?: '' ?>"
-        frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
-        count="<?= /* @noEscape */ $cartItemsCount ?>"
-        binding_place="<?= /* @noEscape */ $bindingPlace ?>">
-    </inpost-izi-button>
+        binding_place="<?= /* @noEscape */ $bindingPlace ?>"
+        variation="<?= /* @noEscape */ $layoutConfig ?>"
+    ></inpost-izi-button>
 
     <script type="text/x-magento-init">
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
-                    "popupBindingPlace": "<?= /* @noEscape */
-                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
-                    "count": <?= /* @noEscape */ $cartItemsCount ?>,
-                    "maskedPhoneNumber": "<?= /* @noEscape */ $maskedPhoneNumber ?>",
                     "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
-                    "isEnabledMinicart": "<?= /* @noEscape */ $widgetViewModel->isEnabledInMiniCart() ?>",
                     "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
-                    "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
-                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */
-                    $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
+                    "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
+                    "language": "<?= /* @noEscape */ $language ?>",
+                    "apiBaseUrl": "<?= /* @noEscape */ $apiBaseUrl ?>"
                 }
             }
         }

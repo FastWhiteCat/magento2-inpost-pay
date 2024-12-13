@@ -6,7 +6,6 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -18,12 +17,10 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
 {
     /**
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
-     * @param BasketBindingDelete $basketBindingDelete
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly BasketBindingDelete $basketBindingDelete,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -63,7 +60,6 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         $guestBasket = $this->getInPostPayQuoteByQuoteId($guestQuoteId);
 
         if ($customerBasket !== null && $guestBasket !== null) {
-            $this->basketBindingDelete->execute($customerBasket->getBasketId());
             $guestBasket->setQuoteId($customerQuoteId);
             $finalBasket = $guestBasket;
             $deprecatedBasket = $customerBasket;
