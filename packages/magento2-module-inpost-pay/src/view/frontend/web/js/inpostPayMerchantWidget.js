@@ -104,7 +104,7 @@ define([
              */
             var widgetOptions = $.extend({
                 merchantClientId: config.merchantClientId,
-                basketBindingApiKey: config.basketBindingApiKey || undefined,
+                basketBindingApiKey: this.retrieveBasketBindingApiKey(config.basketBindingApiKey),
                 unboundWidgetClicked: this.unboundWidgetClicked.bind(this),
                 handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
@@ -292,6 +292,36 @@ define([
                     });
                 });
             }
+        },
+
+        /**
+
+         * Handle retrieving basketBindingApiKey
+
+         * Return true if widget should not refresh the page
+
+         *
+
+         * @callback retrieveApiKey
+
+         * @param {undefined|string} apiKey
+
+         * @return {undefined|string|promise<string>}
+
+         */
+
+        retrieveBasketBindingApiKey: function (apiKey = undefined) {
+            var self = this;
+            if (apiKey) return apiKey;
+            return new Promise(function (resolve, reject) {
+                self.getBasketBindingApiKey(resolve, reject)
+                    .then((data) => {
+                        resolve(data)
+                    })
+                    .catch(function(error) {
+                        reject(error)
+                    });
+            });
         },
 
         /**
