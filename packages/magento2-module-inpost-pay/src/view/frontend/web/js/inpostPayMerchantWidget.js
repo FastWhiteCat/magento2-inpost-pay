@@ -295,21 +295,13 @@ define([
         },
 
         /**
-
          * Handle retrieving basketBindingApiKey
-
          * Return true if widget should not refresh the page
-
          *
-
          * @callback retrieveApiKey
-
          * @param {undefined|string} apiKey
-
          * @return {undefined|string|promise<string>}
-
          */
-
         retrieveBasketBindingApiKey: function (apiKey = undefined) {
             var self = this;
             if (apiKey) return apiKey;
