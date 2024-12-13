@@ -277,18 +277,4 @@ class Widget implements ArgumentInterface
     {
         return $this->authConfigProvider->getClientMerchantId();
     }
-
-    /**
-     * Get CookieLifeTime
-     * @return int scopeCode
-     */
-    public function getCookieLifeTime(): int
-    {
-        $cookieLifetime = $this->scopeConfig->getValue(
-            Config::XML_PATH_COOKIE_LIFETIME,
-            ScopeInterface::SCOPE_STORE
-        );
-
-        return is_scalar($cookieLifetime) ? (int)$cookieLifetime : Config::COOKIE_LIFETIME_DEFAULT;
-    }
 }
