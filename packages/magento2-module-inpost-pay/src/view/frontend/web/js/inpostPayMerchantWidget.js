@@ -194,6 +194,8 @@ define([
                             reject();
                         } else {
                             self.basketBindingApiKey = data.basket_binding_api_key;
+                            var cookieExpires = new Date(new Date().getTime() + self.cookieLifeTime * 1000);
+                            $.mage.cookies.set('basketBindingApiKey', data.basket_binding_api_key, { expires: cookieExpires } )
                             resolve(data.basket_binding_api_key)
                         }
                     })
@@ -305,6 +307,10 @@ define([
         retrieveBasketBindingApiKey: function (apiKey = undefined) {
             var self = this;
             if (apiKey) return apiKey;
+            var basketBindingApiKeyFromCookies = $.mage.cookies.get('basketBindingApiKey');
+
+            if (basketBindingApiKeyFromCookies && !this.isLoggedIn) return basketBindingApiKeyFromCookies;
+
             return new Promise(function (resolve, reject) {
                 self.getBasketBindingApiKey(resolve, reject)
                     .then((data) => {
@@ -346,6 +352,7 @@ define([
                         if (data && data.redirect) {
                             customerData.invalidate(['cart', 'messages']);
                             resolve(true);
+                            $.mage.cookies.clear('basketBindingApiKey')
                             window.location.replace(data.redirect);
                         } else {
                             reject(false);

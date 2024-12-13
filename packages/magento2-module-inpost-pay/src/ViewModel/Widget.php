@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
-
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
@@ -47,6 +47,7 @@ class Widget implements ArgumentInterface
      * @param AuthConfigProvider $authConfigProvider
      * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TestModeProvider $testModeProvider
+     * @param ScopeConfigInterface $scopeConfig
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -63,7 +64,8 @@ class Widget implements ArgumentInterface
         private readonly LoggerInterface $logger,
         private readonly AuthConfigProvider $authConfigProvider,
         private readonly IziApiConfigProvider $iziApiConfigProvider,
-        private readonly TestModeProvider $testModeProvider
+        private readonly TestModeProvider $testModeProvider,
+        private readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
@@ -271,5 +273,17 @@ class Widget implements ArgumentInterface
     public function getClientMerchantId(): string
     {
         return $this->authConfigProvider->getClientMerchantId();
+    }
+
+    /**
+     * Get CookieLifeTime
+     * @return null|string scopeCode
+     */
+    public function getCookieLifeTime(): ?string
+    {
+        return $this->scopeConfig->getValue(
+            \Magento\Framework\Session\Config::XML_PATH_COOKIE_LIFETIME,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 }

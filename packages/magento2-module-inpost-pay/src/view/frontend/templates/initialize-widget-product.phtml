@@ -25,6 +25,7 @@ $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 $apiBaseUrl = $widgetViewModel->getApiBaseUrl();
+$cookieLifeTime = $widgetViewModel->getCookieLifeTime();
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
@@ -43,7 +44,8 @@ $apiBaseUrl = $widgetViewModel->getApiBaseUrl();
                     "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
                     "language": "<?= /* @noEscape */ $language ?>",
                     "productId": "<?= /* @noEscape */ $productId ?>",
-                    "apiBaseUrl": "<?= /* @noEscape */ $apiBaseUrl ?>"
+                    "apiBaseUrl": "<?= /* @noEscape */ $apiBaseUrl ?>",
+                    "cookieLifeTime": "<?= /* @noEscape */ $cookieLifeTime ?>"
                 }
             }
         }
