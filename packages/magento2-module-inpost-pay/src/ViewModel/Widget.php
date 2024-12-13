@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
+
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
@@ -16,12 +17,14 @@ use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\Session\Config;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -277,13 +280,15 @@ class Widget implements ArgumentInterface
 
     /**
      * Get CookieLifeTime
-     * @return null|string scopeCode
+     * @return int scopeCode
      */
-    public function getCookieLifeTime(): ?string
+    public function getCookieLifeTime(): int
     {
-        return $this->scopeConfig->getValue(
-            \Magento\Framework\Session\Config::XML_PATH_COOKIE_LIFETIME,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        $cookieLifetime = $this->scopeConfig->getValue(
+            Config::XML_PATH_COOKIE_LIFETIME,
+            ScopeInterface::SCOPE_STORE
         );
+
+        return is_scalar($cookieLifetime) ? (int)$cookieLifetime : Config::COOKIE_LIFETIME_DEFAULT;
     }
 }

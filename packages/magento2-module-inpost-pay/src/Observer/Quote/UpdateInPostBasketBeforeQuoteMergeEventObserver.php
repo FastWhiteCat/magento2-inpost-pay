@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -17,10 +18,12 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
 {
     /**
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
+     * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -59,16 +62,13 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         $customerBasket = $this->getInPostPayQuoteByQuoteId($customerQuoteId);
         $guestBasket = $this->getInPostPayQuoteByQuoteId($guestQuoteId);
 
-        if ($customerBasket !== null && $guestBasket !== null) {
-            $guestBasket->setQuoteId($customerQuoteId);
-            $finalBasket = $guestBasket;
-            $deprecatedBasket = $customerBasket;
-        } elseif ($customerBasket === null && $guestBasket !== null) {
-            $guestBasket->setQuoteId($customerQuoteId);
-            $finalBasket = $guestBasket;
-            $deprecatedBasket = $customerBasket;
-        } elseif ($customerBasket !== null && $guestBasket === null) {
+        if ($customerBasket !== null) {
             $finalBasket = $customerBasket;
+            $deprecatedBasket = $guestBasket;
+        } elseif ($guestBasket !== null) {
+            $guestBasket->setQuoteId($customerQuoteId);
+            $finalBasket = $guestBasket;
+            $deprecatedBasket = $customerBasket;
         } else {
             throw new NoSuchEntityException(__('Non of the quotes are InPost Pay bound baskets.'));
         }
@@ -80,6 +80,9 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
 
         $finalBasket->setCartVersion(uniqid());
         $this->inPostPayQuoteRepository->save($finalBasket);
+        $this->basketBindingApiKeyCookieService->createOrUpdateBasketBindingCookie(
+            (string)$finalBasket->getBasketBindingApiKey()
+        );
     }
 
     /**

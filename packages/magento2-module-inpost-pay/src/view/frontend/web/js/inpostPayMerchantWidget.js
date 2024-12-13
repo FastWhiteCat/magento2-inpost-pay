@@ -195,7 +195,7 @@ define([
                         } else {
                             self.basketBindingApiKey = data.basket_binding_api_key;
                             var cookieExpires = new Date(new Date().getTime() + self.cookieLifeTime * 1000);
-                            $.mage.cookies.set('basketBindingApiKey', data.basket_binding_api_key, { expires: cookieExpires } )
+                            // $.mage.cookies.set('basketBindingApiKey', data.basket_binding_api_key, { expires: cookieExpires } )
                             resolve(data.basket_binding_api_key)
                         }
                     })
