@@ -63,7 +63,7 @@ class Get extends WidgetController implements HttpGetActionInterface
         try {
             $quote = $this->getQuote();
             // @phpstan-ignore-next-line
-            $this->quoteRestrictionsValidator->validate($quote, true);
+            $this->quoteRestrictionsValidator->validate($quote);
             if ($quote->getId()) {
                 $quoteId = (int)$quote->getId();
                 $this->quoteRepository->getActive($quoteId);
