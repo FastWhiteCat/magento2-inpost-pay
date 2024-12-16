@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
@@ -17,14 +16,12 @@ use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Session\Config;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -50,7 +47,6 @@ class Widget implements ArgumentInterface
      * @param AuthConfigProvider $authConfigProvider
      * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TestModeProvider $testModeProvider
-     * @param ScopeConfigInterface $scopeConfig
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -67,8 +63,7 @@ class Widget implements ArgumentInterface
         private readonly LoggerInterface $logger,
         private readonly AuthConfigProvider $authConfigProvider,
         private readonly IziApiConfigProvider $iziApiConfigProvider,
-        private readonly TestModeProvider $testModeProvider,
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly TestModeProvider $testModeProvider
     ) {
     }
 

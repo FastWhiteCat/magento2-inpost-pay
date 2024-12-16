@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -62,13 +63,14 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         $customerBasket = $this->getInPostPayQuoteByQuoteId($customerQuoteId);
         $guestBasket = $this->getInPostPayQuoteByQuoteId($guestQuoteId);
 
-        if ($customerBasket !== null) {
-            $finalBasket = $customerBasket;
-            $deprecatedBasket = $guestBasket;
-        } elseif ($guestBasket !== null) {
+
+        if ($this->isBasketBound($guestBasket)) {
             $guestBasket->setQuoteId($customerQuoteId);
             $finalBasket = $guestBasket;
             $deprecatedBasket = $customerBasket;
+        } elseif ($this->isBasketBound($customerBasket)) {
+            $finalBasket = $customerBasket;
+            $deprecatedBasket = $guestBasket;
         } else {
             throw new NoSuchEntityException(__('Non of the quotes are InPost Pay bound baskets.'));
         }
@@ -98,5 +100,14 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         }
 
         return $inPostPayQuote;
+    }
+
+    private function isBasketBound(?InPostPayQuoteInterface $basket = null): bool
+    {
+        if (!$basket instanceof InPostPayQuoteInterface) {
+            return false;
+        }
+
+        return $basket->getStatus() === InPostBasketStatus::SUCCESS->value;
     }
 }
