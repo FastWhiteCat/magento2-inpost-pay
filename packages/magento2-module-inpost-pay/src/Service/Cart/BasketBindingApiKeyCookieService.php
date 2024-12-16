@@ -81,6 +81,7 @@ class BasketBindingApiKeyCookieService
             if ($value) {
                 // @phpstan-ignore-next-line
                 $storePath = $this->storeManager->getStore()->getStorePath();
+                // @phpstan-ignore-next-line
                 $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata()
                     ->setHttpOnly(false)
                     ->setDuration((int)$this->getCookieLifeTime())

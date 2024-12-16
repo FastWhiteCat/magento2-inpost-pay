@@ -63,8 +63,7 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         $customerBasket = $this->getInPostPayQuoteByQuoteId($customerQuoteId);
         $guestBasket = $this->getInPostPayQuoteByQuoteId($guestQuoteId);
 
-
-        if ($this->isBasketBound($guestBasket)) {
+        if ($guestBasket && $customerQuoteId && $this->isBasketBound($guestBasket)) {
             $guestBasket->setQuoteId($customerQuoteId);
             $finalBasket = $guestBasket;
             $deprecatedBasket = $customerBasket;
@@ -80,11 +79,13 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
             $this->inPostPayQuoteRepository->delete($deprecatedBasket);
         }
 
-        $finalBasket->setCartVersion(uniqid());
-        $this->inPostPayQuoteRepository->save($finalBasket);
-        $this->basketBindingApiKeyCookieService->createOrUpdateBasketBindingCookie(
-            (string)$finalBasket->getBasketBindingApiKey()
-        );
+        if ($finalBasket) {
+            $finalBasket->setCartVersion(uniqid());
+            $this->inPostPayQuoteRepository->save($finalBasket);
+            $this->basketBindingApiKeyCookieService->createOrUpdateBasketBindingCookie(
+                (string)$finalBasket->getBasketBindingApiKey()
+            );
+        }
     }
 
     /**

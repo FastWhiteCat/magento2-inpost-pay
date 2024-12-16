@@ -320,8 +320,6 @@ define([
          * @return {boolean}
          */
         handleBasketEvent: function (widgetBasketEvent) {
-            var self = this;
-
             if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
                 customerData.invalidate(['cart', 'messages']);
                 return false;
@@ -333,7 +331,7 @@ define([
                             + '/form_key/'
                             + $.mage.cookies.get('form_key'))
                         + '/?basket_binding_api_key='
-                        + self.basketBindingApiKey,
+                        + $.mage.cookies.get('basketBindingApiKey'),
                     method: 'GET',
                 })
                     .done(function (data) {
