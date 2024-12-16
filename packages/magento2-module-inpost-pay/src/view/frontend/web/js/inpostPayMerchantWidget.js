@@ -303,18 +303,11 @@ define([
          * @return {undefined|string|promise<string>}
          */
         retrieveBasketBindingApiKey: function (apiKey = undefined) {
-            var self = this;
             if (apiKey) return apiKey;
 
-            return new Promise(function (resolve, reject) {
-                self.getBasketBindingApiKey(resolve, reject)
-                    .then((data) => {
-                        resolve(data)
-                    })
-                    .catch(function(error) {
-                        reject(error)
-                    });
-            });
+            var basketBindingApiKeyFromCookies = $.mage.cookies.get('basketBindingApiKey');
+
+            return basketBindingApiKeyFromCookies ? basketBindingApiKeyFromCookies : undefined
         },
 
         /**
@@ -327,11 +320,8 @@ define([
          * @return {boolean}
          */
         handleBasketEvent: function (widgetBasketEvent) {
-            var self = this;
-
             if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
                 customerData.invalidate(['cart', 'messages']);
-
                 return false;
             }
 
@@ -341,7 +331,7 @@ define([
                             + '/form_key/'
                             + $.mage.cookies.get('form_key'))
                         + '/?basket_binding_api_key='
-                        + self.basketBindingApiKey,
+                        + $.mage.cookies.get('basketBindingApiKey'),
                     method: 'GET',
                 })
                     .done(function (data) {
