@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2024-12-17
+
+### Fixed
+
+- Bundle Products will no longer throw not found exception when gathering product image URL data.
+
 ## [1.0.11] - 2024-12-05
 
 ### Fixed
