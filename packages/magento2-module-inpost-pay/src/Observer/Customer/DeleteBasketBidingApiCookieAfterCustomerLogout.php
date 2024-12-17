@@ -21,6 +21,7 @@ class DeleteBasketBidingApiCookieAfterCustomerLogout implements ObserverInterfac
     /**
      * @param EventObserver $observer
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function execute(EventObserver $observer): void
     {
