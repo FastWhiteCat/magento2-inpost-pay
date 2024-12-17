@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
+use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
+use InPost\InPostPay\Provider\Config\PollingConfigProvider;
+use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -26,12 +31,15 @@ class Widget implements ArgumentInterface
 {
     private const VARIANT = 'variant';
     private const DARK_MODE = 'darkMode';
-
-    private const NOT_ALLOWED_PRODUCT_TYPES = ['bundle', 'grouped'];
+    private const MAX_WIDTH = 'maxWidth';
+    private const MIN_HEIGHT = 'minHeight';
+    private const FRAME_STYLE = 'frameStyle';
 
     /**
+     * @param SandboxConfigProvider $sandboxConfigProvider
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
+     * @param PollingConfigProvider $pollingConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
      * @param GeneralConfigProvider $generalConfigProvider
@@ -42,21 +50,26 @@ class Widget implements ArgumentInterface
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
+        private readonly SandboxConfigProvider             $sandboxConfigProvider,
         private readonly LayoutConfigProvider              $layoutConfigProvider,
         private readonly DisplayConfigProvider             $displayConfigProvider,
+        private readonly PollingConfigProvider             $pollingConfigProvider,
         private readonly ResolverInterface                 $localeResolver,
         private readonly CheckoutSession                   $checkoutSession,
         private readonly GeneralConfigProvider             $generalConfigProvider,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly ProductRepositoryInterface        $productRepository,
         private readonly StoreManagerInterface             $storeManager,
-        private readonly LoggerInterface                   $logger
+        private readonly RestrictedProductIdsProvider      $restrictedProductIdsProvider,
+        private readonly LoggerInterface                   $logger,
+        private readonly InPostPayQuote                    $inPostPayQuote,
+        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
     ) {
     }
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled();
+        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
     }
 
     /**
@@ -77,11 +90,25 @@ class Widget implements ArgumentInterface
     {
         $variant = $this->layoutConfigProvider->getColorVariant();
         $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
+        $maxWidth = $this->layoutConfigProvider->getMaxWidth();
+        $minHeight = $this->layoutConfigProvider->getMinHeight();
+        $frameStyle = $this->layoutConfigProvider->getFrameStyle();
 
         return [
             self::VARIANT => $variant,
-            self::DARK_MODE => $darkMode
+            self::DARK_MODE => $darkMode,
+            self::MAX_WIDTH => $maxWidth,
+            self::MIN_HEIGHT => $minHeight,
+            self::FRAME_STYLE => $frameStyle
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSandboxEnabled(): bool
+    {
+        return $this->sandboxConfigProvider->isSandboxEnabled();
     }
 
     /**
@@ -117,6 +144,46 @@ class Widget implements ArgumentInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabledOnRegisterPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnRegisterPage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledOnLoginPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnLoginPage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledOnCheckoutPage(): bool
+    {
+        return $this->displayConfigProvider->isEnabledOnCheckoutPage();
+    }
+
+    /**
+     * @return int
+     */
+    public function getLongPollingTimeForInactiveTab(): int
+    {
+        return $this->pollingConfigProvider->getLongPollingTimeForInactiveTab();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledLongPollingForInactiveTab(): bool
+    {
+        return $this->pollingConfigProvider->isEnabledLongPollingForInactiveTab();
+    }
+
+    /**
      * @return float|int
      */
     public function getCartItemsCount(): float|int
@@ -126,6 +193,59 @@ class Widget implements ArgumentInterface
         } catch (NoSuchEntityException|LocalizedException $e) {
             return 0;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getMaskedPhoneNumber(): string
+    {
+        try {
+            $quote = $this->checkoutSession->getQuote();
+
+            if ($quote->getId()) {
+                $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+
+                if ($this->inPostPayQuote->isBasketConnected($quoteId)) {
+                    $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
+
+                    return $inpostPayQuote->getMaskedPhoneNumber()?: "";
+                }
+            }
+        } catch (LocalizedException) {
+            return "";
+        }
+
+        return "";
+    }
+
+    public function isProductRestricted(int $productId): bool
+    {
+        $websiteId = (int)$this->storeManager->getWebsite()->getId();
+
+        return in_array(
+            $productId,
+            $this->restrictedProductIdsProvider->getList($websiteId)
+        );
+    }
+
+    /**
+     * Returns true if at least one product in cart is not restricted
+     *
+     * @return bool
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function canShowForWholeCart(): bool
+    {
+        foreach ($this->checkoutSession->getQuote()->getAllVisibleItems() as $item) {
+            $productId = (int)$item->getProduct()->getId();
+            if (!$this->isProductRestricted($productId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function isInPostPayOrder(): bool
@@ -170,20 +290,13 @@ class Widget implements ArgumentInterface
         return ($product instanceof Product) ? $product : null;
     }
 
-    public function hasNotAllowedProducts(): bool
+    public function getScriptUrl(string $bindingPlace): string
     {
-        try {
-            $quote = $this->checkoutSession->getQuote();
-
-            foreach ($quote->getAllVisibleItems() as $item) {
-                if (in_array($item->getProduct()->getTypeId(), self::NOT_ALLOWED_PRODUCT_TYPES)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } catch (NoSuchEntityException|LocalizedException $e) {
-            return false;
-        }
+        $sandboxMode = $this->isSandboxEnabled();
+        $shouldInitializeScript = !$this->isEnabledInMiniCart()
+            || $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME;
+        return $shouldInitializeScript
+            ? ($sandboxMode ? "https://izi-sandbox.inpost.pl/inpostizi.js" : "https://izi.inpost.pl/inpostizi.js")
+            : '';
     }
 }

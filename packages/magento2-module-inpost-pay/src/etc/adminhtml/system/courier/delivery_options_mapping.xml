@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="inpost_pay_shipment_courier" translate="label" type="text" sortOrder="35"
-           showInDefault="1" showInWebsite="1" showInStore="1">
+           showInDefault="1" showInWebsite="1">
         <label>Shipment Mapping Settings for Courier Delivery</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="inpost_courier_standard_mapping" translate="label" type="select" sortOrder="10"

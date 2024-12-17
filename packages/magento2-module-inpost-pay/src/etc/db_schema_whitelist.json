@@ -40,7 +40,7 @@
             "updated_at": true,
             "phone": true,
             "country_prefix": true,
-            "refresh_required": true
+            "cart_version": true
         },
         "constraint": {
             "PRIMARY": true,
@@ -60,6 +60,36 @@
         "constraint": {
             "PRIMARY": true,
             "INPOST_PAY_CHKT_AGRT_VERSION_AGRT_ID_CHKT_AGRT_AGRT_ID": true
+        }
+    },
+    "inpost_pay_basket_notice": {
+        "column": {
+            "basket_notice_id": true,
+            "inpost_pay_quote_id": true,
+            "type": true,
+            "description": true,
+            "is_sent": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "INPOST_PAY_BASKET_NOTICE_INPOST_PAY_QUOTE_ID": true,
+            "INPOST_PAY_BASKET_NOTICE_IS_SENT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_FAAB0B769017A18DA32E88ABB704AA2E": true,
+            "INPOST_PAY_BASKET_NOTICE_BASKET_NOTICE_ID": true
+        }
+    },
+    "inpost_pay_available_payment_method": {
+        "column": {
+            "payment_method_id": true,
+            "payment_code": true,
+            "created_at": true
+        },
+        "constraint": {
+            "INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID": true
         }
     }
 }

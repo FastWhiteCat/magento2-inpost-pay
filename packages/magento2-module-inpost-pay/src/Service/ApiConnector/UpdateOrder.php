@@ -84,7 +84,7 @@ class UpdateOrder
             $trackNumbers[] = $track->getTrackNumber();
         }
 
-        return $trackNumbers;
+        return array_unique($trackNumbers);
     }
 
     private function getInPostPayOrderStatus(string $status): ?string

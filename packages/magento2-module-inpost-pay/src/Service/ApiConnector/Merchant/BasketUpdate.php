@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Exception\InvalidPromoCodeException;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface;
+use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
+use InPost\InPostPay\Service\CreateBasketNotice;
+use InPost\InPostPay\Service\PrepareQuoteProductsQuantity;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface;
 use InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface;
@@ -23,6 +24,7 @@ use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
 use InPost\InPostPay\Service\Cart\CartService;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use InPost\InPostPay\Validator\QuoteItemQtyValidator;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -37,15 +39,20 @@ class BasketUpdate implements BasketUpdateInterface
 {
     private const PROMO_CODES_EVENT = 'PROMO_CODES';
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly CartService $cartService,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
         private readonly BasketInterfaceFactory $basketFactory,
-        private readonly NoticeInterfaceFactory $noticeFactory,
         private readonly InPostPayQuote $inPostPayQuote,
         private readonly EventManager $eventManager,
+        private readonly CreateBasketNotice $createBasketNotice,
+        private readonly PrepareQuoteProductsQuantity $prepareQuoteProductsQuantity,
+        private readonly QuoteItemQtyValidator $qtyValidator,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -86,6 +93,7 @@ class BasketUpdate implements BasketUpdateInterface
 
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+            $quote->setData(InPostPayQuoteInterface::INPOST_BASKET_ID, $basketId);
 
             try {
                 $this->updateQuote(
@@ -95,21 +103,19 @@ class BasketUpdate implements BasketUpdateInterface
                     $relatedProductsEventData,
                     $promoCodesEventData
                 );
-            } catch (InvalidPromoCodeException $e) {
-                /** @var NoticeInterface $basketNoticeInvalidPromoCodeError */
-                $basketNoticeInvalidPromoCodeError = $this->noticeFactory->create();
-                $basketNoticeInvalidPromoCodeError->setType(NoticeInterface::ERROR);
-                $basketNoticeInvalidPromoCodeError->setDescription($e->getMessage());
+            } catch (InvalidPromoCodeException|LocalizedException $e) {
+                $this->createBasketNotice->execute(
+                    $basketId,
+                    InPostPayBasketNoticeInterface::ERROR,
+                    $e->getMessage()
+                );
             }
 
             $reloadedQuote = $this->reloadQuote((int)(is_scalar($quote->getId()) ? (int)$quote->getId() : null));
             $basket = $this->basketFactory->create();
+            $basket->setBasketId($basketId);
             $this->quoteToBasketDataTransfer->transfer($reloadedQuote ?? $quote, $basket);
-            $this->inPostPayQuote->updateRefreshRequired($inPostPayQuote->getBasketId(), true);
-
-            if (isset($basketNoticeInvalidPromoCodeError)) {
-                $this->mergeBasketNotice($basket, $basketNoticeInvalidPromoCodeError);
-            }
+            $this->inPostPayQuote->updateCartVersion($inPostPayQuote->getBasketId());
 
             $this->eventManager->dispatch('izi_basket_update_after', [BasketConfirmationInterface::BASKET => $basket]);
 
@@ -172,12 +178,22 @@ class BasketUpdate implements BasketUpdateInterface
 
     private function handleProductQuantities(Quote $quote, QuantityUpdateInterface $productQuantity): void
     {
-        $productId = (int)$productQuantity->getProductId();
+        $productIdArr = explode('_', $productQuantity->getProductId());
+        $isQuoteItemId = false;
+        if (isset($productIdArr[1])) {
+            $productId = (int)$productIdArr[1];
+            $isQuoteItemId = true;
+        } else {
+            $productId = (int)$productQuantity->getProductId();
+        }
+
         $qty = (float)$productQuantity->getQuantity()->getQuantity();
         if ($qty) {
-            $this->cartService->addToCart($quote, $productId, $qty);
+            $quoteItemsQuantity = $this->prepareQuoteProductsQuantity->execute($quote);
+            $this->qtyValidator->validate($quote, $productId, $qty, $isQuoteItemId, $quoteItemsQuantity);
+            $this->cartService->addToCart($quote, $productId, $qty, $isQuoteItemId);
         } else {
-            $this->cartService->removeFromCart($quote, $productId);
+            $this->cartService->removeFromCart($quote, $productId, $isQuoteItemId);
         }
     }
 
@@ -228,17 +244,5 @@ class BasketUpdate implements BasketUpdateInterface
         }
 
         return (isset($quote) && $quote instanceof Quote) ? $quote : null;
-    }
-
-    private function mergeBasketNotice(BasketInterface $basket, NoticeInterface $newBasketNoticeError): void
-    {
-        $existingBasketNotice = $basket->getSummary()->getBasketNotice();
-        if ($existingBasketNotice) {
-            $existingBasketNotice->setDescription(
-                $existingBasketNotice->getDescription() . PHP_EOL . $newBasketNoticeError->getDescription()
-            );
-        } else {
-            $basket->getSummary()->setBasketNotice($newBasketNoticeError);
-        }
     }
 }

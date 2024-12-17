@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="inpost_pay_sandbox" translate="label" type="text" sortOrder="25"
-           showInDefault="1" showInWebsite="1" showInStore="1">
+    <group id="inpost_pay_sandbox" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1">
         <label>Sandbox</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="enabled" translate="label" type="select" sortOrder="10"
@@ -35,7 +34,13 @@
                 <field id="enabled">1</field>
             </depends>
         </field>
-        <field id="sandbox_pos_id" translate="label" type="text" sortOrder="26"
+        <field id="sandbox_merchant_secret" translate="label" type="text" sortOrder="26"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Merchant Secret</label>
+            <config_path>payment/inpost_pay/sandbox_merchant_secret</config_path>
+            <comment>The key needed to generate returns</comment>
+        </field>
+        <field id="sandbox_pos_id" translate="label" type="text" sortOrder="27"
                showInDefault="1" showInWebsite="1" canRestore="1">
             <label>Sandbox POS ID</label>
             <config_path>payment/inpost_pay/sandbox_pos_id</config_path>

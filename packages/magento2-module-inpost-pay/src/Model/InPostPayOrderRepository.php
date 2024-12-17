@@ -97,6 +97,19 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
         return $inPostPayOrder;
     }
 
+    public function getByBasketId(string $basketId): InPostPayOrderInterface
+    {
+        /** @var InPostPayOrderInterface $inPostPayOrder */
+        $inPostPayOrder = $this->inPostPayOrderInterfaceFactory->create();
+        // @phpstan-ignore-next-line
+        $this->resource->load($inPostPayOrder, $basketId, InPostPayOrderInterface::BASKET_ID);
+        if (!$inPostPayOrder->getInPostPayOrderId()) {
+            throw new NoSuchEntityException(__('InPost Pay Order with Basket ID "%1" does not exist.', $basketId));
+        }
+
+        return $inPostPayOrder;
+    }
+
     public function getList(SearchCriteriaInterface $searchCriteria): SearchResults
     {
         $collection = $this->productSalesRestrictionLockCollectionFactory->create();

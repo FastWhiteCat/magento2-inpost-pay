@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service;
 
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Math\Random;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
@@ -35,9 +36,11 @@ class GetBasketId
             }
 
             if ($generateIfEmpty && (!$inPostPayQuote || !$inPostPayQuote->getQuoteId())) {
+                /** @var InPostPayQuoteInterface $inPostPayQuote */
                 $inPostPayQuote = $this->inPostPayQuoteFactory->create();
                 $inPostPayQuote->setQuoteId($quoteId);
                 $inPostPayQuote->setBasketId($this->randomDataGenerator->getUniqueHash());
+                $inPostPayQuote->setCartVersion(uniqid());
                 $this->inPostPayQuoteRepository->save($inPostPayQuote);
             }
 

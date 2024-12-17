@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
+use InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Service\SynchronizePaymentMethods as SynchronizePaymentMethodsService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -14,6 +16,7 @@ class IziApiConfigProvider
     private const XML_PATH_BASKET_LIFETIME = 'payment/inpost_pay/basket_lifetime';
     private const XML_PATH_ACCEPTED_PAYMENT_TYPES = 'payment/inpost_pay/accepted_payment_types';
     private const XML_PATH_ASYNC_BASKET_EXPORT = 'payment/inpost_pay/async_basket_export';
+    private const XML_PATH_PROD_ATTR_CLEANING = 'payment/inpost_pay/remove_html_and_special_chars_from_attributes';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -21,7 +24,9 @@ class IziApiConfigProvider
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly SandboxConfigProvider $sandboxConfigProvider
+        private readonly SandboxConfigProvider $sandboxConfigProvider,
+        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository,
+        private readonly SynchronizePaymentMethodsService $synchronizePaymentMethods
     ) {
     }
 
@@ -64,7 +69,13 @@ class IziApiConfigProvider
         $acceptedPaymentTypes = $this->scopeConfig->getValue(self::XML_PATH_ACCEPTED_PAYMENT_TYPES);
 
         if (!empty($acceptedPaymentTypes) && is_scalar($acceptedPaymentTypes)) {
-            return explode(',', (string)$acceptedPaymentTypes);
+            $acceptedPaymentTypes = explode(',', (string)$acceptedPaymentTypes);
+            $availablePaymentMethodsCodes = $this->getAvailablePaymentMethodsCodes();
+
+            return array_intersect(
+                $acceptedPaymentTypes,
+                $availablePaymentMethodsCodes
+            );
         }
 
         return [];
@@ -73,5 +84,24 @@ class IziApiConfigProvider
     public function isAsyncBasketExportEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_ASYNC_BASKET_EXPORT);
+    }
+
+    public function isProductAttributesHTMLAndSpecialCharactersCleaningEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_PROD_ATTR_CLEANING);
+    }
+
+    private function getAvailablePaymentMethodsCodes(): array
+    {
+        $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
+
+        if (empty($availablePaymentTypes)
+            || strtotime($availablePaymentTypes[0]['created_at']) < strtotime("-1 day")
+        ) {
+            $this->synchronizePaymentMethods->execute();
+            $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
+        }
+
+        return !empty($availablePaymentTypes) ? array_column($availablePaymentTypes, 'payment_code') : [];
     }
 }

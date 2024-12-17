@@ -2,14 +2,18 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/model/step-navigator',
     'mage/url',
     'underscore',
-    'mage/validation'
-], function (Component, $, customerData, urlBuilder, _) {
+    'ko',
+    'mage/validation',
+], function (Component, $, customerData, stepNavigator, urlBuilder, _, ko) {
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
     var timeoutId, xhrForBasketConfirmation, xhrForOrderConfirmation;
+    var globalOrderResetFlag = false;
+    var globalBindingCheckedFlag = false;
     var PRODUCT_TYPES = {
         CONFIGURABLE: 'configurable',
         SIMPLE: 'simple',
@@ -18,41 +22,97 @@ define([
         DOWNLOADABLE: 'downloadable',
         BUNDLE: 'bundle'
     };
-    var NOT_ALLOWED_PRODUCT_TYPES = [
-        PRODUCT_TYPES.GROUPED,
-        PRODUCT_TYPES.BUNDLE
-    ];
 
     return Component.extend({
         initialize: function (config) {
             this._super();
+            var self = this;
+            this.configuration = window.checkoutConfig ? window.checkoutConfig.inPostConfig : null;
+            this.isVisible = ko.observable(false);
 
-            if (this.isWidgetInitialized()) return;
-
-            window.iziCanBeBound = this.iziCanBeBound;
-            window.iziGetPayData = this.iziGetPayData;
-            window.iziGetBrowserData = this.iziGetBrowserData;
-            window.iziMobileLink = this.iziMobileLink;
-            window.iziGetIsBound = this.iziGetIsBound;
-            window.iziGetOrderComplete = this.iziGetOrderComplete;
-            window.iziBindingDelete = this.iziBindingDelete;
-            window.iziAddToCart = this.iziAddToCart;
-            window.getBrowserDescription = this.getBrowserDescription;
-            window.abortRequest = this.abortRequest;
-            window.checkIfProductIsAdded = this.checkIfProductIsAdded;
-            window.setTimerAndRunCallback = this.setTimerAndRunCallback;
-            window.checkIsBinding = this.checkIsBinding;
-
-            window.getConfig = function (defaultConfig = config) {
-                return defaultConfig;
+            if (this.disabledOnCheckoutPage(config)) {
+                return;
             }
 
-            this.bindEvents();
-            this.checkIsBinding();
+            if (this.configuration) {
+                stepNavigator.steps.subscribe(function (steps) {
+                    var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
+                    var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
+                    self.isVisible(self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
+                })
+            }
+
+            if (!this.isWidgetInitialized()) {
+                window.iziCanBeBound = this.iziCanBeBound;
+                window.iziGetPayData = this.iziGetPayData;
+                window.iziGetBrowserData = this.iziGetBrowserData;
+                window.iziMobileLink = this.iziMobileLink;
+                window.iziGetIsBound = this.iziGetIsBound;
+                window.iziGetOrderComplete = this.iziGetOrderComplete;
+                window.iziBindingDelete = this.iziBindingDelete;
+                window.iziAddToCart = this.iziAddToCart;
+                window.getBrowserDescription = this.getBrowserDescription;
+                window.abortRequest = this.abortRequest;
+                window.checkIfProductIsAdded = this.checkIfProductIsAdded;
+                window.setTimerAndRunCallback = this.setTimerAndRunCallback;
+                window.checkIsBinding = this.checkIsBinding;
+            }
+
+            window.getConfig = function (defaultConfig = config) {
+                return defaultConfig.popupBindingPlace ? defaultConfig : self.configuration;
+            }
+
+            if (config.scriptUrl) {
+                this.loadScript(config.scriptUrl, function() {
+                    if (config && config.popupBindingPlace) {
+                        this.bindEvents(false);
+                    }
+                }.bind(this));
+            }
+        },
+
+        disabledOnCheckoutPage: function(config = {}) {
+            if (config && config.popupBindingPlace) return false;
+            if (!this.configuration) return false;
+
+            return this.configuration.hasOwnProperty('enabledOnCheckoutPage')
+                && !this.configuration.enabledOnCheckoutPage;
+        },
+
+        initAfterRender: function() {
+            if (this.disabledOnCheckoutPage()) {
+                $('#inpost-izi-button-wrapper').remove()
+                return;
+            }
+
+            if (this.configuration.scriptUrl) {
+                this.loadScript(this.configuration.scriptUrl, function() {
+                    this.bindEvents(true);
+                }.bind(this));
+            } else {
+                this.bindEvents(true);
+            }
+
+
+        },
+
+        loadScript: function(url, callback) {
+            var script = document.createElement( "script" )
+            script.type = "text/javascript";
+            script.src = url;
+            script.onload = function() {
+                callback();
+            };
+
+            document.getElementsByTagName( "head" )[0].appendChild( script );
+        },
+
+        getConfiguration: function() {
+            return this.configuration.enabledOnCheckoutPage ? this.configuration : {};
         },
 
         isWidgetInitialized: function () {
-            return window.iziGetPayData && window.iziGetPayData && window.iziGetBrowserData && window.iziMobileLink;
+            return !!window.iziGetPayData && !!window.iziGetPayData && !!window.iziGetBrowserData && !!window.iziMobileLink;
         },
 
         iziCanBeBound: function (productId) {
@@ -80,14 +140,17 @@ define([
             })
                 .done(function (data) {
                     if (data.status && data.status === 'SUCCESS') {
+                        if (data.basket_id) {
+                            localStorage.setItem('basketId', data.basket_id);
+                        }
                         var $iziButtons = $("inpost-izi-button");
                         if (!$iziButtons.length) return;
 
-                        var event = new CustomEvent("izi-binding-complete", {detail: data});
-
                         $iziButtons.each(function () {
-                            this.dispatchEvent(event)
+                            $(this).attr('masked_phone_number', data.masked_phone_number)
                         });
+
+                        window.handleInpostIziButtons();
                     }
                 });
         },
@@ -95,9 +158,11 @@ define([
         iziGetPayData: function (prefix, phoneNumber, bindingPlace) {
             var url = urlBuilder.build('inpostizi/PayData/Get' + '/form_key/' + $.mage.cookies.get('form_key'));
             var browserData = window.iziGetBrowserData({base64: true});
+            var prefixValue = globalBindingCheckedFlag ? "" : prefix ? "+" + prefix : "";
+            var phoneNumberValue = globalBindingCheckedFlag ? "" : phoneNumber ? phoneNumber : "";
             var data = {
-                prefix: prefix && "+" + prefix || "",
-                number: phoneNumber || "",
+                prefix: prefixValue,
+                number: phoneNumberValue,
                 browser: browserData,
                 binding_place: bindingPlace
             };
@@ -111,20 +176,28 @@ define([
                     data: JSON.stringify(data)
                 })
                     .done(function (data) {
-                        if (Object.keys(data).length === 1 && data.basket_id) {
+                        if (!Object.keys(data).length) {
+                            reject({ message: new Error($.mage.__('Something went wrong, refresh the page and try again')) });
+                        } else if (Object.keys(data).length === 1 && data.basket_id) {
                             window.checkIsBinding();
+                            localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = true;
+                            globalOrderResetFlag = false;
                             resolve([]);
+                        } else if (data.action){
+                            reject({ message: data.errorMessage });
+                        } else {
+                            localStorage.setItem('basketId', data.basket_id);
+                            globalBindingCheckedFlag = false;
+                            resolve({
+                                qr_code: data.qr_code,
+                                deep_link: data.deep_link,
+                                deep_link_hms: data.deep_link_hms,
+                            })
                         }
-
-                        localStorage.setItem('basketId', data.basket_id);
-                        resolve({
-                            qr_code: data.qr_code,
-                            deep_link: data.deep_link,
-                            deep_link_hms: data.deep_link_hms,
-                        })
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -149,8 +222,8 @@ define([
                     .done(function (data) {
                         resolve(data)
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
+                    .fail(function () {
+                        reject(new Error($.mage.__('Network problem')));
                     });
             });
         },
@@ -163,7 +236,6 @@ define([
                     })
                     .catch(function(error) {
                         reject(error)
-                        console.error(error);
                     });
             });
 
@@ -171,84 +243,130 @@ define([
                 abortRequest(xhrForBasketConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    xhrForBasketConfirmation = $.ajax({
-                        url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
-                            + '/form_key/'
-                            + $.mage.cookies.get('form_key')
-                        ),
-                        method: 'GET',
-                    })
-                        .done(function (data) {
-                            if (data.status) {
-                                if (timeoutId) {
-                                    clearTimeout(timeoutId);
-                                    abortRequest(xhrForBasketConfirmation)
-                                }
-
-                                switch (data.status) {
-                                    case 'REJECT':
-                                        reject(new Error($.mage.__('Connection has been interrupted, please try again.')));
-                                        break;
-                                    case 'PENDING':
-                                        setTimerAndRunCallback(checkIsBound, resolve, reject);
-                                        break;
-                                    case 'SUCCESS':
-                                        localStorage.setItem('browser_id', data.browser.browser_id);
-                                        resolve(data)
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            } else {
-                                setTimerAndRunCallback(checkIsBound, resolve, reject);
-                            }
+                    if (document.hidden && !getConfig().isEnabledLongPollingForInactiveTab) {
+                        setTimerAndRunCallback(checkIsBound, resolve, reject);
+                    } else {
+                        xhrForBasketConfirmation = $.ajax({
+                            url: urlBuilder.build('inpostizi/BasketConfirmation/Get'
+                                + '/form_key/'
+                                + $.mage.cookies.get('form_key')
+                            ),
+                            method: 'GET',
                         })
-                        .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem: ') + error));
-                        });
+                            .done(function (data) {
+                                if (data.status) {
+                                    if (timeoutId) {
+                                        clearTimeout(timeoutId);
+                                        abortRequest(xhrForBasketConfirmation)
+                                    }
+
+                                    switch (data.status) {
+                                        case 'REJECT':
+                                            reject({ message: new Error($.mage.__('Connection has been interrupted, please try again.')) });
+                                            break;
+                                        case 'PENDING':
+                                            setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                            break;
+                                        case 'SUCCESS':
+                                            if (data.errorMessage){
+                                                reject({ message: data.errorMessage });
+                                            } else {
+                                                localStorage.setItem('browser_id', data.browser.browser_id);
+                                                delete data.basket_id;
+                                                resolve(data)
+                                            }
+
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else if (data.errorMessage){
+                                    reject({ message: data.errorMessage });
+                                } else {
+                                    setTimerAndRunCallback(checkIsBound, resolve, reject);
+                                }
+                            })
+                            .fail(function () {
+                                reject(new Error($.mage.__('Network problem')));
+                            });
+                    }
                 });
             }
         },
 
         iziGetOrderComplete: function () {
+            var basketId = localStorage.getItem('basketId');
+
+            if (!basketId) {
+                return Promise.resolve(new Error($.mage.__('Problem loading the cart, please refresh the page and try again')))
+            }
+
             return new Promise((resolve, reject) => {
                 checkOrderStatus()
                     .then((data) => {
-                        resolve(data)
+                        if (data) {
+                            resolve(data)
+                        }
                     })
                     .catch(function(error) {
                         reject(error)
-                        console.error(error);
                     });
             });
             function checkOrderStatus() {
                 abortRequest(xhrForOrderConfirmation)
 
                 return new Promise((resolve, reject) => {
-                    var basketId = localStorage.getItem('basketId');
-
-                    xhrForOrderConfirmation = $.ajax({
-                        url: urlBuilder.build('inpostizi/OrderComplete/Get'
-                            + '/?basketId='
-                            + basketId
-                        ),
-                        method: 'GET',
-                    })
-                        .done(function (data) {
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                                abortRequest(xhrForBasketConfirmation)
-                            }
-
-                            if (!data.action) {
-                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
-                            } else {
-                                resolve(data);
-                            }
+                    if (document.hidden && !getConfig().isEnabledLongPollingForInactiveTab) {
+                        setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                    } else if (globalOrderResetFlag) {
+                        resolve();
+                    } else {
+                        xhrForOrderConfirmation = $.ajax({
+                            url: urlBuilder.build('inpostizi/OrderComplete/Get'
+                                + '/?basketId='
+                                + basketId
+                            ),
+                            method: 'GET',
                         })
-                        .fail(function (error) {
-                            reject(new Error($.mage.__('Network problem: ') + error));
-                        });
+                            .done(function (data) {
+                                if (timeoutId) {
+                                    clearTimeout(timeoutId);
+                                    abortRequest(xhrForBasketConfirmation)
+                                }
+
+                                if (data.action) {
+                                    sessionStorage.removeItem('cart_version')
+                                    delete data.cart_version;
+                                    resolve(data);
+                                } else if (!data) {
+                                    setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                } else {
+                                    if (data.cart_version) {
+                                        var cartVersion = sessionStorage.getItem('cart_version');
+
+                                        if (cartVersion) {
+                                            if (data.cart_version === cartVersion) {
+                                                setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                            } else {
+                                                sessionStorage.setItem('cart_version', data.cart_version)
+                                                resolve({action: 'refresh'});
+                                            }
+                                        } else if (!cartVersion) {
+                                            sessionStorage.setItem('cart_version', data.cart_version)
+                                            setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                        } else {
+                                            setTimerAndRunCallback(checkOrderStatus, resolve, reject);
+                                        }
+                                    } else {
+                                        sessionStorage.removeItem('cart_version')
+                                        resolve({action: 'refresh'});
+                                    }
+                                }
+                            })
+                            .fail(function () {
+                                reject(new Error($.mage.__('Network problem')));
+                            });
+                    }
                 });
             }
         },
@@ -260,11 +378,14 @@ define([
                     method: 'GET',
                 })
                     .done(function () {
+                        sessionStorage.removeItem('cart_version');
+                        globalOrderResetFlag = true;
                         resolve()
                     })
-                    .fail(function (error) {
-                        reject(new Error($.mage.__('Network problem: ') + error));
-                    });
+                    .fail(function () {
+                        globalOrderResetFlag = true;
+                        reject(new Error($.mage.__('Network problem')));
+                    })
             });
         },
 
@@ -302,37 +423,64 @@ define([
             }
         },
 
-        bindEvents: function () {
-            checkCartWidget();
-            customerData.invalidate(['cart']);
-            customerData.reload(['cart'], true);
+        bindEvents: function (isCheckout) {
+            var firstFired = false;
 
-            customerData.get('cart').subscribe(function (cartData) {
-                checkCartWidget(cartData);
-                updateCounter(cartData.summary_count);
-            });
-
-            document.addEventListener('iziModalEventClose', function () {
-                abortRequest(xhrForBasketConfirmation)
+            document.addEventListener('iziModalEventOpen', function () {
+                $('.block-minicart').dropdownDialog('close');
             })
 
             window.addEventListener("inpost-update-count", function (e){
                 updateCounter(e.detail);
             });
 
-            function checkCartWidget(cartData = "") {
-                var wrapperClass = getConfig().wrapperClass || "inpay-widget-wrapper";
-                var popupBindingPlace = getConfig().popupBindingPlace || "BASKET_POPUP";
-                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
-                var counter = cartData ? cartData.summary_count : getConfig().count || 0;
-                var hasCartNotAllowedProducts = cartData ? cartData.items.some(function(item) {
-                    return NOT_ALLOWED_PRODUCT_TYPES.includes(item.product_type)
-                }) : false;
+            customerData.get('cart').subscribe(function (cartData) {
+                if (!firstFired) return;
 
-                if (hasCartNotAllowedProducts) {
-                    $inpayWrapperOnBasket.hide()
-                    return;
+                checkCartWidget(cartData);
+                updateCounter(cartData.summary_count);
+            });
+
+            checkCartWidget();
+            customerData.invalidate(['cart']);
+            customerData.reload(['cart']).done(function(cartData) {
+                firstFired = true;
+                checkCartWidget(cartData.cart);
+                updateCounter(cartData.cart.summary_count, true);
+
+                var config = window.getConfig();
+
+                if ((config.bindingPlace || isCheckout) && config.isEnabledMinicart) {
+                    if (config.maskedPhoneNumber) {
+                        var $iziButtons = $("inpost-izi-button");
+
+                        if ($iziButtons.length) {
+                            $iziButtons.each(function () {
+                                $(this).attr('masked_phone_number', config.maskedPhoneNumber)
+                            });
+                        }
+                    }
                 }
+
+                if (isCheckout) {
+                    //run handle inpost button in next tick after component template render
+                    setTimeout(() => {
+                        window.handleInpostIziButtons();
+                    }, 0)
+                } else {
+                    if (!config.bindingPlace) {
+                        window.checkIsBinding();
+                    }
+
+                    window.handleInpostIziButtons();
+                }
+            });
+
+            function checkCartWidget(cartData = "") {
+                var wrapperClass = window.getConfig().wrapperClass || "inpay-widget-wrapper";
+                var popupBindingPlace = window.getConfig().popupBindingPlace || "BASKET_POPUP";
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
+                var counter = cartData ? cartData.summary_count : window.getConfig().count || 0;
 
                 if ($inpayWrapperOnBasket.length) {
                     if (counter === 0) {
@@ -343,15 +491,21 @@ define([
                 }
             }
 
-            function updateCounter(count) {
+            function updateCounter(count, onlyAttribute = false) {
                 var $iziButtons = $("inpost-izi-button");
                 if (!$iziButtons.length) return;
 
-                var event = new CustomEvent("inpost-update-count", {detail: count});
+                if (onlyAttribute) {
+                    $iziButtons.each(function () {
+                        $(this).attr('count', count)
+                    });
+                } else {
+                    var event = new CustomEvent("inpost-update-count", {detail: count});
 
-                $iziButtons.each(function () {
-                    this.dispatchEvent(event)
-                });
+                    $iziButtons.each(function () {
+                        this.dispatchEvent(event)
+                    });
+                }
             }
         },
 
@@ -389,7 +543,10 @@ define([
             }
         },
 
-        setTimerAndRunCallback: function (callback, resolve, reject) {
+        setTimerAndRunCallback: function (callback, resolve, reject, time) {
+            var pollingTime = document.hidden && getConfig().isEnabledLongPollingForInactiveTab
+                ? getConfig().longPollingTimeForInactiveTab
+                : time || LONG_POLLING_TIME;
             timeoutId = setTimeout(function () {
                 callback()
                     .then((data) => {
@@ -397,9 +554,8 @@ define([
                     })
                     .catch(function(error) {
                         reject(error);
-                        console.error(error);
                     });
-            }, LONG_POLLING_TIME);
+            }, pollingTime);
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {

@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="inpost_pay_general" translate="label" type="text" sortOrder="10"
-           showInDefault="1" showInWebsite="1" showInStore="1">
+    <group id="inpost_pay_general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1">
         <label>General Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="active" translate="label" type="select" sortOrder="10"
@@ -44,6 +43,18 @@
             <label>Maximum Order Total</label>
             <validate>validate-number validate-zero-or-greater</validate>
             <config_path>payment/inpost_pay/max_order_total</config_path>
+        </field>
+        <field id="use_address_as_firstname_source" translate="label" type="select" sortOrder="80"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Use order address firstname and lastname instead of customer firstname and lastname</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/use_address_as_firstname_source</config_path>
+        </field>
+        <field id="image_role" translate="label" type="select" sortOrder="90"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Image role sended to InPost Pay</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ImageType</source_model>
+            <config_path>payment/inpost_pay/image_role</config_path>
         </field>
     </group>
 </include>

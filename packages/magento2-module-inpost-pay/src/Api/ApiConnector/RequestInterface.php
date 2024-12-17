@@ -21,7 +21,7 @@ interface RequestInterface
      */
     public function getApiUrl(): string;
 
-    public function getHeaders(): array;
+    public function getHeaders(bool $keepParamsIntact = false): array;
 
     public function getMethod(): string;
 

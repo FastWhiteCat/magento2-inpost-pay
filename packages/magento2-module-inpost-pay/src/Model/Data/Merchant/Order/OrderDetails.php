@@ -64,6 +64,25 @@ class OrderDetails extends DataObject implements OrderDetailsInterface, Extensib
     }
 
     /**
+     * @return float
+     */
+    public function getOrderDiscount(): float
+    {
+        $orderDiscount = $this->getData(self::ORDER_DISCOUNT);
+
+        return (is_scalar($orderDiscount)) ? (float)$orderDiscount : 0.00;
+    }
+
+    /**
+     * @param float $orderDiscount
+     * @return void
+     */
+    public function setOrderDiscount(float $orderDiscount): void
+    {
+        $this->setData(self::ORDER_DISCOUNT, $orderDiscount);
+    }
+
+    /**
      * @return string
      */
     public function getOrderComments(): string

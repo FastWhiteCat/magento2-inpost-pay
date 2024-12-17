@@ -1,0 +1,28 @@
+"InPost Restricted Products Cache","Pamięć systemowa produktów objętych restrykcjami dla InPost",module,InPost_Restrictions
+"Cached list of product IDs restricted for InPost Delivery and/or InPost Pay.","Przechowywana w pamięci systemowej lista ID produktów objętych restrykcjami dostaw InPost i/lub usługi InPost Pay.",module,InPost_Restrictions
+"InPost Restrictions Rules List","Lista Reguł Restrykcji InPost",module,InPost_Restrictions
+"Add New Rule","Dodaj Nową Regułę",module,InPost_Restrictions
+"Refresh All Rules","Odśwież Wszystkie Regułu",module,InPost_Restrictions
+"Is Enabled","Włączona",module,InPost_Restrictions
+"Applies To","Dotyczy",module,InPost_Restrictions
+"Name","Nazwa",module,InPost_Restrictions
+"Action","Operacje",module,InPost_Restrictions
+"Edit","Edytuj",module,InPost_Restrictions
+"Delete","Usuń",module,InPost_Restrictions
+"Edit Restriction Rule %1","Edytuj Regułę Restrykcji",module,InPost_Restrictions
+"General Restrictions Rule Configuration","Ogólna konfiguracja reguły restrykcji",module,InPost_Restrictions
+"Delete Rule","Usuń Regułę",module,InPost_Restrictions
+"Save Rule","Zapisz Regułę",module,InPost_Restrictions
+"Rule","Reguła",module,InPost_Restrictions
+"Product ID","ID Produktu",module,InPost_Restrictions
+"InPost Restrictions Rule Products List","Lista Produktów Reguł Restrykcji InPost",module,InPost_Restrictions
+"InPost Restrictions","Restrykcje InPost",module,InPost_Restrictions
+"Restriction Rules","Reguły Restrykcji",module,InPost_Restrictions
+"Restricted Products","Ograniczone Produkty",module,InPost_Restrictions
+"Restrictions Settings","Ustawienia Restrykcji",module,InPost_Restrictions
+"Enable Restrictions Refresh CRON","Uruchom Odświeżanie Restrykcji w CRON",module,InPost_Restrictions
+"Restrictions Refresh CRON Schedule","Harmonogram Odświeżania Restrykcji w CRON",module,InPost_Restrictions
+"When enabled CRON will perform restriction rules products list refreshing.","Jeśli to ustawienie jest włączone restrykcje produktowe będą automatycznie odświeżane przez CRON.",module,InPost_Restrictions
+"30 1,7,13,19 * * * for example causes this CRON to run every day, at 1:30 AM, 7:30 AM, 1:30 PM and 7:30 PM","30 1,7,13,19 * * * dla przykładu sprawi, że CRON uruchomi proces codziennie o 1:30, 7:30, 13:30 oraz 19:30",module,InPost_Restrictions
+"Could not refresh restricted products. Reason: %1","Nie udało się odświeżyć reguł restrykcji produktów. Przyczyna: %1",module,InPost_Restrictions
+"You have refreshed the InPost Restriction Rules.","Reguły Restrykcji InPost Pay zostały odświeżone.",module,InPost_Restrictions

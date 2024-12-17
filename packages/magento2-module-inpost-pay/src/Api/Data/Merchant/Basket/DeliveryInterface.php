@@ -60,9 +60,9 @@ interface DeliveryInterface
     public function setDeliveryPrice(PriceInterface $deliveryPrice): void;
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getFreeDeliveryMinimumGrossPrice(): float;
+    public function getFreeDeliveryMinimumGrossPrice(): ?float;
 
     /**
      * @param float $freeDeliveryMinimumGrossPrice

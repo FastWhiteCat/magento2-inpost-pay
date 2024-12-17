@@ -8,6 +8,8 @@ interface PromoCodeInterface
 {
     public const NAME = 'name';
     public const PROMO_CODE_VALUE = 'promo_code_value';
+    public const REGULATION_TYPE = 'regulation_type';
+    public const REGULATION_TYPE_OMNIBUS = 'OMNIBUS';
 
     /**
      * @return string
@@ -30,4 +32,15 @@ interface PromoCodeInterface
      * @return void
      */
     public function setPromoCodeValue(string $promoCodeValue): void;
+
+    /**
+     * @return string|null
+     */
+    public function getRegulationType(): ?string;
+
+    /**
+     * @param string|null $regulationType
+     * @return void
+     */
+    public function setRegulationType(?string $regulationType): void;
 }
