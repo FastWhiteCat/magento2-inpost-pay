@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Order;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -19,6 +20,7 @@ class PlaceOrderEventObserver implements ObserverInterface
 
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -44,6 +46,7 @@ class PlaceOrderEventObserver implements ObserverInterface
                     && $inPostPayQuoteId = $inPostPayQuote->getInPostPayQuoteId()
                 ) {
                     $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
+                    $this->basketBindingApiKeyCookieService->deleteBasketBindingKeyCookie();
                 }
             } catch (LocalizedException $e) {
                 $errorMsg = 'Deleting order binding with InPost Pay was not successful.';
