@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Product\Attribute;
 
+use InPost\InPostPay\Provider\Config\OmnibusConfigProvider;
 use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Catalog\Model\ResourceModel\ProductFactory;
 use Magento\Eav\Model\Entity\Attribute;
@@ -16,6 +17,7 @@ class InPostPayProductAttributesProvider
 
     public function __construct(
         private readonly EavAttributeCollectionFactory $eavAttributeCollectionFactory,
+        private readonly OmnibusConfigProvider $omnibusConfigProvider,
         private readonly ProductFactory $productFactory
     ) {
     }
@@ -39,6 +41,17 @@ class InPostPayProductAttributesProvider
                 if ($attribute instanceof Attribute) {
                     $visibleOnFrontAttributes[] = $attribute->getAttributeCode();
                 }
+            }
+
+            $customPromoPriceAttribute = $this->omnibusConfigProvider->getCustomProductPromoPriceAttributeCode();
+            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode();
+
+            if ($customPromoPriceAttribute) {
+                $visibleOnFrontAttributes[] = $customPromoPriceAttribute;
+            }
+
+            if ($lowestPriceAttributeCode) {
+                $visibleOnFrontAttributes[] = $lowestPriceAttributeCode;
             }
 
             $this->inPostPayProductAttributes = array_unique($visibleOnFrontAttributes);
