@@ -190,15 +190,17 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        if (!data || !data.basket_binding_api_key) {
-                            reject();
-                        } else {
+                        if (data && data.success && data.basket_binding_api_key) {
                             self.basketBindingApiKey = data.basket_binding_api_key;
                             resolve(data.basket_binding_api_key)
+                        } else if (data.error) {
+                            reject(data.error)
+                        } else {
+                            reject(new Error('Something went wrong, refresh the page and try again'))
                         }
                     })
                     .fail(function () {
-                        reject();
+                        reject(new Error('Something went wrong, refresh the page and try again'));
                     });
             })
         },
@@ -275,15 +277,17 @@ define([
                                 method: 'GET',
                             })
                                 .done(function (data) {
-                                    if (!data || !data.basket_binding_api_key) {
-                                        resolve(undefined)
-                                    } else {
+                                    if (data && data.success && data.basket_binding_api_key) {
                                         self.basketBindingApiKey = data.basket_binding_api_key;
                                         resolve(data.basket_binding_api_key)
+                                    } else if (data.error) {
+                                        reject(data.error)
+                                    } else {
+                                        reject(new Error('Something went wrong, refresh the page and try again'))
                                     }
                                 })
                                 .fail(function () {
-                                    reject();
+                                    reject(new Error('Something went wrong, refresh the page and try again'));
                                 });
                         },
                         error: function () {
