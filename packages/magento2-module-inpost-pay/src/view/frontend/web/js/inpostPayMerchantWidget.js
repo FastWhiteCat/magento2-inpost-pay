@@ -30,6 +30,7 @@ define([
     };
 
     var CHECKOUT_BINDING_PLACE = 'CHECKOUT_PAGE'
+    var MINICART_BINDING_PLACE = 'BASKET_POPUP'
 
     return Component.extend({
         /**
@@ -54,7 +55,7 @@ define([
             this.checkIfProductIsAdded = this.checkIfProductIsAdded.bind(this);
             this.sectionData = customerData.get("cart")
 
-            if (!this.sectionData.hasOwnProperty('summary_count')) {
+            if (!this.sectionData().hasOwnProperty('summary_count')) {
                 customerData.reload(['cart'])
             }
 
@@ -114,10 +115,35 @@ define([
             });
 
             var widget = InPostPayWidget.init(widgetOptions);
+
+            this.bindEvents();
         },
 
         getConfiguration: function() {
             return this.checkoutConfiguration;
+        },
+
+        bindEvents: function() {
+            customerData.get('cart').subscribe(function (cartData) {
+                checkCartWidget(cartData);
+            });
+
+            checkCartWidget(this.sectionData());
+
+            function checkCartWidget(cartData = "") {
+                var wrapperClass = "inpay-widget-wrapper";
+                var popupBindingPlace = MINICART_BINDING_PLACE;
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
+                var counter = cartData ? cartData.summary_count : 0;
+
+                if ($inpayWrapperOnBasket.length) {
+                    if (counter === 0) {
+                        $inpayWrapperOnBasket.hide()
+                    } else {
+                        $inpayWrapperOnBasket.show()
+                    }
+                }
+            }
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
