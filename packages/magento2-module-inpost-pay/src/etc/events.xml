@@ -11,6 +11,12 @@
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
     </event>
+    <event name="customer_logout">
+        <observer name="InPost_InPostPay::deleteBasketBidingApiCookieAfterCustomerLogout" instance="InPost\InPostPay\Observer\Customer\DeleteBasketBidingApiCookieAfterCustomerLogout" />
+    </event>
+    <event name="customer_login">
+        <observer name="InPost_InPostPay::createOrUpdateBasketBidingApiCookieAfterCustomerLogin" instance="InPost\InPostPay\Observer\Customer\CreateOrUpdateBasketBidingApiCookieAfterCustomerLogin" />
+    </event>
     <event name="sales_order_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>

@@ -7,6 +7,7 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Controller\WidgetController;
 use InPost\InPostPay\Provider\Config\SuccessPageUrlConfigProvider;
+use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -17,6 +18,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Get extends WidgetController implements HttpGetActionInterface
 {
     public const REDIRECT_RESULT_KEY = 'redirect';
@@ -30,6 +34,7 @@ class Get extends WidgetController implements HttpGetActionInterface
      * @param OrderRepositoryInterface $orderRepository
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param SuccessPageUrlConfigProvider $successPageUrlConfigProvider
+     * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
      */
     public function __construct(
         Context $context,
@@ -39,7 +44,8 @@ class Get extends WidgetController implements HttpGetActionInterface
         LoggerInterface $logger,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly SuccessPageUrlConfigProvider $successPageUrlConfigProvider
+        private readonly SuccessPageUrlConfigProvider $successPageUrlConfigProvider,
+        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
     ) {
         parent::__construct($context, $checkoutSession, $formKeyValidator, $jsonFactory, $logger);
     }
@@ -59,6 +65,7 @@ class Get extends WidgetController implements HttpGetActionInterface
                 $this->checkoutSession->setLastOrderId($order->getEntityId());
                 $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
                 $this->checkoutSession->setLastOrderStatus($order->getStatus());
+                $this->basketBindingApiKeyCookieService->deleteBasketBindingKeyCookie();
 
                 $result = [
                     self::SUCCESS_RESULT_KEY => true,
