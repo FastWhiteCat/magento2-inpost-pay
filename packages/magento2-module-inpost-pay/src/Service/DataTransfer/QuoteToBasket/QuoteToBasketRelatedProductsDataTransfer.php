@@ -86,7 +86,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         if ($linkedProductIds) {
             /** @var ProductCollection $productsCollection */
             $productsCollection = $this->productCollectionFactory->create();
-            $productsCollection->addAttributeToSelect($this->prepareProductAttributesList())
+            $productsCollection->addAttributeToSelect($this->prepareProductAttributesList($storeId))
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
                 ->addAttributeToFilter(ProductInterface::TYPE_ID, ['eq' => Type::TYPE_SIMPLE])
@@ -136,12 +136,12 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         return $linkedProductIds;
     }
 
-    private function prepareProductAttributesList(): array
+    private function prepareProductAttributesList(int $storeId): array
     {
         return array_unique(
             array_merge(
                 $this->catalogConfig->getProductAttributes(),
-                $this->inPostPayProductAttributesProvider->getProductAttributeCodes()
+                $this->inPostPayProductAttributesProvider->getProductAttributeCodes($storeId)
             )
         );
     }

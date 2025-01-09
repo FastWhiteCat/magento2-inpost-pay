@@ -32,17 +32,19 @@ class IziApiConfigProvider
     /**
      * Returns production or sandbox Izi API URL
      *
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getIziApiUrl(): string
+    public function getIziApiUrl(?int $storeId = null): string
     {
         $iziApiUrl = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_IZI_API_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($iziApiUrl) || !is_scalar($iziApiUrl)) {

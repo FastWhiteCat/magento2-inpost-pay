@@ -39,10 +39,11 @@ class ApplyCustomPromoPriceForCustomerGroupPlugin
         Quote $quote,
         BasketInterface $basket
     ): void {
+        $storeId = $quote->getStoreId();
         $customPromoPriceAttribute = $this->configProvider->getCustomProductPromoPriceAttributeCode();
-        $customerGroups = $this->configProvider->getCustomProductPromoPriceCustomerGroups();
+        $customerGroups = $this->configProvider->getCustomProductPromoPriceCustomerGroups($storeId);
 
-        if (!$this->configProvider->isCustomPromoPriceForSpecificCustomerGroupEnabled()
+        if (!$this->configProvider->isCustomPromoPriceForSpecificCustomerGroupEnabled($storeId)
             || $customPromoPriceAttribute === null
             || !in_array($quote->getCustomerGroupId(), $customerGroups)
         ) {

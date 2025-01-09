@@ -74,7 +74,7 @@ class OmnibusProductLowestPriceProvider
      */
     public function getLowestPrice(Product $product): ?PriceInterface
     {
-        $lowestPriceAttributeCode = $this->getOmnibusLowestPriceProductAttributeCode();
+        $lowestPriceAttributeCode = $this->getOmnibusLowestPriceProductAttributeCode($product->getStoreId());
 
         if ($lowestPriceAttributeCode === null) {
             return null;
@@ -141,12 +141,15 @@ class OmnibusProductLowestPriceProvider
     }
 
     /**
+     * @param int $storeId
      * @return string|null
      */
-    private function getOmnibusLowestPriceProductAttributeCode(): ?string
+    private function getOmnibusLowestPriceProductAttributeCode(int $storeId): ?string
     {
         if ($this->omnibusLowestPriceAttributeCode === null) {
-            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode();
+            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode(
+                $storeId
+            );
 
             if ($lowestPriceAttributeCode) {
                 $this->omnibusLowestPriceAttributeCode = $lowestPriceAttributeCode;
