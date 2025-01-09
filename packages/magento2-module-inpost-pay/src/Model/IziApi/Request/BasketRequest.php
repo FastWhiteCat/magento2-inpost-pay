@@ -21,6 +21,8 @@ class BasketRequest extends Request implements RequestInterface
 
     protected string $uri = '/v2/izi/basket/{basket_id}';
 
+    private ?int $storeId = null;
+
     /**
      * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TokenGenerator $tokenGenerator
@@ -51,13 +53,34 @@ class BasketRequest extends Request implements RequestInterface
 
     public function getApiUrl(): string
     {
-        return $this->iziApiConfigProvider->getIziApiUrl();
+        $storeId = null;
+        $isAsync = $this->iziApiConfigProvider->isAsyncBasketExportEnabled();
+
+        if ($isAsync) {
+            $storeId = $this->storeId ?? 0;
+        }
+
+        return $this->iziApiConfigProvider->getIziApiUrl($storeId);
     }
 
     public function getBearerToken(): ?string
     {
+        $storeId = null;
         $isAsync = $this->iziApiConfigProvider->isAsyncBasketExportEnabled();
 
-        return $this->tokenGenerator->generate($isAsync)->getAccessToken();
+        if ($isAsync) {
+            $storeId = $this->storeId ?? 0;
+        }
+
+        return $this->tokenGenerator->generate($isAsync, $storeId)->getAccessToken();
+    }
+
+    /**
+     * @param int $storeId
+     * @return void
+     */
+    public function setStoreId(int $storeId): void
+    {
+        $this->storeId = $storeId;
     }
 }

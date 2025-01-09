@@ -50,6 +50,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
+        $storeId = $quote->getStoreId();
+
         if ($quote->isVirtual()) {
             $this->logger->error('Quote is virtual. Setting empty delivery.');
             $basket->setDelivery([]);
@@ -81,7 +83,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $shippingMethods = $this->getShippingMethodsForQuote($quote);
-        $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods);
+        $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
 
         if (empty($deliveries)) {
             $this->createBasketNotice->execute(
@@ -118,16 +120,18 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 
     /**
      * @param ShippingMethodInterface[] $quoteAvailableShippingMethods
+     * @param int $storeId
      * @return array
      */
-    private function prepareMappedShippingMethodsData(array $quoteAvailableShippingMethods): array
+    private function prepareMappedShippingMethodsData(array $quoteAvailableShippingMethods, int $storeId): array
     {
         $deliveryData = [];
         foreach ($this->shipmentMappingConfigProvider->getAllDeliveryTypes() as $deliveryType) {
             $shippingMethod = $this->getDeliveryByTypeAndOption(
                 $quoteAvailableShippingMethods,
                 $deliveryType,
-                ShipmentMappingConfigProvider::OPTION_STANDARD
+                ShipmentMappingConfigProvider::OPTION_STANDARD,
+                $storeId
             );
             if ($shippingMethod === null) {
                 continue;
@@ -143,7 +147,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             $deliverPrice->setVat(DecimalCalculator::sub($deliverPrice->getGross(), $deliverPrice->getNet()));
             $delivery->setDeliveryPrice($deliverPrice);
 
-            $freeShippingLimit = $this->getFreeShippingLimit($shippingMethod);
+            $freeShippingLimit = $this->getFreeShippingLimit($shippingMethod, $storeId);
             if ($freeShippingLimit) {
                 $delivery->setFreeDeliveryMinimumGrossPrice($freeShippingLimit);
             }
@@ -153,7 +157,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
                 $optionShippingMethod = $this->getDeliveryByTypeAndOption(
                     $quoteAvailableShippingMethods,
                     $deliveryType,
-                    $optionCode
+                    $optionCode,
+                    $storeId
                 );
 
                 if ($optionShippingMethod === null) {
@@ -202,12 +207,14 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     private function getDeliveryByTypeAndOption(
         array $quoteAvailableShippingMethods,
         string $deliveryType,
-        string $option
+        string $option,
+        int $storeId
     ): ?ShippingMethodInterface {
         try {
             $mappedMethodCode = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
                 $deliveryType,
-                $option
+                $option,
+                $storeId
             );
             foreach ($quoteAvailableShippingMethods as $shippingMethod) {
                 $allowedMethodCode = sprintf(
@@ -227,13 +234,13 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         return $mappedShippingMethod ?? null;
     }
 
-    private function getFreeShippingLimit(ShippingMethodInterface $pickupPointShippingMethod): ?float
+    private function getFreeShippingLimit(ShippingMethodInterface $pickupPointShippingMethod, int $storeId): ?float
     {
         $limit = null;
         $method = (string)$pickupPointShippingMethod->getMethodCode();
         $code = (string)$pickupPointShippingMethod->getCarrierCode();
-        if ($this->shipmentMappingConfigProvider->isFreeShippingEnabledForCarrier($code, $method)) {
-            $limit = $this->shipmentMappingConfigProvider->getFreeShippingSubtotalForCarrier($code, $method);
+        if ($this->shipmentMappingConfigProvider->isFreeShippingEnabledForCarrier($code, $method, $storeId)) {
+            $limit = $this->shipmentMappingConfigProvider->getFreeShippingSubtotalForCarrier($code, $method, $storeId);
         }
 
         return $limit;

@@ -23,9 +23,10 @@ class InPostPayProductAttributesProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return string[]
      */
-    public function getProductAttributeCodes(): array
+    public function getProductAttributeCodes(?int $storeId = null): array
     {
         if ($this->inPostPayProductAttributes === null) {
             /** @var EavAttributeCollection $collection */
@@ -43,8 +44,12 @@ class InPostPayProductAttributesProvider
                 }
             }
 
-            $customPromoPriceAttribute = $this->omnibusConfigProvider->getCustomProductPromoPriceAttributeCode();
-            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode();
+            $customPromoPriceAttribute = $this->omnibusConfigProvider->getCustomProductPromoPriceAttributeCode(
+                $storeId
+            );
+            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode(
+                $storeId
+            );
 
             if ($customPromoPriceAttribute) {
                 $visibleOnFrontAttributes[] = $customPromoPriceAttribute;
