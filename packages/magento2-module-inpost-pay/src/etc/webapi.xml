@@ -55,4 +55,10 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
+    <route url="/V1/izi/inpostpaylogs/:logDate" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface" method="execute"/>
+        <resources>
+            <resource ref="InPost_InPostPay::logs"/>
+        </resources>
+    </route>
 </routes>

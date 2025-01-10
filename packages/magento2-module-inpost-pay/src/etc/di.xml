@@ -119,6 +119,10 @@
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
     <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\InPostPayLogsByDate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Logs\InPostPayLogInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Logs\InPostPayLog"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface"
                 type="InPost\InPostPay\Model\InPostPayBestsellerProduct"/>
     <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
@@ -161,28 +165,8 @@
         <plugin name="InPost_InPostPay::swaggerAllowAclResourcePlugin"
                 type="InPost\InPostPay\Plugin\Swagger\SwaggerAllowAclResourcePlugin" />
     </type>
-    <type name="InPost\InPostPay\Controller\BasketBinding\Delete">
-        <plugin name="InPost_InPostPay::basketBindingDeleteIsEnablePlugin"
-                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
-    </type>
-    <type name="InPost\InPostPay\Controller\BasketConfirmation\Get">
-        <plugin name="InPost_InPostPay::basketConfirmationIsEnablePlugin"
-                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
-    </type>
-    <type name="InPost\InPostPay\Controller\BrowserBinding\Delete">
-        <plugin name="InPost_InPostPay::browserBindingIsEnablePlugin"
-                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
-    </type>
-    <type name="InPost\InPostPay\Controller\MobileLink\Get">
-        <plugin name="InPost_InPostPay::mobileLinkIsEnablePlugin"
-                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
-    </type>
     <type name="InPost\InPostPay\Controller\OrderComplete\Get">
         <plugin name="InPost_InPostPay::orderCompleteIsEnablePlugin"
-                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
-    </type>
-    <type name="InPost\InPostPay\Controller\PayData\Get">
-        <plugin name="InPost_InPostPay::payDataIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
     </type>
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface">
@@ -233,7 +217,7 @@
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
-            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="infoBlockType" xsi:type="string">InPost\InPostPay\Block\Payment\Info</argument>
             <argument name="valueHandlerPool" xsi:type="object">InPostPayPaymentValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">InPostPayPaymentCommandPool</argument>
         </arguments>
@@ -332,6 +316,23 @@
                 <item name="save_pickup_point" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SavePickupPointStep</item>
                 <item name="save_delivery_options" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveDeliveryOptionsStep</item>
                 <item name="save_accepted_consents" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveAcceptedConsentsStep</item>
+                <item name="update_payment_title" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdatePaymentTitleStep</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Config\Payment\TitleMapper">
+        <arguments>
+            <argument name="mappings" xsi:type="array">
+                <item name="CARD" xsi:type="string">Card (InPost Pay)</item>
+                <item name="CARD_TOKEN" xsi:type="string">Card (InPost Pay)</item>
+                <item name="APPLE_PAY" xsi:type="string">Apple Pay (InPost Pay)</item>
+                <item name="BLIK_CODE" xsi:type="string">BLIK (InPost Pay)</item>
+                <item name="BLIK_TOKEN" xsi:type="string">BLIK (InPost Pay)</item>
+                <item name="PAY_BY_LINK" xsi:type="string">Pay by Link (InPost Pay)</item>
+                <item name="SHOPPING_LIMIT" xsi:type="string">Shopping Limit (InPost Pay)</item>
+                <item name="DEFERRED_PAYMENT" xsi:type="string">Deferred Payment (InPost Pay)</item>
+                <item name="GOOGLE_PAY" xsi:type="string">Google Pay (InPost Pay)</item>
+                <item name="CASH_ON_DELIVERY" xsi:type="string">Cash on delivery (InPost Pay)</item>
             </argument>
         </arguments>
     </type>
@@ -353,6 +354,16 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="InPost\Restrictions\Service\RefreshRestrictionRulesService">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\Restrictions\Cron\RefreshRestrictionRulesCron">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Connector">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -369,6 +380,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\InPostPayLogsByDate">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -503,26 +519,6 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Controller\MobileLink\Get">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
-    <type name="InPost\InPostPay\Controller\PayData\Get">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
-    <type name="InPost\InPostPay\Controller\BasketConfirmation\Get">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
-    <type name="InPost\InPostPay\Controller\BrowserBinding\Delete">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
     <type name="InPost\InPostPay\Controller\OrderComplete\Get">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -573,7 +569,7 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\PayDataProcessor">
+    <type name="InPost\InPostPay\Service\InitBasketProcessor">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -674,6 +670,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Cron\Bestsellers\SynchronizeBestsellers">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Config\Payment\TitleUpdater">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

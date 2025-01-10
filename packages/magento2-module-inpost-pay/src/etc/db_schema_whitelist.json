@@ -3,19 +3,18 @@
         "column": {
             "inpost_pay_order_id": true,
             "order_id": true,
-            "locker_id": true,
-            "created_at": true,
-            "updated_at": true,
-            "order_status": true,
-            "prefix": true,
-            "phone_number": true,
             "basket_id": true,
+            "basket_binding_api_key": true,
             "payment_type": true,
+            "locker_id": true,
+            "order_status": true,
             "country_prefix": true,
             "phone": true,
             "courier_note": true,
             "delivery_options": true,
-            "accepted_consents": true
+            "accepted_consents": true,
+            "created_at": true,
+            "updated_at": true
         },
         "constraint": {
             "PRIMARY": true,
@@ -28,28 +27,28 @@
             "inpost_pay_quote_id": true,
             "quote_id": true,
             "basket_id": true,
+            "basket_binding_api_key": true,
             "inpost_basket_id": true,
             "status": true,
-            "phone_number": true,
+            "phone": true,
+            "country_prefix": true,
             "masked_phone_number": true,
             "browser_trusted": true,
             "browser_id": true,
             "name": true,
             "surname": true,
+            "cart_version": true,
             "created_at": true,
-            "updated_at": true,
-            "phone": true,
-            "country_prefix": true,
-            "cart_version": true
+            "updated_at": true
+        },
+        "index": {
+            "INPOST_PAY_QUOTE_INPOST_BASKET_ID": true,
+            "INPOST_PAY_QUOTE_BASKET_ID": true
         },
         "constraint": {
             "PRIMARY": true,
             "INPOST_PAY_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
             "INPOST_PAY_QUOTE_QUOTE_ID": true
-        },
-        "index": {
-            "INPOST_PAY_QUOTE_INPOST_BASKET_ID": true,
-            "INPOST_PAY_QUOTE_BASKET_ID": true
         }
     },
     "inpost_pay_checkout_agreement_version": {

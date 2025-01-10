@@ -16,12 +16,7 @@
                 <value id="inpostpay" type="host">*.inpost.pl</value>
             </values>
         </policy>
-        <policy id="media-src">
-            <values>
-                <value id="inpostpay" type="host">*.inpost.pl</value>
-            </values>
-        </policy>
-        <policy id="img-src">
+        <policy id="font-src">
             <values>
                 <value id="inpostpay" type="host">*.inpost.pl</value>
             </values>
@@ -31,12 +26,12 @@
                 <value id="inpostpay" type="host">*.inpost.pl</value>
             </values>
         </policy>
-        <policy id="font-src">
+        <policy id="frame-src">
             <values>
                 <value id="inpostpay" type="host">*.inpost.pl</value>
             </values>
         </policy>
-        <policy id="frame-src">
+        <policy id="media-src">
             <values>
                 <value id="inpostpay" type="host">*.inpost.pl</value>
             </values>

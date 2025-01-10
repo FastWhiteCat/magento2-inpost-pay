@@ -31,37 +31,9 @@ class BillingInformationValidator implements OrderValidatorInterface
             $this->validateInvoiceDetails($inPostOrder->getInvoiceDetails());
         } else {
             $accountInfo = $inPostOrder->getAccountInfo();
-            $this->validateName($accountInfo, $inPostPayQuote);
-            $this->validateSurname($accountInfo, $inPostPayQuote);
             $this->validatePhoneNumber($accountInfo->getPhoneNumber(), $inPostPayQuote);
             $this->validateMail($accountInfo->getMail());
             $this->validateBillingAddress($accountInfo->getClientAddress());
-        }
-    }
-
-    /**
-     * @param AccountInfoInterface $accountInfo
-     * @param InPostPayQuoteInterface $inPostPayQuote
-     * @return void
-     * @throws LocalizedException
-     */
-    private function validateName(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
-    {
-        if ($inPostPayQuote->getName() && $accountInfo->getName() !== $inPostPayQuote->getName()) {
-            throw new LocalizedException(__('Invalid name.'));
-        }
-    }
-
-    /**
-     * @param AccountInfoInterface $accountInfo
-     * @param InPostPayQuoteInterface $inPostPayQuote
-     * @return void
-     * @throws LocalizedException
-     */
-    private function validateSurname(AccountInfoInterface $accountInfo, InPostPayQuoteInterface $inPostPayQuote): void
-    {
-        if ($inPostPayQuote->getSurname() && $accountInfo->getSurname() !== $inPostPayQuote->getSurname()) {
-            throw new LocalizedException(__('Invalid surname.'));
         }
     }
 
