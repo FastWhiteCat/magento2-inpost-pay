@@ -2,13 +2,12 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Customer/js/customer-data',
-    'Magento_Customer/js/model/customer',
     'Magento_Checkout/js/model/step-navigator',
     'mage/url',
     'underscore',
     'ko',
     'mage/validation',
-], function (Component, $, customerData, customer, stepNavigator, urlBuilder, _, ko) {
+], function (Component, $, customerData, stepNavigator, urlBuilder, _, ko) {
     'use strict';
 
     var LONG_POLLING_TIME = 10000;
@@ -39,7 +38,7 @@ define([
                 stepNavigator.steps.subscribe(function (steps) {
                     var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
                     var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
-                    self.isVisible(!customer.isLoggedIn() && self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
+                    self.isVisible(self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
                 })
             }
 

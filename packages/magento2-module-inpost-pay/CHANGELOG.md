@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2024-12-17
+
+### Fixed
+
+- Bundle Products will no longer throw not found exception when gathering product image URL data.
+
+## [1.0.11] - 2024-12-05
+
+### Fixed
+
+- Widget will now be displayed if configured in Checkout for logged in customers.
+
+## [1.0.10] - 2024-12-05
+
+### Fixed
+
+- InPost Pay Terms And Conditions Cache will now keep configured values for each store separately instead of one single cached record.
+- InPost Pay Public Key for API requests Signature validation Cache will now keep Public Key versions for each store separately instead of one single cached record.
+
 ## [1.0.9] - 2024-09-26
 
 ### Added
