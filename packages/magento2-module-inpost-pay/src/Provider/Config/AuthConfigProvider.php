@@ -41,7 +41,7 @@ class AuthConfigProvider
                 self::XML_PATH_CLIENT_ID,
                 $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
 
@@ -66,7 +66,7 @@ class AuthConfigProvider
                 self::XML_PATH_CLIENT_SECRET,
                 $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
 
@@ -109,7 +109,8 @@ class AuthConfigProvider
                 self::XML_PATH_AUTH_TOKEN_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($authTokenUrl) || !is_scalar($authTokenUrl)) {

@@ -150,7 +150,7 @@ class ProductToInPostProductDataTransfer
         $storeId = (int)$product->getStoreId();
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
-        $imageRole = $this->generalConfigProvider->getImageRole();
+        $imageRole = $this->generalConfigProvider->getImageRole($product->getStoreId());
         $productImageRole = $product->getData($imageRole);
         $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
 
