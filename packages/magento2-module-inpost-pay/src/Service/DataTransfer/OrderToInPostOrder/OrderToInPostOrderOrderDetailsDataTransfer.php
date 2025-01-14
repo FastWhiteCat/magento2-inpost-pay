@@ -30,6 +30,7 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
     {
         $orderDetails = $inPostOrder->getOrderDetails();
         $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
+        $storeId = (is_scalar($order->getStoreId())) ? (int)$order->getStoreId() : null;
         $inPostPayOrderEntity = $this->getInPostPayOrderByOrderId($orderId);
 
         $orderDetails->setOrderId((string)$order->getIncrementId());
@@ -55,7 +56,7 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
         );
         $orderDetails->setOrderComments((string)$order->getCustomerNote());
         $orderDetails->setOrderMerchantStatusDescription($order->getStatusLabel());
-        $orderDetails->setPosId($this->authConfigProvider->getPosId());
+        $orderDetails->setPosId($this->authConfigProvider->getPosId($storeId));
 
         $inPostOrder->setOrderDetails($orderDetails);
     }

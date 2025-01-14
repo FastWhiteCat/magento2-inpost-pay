@@ -11,16 +11,13 @@ use Magento\Framework\Exception\NoSuchEntityException;
 class CustomProductPromoPriceProvider extends OmnibusProductLowestPriceProvider
 {
     /**
-     * @param string $sku
+     * @param Product $product
      * @param string $customPromoPriceAttributeCode
      * @return PriceInterface|null
      * @throws NoSuchEntityException
      */
-    public function getCustomPromoPrice(string $sku, string $customPromoPriceAttributeCode): ?PriceInterface
+    public function getCustomPromoPrice(Product $product, string $customPromoPriceAttributeCode): ?PriceInterface
     {
-        /** @var Product $product */
-        $product = $this->productRepository->get($sku);
-
         $customPromoPriceAttribute = $product->getCustomAttribute($customPromoPriceAttributeCode);
         $customPromoPriceValue = $customPromoPriceAttribute?->getValue() ?? null;
 

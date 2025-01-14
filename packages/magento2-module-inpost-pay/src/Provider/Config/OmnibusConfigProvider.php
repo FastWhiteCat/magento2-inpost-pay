@@ -24,13 +24,15 @@ class OmnibusConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return int[]
      */
-    public function getOmnibusCartPriceRuleIds(): array
+    public function getOmnibusCartPriceRuleIds(?int $storeId = null): array
     {
         $configValue = $this->scopeConfig->getValue(
             self::XML_PATH_OMNIBUS_SALESRULES,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         $ruleIdsCombined = explode(',', is_scalar($configValue) ? (string)$configValue : '');
@@ -44,13 +46,15 @@ class OmnibusConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return string|null
      */
-    public function getOmnibusProductLowestPriceAttributeCode(): ?string
+    public function getOmnibusProductLowestPriceAttributeCode(?int $storeId = null): ?string
     {
         $configValue = $this->scopeConfig->getValue(
             self::XML_PATH_OMNIBUS_LOWEST_PRICE_ATTR,
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($configValue)
@@ -66,24 +70,28 @@ class OmnibusConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return bool
      */
-    public function isCustomPromoPriceForSpecificCustomerGroupEnabled(): bool
+    public function isCustomPromoPriceForSpecificCustomerGroupEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(
             sprintf('payment/inpost_pay/%s', self::ENABLE_CUSTOM_PROMO_PRICE),
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 
     /**
+     * @param int|null $storeId
      * @return string|null
      */
-    public function getCustomProductPromoPriceAttributeCode(): ?string
+    public function getCustomProductPromoPriceAttributeCode(?int $storeId = null): ?string
     {
         $configValue = $this->scopeConfig->getValue(
             sprintf('payment/inpost_pay/%s', self::CUSTOM_PROMO_PRICE_ATTRIBUTE),
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($configValue)
@@ -99,13 +107,15 @@ class OmnibusConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return array
      */
-    public function getCustomProductPromoPriceCustomerGroups(): array
+    public function getCustomProductPromoPriceCustomerGroups(?int $storeId = null): array
     {
         $configValue = $this->scopeConfig->getValue(
             sprintf('payment/inpost_pay/%s', self::CUSTOM_PROMO_PRICE_CUSTOMER_GROUPS),
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         $customerGroups = [];

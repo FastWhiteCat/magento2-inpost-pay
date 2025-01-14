@@ -65,11 +65,12 @@ class GeneralConfigProvider
         return $this->scopeConfig->isSetFlag(self::XML_PATH_ORDER_ADDRESS_SOURCE_FLAG, ScopeInterface::SCOPE_WEBSITE);
     }
 
-    public function getImageRole(): string
+    public function getImageRole(?int $storeId = null): string
     {
         $orderStatus = $this->scopeConfig->getValue(
             self::XML_PATH_INPOST_PAY_IMAGE_ROLE,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         return is_scalar($orderStatus) ? (string)$orderStatus : 'small_image';
