@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct;
 
-use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity;
 use InPost\InPostPay\Model\Utils\StringUtils;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
-use InPost\InPostPay\Provider\Product\AdditionalImagesProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
@@ -47,7 +44,6 @@ class ProductToInPostProductDataTransfer
 {
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
-    public const MAX_ADDITIONAL_IMAGES_COUNT = 10;
 
     public const UNMANAGED_STOCK_QUANTITY = 9999;
 
@@ -75,12 +71,11 @@ class ProductToInPostProductDataTransfer
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper,
+        private readonly AdditionalProductImagesDataTransfer $additionalProductImagesDataTransfer,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
         private readonly LoggerInterface $logger,
-        Filesystem $filesystem,
-        private readonly AdditionalImageInterfaceFactory $additionalImageFactory,
-        private readonly AdditionalImagesProvider $additionalImagesProvider
+        Filesystem $filesystem
     ) {
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
@@ -149,9 +144,10 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
         $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
-        $inPostProduct->setAdditionalProductImages(
-            $this->getAdditionalProductImages($product, $inPostProduct)
-        );
+
+        /** @var Product $product */
+        $product = $this->getProduct($product);
+        $this->additionalProductImagesDataTransfer->transfer($product, $inPostProduct);
     }
 
     /**
@@ -394,82 +390,6 @@ class ProductToInPostProductDataTransfer
         }
 
         return $deliveryProductArr;
-    }
-
-    private function getAdditionalProductImages(
-        Product $product,
-        ProductInterface $inpostProduct
-    ): array {
-        if (!$this->generalConfigProvider->isAdditionalImagesEnabled()) {
-            return [];
-        }
-
-        $storeId = (int)$product->getStoreId();
-        /** @var Product $product */
-        $product = $this->getProduct($product);
-        $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
-
-        $mediaGalleryImages = $this->additionalImagesProvider->execute($product);
-        if ((empty($mediaGalleryImages))
-            && $product->hasData('configurable_product_id')
-            && is_scalar($product->getData('configurable_product_id'))
-        ) {
-            $configurableProductId = (int)$product->getData('configurable_product_id');
-            try {
-                /** @var Product $product */
-                $product = $this->productRepository->getById($configurableProductId, false, $storeId);
-                $mediaGalleryImages = $this->additionalImagesProvider->execute($product);
-            } catch (NoSuchEntityException $e) {
-                $this->logger->info($e->getMessage());
-            }
-        }
-
-        if (!$mediaGalleryImages->count()) {
-            return [];
-        }
-
-        $images = [];
-        $totalImages = 0;
-        foreach ($mediaGalleryImages as $galleryImage) {
-            $file = $galleryImage->getFile();
-            if ($file && $totalImages < self::MAX_ADDITIONAL_IMAGES_COUNT) {
-                $normalImage = $smallImage = $galleryImage->getUrl();
-                if ($normalImage === $inpostProduct->getProductImage()) {
-                    continue;
-                }
-
-                if ($this->generalConfigProvider->isPrepareResizedImagesEnabled()) {
-                    $smallImage = $this->imageHelper->init($product, 'product_page_image_large')
-                        ->setImageFile($file)
-                        ->constrainOnly(false)
-                        ->keepAspectRatio(true)
-                        ->keepFrame(false)
-                        ->resize(
-                            AdditionalImageInterface::SMALL_SIZE_WIDTH,
-                            AdditionalImageInterface::SMALL_SIZE_HEIGHT
-                        )->getUrl();
-
-                    $normalImage = $this->imageHelper->init($product, 'product_page_image_large')
-                        ->setImageFile($file)
-                        ->constrainOnly(false)
-                        ->keepAspectRatio(true)
-                        ->keepFrame(false)
-                        ->resize(
-                            AdditionalImageInterface::NORMAL_SIZE_WIDTH,
-                            AdditionalImageInterface::NORMAL_SIZE_HEIGHT
-                        )->getUrl();
-                }
-
-                $additionalImage = $this->additionalImageFactory->create();
-                $additionalImage->setSmallSize($smallImage ?? '');
-                $additionalImage->setNormalSize($normalImage ?? '');
-                $images[] = $additionalImage;
-                $totalImages++;
-            }
-        }
-
-        $this->emulation->stopEnvironmentEmulation();
-        return $images;
     }
 
     private function isProductRestricted(int $productId, int $websiteId, int $appliesTo = 0): bool

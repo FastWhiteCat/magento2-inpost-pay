@@ -76,7 +76,6 @@ class GetBestsellers
 
             $pageIndex++;
             $bestsellerProducts = array_merge($bestsellerProducts, $pageItems);
-            $a = 2;
         } while (!empty($pageItems));
 
         return $bestsellerProducts;

@@ -22,8 +22,7 @@ class GeneralConfigProvider
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
-    )
-    {
+    ) {
     }
 
     /**
@@ -88,7 +87,7 @@ class GeneralConfigProvider
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_INPOST_PAY_PREPARE_RESIZED_IMAGES,
-            ScopeInterface::SCOPE_WEBSITE)
-            ;
+            ScopeInterface::SCOPE_WEBSITE
+        );
     }
 }

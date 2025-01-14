@@ -26,7 +26,6 @@ class InPostPayBestsellerProductAfterDeleteObserver implements ObserverInterface
     /**
      * @param Observer $observer
      * @return void
-     * @throws LocalizedException
      */
     public function execute(Observer $observer): void
     {
@@ -42,7 +41,7 @@ class InPostPayBestsellerProductAfterDeleteObserver implements ObserverInterface
                     __(
                         'Bestsellers deleted from Admin Panel but could not be deleted in InPost Pay. Reason: %1',
                         $e->getMessage()
-                    )
+                    )->render()
                 );
             }
         }

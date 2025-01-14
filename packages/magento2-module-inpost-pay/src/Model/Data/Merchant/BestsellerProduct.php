@@ -119,12 +119,12 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
     }
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null $productAvailability
+     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null $availability
      * @return void
      */
-    public function setProductAvailability(?ProductAvailabilityInterface $productAvailability): void
+    public function setProductAvailability(?ProductAvailabilityInterface $availability): void
     {
-        $this->setData(self::PRODUCT_AVAILABILITY, $productAvailability);
+        $this->setData(self::PRODUCT_AVAILABILITY, $availability);
     }
 
     /**
@@ -185,7 +185,7 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
     }
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[]
      */
     public function getAdditionalProductImages(): array
     {
@@ -195,7 +195,7 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
     }
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface[] $additionalImages
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[] $additionalImages
      * @return void
      */
     public function setAdditionalProductImages(array $additionalImages): void

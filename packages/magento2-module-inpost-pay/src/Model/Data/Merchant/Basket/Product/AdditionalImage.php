@@ -11,7 +11,9 @@ class AdditionalImage extends DataObject implements AdditionalImageInterface
 {
     public function getSmallSize(): string
     {
-        return $this->getData(self::SMALL_SIZE) ?? '';
+        $smallSize = $this->getData(self::SMALL_SIZE);
+
+        return is_scalar($smallSize) ? (string)$smallSize : '';
     }
 
     public function setSmallSize(string $imageUrl): void
@@ -21,7 +23,9 @@ class AdditionalImage extends DataObject implements AdditionalImageInterface
 
     public function getNormalSize(): string
     {
-        return $this->getData(self::NORMAL_SIZE) ?? '';
+        $normalSize = $this->getData(self::NORMAL_SIZE);
+
+        return is_scalar($normalSize) ? (string)$normalSize : '';
     }
 
     public function setNormalSize(string $imageUrl): void

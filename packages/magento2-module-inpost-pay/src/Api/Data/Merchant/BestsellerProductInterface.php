@@ -75,10 +75,10 @@ interface BestsellerProductInterface
     public function getProductAvailability(): ?ProductAvailabilityInterface;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null $productAvailability
+     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null $availability
      * @return void
      */
-    public function setProductAvailability(?ProductAvailabilityInterface $productAvailability): void;
+    public function setProductAvailability(?ProductAvailabilityInterface $availability): void;
 
     /**
      * @return string
@@ -114,12 +114,12 @@ interface BestsellerProductInterface
     public function setProductImage(string $productImage): void;
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface[]
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[]
      */
     public function getAdditionalProductImages(): array;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface[] $additionalImages
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[] $additionalImages
      * @return void
      */
     public function setAdditionalProductImages(array $additionalImages): void;

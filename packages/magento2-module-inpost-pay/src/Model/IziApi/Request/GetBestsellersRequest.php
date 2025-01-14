@@ -55,6 +55,26 @@ class GetBestsellersRequest extends Request implements RequestInterface
             }
         }
 
+        return $this->modifyUriWithPageIndexAndSize($uri, $pageIndex, $pageSize);
+    }
+
+    public function getApiUrl(): string
+    {
+        return $this->iziApiConfigProvider->getIziApiUrl();
+    }
+
+    public function getBearerToken(): ?string
+    {
+        $this->tokenGenerator->cleanTokenCache();
+
+        return $this->tokenGenerator->generate()->getAccessToken();
+    }
+
+    private function modifyUriWithPageIndexAndSize(
+        string $uri,
+        ?string $pageIndex = null,
+        ?string $pageSize = null
+    ): string {
         if ($pageIndex) {
             $uri = sprintf('%s?%s=%s', $this->uri, self::PAGE_INDEX_PARAM, $pageIndex);
         }
@@ -70,17 +90,5 @@ class GetBestsellersRequest extends Request implements RequestInterface
         }
 
         return $uri;
-    }
-
-    public function getApiUrl(): string
-    {
-        return $this->iziApiConfigProvider->getIziApiUrl();
-    }
-
-    public function getBearerToken(): ?string
-    {
-        $this->tokenGenerator->cleanTokenCache();
-
-        return $this->tokenGenerator->generate()->getAccessToken();
     }
 }

@@ -51,8 +51,6 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\QuantityChange"/>
-    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface"
-                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\AdditionalProductImage"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellersInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Bestsellers"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface"
@@ -608,6 +606,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\AdditionalProductImagesDataTransfer">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

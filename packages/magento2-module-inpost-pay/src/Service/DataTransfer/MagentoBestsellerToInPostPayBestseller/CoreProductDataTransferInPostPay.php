@@ -54,6 +54,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         $bestsellerProduct->setProductDescription($inPostProduct->getProductDescription());
         $bestsellerProduct->setProductAttributes($inPostProduct->getProductAttributes());
         $bestsellerProduct->setProductImage($inPostProduct->getProductImage());
+        $bestsellerProduct->setAdditionalProductImages($inPostProduct->getAdditionalProductImages());
         $this->transferQuantityData($inPostProduct, $bestsellerProduct);
         $this->transferAvailabilityData($magentoBestsellerProduct, $bestsellerProduct);
     }
@@ -91,7 +92,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         if ($magentoBestsellerProduct->getAvailableStartDate()) {
             $productAvailability->setStartDate(
                 $this->convertDateToInPostPayFormat(
-                    $magentoBestsellerProduct->getAvailableStartDate()
+                    (string)$magentoBestsellerProduct->getAvailableStartDate()
                 )
             );
         }
@@ -99,7 +100,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         if ($magentoBestsellerProduct->getAvailableEndDate()) {
             $productAvailability->setEndDate(
                 $this->convertDateToInPostPayFormat(
-                    $magentoBestsellerProduct->getAvailableEndDate()
+                    (string)$magentoBestsellerProduct->getAvailableEndDate()
                 )
             );
         }
@@ -126,11 +127,13 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
     }
 
     /**
-     * @param string|null $originalDate
+     * @param string $originalDate
      * @return string
      */
-    private function convertDateToInPostPayFormat(?string $originalDate): string
+    private function convertDateToInPostPayFormat(string $originalDate): string
     {
-        return date(BasketInterface::INPOST_DATE_FORMAT, strtotime($originalDate));
+        $strToTime = strtotime($originalDate);
+
+        return $strToTime ? date(BasketInterface::INPOST_DATE_FORMAT, $strToTime) : '';
     }
 }

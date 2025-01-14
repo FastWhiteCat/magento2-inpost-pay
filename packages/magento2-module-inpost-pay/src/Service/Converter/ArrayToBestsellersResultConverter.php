@@ -16,8 +16,8 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInter
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterfaceFactory;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -29,14 +29,14 @@ class ArrayToBestsellersResultConverter
      * @param BestsellerProductInterfaceFactory $bestsellerProductFactory
      * @param ProductAvailabilityInterfaceFactory $productAvailabilityFactory
      * @param ProductAttributeInterfaceFactory $productAttributeFactory
-     * @param AdditionalProductImageInterfaceFactory $additionalProductImageFactory
+     * @param AdditionalImageInterfaceFactory $additionalImageFactory
      */
     public function __construct(
         private readonly BestsellersInterfaceFactory $bestsellersFactory,
         private readonly BestsellerProductInterfaceFactory $bestsellerProductFactory,
         private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory,
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
-        private readonly AdditionalProductImageInterfaceFactory $additionalProductImageFactory,
+        private readonly AdditionalImageInterfaceFactory $additionalImageFactory,
     ) {
     }
 
@@ -85,7 +85,7 @@ class ArrayToBestsellersResultConverter
         $productName = $productData[BestsellerProductInterface::PRODUCT_NAME] ?? '';
         $productDescription = $productData[BestsellerProductInterface::PRODUCT_DESCRIPTION] ?? '';
         $productImage = $productData[BestsellerProductInterface::PRODUCT_IMAGE] ?? '';
-        $additionalProductImagesData = $productData[BestsellerProductInterface::ADDITIONAL_PRODUCT_IMAGES] ?? [];
+        $additionalImagesData = $productData[BestsellerProductInterface::ADDITIONAL_PRODUCT_IMAGES] ?? [];
         $priceData = $productData[BestsellerProductInterface::PRICE] ?? [];
         $currency = $productData[BestsellerProductInterface::CURRENCY] ?? BestsellerProductInterface::DEFAULT_CURRENCY;
         $quantityData = $productData[BestsellerProductInterface::QUANTITY] ?? [];
@@ -101,7 +101,7 @@ class ArrayToBestsellersResultConverter
         $bestsellerProduct->setCurrency($currency);
         $bestsellerProduct->setProductAvailability($this->convertAvailability((array)$productAvailabilityData));
         $bestsellerProduct->setAdditionalProductImages(
-            $this->convertAdditionalProductImages((array)$additionalProductImagesData)
+            $this->convertAdditionalImages((array)$additionalImagesData)
         );
         $bestsellerProduct->setProductAttributes(
             $this->convertProductAttributes((array)$productAttributesData)
@@ -137,28 +137,28 @@ class ArrayToBestsellersResultConverter
     }
 
     /**
-     * @param array $additionalProductImagesData
-     * @return AdditionalProductImageInterface[]
+     * @param array $additionalImagesData
+     * @return AdditionalImageInterface[]
      */
-    private function convertAdditionalProductImages(array $additionalProductImagesData): array
+    private function convertAdditionalImages(array $additionalImagesData): array
     {
-        $additionalProductImages = [];
+        $additionalImages = [];
 
-        foreach ($additionalProductImagesData as $additionalProductImageData) {
-            $smallSize = $additionalProductImageData[AdditionalProductImageInterface::SMALL_SIZE] ?? null;
-            $normalSize = $additionalProductImageData[AdditionalProductImageInterface::NORMAL_SIZE] ?? null;
+        foreach ($additionalImagesData as $additionalImageData) {
+            $smallSize = $additionalImageData[AdditionalImageInterface::SMALL_SIZE] ?? null;
+            $normalSize = $additionalImageData[AdditionalImageInterface::NORMAL_SIZE] ?? null;
 
             if ($smallSize && $normalSize) {
-                /** @var AdditionalProductImageInterface $additionalProductImage */
-                $additionalProductImage = $this->additionalProductImageFactory->create();
-                $additionalProductImage->setSmallSize((string)$smallSize);
-                $additionalProductImage->setNormalSize((string)$normalSize);
+                /** @var AdditionalImageInterface $additionalImage */
+                $additionalImage = $this->additionalImageFactory->create();
+                $additionalImage->setSmallSize((string)$smallSize);
+                $additionalImage->setNormalSize((string)$normalSize);
 
-                $additionalProductImages[] = $additionalProductImage;
+                $additionalImages[] = $additionalImage;
             }
         }
 
-        return $additionalProductImages;
+        return $additionalImages;
     }
 
     /**
