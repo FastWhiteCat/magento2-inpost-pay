@@ -12,6 +12,8 @@
                 <order_status>pending</order_status>
                 <allowspecific>0</allowspecific>
                 <image_role>small_image</image_role>
+                <additional_images_enabled>0</additional_images_enabled>
+                <prepare_resized_additional_images>0</prepare_resized_additional_images>
                 <sort_order>5</sort_order>
                 <min_order_total>0</min_order_total>
                 <max_order_total>99999</max_order_total>
