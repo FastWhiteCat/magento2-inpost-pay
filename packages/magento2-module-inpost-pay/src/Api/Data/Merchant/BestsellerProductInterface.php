@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Api\Data\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterface;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
 
 interface BestsellerProductInterface
 {
@@ -14,7 +14,7 @@ interface BestsellerProductInterface
     public const EAN = 'ean';
     public const QR_CODE = 'qr_code';
     public const DEEP_LINK = 'deep_link';
-    public const PRODUCT_AVAILABLE = 'product_available';
+    public const PRODUCT_AVAILABILITY = 'product_availability';
     public const PRODUCT_NAME = 'product_name';
     public const PRODUCT_DESCRIPTION = 'product_description';
     public const PRODUCT_IMAGE = 'product_image';
@@ -70,15 +70,15 @@ interface BestsellerProductInterface
     public function setDeepLink(?string $deepLink): void;
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface|null
+     * @return \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null
      */
-    public function getProductAvailable(): ?ProductAvailableInterface;
+    public function getProductAvailability(): ?ProductAvailabilityInterface;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface|null $productAvailable
+     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null $productAvailability
      * @return void
      */
-    public function setProductAvailable(?ProductAvailableInterface $productAvailable): void;
+    public function setProductAvailability(?ProductAvailabilityInterface $productAvailability): void;
 
     /**
      * @return string

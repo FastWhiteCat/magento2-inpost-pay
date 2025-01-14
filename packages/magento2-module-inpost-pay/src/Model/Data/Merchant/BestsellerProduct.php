@@ -8,7 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Api\ExtensibleDataInterface;
@@ -105,26 +105,26 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
     }
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface|null
+     * @return \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null
      */
-    public function getProductAvailable(): ?ProductAvailableInterface
+    public function getProductAvailability(): ?ProductAvailabilityInterface
     {
-        $productAvailable = $this->getData(self::PRODUCT_AVAILABLE);
+        $productAvailability = $this->getData(self::PRODUCT_AVAILABILITY);
 
-        if ($productAvailable instanceof ProductAvailableInterface) {
-            return $productAvailable;
+        if ($productAvailability instanceof ProductAvailabilityInterface) {
+            return $productAvailability;
         }
 
         return null;
     }
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface|null $productAvailable
+     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface|null $productAvailability
      * @return void
      */
-    public function setProductAvailable(?ProductAvailableInterface $productAvailable): void
+    public function setProductAvailability(?ProductAvailabilityInterface $productAvailability): void
     {
-        $this->setData(self::PRODUCT_AVAILABLE, $productAvailable);
+        $this->setData(self::PRODUCT_AVAILABILITY, $productAvailability);
     }
 
     /**

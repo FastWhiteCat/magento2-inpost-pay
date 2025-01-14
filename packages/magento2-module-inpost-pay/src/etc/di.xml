@@ -57,8 +57,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Bestsellers"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct"/>
-    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface"
-                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\ProductAvailable"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\ProductAvailability"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\BestsellerQuantity"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"

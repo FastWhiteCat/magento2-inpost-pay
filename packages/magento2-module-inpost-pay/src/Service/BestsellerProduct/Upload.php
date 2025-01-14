@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\BestsellerProduct;
 
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
+use InPost\InPostPay\Service\ApiConnector\DeleteBestseller;
 use InPost\InPostPay\Service\ApiConnector\PostBestsellers;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Service\DataTransfer\BestsellerProductDataTransfer;
@@ -24,6 +26,7 @@ class Upload extends BestsellerProductService
      * @param BestsellerProductDataTransfer $bestsellerProductDataTransfer
      * @param PostBestsellers $postBestsellers
      * @param UploadResponseHandler $uploadResponseHandler
+     * @param DeleteBestseller $deleteBestseller
      * @param StoreEmulator $storeEmulator
      * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
@@ -34,6 +37,7 @@ class Upload extends BestsellerProductService
         private readonly BestsellerProductDataTransfer $bestsellerProductDataTransfer,
         private readonly PostBestsellers $postBestsellers,
         private readonly UploadResponseHandler $uploadResponseHandler,
+        private readonly DeleteBestseller $deleteBestseller,
         StoreEmulator $storeEmulator,
         StoreManagerInterface $storeManager,
         LoggerInterface $logger
@@ -56,6 +60,7 @@ class Upload extends BestsellerProductService
 
             try {
                 foreach ($this->getBestsellersByWebsiteId($websiteId) as $magentoBestsellerProduct) {
+                    /** @var BestsellerProductInterface $bestsellerProduct */
                     $bestsellerProduct = $this->bestsellerProductFactory->create();
                     $this->bestsellerProductDataTransfer->transfer(
                         $magentoBestsellerProduct,
@@ -63,6 +68,10 @@ class Upload extends BestsellerProductService
                     );
 
                     $bestsellerProducts[] = $bestsellerProduct;
+                    $this->deleteBestseller->deleteBestsellerByProductId(
+                        (int)$bestsellerProduct->getProductId(),
+                        true
+                    );
                 }
 
                 $response = $this->postBestsellers->execute($bestsellerProducts);

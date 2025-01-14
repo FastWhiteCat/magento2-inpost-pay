@@ -70,19 +70,19 @@ class Bestsellers extends DataObject implements BestsellersInterface, Extensible
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface[]
      */
-    public function getProducts(): array
+    public function getContent(): array
     {
-        $products = $this->getData(self::PRODUCTS);
+        $content = $this->getData(self::CONTENT);
 
-        return is_array($products) ? $products : [];
+        return is_array($content) ? $content : [];
     }
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface[] $products
+     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface[] $content
      * @return void
      */
-    public function setProducts(array $products): void
+    public function setContent(array $content): void
     {
-        $this->setData(self::PRODUCTS, $products);
+        $this->setData(self::CONTENT, $content);
     }
 }

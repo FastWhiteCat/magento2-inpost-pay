@@ -118,7 +118,7 @@ class BestsellersProvider
         $result->setPageIndex($pageIndex);
         $result->setPageSize($pageSize);
         $result->setTotalItems($totalCount);
-        $result->setProducts($items);
+        $result->setContent($items);
 
         return $result;
     }

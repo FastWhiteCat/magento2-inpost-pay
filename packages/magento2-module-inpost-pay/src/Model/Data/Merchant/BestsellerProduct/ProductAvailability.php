@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Model\Data\Merchant\BestsellerProduct;
 
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Api\ExtensibleDataInterface;
 
-class ProductAvailable extends DataObject implements ProductAvailableInterface, ExtensibleDataInterface
+class ProductAvailability extends DataObject implements ProductAvailabilityInterface, ExtensibleDataInterface
 {
     /**
      * @return string|null

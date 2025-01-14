@@ -11,6 +11,9 @@ use InPost\InPostPay\Service\ApiConnector\TokenGenerator;
 
 class GetBestsellersRequest extends Request implements RequestInterface
 {
+    private const PAGE_INDEX_PARAM = 'page_index';
+    private const PAGE_SIZE_PARAM = 'page_size';
+
     protected string $uri = '/v1/izi/products';
 
     /**
@@ -21,6 +24,52 @@ class GetBestsellersRequest extends Request implements RequestInterface
         private readonly IziApiConfigProvider $iziApiConfigProvider,
         private readonly TokenGenerator $tokenGenerator
     ) {
+    }
+
+    public function getUri(bool $keepParamsIntact = false): string
+    {
+        $uri = $this->uri;
+        $params = $this->getParams();
+        $pageIndex = null;
+        $pageSize = null;
+
+        if (array_key_exists(self::PAGE_INDEX_PARAM, $params)
+            && is_scalar($params[self::PAGE_INDEX_PARAM])
+        ) {
+            $pageIndex = (string)$params[self::PAGE_INDEX_PARAM];
+
+            if (!$keepParamsIntact) {
+                unset($params[self::PAGE_INDEX_PARAM]);
+                $this->setParams($params);
+            }
+        }
+
+        if (array_key_exists(self::PAGE_SIZE_PARAM, $params)
+            && is_scalar($params[self::PAGE_SIZE_PARAM])
+        ) {
+            $pageSize = (string)$params[self::PAGE_SIZE_PARAM];
+
+            if (!$keepParamsIntact) {
+                unset($params[self::PAGE_SIZE_PARAM]);
+                $this->setParams($params);
+            }
+        }
+
+        if ($pageIndex) {
+            $uri = sprintf('%s?%s=%s', $this->uri, self::PAGE_INDEX_PARAM, $pageIndex);
+        }
+
+        if ($pageSize) {
+            $uri = sprintf(
+                '%s%s%s=%s',
+                $this->uri,
+                !empty($pageIndex) ? '&' : '?',
+                self::PAGE_SIZE_PARAM,
+                $pageSize
+            );
+        }
+
+        return $uri;
     }
 
     public function getApiUrl(): string
