@@ -42,7 +42,7 @@ class Creator
         int $priority
     ): InPostPayBestsellerProductInterface {
         $product = $this->getProductById((int)$inPostBestseller->getProductId());
-        $productAvailable = $inPostBestseller->getProductAvailable();
+        $productAvailability = $inPostBestseller->getProductAvailability();
         $availableStartDate = null;
         $availableEndDate = null;
         $qrCode = $inPostBestseller->getQrCode();
@@ -54,9 +54,9 @@ class Creator
         $bestsellerProduct->setSku($product->getSku());
         $bestsellerProduct->setPriority($priority);
 
-        if ($productAvailable) {
-            $availableStartDate = $productAvailable->getStartDate();
-            $availableEndDate = $productAvailable->getEndDate();
+        if ($productAvailability) {
+            $availableStartDate = $productAvailability->getStartDate();
+            $availableEndDate = $productAvailability->getEndDate();
         }
 
         $bestsellerProduct->setAvailableStartDate($availableStartDate);

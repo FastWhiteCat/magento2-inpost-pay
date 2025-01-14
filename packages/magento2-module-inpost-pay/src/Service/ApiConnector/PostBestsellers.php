@@ -29,24 +29,29 @@ class PostBestsellers
     }
 
     /**
+     * @param array $bestsellerProducts
      * @return array
      * @throws LocalizedException
      */
     public function execute(array $bestsellerProducts): array
     {
+        if (empty($bestsellerProducts)) {
+            return [];
+        }
+
         /** @var PostBestsellersRequest $postBestsellersRequest */
         $postBestsellersRequest = $this->postBestsellersRequestFactory->create();
-        $params = [];
+        $products = [];
 
         foreach ($bestsellerProducts as $bestsellerProduct) {
             $bestsellerProductData = $this->inPostBestsellerProductToArrayConverter->convert($bestsellerProduct);
 
             if ($bestsellerProductData) {
-                $params[] = $bestsellerProductData;
+                $products[] = $bestsellerProductData;
             }
         }
 
-        $postBestsellersRequest->setParams($params);
+        $postBestsellersRequest->setParams(['content' => $products]);
 
         try {
             return $this->connector->sendRequest($postBestsellersRequest);

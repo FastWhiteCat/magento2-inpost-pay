@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Api\Data\Merchant\BestsellerProduct;
 
-interface ProductAvailableInterface
+interface ProductAvailabilityInterface
 {
     public const START_DATE = 'start_date';
     public const END_DATE = 'end_date';

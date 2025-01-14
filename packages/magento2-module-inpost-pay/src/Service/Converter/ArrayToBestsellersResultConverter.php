@@ -10,14 +10,14 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellersInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellersInterfaceFactory;
 use InPost\InPostPay\Enum\InPostQuantityType;
 use InPost\InPostPay\Model\IziApi\Request\GetBestsellersRequestFactory;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterface;
-use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalProductImageInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterfaceFactory;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -27,16 +27,16 @@ class ArrayToBestsellersResultConverter
     /**
      * @param BestsellersInterfaceFactory $bestsellersFactory
      * @param BestsellerProductInterfaceFactory $bestsellerProductFactory
-     * @param ProductAvailableInterfaceFactory $productAvailableFactory
+     * @param ProductAvailabilityInterfaceFactory $productAvailabilityFactory
      * @param ProductAttributeInterfaceFactory $productAttributeFactory
-     * @param AdditionalProductImageInterfaceFactory $additionalProductImageFactory
+     * @param AdditionalImageInterfaceFactory $additionalImageFactory
      */
     public function __construct(
         private readonly BestsellersInterfaceFactory $bestsellersFactory,
         private readonly BestsellerProductInterfaceFactory $bestsellerProductFactory,
-        private readonly ProductAvailableInterfaceFactory $productAvailableFactory,
+        private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory,
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
-        private readonly AdditionalProductImageInterfaceFactory $additionalProductImageFactory,
+        private readonly AdditionalImageInterfaceFactory $additionalImageFactory,
     ) {
     }
 
@@ -52,18 +52,18 @@ class ArrayToBestsellersResultConverter
         $pageIndex = $resultArray[BestsellersInterface::PAGE_INDEX] ?? null;
         $pageSize = $resultArray[BestsellersInterface::PAGE_SIZE] ?? null;
         $totalItems = $resultArray[BestsellersInterface::TOTAL_ITEMS] ?? null;
-        $products = $resultArray[BestsellersInterface::PRODUCTS] ?? [];
+        $contentProducts = $resultArray[BestsellersInterface::CONTENT] ?? [];
 
         $bestsellersResult->setPageIndex($pageIndex);
         $bestsellersResult->setPageSize($pageSize);
         $bestsellersResult->setTotalItems($totalItems);
         $bestsellerProducts = [];
 
-        foreach ($products as $productData) {
+        foreach ($contentProducts as $productData) {
             $bestsellerProducts[] = $this->convertBestsellerProductResult((array)$productData);
         }
 
-        $bestsellersResult->setProducts($bestsellerProducts);
+        $bestsellersResult->setContent($bestsellerProducts);
 
         return $bestsellersResult;
     }
@@ -81,11 +81,11 @@ class ArrayToBestsellersResultConverter
         $ean = $productData[BestsellerProductInterface::EAN] ?? '';
         $qrCode = $productData[BestsellerProductInterface::QR_CODE] ?? '';
         $deepLink = $productData[BestsellerProductInterface::DEEP_LINK] ?? '';
-        $productAvailableData = $productData[BestsellerProductInterface::PRODUCT_AVAILABLE] ?? [];
+        $productAvailabilityData = $productData[BestsellerProductInterface::PRODUCT_AVAILABILITY] ?? [];
         $productName = $productData[BestsellerProductInterface::PRODUCT_NAME] ?? '';
         $productDescription = $productData[BestsellerProductInterface::PRODUCT_DESCRIPTION] ?? '';
         $productImage = $productData[BestsellerProductInterface::PRODUCT_IMAGE] ?? '';
-        $additionalProductImagesData = $productData[BestsellerProductInterface::ADDITIONAL_PRODUCT_IMAGES] ?? [];
+        $additionalImagesData = $productData[BestsellerProductInterface::ADDITIONAL_PRODUCT_IMAGES] ?? [];
         $priceData = $productData[BestsellerProductInterface::PRICE] ?? [];
         $currency = $productData[BestsellerProductInterface::CURRENCY] ?? BestsellerProductInterface::DEFAULT_CURRENCY;
         $quantityData = $productData[BestsellerProductInterface::QUANTITY] ?? [];
@@ -99,9 +99,9 @@ class ArrayToBestsellersResultConverter
         $bestsellerProduct->setProductDescription($productDescription);
         $bestsellerProduct->setProductImage($productImage);
         $bestsellerProduct->setCurrency($currency);
-        $bestsellerProduct->setProductAvailable($this->convertAvailability((array)$productAvailableData));
+        $bestsellerProduct->setProductAvailability($this->convertAvailability((array)$productAvailabilityData));
         $bestsellerProduct->setAdditionalProductImages(
-            $this->convertAdditionalProductImages((array)$additionalProductImagesData)
+            $this->convertAdditionalImages((array)$additionalImagesData)
         );
         $bestsellerProduct->setProductAttributes(
             $this->convertProductAttributes((array)$productAttributesData)
@@ -116,49 +116,49 @@ class ArrayToBestsellersResultConverter
 
     /**
      * @param array $availabilityData
-     * @return ProductAvailableInterface|null
+     * @return ProductAvailabilityInterface|null
      */
-    private function convertAvailability(array $availabilityData): ?ProductAvailableInterface
+    private function convertAvailability(array $availabilityData): ?ProductAvailabilityInterface
     {
         if (empty($availabilityData)) {
             return null;
         }
 
-        /** @var ProductAvailableInterface $productAvailable */
-        $productAvailable = $this->productAvailableFactory->create();
+        /** @var ProductAvailabilityInterface $productAvailability */
+        $productAvailability = $this->productAvailabilityFactory->create();
 
-        $startDate = $availabilityData[ProductAvailableInterface::START_DATE] ?? null;
-        $endDate = $availabilityData[ProductAvailableInterface::END_DATE] ?? null;
+        $startDate = $availabilityData[ProductAvailabilityInterface::START_DATE] ?? null;
+        $endDate = $availabilityData[ProductAvailabilityInterface::END_DATE] ?? null;
 
-        $productAvailable->setStartDate($startDate);
-        $productAvailable->setEndDate($endDate);
+        $productAvailability->setStartDate($startDate);
+        $productAvailability->setEndDate($endDate);
 
-        return $productAvailable;
+        return $productAvailability;
     }
 
     /**
-     * @param array $additionalProductImagesData
-     * @return AdditionalProductImageInterface[]
+     * @param array $additionalImagesData
+     * @return AdditionalImageInterface[]
      */
-    private function convertAdditionalProductImages(array $additionalProductImagesData): array
+    private function convertAdditionalImages(array $additionalImagesData): array
     {
-        $additionalProductImages = [];
+        $additionalImages = [];
 
-        foreach ($additionalProductImagesData as $additionalProductImageData) {
-            $smallSize = $additionalProductImageData[AdditionalProductImageInterface::SMALL_SIZE] ?? null;
-            $normalSize = $additionalProductImageData[AdditionalProductImageInterface::NORMAL_SIZE] ?? null;
+        foreach ($additionalImagesData as $additionalImageData) {
+            $smallSize = $additionalImageData[AdditionalImageInterface::SMALL_SIZE] ?? null;
+            $normalSize = $additionalImageData[AdditionalImageInterface::NORMAL_SIZE] ?? null;
 
             if ($smallSize && $normalSize) {
-                /** @var AdditionalProductImageInterface $additionalProductImage */
-                $additionalProductImage = $this->additionalProductImageFactory->create();
-                $additionalProductImage->setSmallSize((string)$smallSize);
-                $additionalProductImage->setNormalSize((string)$normalSize);
+                /** @var AdditionalImageInterface $additionalImage */
+                $additionalImage = $this->additionalImageFactory->create();
+                $additionalImage->setSmallSize((string)$smallSize);
+                $additionalImage->setNormalSize((string)$normalSize);
 
-                $additionalProductImages[] = $additionalProductImage;
+                $additionalImages[] = $additionalImage;
             }
         }
 
-        return $additionalProductImages;
+        return $additionalImages;
     }
 
     /**

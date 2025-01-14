@@ -28,10 +28,11 @@ class DeleteBestseller
 
     /**
      * @param int $productId
+     * @param bool|null $skipErrors
      * @return void
      * @throws CouldNotDeleteInPostPayBestsellerProductException
      */
-    public function deleteBestsellerByProductId(int $productId): void
+    public function deleteBestsellerByProductId(int $productId, ?bool $skipErrors = false): void
     {
         /** @var DeleteBestsellerRequest $request */
         $request = $this->deleteBestsellerRequestFactory->create();
@@ -55,7 +56,9 @@ class DeleteBestseller
             );
             $instruction = __('Please log in to InPost Pay Panel and delete this Bestseller Product manually.');
 
-            throw new CouldNotDeleteInPostPayBestsellerProductException(__('%1 %2', $errorMsg, $instruction));
+            if (!$skipErrors) {
+                throw new CouldNotDeleteInPostPayBestsellerProductException(__('%1 %2', $errorMsg, $instruction));
+            }
         }
     }
 }

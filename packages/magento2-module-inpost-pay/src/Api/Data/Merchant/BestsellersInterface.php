@@ -9,7 +9,7 @@ interface BestsellersInterface
     public const PAGE_SIZE = 'page_size';
     public const TOTAL_ITEMS = 'total_items';
     public const PAGE_INDEX = 'page_index';
-    public const PRODUCTS = 'products';
+    public const CONTENT = 'content';
 
     /**
      * @return int|null
@@ -47,11 +47,11 @@ interface BestsellersInterface
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface[]
      */
-    public function getProducts(): array;
+    public function getContent(): array;
 
     /**
-     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface[] $products
+     * @param \InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface[] $content
      * @return void
      */
-    public function setProducts(array $products): void;
+    public function setContent(array $content): void;
 }

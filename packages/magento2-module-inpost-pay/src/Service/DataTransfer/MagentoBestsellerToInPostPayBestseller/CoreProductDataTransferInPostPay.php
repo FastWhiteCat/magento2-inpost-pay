@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller;
 
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\DataTransfer\MagentoBestsellerToInPostPayBestsellerDataTransferInterface;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface as InPostProduct;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory as InPostProductFactory;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterfaceFactory;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailableInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -22,13 +23,13 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
      * @param ProductRepositoryInterface $productRepository
      * @param ProductToInPostProductDataTransfer $productToInPostProductDataTransfer
      * @param InPostProductFactory $inPostProductFactory
-     * @param ProductAvailableInterfaceFactory $productAvailableFactory
+     * @param ProductAvailabilityInterfaceFactory $productAvailabilityFactory
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly InPostProductFactory $inPostProductFactory,
-        private readonly ProductAvailableInterfaceFactory $productAvailableFactory
+        private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory
     ) {
     }
 
@@ -53,6 +54,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         $bestsellerProduct->setProductDescription($inPostProduct->getProductDescription());
         $bestsellerProduct->setProductAttributes($inPostProduct->getProductAttributes());
         $bestsellerProduct->setProductImage($inPostProduct->getProductImage());
+        $bestsellerProduct->setAdditionalProductImages($inPostProduct->getAdditionalProductImages());
         $this->transferQuantityData($inPostProduct, $bestsellerProduct);
         $this->transferAvailabilityData($magentoBestsellerProduct, $bestsellerProduct);
     }
@@ -84,19 +86,27 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         InPostPayBestsellerProductInterface $magentoBestsellerProduct,
         BestsellerProductInterface $bestsellerProduct
     ): void {
-        /** @var ProductAvailableInterface $productAvailable */
-        $productAvailable = $this->productAvailableFactory->create();
+        /** @var ProductAvailabilityInterface $productAvailability */
+        $productAvailability = $this->productAvailabilityFactory->create();
 
         if ($magentoBestsellerProduct->getAvailableStartDate()) {
-            $productAvailable->setStartDate($magentoBestsellerProduct->getAvailableStartDate());
+            $productAvailability->setStartDate(
+                $this->convertDateToInPostPayFormat(
+                    (string)$magentoBestsellerProduct->getAvailableStartDate()
+                )
+            );
         }
 
         if ($magentoBestsellerProduct->getAvailableEndDate()) {
-            $productAvailable->setEndDate($magentoBestsellerProduct->getAvailableEndDate());
+            $productAvailability->setEndDate(
+                $this->convertDateToInPostPayFormat(
+                    (string)$magentoBestsellerProduct->getAvailableEndDate()
+                )
+            );
         }
 
-        if ($productAvailable->getStartDate() || $productAvailable->getEndDate()) {
-            $bestsellerProduct->setProductAvailable($productAvailable);
+        if ($productAvailability->getStartDate() || $productAvailability->getEndDate()) {
+            $bestsellerProduct->setProductAvailability($productAvailability);
         }
     }
 
@@ -114,5 +124,16 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         $bestsellerQuantity->setQuantityUnit($inPostProduct->getQuantity()->getQuantityUnit());
         $bestsellerQuantity->setAvailableQuantity($inPostProduct->getQuantity()->getAvailableQuantity());
         $bestsellerProduct->setQuantity($bestsellerQuantity);
+    }
+
+    /**
+     * @param string $originalDate
+     * @return string
+     */
+    private function convertDateToInPostPayFormat(string $originalDate): string
+    {
+        $strToTime = strtotime($originalDate);
+
+        return $strToTime ? date(BasketInterface::INPOST_DATE_FORMAT, $strToTime) : '';
     }
 }

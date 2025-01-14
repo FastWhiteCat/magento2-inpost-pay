@@ -69,7 +69,7 @@ class GetBestsellers
             try {
                 $resultArray = $this->connector->sendRequest($request);
                 $bestsellerResult = $this->arrayToBestsellerProductConverter->convert($resultArray);
-                $pageItems = $bestsellerResult->getProducts();
+                $pageItems = $bestsellerResult->getContent();
             } catch (LocalizedException $e) {
                 $pageItems = [];
             }

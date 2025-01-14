@@ -10,11 +10,12 @@ use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Stdlib\DateTime;
 use Psr\Log\LoggerInterface;
 
 class UploadResponseHandler
 {
-    public const SUCCESS_KEY = 'success';
+    public const CONTENT_KEY = 'content';
     public const ERROR_KEY = 'error';
     public const ERROR_REASON_KEY = 'reason';
 
@@ -37,7 +38,7 @@ class UploadResponseHandler
      */
     public function handleResponse(array $response, int $websiteId): bool
     {
-        $successfulData = (array)($response[self::SUCCESS_KEY] ?? []);
+        $successfulData = (array)($response[self::CONTENT_KEY] ?? []);
         $errorData = (array)($response[self::ERROR_KEY] ?? []);
 
         $this->handleSuccessfulData($successfulData, $websiteId);
@@ -71,6 +72,7 @@ class UploadResponseHandler
 
             $inPostPayBestsellerProduct->setQrCode($qrCode);
             $inPostPayBestsellerProduct->setDeepLink($deepLink);
+            $inPostPayBestsellerProduct->setSynchronizedAt(date(DateTime::DATETIME_PHP_FORMAT));
 
             try {
                 $this->inPostPayBestsellerProductRepository->save($inPostPayBestsellerProduct);

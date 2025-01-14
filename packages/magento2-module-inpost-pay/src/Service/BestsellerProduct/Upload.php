@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\BestsellerProduct;
 
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
+use InPost\InPostPay\Service\ApiConnector\DeleteBestseller;
 use InPost\InPostPay\Service\ApiConnector\PostBestsellers;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Service\DataTransfer\BestsellerProductDataTransfer;
@@ -16,6 +17,9 @@ use Magento\Store\Model\App\Emulation as StoreEmulator;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Upload extends BestsellerProductService
 {
     /**
@@ -24,6 +28,7 @@ class Upload extends BestsellerProductService
      * @param BestsellerProductDataTransfer $bestsellerProductDataTransfer
      * @param PostBestsellers $postBestsellers
      * @param UploadResponseHandler $uploadResponseHandler
+     * @param DeleteBestseller $deleteBestseller
      * @param StoreEmulator $storeEmulator
      * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
@@ -34,6 +39,7 @@ class Upload extends BestsellerProductService
         private readonly BestsellerProductDataTransfer $bestsellerProductDataTransfer,
         private readonly PostBestsellers $postBestsellers,
         private readonly UploadResponseHandler $uploadResponseHandler,
+        private readonly DeleteBestseller $deleteBestseller,
         StoreEmulator $storeEmulator,
         StoreManagerInterface $storeManager,
         LoggerInterface $logger
@@ -63,15 +69,19 @@ class Upload extends BestsellerProductService
                     );
 
                     $bestsellerProducts[] = $bestsellerProduct;
+                    $this->deleteBestseller->deleteBestsellerByProductId(
+                        (int)$bestsellerProduct->getProductId(),
+                        true
+                    );
                 }
 
                 $response = $this->postBestsellers->execute($bestsellerProducts);
                 $fullSuccess = $this->uploadResponseHandler->handleResponse($response, $websiteId);
 
                 if ($fullSuccess) {
-                    $this->logger->debug(sprintf('InPost Bestseller Product successfully uploaded.'));
+                    $this->logger->debug('InPost Bestseller Product successfully uploaded.');
                 } else {
-                    $this->logger->warning(sprintf('InPost Bestseller Product were uploaded with errors.'));
+                    $this->logger->warning('InPost Bestseller Product were uploaded with errors.');
                     $fullSuccess = false;
                 }
             } catch (LocalizedException $e) {
