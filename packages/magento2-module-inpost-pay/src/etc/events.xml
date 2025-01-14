@@ -11,6 +11,9 @@
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
     </event>
+    <event name="sales_quote_item_collection_products_after_load">
+        <observer name="InPost_InPostPay::addImageGalleryToProductsCollectionEventObserver" instance="InPost\InPostPay\Observer\Quote\AddImageGalleryToProductsCollectionEventObserver"/>
+    </event>
     <event name="customer_logout">
         <observer name="InPost_InPostPay::deleteBasketBidingApiCookieAfterCustomerLogout" instance="InPost\InPostPay\Observer\Customer\DeleteBasketBidingApiCookieAfterCustomerLogout" />
     </event>

@@ -140,9 +140,6 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
         $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
-
-        /** @var Product $product */
-        $product = $this->getProduct($product);
         $this->additionalProductImagesDataTransfer->transfer($product, $inPostProduct);
     }
 

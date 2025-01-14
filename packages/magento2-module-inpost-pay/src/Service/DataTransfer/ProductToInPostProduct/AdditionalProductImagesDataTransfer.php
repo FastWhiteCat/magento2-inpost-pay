@@ -7,25 +7,20 @@ namespace InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\NoSuchEntityException;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterfaceFactory;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Product\AdditionalImagesProvider;
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Store\Model\App\Emulation;
-use Psr\Log\LoggerInterface;
 
 class AdditionalProductImagesDataTransfer
 {
     public const MAX_ADDITIONAL_IMAGES_COUNT = 10;
 
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
         private readonly ImageHelper $imageHelper,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
-        private readonly LoggerInterface $logger,
         private readonly AdditionalImageInterfaceFactory $additionalImageFactory,
         private readonly AdditionalImagesProvider $additionalImagesProvider
     ) {
@@ -113,21 +108,15 @@ class AdditionalProductImagesDataTransfer
 
     private function getMediaGalleryImages(Product $product): array
     {
-        $storeId = (int)$product->getStoreId();
         $mediaGalleryImages = $this->additionalImagesProvider->execute($product);
 
         if ((empty($mediaGalleryImages->getItems()))
-            && $product->hasData('configurable_product_id')
-            && is_scalar($product->getData('configurable_product_id'))
+            && $product->hasData(ProductToInPostProductDataTransfer::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(ProductToInPostProductDataTransfer::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
         ) {
-            $configurableProductId = (int)$product->getData('configurable_product_id');
-            try {
-                /** @var Product $product */
-                $product = $this->productRepository->getById($configurableProductId, false, $storeId);
-                $mediaGalleryImages = $this->additionalImagesProvider->execute($product);
-            } catch (NoSuchEntityException $e) {
-                $this->logger->info($e->getMessage());
-            }
+            /** @var Product $product */
+            $product = $product->getData(ProductToInPostProductDataTransfer::CONFIGURABLE_PARENT_PRODUCT);
+            $mediaGalleryImages = $this->additionalImagesProvider->execute($product);
         }
 
         return $mediaGalleryImages->getItems();

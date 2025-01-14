@@ -155,7 +155,7 @@ class TokenGenerator
 
     public function cleanTokenCache(): void
     {
-        $this->tokenResponse = null;
+        $this->tokenResponses = [];
     }
 
     private function handle(array $result): TokenResponse

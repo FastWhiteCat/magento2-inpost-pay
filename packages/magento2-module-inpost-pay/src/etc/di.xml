@@ -615,6 +615,11 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Observer\Quote\AddImageGalleryToProductsCollectionEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ZeroQuantityWhenOutOfStockPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
