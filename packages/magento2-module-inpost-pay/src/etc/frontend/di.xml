@@ -8,4 +8,8 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Quote\Model\Quote\Config">
+        <plugin name="InPost_InPostPay::addAdditionalQuoteProductAttributesPlugin"
+                type="InPost\InPostPay\Plugin\Quote\AddAdditionalQuoteProductAttributesPlugin" />
+    </type>
 </config>

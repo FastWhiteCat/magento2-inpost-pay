@@ -13,17 +13,30 @@ use InPost\InPostPay\Model\AuthApi\Request\OAuthTokenRequestFactory as TokenRequ
 use InPost\InPostPay\Model\AuthApi\Response\OAuthTokenResponseFactory as TokenResponseFactory;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\CacheInterface;
+use InPost\InPostPay\Model\Cache\OAuthToken\Type as OAuthTokenCache;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class TokenGenerator
 {
-    private ?TokenResponse $tokenResponse = null;
+    public const EXPIRES_IN_SAFETY_BUFFER = 60;
+
+    private array $tokenResponses = [];
 
     /**
      * @param ConnectorInterface $connector
      * @param AuthConfigProvider $authConfigProvider
      * @param TokenRequestFactory $tokenRequestFactory
      * @param TokenResponseFactory $tokenResponseFactory
+     * @param StoreManagerInterface $storeManager
+     * @param CacheInterface $cache
+     * @param SerializerInterface $serializer
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -31,55 +44,118 @@ class TokenGenerator
         private readonly AuthConfigProvider $authConfigProvider,
         private readonly TokenRequestFactory $tokenRequestFactory,
         private readonly TokenResponseFactory $tokenResponseFactory,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly CacheInterface $cache,
+        private readonly SerializerInterface $serializer,
         private readonly LoggerInterface $logger
     ) {
     }
 
     /**
+     * @param bool|null $forceNew
+     * @param int|null $storeId
      * @return TokenResponse
-     * @throws InPostPayInternalException
      * @throws LocalizedException
      */
-    public function generate(): TokenResponse
+    public function generate(?bool $forceNew = false, ?int $storeId = null): TokenResponse
     {
-        if ($this->tokenResponse === null) {
-            try {
-                /** @var TokenRequest $request */
-                $request = $this->tokenRequestFactory->create();
-                $request->setParams(
-                    [
-                        TokenRequest::CLIENT_ID => $this->authConfigProvider->getClientId(),
-                        TokenRequest::CLIENT_SECRET => $this->authConfigProvider->getClientSecret(),
-                        TokenRequest::GRANT_TYPE => TokenRequest::CREDENTIAL_GRANT_TYPE,
-                    ]
-                );
-                $result = $this->connector->sendRequest($request);
-                $this->tokenResponse = $this->handle($result);
-            } catch (InPostPayInternalException $e) {
-                $errorPhrase = __(
-                    'Could not generate token due to invalid configuration. Details: %1',
-                    $e->getMessage()
-                );
-                $this->logger->error($errorPhrase->render());
+        $cacheIdentifier = $this->getTokenCacheIdentifier($storeId);
+        $tokenResponse = $this->getCachedTokenResponse($cacheIdentifier);
 
-                throw new LocalizedException($errorPhrase);
-            } catch (Exception $e) {
-                $errorPhrase = __(
-                    'There was a problem with processing token generation request. Details: %1',
-                    $e->getMessage()
-                );
-                $this->logger->critical($errorPhrase->render());
-
-                throw new LocalizedException($errorPhrase);
-            }
+        if (!$forceNew && $tokenResponse) {
+            return $tokenResponse;
         }
 
-        return $this->tokenResponse;
+        try {
+            /** @var TokenRequest $request */
+            $request = $this->tokenRequestFactory->create();
+            $request->setStoreId($storeId);
+            $request->setParams(
+                [
+                    TokenRequest::CLIENT_ID => $this->authConfigProvider->getClientId($storeId),
+                    TokenRequest::CLIENT_SECRET => $this->authConfigProvider->getClientSecret($storeId),
+                    TokenRequest::GRANT_TYPE => TokenRequest::CREDENTIAL_GRANT_TYPE,
+                ]
+            );
+            $result = $this->connector->sendRequest($request);
+            $this->setCachedTokenResponseData($cacheIdentifier, $result);
+            $this->tokenResponses[$cacheIdentifier] = $this->handle($result);
+        } catch (InPostPayInternalException $e) {
+            $errorPhrase = __(
+                'Could not generate token due to invalid configuration. Details: %1',
+                $e->getMessage()
+            );
+            $this->logger->error($errorPhrase->render());
+
+            throw new LocalizedException($errorPhrase);
+        } catch (Exception $e) {
+            $errorPhrase = __(
+                'There was a problem with processing token generation request. Details: %1',
+                $e->getMessage()
+            );
+            $this->logger->critical($errorPhrase->render());
+
+            throw new LocalizedException($errorPhrase);
+        }
+
+        return $this->tokenResponses[$cacheIdentifier];
+    }
+
+    private function getCachedTokenResponse(string $cacheIdentifier): ?TokenResponse
+    {
+        if (isset($this->tokenResponses[$cacheIdentifier])) {
+            return $this->tokenResponses[$cacheIdentifier];
+        }
+
+        $encodedTokenResponse = $this->cache->load($cacheIdentifier);
+
+        if (!empty($encodedTokenResponse)) {
+            $tokenResponseData = $this->serializer->unserialize($encodedTokenResponse);
+
+            if (!is_array($tokenResponseData)) {
+                $tokenResponseData = [];
+            }
+
+            $this->tokenResponses[$cacheIdentifier] = $this->handle($tokenResponseData);
+        } else {
+            $this->tokenResponses[$cacheIdentifier] = null;
+        }
+
+        return $this->tokenResponses[$cacheIdentifier];
+    }
+
+    private function setCachedTokenResponseData(string $cacheIdentifier, array $tokenResponseData): void
+    {
+        $expiresIn = (int)($tokenResponseData[TokenResponse::EXPIRES_IN] ?? 0);
+        $expiresIn -= self::EXPIRES_IN_SAFETY_BUFFER;
+
+        if ($expiresIn > 0) {
+            $encodedTokenResponseData = $this->serializer->serialize($tokenResponseData);
+            $this->cache->save(
+                is_string($encodedTokenResponseData) ? $encodedTokenResponseData : '',
+                $cacheIdentifier,
+                [OAuthTokenCache::CACHE_TAG],
+                $expiresIn
+            );
+        }
+    }
+
+    private function getTokenCacheIdentifier(?int $storeId = null): string
+    {
+        if ($storeId === null) {
+            $storeId = $this->getCurrentStoreId();
+        }
+
+        return sprintf(
+            '%s_%s',
+            OAuthTokenCache::TYPE_IDENTIFIER,
+            $storeId
+        );
     }
 
     public function cleanTokenCache(): void
     {
-        $this->tokenResponse = null;
+        $this->tokenResponses = [];
     }
 
     private function handle(array $result): TokenResponse
@@ -101,5 +177,16 @@ class TokenGenerator
         $tokenResponse->setScope($scope);
 
         return $tokenResponse;
+    }
+
+    private function getCurrentStoreId(): int
+    {
+        try {
+            $storeId = (int)$this->storeManager->getStore()->getId();
+        } catch (NoSuchEntityException $e) {
+            $storeId = 0;
+        }
+
+        return $storeId;
     }
 }
