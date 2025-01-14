@@ -62,5 +62,17 @@
             <source_model>InPost\InPostPay\Model\Config\Source\ImageType</source_model>
             <config_path>payment/inpost_pay/image_role</config_path>
         </field>
+        <field id="additional_images_enabled" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Send additional images to InPost Pay</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/additional_images_enabled</config_path>
+        </field>
+        <field id="prepare_resized_additional_images" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Prepare resized additional images</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/prepare_resized_additional_images</config_path>
+        </field>
     </group>
 </include>
