@@ -161,10 +161,18 @@ class ProductToInPostProductDataTransfer
     private function getProductImageUrl(Product $originalProduct): string
     {
         $storeId = (int)$originalProduct->getStoreId();
-        $originalProductSku = (string)$originalProduct->getSku();
-        /** @var Product $product */
-        $product = $this->productRepository->get($originalProductSku, false, $storeId);
-        $productId = (int)$product->getId();
+
+        if ($originalProduct->getTypeId() === Type::TYPE_BUNDLE) {
+            $productId = (int)$originalProduct->getId();
+            /** @var Product $product */
+            $product = $this->productRepository->getById($productId, false, $storeId);
+        } else {
+            $originalProductSku = (string)$originalProduct->getSku();
+            /** @var Product $product */
+            $product = $this->productRepository->get($originalProductSku, false, $storeId);
+            $productId = (int)$product->getId();
+        }
+
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
         $imageRole = $this->generalConfigProvider->getImageRole();
