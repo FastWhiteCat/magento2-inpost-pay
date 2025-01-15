@@ -35,7 +35,8 @@ class InPostPayProductAttributesProvider
             $collection->setEntityTypeFilter($this->productFactory->create()->getTypeId());
             $visibleOnFrontAttributes = [
                 'description',
-                'short_description'
+                'short_description',
+                'image'
             ];
 
             foreach ($collection->getItems() as $attribute) {

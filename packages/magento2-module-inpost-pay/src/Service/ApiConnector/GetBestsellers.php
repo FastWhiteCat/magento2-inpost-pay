@@ -54,7 +54,7 @@ class GetBestsellers
     private function getAllBestsellerProducts(): array
     {
         $bestsellerProducts = [];
-        $pageIndex = 1;
+        $pageIndex = 0;
 
         do {
             /** @var GetBestsellersRequest $request */
