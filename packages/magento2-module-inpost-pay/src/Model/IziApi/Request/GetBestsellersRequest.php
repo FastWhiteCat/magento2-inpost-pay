@@ -82,7 +82,7 @@ class GetBestsellersRequest extends Request implements RequestInterface
         if ($pageSize) {
             $uri = sprintf(
                 '%s%s%s=%s',
-                $this->uri,
+                $uri,
                 !empty($pageIndex) ? '&' : '?',
                 self::PAGE_SIZE_PARAM,
                 $pageSize
