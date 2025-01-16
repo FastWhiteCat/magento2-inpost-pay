@@ -20,6 +20,8 @@ class DeleteBestsellerRequest extends Request implements RequestInterface
 
     protected ?string $contentType = 'application/json';
 
+    private ?int $storeId = null;
+
     /**
      * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TokenGenerator $tokenGenerator
@@ -59,6 +61,11 @@ class DeleteBestsellerRequest extends Request implements RequestInterface
     {
         $this->tokenGenerator->cleanTokenCache();
 
-        return $this->tokenGenerator->generate()->getAccessToken();
+        return $this->tokenGenerator->generate(true, $this->storeId)->getAccessToken();
+    }
+
+    public function setStoreId(int $storeId): void
+    {
+        $this->storeId = $storeId;
     }
 }

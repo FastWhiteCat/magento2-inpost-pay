@@ -57,6 +57,7 @@ class Upload extends BestsellerProductService
 
         foreach ($this->getDefaultStoresForWebsites() as $store) {
             $websiteId = (int)$store->getWebsiteId();
+            $storeId = (int)$store->getId();
             $this->storeEmulator->startEnvironmentEmulation((int)$store->getId(), Area::AREA_FRONTEND, true);
             $bestsellerProducts = [];
 
@@ -71,11 +72,12 @@ class Upload extends BestsellerProductService
                     $bestsellerProducts[] = $bestsellerProduct;
                     $this->deleteBestseller->deleteBestsellerByProductId(
                         (int)$bestsellerProduct->getProductId(),
+                        $storeId,
                         true
                     );
                 }
 
-                $response = $this->postBestsellers->execute($bestsellerProducts);
+                $response = $this->postBestsellers->execute($bestsellerProducts, $storeId);
                 $fullSuccess = $this->uploadResponseHandler->handleResponse($response, $websiteId);
 
                 if ($fullSuccess) {

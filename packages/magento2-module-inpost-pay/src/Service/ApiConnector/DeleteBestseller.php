@@ -28,15 +28,17 @@ class DeleteBestseller
 
     /**
      * @param int $productId
+     * @param int $storeId
      * @param bool|null $skipErrors
      * @return void
      * @throws CouldNotDeleteInPostPayBestsellerProductException
      */
-    public function deleteBestsellerByProductId(int $productId, ?bool $skipErrors = false): void
+    public function deleteBestsellerByProductId(int $productId, int $storeId, ?bool $skipErrors = false): void
     {
         /** @var DeleteBestsellerRequest $request */
         $request = $this->deleteBestsellerRequestFactory->create();
         $request->setParams([BestsellerProductInterface::PRODUCT_ID => $productId]);
+        $request->setStoreId($storeId);
 
         try {
             $this->connector->sendRequest($request);

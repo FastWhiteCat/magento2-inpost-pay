@@ -14,6 +14,7 @@ class PostBestsellersRequest extends Request implements RequestInterface
 {
     protected string $uri = '/v1/izi/products';
     protected string $method = HttpRequest::METHOD_POST;
+    private ?int $storeId = null;
 
     /**
      * @param IziApiConfigProvider $iziApiConfigProvider
@@ -39,6 +40,11 @@ class PostBestsellersRequest extends Request implements RequestInterface
     {
         $this->tokenGenerator->cleanTokenCache();
 
-        return $this->tokenGenerator->generate()->getAccessToken();
+        return $this->tokenGenerator->generate(true, $this->storeId)->getAccessToken();
+    }
+
+    public function setStoreId(int $storeId): void
+    {
+        $this->storeId = $storeId;
     }
 }

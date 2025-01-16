@@ -30,10 +30,11 @@ class PostBestsellers
 
     /**
      * @param array $bestsellerProducts
+     * @param int $storeId
      * @return array
      * @throws LocalizedException
      */
-    public function execute(array $bestsellerProducts): array
+    public function execute(array $bestsellerProducts, int $storeId): array
     {
         if (empty($bestsellerProducts)) {
             return [];
@@ -51,6 +52,7 @@ class PostBestsellers
             }
         }
 
+        $postBestsellersRequest->setStoreId($storeId);
         $postBestsellersRequest->setParams(['content' => $products]);
 
         try {
