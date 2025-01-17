@@ -23,6 +23,10 @@ All notable changes to this project will be documented in this file.
 - Communication between Magento frontend and backend has been reduced and replace with communication between frontend and InPost Pay API directly
 - Payment method title from now on contains also information about chosen payment type by customer (BLIK, Card, Cash on delivery, etc.)
 
+### Fixed
+
+- Public Key for signature validation cache key now contains store ID to handle correctly multistore Magento instances with separated InPost Pay Client Credentials
+
 ## [1.0.12] - 2024-12-17
 
 ### Fixed
