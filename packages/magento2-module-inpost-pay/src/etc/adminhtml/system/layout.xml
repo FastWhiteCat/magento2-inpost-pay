@@ -3,33 +3,16 @@
     <group id="inpost_pay_layout" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1">
         <label>Button Layout Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
-        <field id="widget_color_variant" translate="label" type="select" sortOrder="10"
+        <field id="widget_size" translate="label" type="select" sortOrder="30"
                showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Default value of the button color variant</label>
-            <source_model>InPost\InPostPay\Model\Config\Source\ColorVariant</source_model>
-            <config_path>payment/inpost_pay/widget_color_variant</config_path>
+            <label>Widget size</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\Sizes</source_model>
+            <config_path>payment/inpost_pay/widget_size</config_path>
         </field>
-        <field id="widget_dark_mode" translate="label" type="select" sortOrder="20"
+        <field id="widget_frame_style" translate="label" type="multiselect" sortOrder="40"
                showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Widget dark mode enabled by default</label>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <config_path>payment/inpost_pay/widget_dark_mode</config_path>
-        </field>
-        <field id="widget_max_width" translate="label" type="text" sortOrder="30"
-               showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Max widget width(value between 220 and 600)</label>
-            <config_path>payment/inpost_pay/widget_max_width</config_path>
-            <validate>validate-digits validate-not-negative-number validate-digits-range digits-range-220-600</validate>
-        </field>
-        <field id="widget_min_height" translate="label" type="text" sortOrder="40"
-               showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Min widget height(value between 48 and 64)</label>
-            <config_path>payment/inpost_pay/widget_min_height</config_path>
-            <validate>validate-digits validate-not-negative-number validate-digits-range digits-range-48-64</validate>
-        </field>
-        <field id="frame_style" translate="label" type="select" sortOrder="50"
-               showInDefault="1" showInWebsite="1" canRestore="1">
-            <label>Widget frame corner style</label>
+            <label>Widget frame style</label>
+            <can_be_empty>1</can_be_empty>
             <source_model>InPost\InPostPay\Model\Config\Source\FrameStyle</source_model>
             <config_path>payment/inpost_pay/widget_frame_style</config_path>
         </field>
