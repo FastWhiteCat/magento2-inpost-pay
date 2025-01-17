@@ -7,15 +7,18 @@ use Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface;
 use Magento\CheckoutAgreements\Api\Data\AgreementInterface;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
 
 class UpdateCheckoutAgreementsVersionPlugin
 {
     /**
      * @param CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository
+     * @param StoreManagerInterface $storeManager
      * @param CacheInterface $cache
      */
     public function __construct(
         private readonly CheckoutAgreementsVersionRepositoryInterface $checkoutAgreementsVersionRepository,
+        private readonly StoreManagerInterface $storeManager,
         private readonly CacheInterface $cache
     ) {
     }
@@ -53,7 +56,17 @@ class UpdateCheckoutAgreementsVersionPlugin
             $data['version'] = uniqid();
 
             $this->checkoutAgreementsVersionRepository->save($data);
-            $this->cache->clean([TermsAndConditionsCacheType::TYPE_IDENTIFIER]);
+            $cacheIdentifiers = [TermsAndConditionsCacheType::TYPE_IDENTIFIER];
+
+            foreach ($this->storeManager->getStores(true) as $store) {
+                $cacheIdentifiers[] = sprintf(
+                    '%s_%s',
+                    TermsAndConditionsCacheType::TYPE_IDENTIFIER,
+                    (int)$store->getId()
+                );
+            }
+
+            $this->cache->clean($cacheIdentifiers);
         }
     }
 }

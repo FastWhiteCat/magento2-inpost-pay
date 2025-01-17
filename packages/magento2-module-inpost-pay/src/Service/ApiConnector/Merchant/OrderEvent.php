@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterfaceFactory;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
+use InPost\InPostPay\Model\Config\Payment\TitleUpdater;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\GetOrderById;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
@@ -24,7 +25,6 @@ use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface as TransactionBuilder;
 use Psr\Log\LoggerInterface;
 
@@ -40,6 +40,17 @@ class OrderEvent implements OrderEventInterface
     public const ORDER_STATUS_COMPLETED = 'ORDER_COMPLETED';
 
     /**
+     * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
+     * @param OrderRepositoryInterface $orderRepository
+     * @param GeneralConfigProvider $generalConfigProvider
+     * @param OrderUpdateInterfaceFactory $orderUpdateFactory
+     * @param GetOrderByIncrementId $getOrderByIncrementId
+     * @param GetOrderById $getOrderById
+     * @param EventManager $eventManager
+     * @param TransactionBuilder $transactionBuilder
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param LoggerInterface $logger
+     * @param TitleUpdater $titleUpdater
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -52,7 +63,8 @@ class OrderEvent implements OrderEventInterface
         private readonly EventManager $eventManager,
         private readonly TransactionBuilder $transactionBuilder,
         private readonly TransactionRepositoryInterface $transactionRepository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly TitleUpdater $titleUpdater
     ) {
     }
 
@@ -186,6 +198,7 @@ class OrderEvent implements OrderEventInterface
                 $payment->capture();
 
                 $this->addTransaction($payment, $order, $eventData);
+                $this->updateOrderPaymentType($payment, $order, $eventData);
 
                 $order->setIsInProcess(true);
 
@@ -194,6 +207,15 @@ class OrderEvent implements OrderEventInterface
         }
 
         throw new OrderNotUpdateException();
+    }
+
+    private function updateOrderPaymentType(
+        OrderPaymentInterface $payment,
+        Order $order,
+        EventDataInterface $eventData
+    ): void {
+        $paymentType = $eventData->getPaymentType();
+        $this->titleUpdater->updatePaymentTitleByType($payment, $order, $paymentType);
     }
 
     private function updateOrderStatus(Order $order): void

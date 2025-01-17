@@ -56,5 +56,10 @@
                 <field id="enabled">1</field>
             </depends>
         </field>
+        <field id="sandbox_client_merchant_id" translate="label" type="text" sortOrder="35"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Client Merchant ID</label>
+            <config_path>payment/inpost_pay/sandbox_client_merchant_id</config_path>
+        </field>
     </group>
 </include>

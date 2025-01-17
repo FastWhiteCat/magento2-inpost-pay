@@ -4,6 +4,7 @@
         <payment>
             <inpost_pay>
                 <active>0</active>
+                <test_mode_active>0</test_mode_active>
                 <widget_enabled>1</widget_enabled>
                 <can_use_checkout>1</can_use_checkout>
                 <model>InPostPayPaymentFacade</model>
@@ -22,8 +23,9 @@
                 <product_cart_enabled>1</product_cart_enabled>
                 <cart_enabled>1</cart_enabled>
                 <success_page_enabled>1</success_page_enabled>
-                <widget_color_variant>primary</widget_color_variant>
-                <widget_dark_mode>0</widget_dark_mode>
+                <success_page_url>checkout/onepage/success</success_page_url>
+                <widget_size>size-md</widget_size>
+                <widget_frame_style>primary</widget_frame_style>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
                 <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
                 <async_basket_export>0</async_basket_export>
@@ -38,8 +40,6 @@
                 <can_refund>1</can_refund>
                 <is_offline>1</is_offline>
                 <use_address_as_firstname_source>0</use_address_as_firstname_source>
-                <polling_time_for_inactive>10000</polling_time_for_inactive>
-                <polling_enabled_for_inactive>1</polling_enabled_for_inactive>
                 <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
             </inpost_pay>

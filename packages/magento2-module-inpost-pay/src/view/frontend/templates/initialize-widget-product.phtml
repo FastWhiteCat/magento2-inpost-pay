@@ -1,7 +1,5 @@
 <?php
 
-use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
-
 /**
  * @var Magento\Framework\View\Element\Template $block
  * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
@@ -12,6 +10,7 @@ if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnProductCart(
     return;
 }
 
+$merchantClientId = $widgetViewModel->getClientMerchantId();
 $bindingPlace = $block->getBindingPlace();
 $productId = $block->getRequest()->getParam('id');
 $productId = is_scalar($productId) ? (string)$productId : "";
@@ -25,37 +24,26 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
-$longPollingTimeForInactiveTab = $widgetViewModel->getLongPollingTimeForInactiveTab();
-$isEnabledLongPollingForInactiveTab = $widgetViewModel->isEnabledLongPollingForInactiveTab();
+$apiBaseUrl = $widgetViewModel->getApiBaseUrl();
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-izi-button
-        name
-        masked_phone_number
+        binding_place="<?= /* @noEscape */ $bindingPlace ?>"
         data-product-id="<?= /* @noEscape */ $productId ?>"
-        language="<?= /* @noEscape */ $language ?>"
-        variant="<?= /* @noEscape */ $layoutConfig['variant'] ?>"
-        basket="false"
-        dark_mode="<?= /* @noEscape */ $layoutConfig['darkMode'] ? 'true' : '' ?>"
-        max_width="<?= /* @noEscape */ $layoutConfig['maxWidth'] ?: '' ?>"
-        min_height="<?= /* @noEscape */ $layoutConfig['minHeight'] ?: '' ?>"
-        frame_style="<?= /* @noEscape */ $layoutConfig['frameStyle'] ?>"
-        count="0"
-        binding_place="<?= /* @noEscape */ $bindingPlace ?>">
-    </inpost-izi-button>
+        variation="<?= /* @noEscape */ $layoutConfig ?>"
+    ></inpost-izi-button>
 
     <script type="text/x-magento-init">
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "wrapperClass": "<?= /* @noEscape */ $widgetWrapperClass ?>",
-                    "popupBindingPlace": "<?= /* @noEscape */
-                        DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME ?>",
+                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
                     "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
-                    "longPollingTimeForInactiveTab": <?= /* @noEscape */ $longPollingTimeForInactiveTab ?>,
-                    "isEnabledLongPollingForInactiveTab": <?= /* @noEscape */
-                    $isEnabledLongPollingForInactiveTab ? 'true' : 'false' ?>
+                    "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
+                    "language": "<?= /* @noEscape */ $language ?>",
+                    "productId": "<?= /* @noEscape */ $productId ?>",
+                    "apiBaseUrl": "<?= /* @noEscape */ $apiBaseUrl ?>"
                 }
             }
         }
