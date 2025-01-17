@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.2] - 2025-01-17
+
+### Added
+
+- sending of module version in header of requests to InPost Pay API
+
+### Changed
+
+- handling both order ID and order Increment ID in communication with InPost Pay API 
+
 ## [2.0.1] - 2025-01-17
 
 ### Fixed
