@@ -1,7 +1,7 @@
 {
     "name": "inpost/magento2-module-restrictions",
     "description": "Module allows for configuration of restrictions for products not handled by InPost.",
-    "version": "1.0.12",
+    "version": "2.0.0",
     "type": "magento2-module",
     "license": [
         "Commercial"
