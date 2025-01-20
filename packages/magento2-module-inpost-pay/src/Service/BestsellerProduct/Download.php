@@ -42,10 +42,11 @@ class Download extends BestsellerProductService
     {
         foreach ($this->getDefaultStoresForWebsites() as $store) {
             $websiteId = (int)$store->getWebsiteId();
+            $storeId = (int)$store->getId();
             $this->storeEmulator->startEnvironmentEmulation((int)$store->getId(), Area::AREA_FRONTEND, true);
 
             try {
-                $inPostBestsellers = $this->getBestsellers->execute();
+                $inPostBestsellers = $this->getBestsellers->execute($storeId);
                 $this->cleanBestsellersByWebsiteId($websiteId);
                 $priority = BestsellerProductPriority::MIN_PRIORITY;
 

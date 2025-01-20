@@ -33,13 +33,14 @@ class GetBestsellers
     }
 
     /**
+     * @param int $storeId
      * @return BestsellerProductInterface[]
      * @throws LocalizedException
      */
-    public function execute(): array
+    public function execute(int $storeId): array
     {
         try {
-            return $this->getAllBestsellerProducts();
+            return $this->getAllBestsellerProducts($storeId);
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with downloading bestsellers. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
@@ -49,9 +50,10 @@ class GetBestsellers
     }
 
     /**
+     * @param int $storeId
      * @return BestsellerProductInterface[]
      */
-    private function getAllBestsellerProducts(): array
+    private function getAllBestsellerProducts(int $storeId): array
     {
         $bestsellerProducts = [];
         $pageIndex = 0;
@@ -59,6 +61,7 @@ class GetBestsellers
         do {
             /** @var GetBestsellersRequest $request */
             $request = $this->getBestsellersRequestFactory->create();
+            $request->setStoreId($storeId);
             $request->setParams(
                 [
                     BestsellersInterface::PAGE_INDEX => $pageIndex,

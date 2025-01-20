@@ -36,24 +36,36 @@ class UploadResponseHandler
      * @param int $websiteId
      * @return bool True on full success
      */
-    public function handleResponse(array $response, int $websiteId): bool
+    public function handlePostResponse(array $response, int $websiteId): bool
     {
         $successfulData = (array)($response[self::CONTENT_KEY] ?? []);
         $errorData = (array)($response[self::ERROR_KEY] ?? []);
 
-        $this->handleSuccessfulData($successfulData, $websiteId);
+        $success = $this->handleSuccessfulData($successfulData, $websiteId);
         $this->handleErrorData($errorData, $websiteId);
 
-        return empty($errorData);
+        return empty($errorData) && $success;
+    }
+
+    /**
+     * @param array $response
+     * @param int $websiteId
+     * @return bool True on full success
+     */
+    public function handlePutResponse(array $response, int $websiteId): bool
+    {
+        return $this->handleSuccessfulData([$response], $websiteId);
     }
 
     /**
      * @param array $successfulData
      * @param int $websiteId
-     * @return void
+     * @return bool
      */
-    private function handleSuccessfulData(array $successfulData, int $websiteId): void
+    private function handleSuccessfulData(array $successfulData, int $websiteId): bool
     {
+        $success = true;
+
         foreach ($successfulData as $successfulProductData) {
             $productId = (int)($successfulProductData[BestsellerProductInterface::PRODUCT_ID] ?? 0);
             $qrCode = (string)($successfulProductData[InPostPayBestsellerProductInterface::QR_CODE] ?? '');
@@ -85,8 +97,12 @@ class UploadResponseHandler
                         $e->getMessage()
                     )
                 );
+
+                $success = false;
             }
         }
+
+        return $success;
     }
 
     /**

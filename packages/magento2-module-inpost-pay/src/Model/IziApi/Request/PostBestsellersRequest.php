@@ -28,7 +28,7 @@ class PostBestsellersRequest extends Request implements RequestInterface
 
     public function getApiUrl(): string
     {
-        return $this->iziApiConfigProvider->getIziApiUrl();
+        return $this->iziApiConfigProvider->getIziApiUrl($this->storeId);
     }
 
     public function getUri(bool $keepParamsIntact = false): string
