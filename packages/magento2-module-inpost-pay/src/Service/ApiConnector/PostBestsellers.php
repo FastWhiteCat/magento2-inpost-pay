@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector;
 
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
-use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Model\IziApi\Request\PostBestsellersRequest;
 use InPost\InPostPay\Model\IziApi\Request\PostBestsellersRequestFactory;
 use InPost\InPostPay\Service\Converter\InPostBestsellerProductToArrayConverter;
@@ -30,10 +29,11 @@ class PostBestsellers
 
     /**
      * @param array $bestsellerProducts
+     * @param int $storeId
      * @return array
      * @throws LocalizedException
      */
-    public function execute(array $bestsellerProducts): array
+    public function execute(array $bestsellerProducts, int $storeId): array
     {
         if (empty($bestsellerProducts)) {
             return [];
@@ -51,6 +51,7 @@ class PostBestsellers
             }
         }
 
+        $postBestsellersRequest->setStoreId($storeId);
         $postBestsellersRequest->setParams(['content' => $products]);
 
         try {

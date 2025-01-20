@@ -16,6 +16,8 @@ class GetBestsellersRequest extends Request implements RequestInterface
 
     protected string $uri = '/v1/izi/products';
 
+    private ?int $storeId = null;
+
     /**
      * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TokenGenerator $tokenGenerator
@@ -60,14 +62,14 @@ class GetBestsellersRequest extends Request implements RequestInterface
 
     public function getApiUrl(): string
     {
-        return $this->iziApiConfigProvider->getIziApiUrl();
+        return $this->iziApiConfigProvider->getIziApiUrl($this->storeId);
     }
 
     public function getBearerToken(): ?string
     {
         $this->tokenGenerator->cleanTokenCache();
 
-        return $this->tokenGenerator->generate()->getAccessToken();
+        return $this->tokenGenerator->generate(true, $this->storeId)->getAccessToken();
     }
 
     private function modifyUriWithPageIndexAndSize(
@@ -90,5 +92,10 @@ class GetBestsellersRequest extends Request implements RequestInterface
         }
 
         return $uri;
+    }
+
+    public function setStoreId(int $storeId): void
+    {
+        $this->storeId = $storeId;
     }
 }

@@ -50,7 +50,7 @@ class Delete extends BestsellerProductService
         try {
             $this->storeEmulator->startEnvironmentEmulation((int)$store->getId(), Area::AREA_FRONTEND, true);
             $product = $this->getProductBySku($bestsellerProduct->getSku());
-            $this->deleteBestseller->deleteBestsellerByProductId((int)$product->getId());
+            $this->deleteBestseller->deleteBestsellerByProductId((int)$product->getId(), (int)$store->getId());
             $this->storeEmulator->stopEnvironmentEmulation();
             $this->logger->debug(
                 sprintf('Bestseller Product [SKU:%s] has been deleted from InPost Pay API.', $product->getSku())
