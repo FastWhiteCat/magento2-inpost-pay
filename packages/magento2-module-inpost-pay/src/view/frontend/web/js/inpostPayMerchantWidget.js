@@ -30,7 +30,7 @@ define([
     };
 
     var CHECKOUT_BINDING_PLACE = 'CHECKOUT_PAGE'
-    var MINICART_BINDING_PLACE = 'BASKET_POPUP'
+    var PRODUCT_CARD_BINDING_PLACE = 'PRODUCT_CARD'
 
     return Component.extend({
         /**
@@ -132,16 +132,20 @@ define([
 
             function checkCartWidget(cartData = "") {
                 var wrapperClass = "inpay-widget-wrapper";
-                var popupBindingPlace = MINICART_BINDING_PLACE;
-                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
+                var $inpayWrapperOnBasket = $("." + wrapperClass);
                 var counter = cartData ? cartData.summary_count : 0;
 
                 if ($inpayWrapperOnBasket.length) {
-                    if (counter === 0) {
-                        $inpayWrapperOnBasket.hide()
-                    } else {
-                        $inpayWrapperOnBasket.show()
-                    }
+                    $inpayWrapperOnBasket.each(function() {
+                        if ($(this).hasClass(PRODUCT_CARD_BINDING_PLACE)) return;
+
+                        if (counter === 0) {
+                            $(this).hide()
+                        } else {
+                            $(this).show()
+                        }
+                    })
+
                 }
             }
         },
