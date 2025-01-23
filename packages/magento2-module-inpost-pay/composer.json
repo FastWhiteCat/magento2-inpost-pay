@@ -12,14 +12,18 @@
         "monolog/monolog": "*",
         "psr/log": "*",
         "guzzlehttp/guzzle": "*",
-        "inpost/magento2-module-restrictions": ">=1.0.0"
+        "inpost/magento2-module-restrictions": ">=2.0.0"
     },
     "autoload": {
         "files": [
-            "registration.php"
+            "src/registration.php"
         ],
         "psr-4": {
-            "InPost\\InPostPay\\": ""
+            "InPost\\InPostPay\\": "src"
         }
-    }
+    },
+    "keywords": [
+        "magento2",
+        "inpostpay"
+    ]
 }
