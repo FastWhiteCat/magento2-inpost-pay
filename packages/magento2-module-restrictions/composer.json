@@ -1,6 +1,6 @@
 {
     "name": "inpost/magento2-module-restrictions",
-    "description": "Module allows for configuration of restrictions for products not handled by InPost.",
+    "description": "Module allows for configuration of restrictions for products not handled by InPost Pay.",
     "version": "2.0.3",
     "type": "magento2-module",
     "license": [
@@ -9,16 +9,21 @@
     "require": {
         "php": ">=8.1",
         "magento/framework": "*",
-        "magento/module-ui": "101.1.*",
-        "magento/module-catalog-rule": "101.1.*"
+        "monolog/monolog": "*",
+        "psr/log": "*",
+        "magento/module-ui": "*",
+        "magento/module-catalog-rule": "*"
     },
     "autoload": {
         "files": [
-            "registration.php"
+            "src/registration.php"
         ],
         "psr-4": {
-            "InPost\\Restrictions\\": ""
+            "InPost\\Restrictions\\": "src"
         }
-    }
+    },
+    "keywords": [
+        "magento2",
+        "inpostpay"
+    ]
 }
-
