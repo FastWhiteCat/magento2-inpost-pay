@@ -177,7 +177,11 @@
         <plugin name="InPost_InPostPay::applyCustomPromoPriceForCustomerGroupPlugin"
                 type="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ApplyCustomPromoPriceForCustomerGroupPlugin" />
     </type>
-    <type name="InPost\InPostPay\Model\Request">
+    <type name="InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface">
+        <plugin name="InPost_InPostPay::limitProductAttributeNameAndValueCharactersPlugin"
+                type="InPost\InPostPay\Plugin\Model\Data\Basket\Product\LimitProductAttributeNameAndValueCharactersPlugin" />
+    </type>
+    <type name="\InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface">
         <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
                 type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
     </type>
