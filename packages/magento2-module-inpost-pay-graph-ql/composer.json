@@ -3,9 +3,7 @@
     "description": "Module implements GraphQL endpoints for InPost_InPostPay module.",
     "version": "2.0.3",
     "type": "magento2-module",
-    "license": [
-        "Commercial"
-    ],
+    "license": ["CC-BY-NC-ND-4.0"],
     "require": {
         "php": ">=8.1",
         "monolog/monolog": "*",
