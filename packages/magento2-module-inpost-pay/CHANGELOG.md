@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.3] - 2025-01-17
+
+### Fixed
+
+- handling of order update event for legacy identification
+
 ## [2.0.2] - 2025-01-17
 
 ### Added

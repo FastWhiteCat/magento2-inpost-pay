@@ -98,6 +98,8 @@ class OrderGet implements OrderGetInterface
 
             if ((string)$orderId === $orderIdentificationNr) {
                 $order = $this->getOrderById->get($orderId);
+            } else {
+                $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
             }
         } catch (NoSuchEntityException $e) {
             $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
