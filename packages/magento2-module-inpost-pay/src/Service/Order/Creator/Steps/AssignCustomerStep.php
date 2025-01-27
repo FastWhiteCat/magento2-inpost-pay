@@ -24,25 +24,33 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
     public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
         // @phpstan-ignore-next-line
-        $quoteCustomerId = (int)$quote->getCustomer()->getId();
-        $email = $inPostOrder->getAccountInfo()->getMail();
+        $quoteCustomerId = is_scalar($quote->getCustomer()->getId()) ? (int)$quote->getCustomer()->getId() : null;
+        $accountEmail = $inPostOrder->getAccountInfo()->getMail();
         $websiteId = (int)$quote->getStore()->getWebsiteId();
+
         try {
-            $customer = $this->customerRepository->get($email, $websiteId);
-            $foundCustomerId = (int)$customer->getId();
-            if ($foundCustomerId && $quoteCustomerId === $foundCustomerId) {
+            if ($quoteCustomerId) {
+                $this->createLog(
+                    sprintf(
+                        'Basket has been initialized by logged-in user. Order will be assigned to customer ID: %s',
+                        (int)$quote->getCustomerId()
+                    )
+                );
+            } elseif ($accountEmail) {
+                $customer = $this->customerRepository->get($accountEmail, $websiteId);
                 $quote->assignCustomer($customer);
+                $quote->setCustomerIsGuest(false);
                 $this->createLog(
                     sprintf(
                         'Customer account found by email: %s. Order will be assigned to customer ID: %s',
-                        $email,
+                        $accountEmail,
                         (int)$customer->getId()
                     )
                 );
             }
         } catch (NoSuchEntityException | LocalizedException $e) {
             $this->createLog(
-                sprintf('Customer account not found by email: %s. Order will be processed for guest.', $email)
+                sprintf('Customer account not found by email: %s. Order will be processed for guest.', $accountEmail)
             );
         }
     }
