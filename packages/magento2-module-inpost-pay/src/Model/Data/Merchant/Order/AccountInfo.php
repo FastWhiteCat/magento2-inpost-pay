@@ -108,6 +108,25 @@ class AccountInfo extends DataObject implements AccountInfoInterface, Extensible
     }
 
     /**
+     * @return string|null
+     */
+    public function getAccountEmail(): ?string
+    {
+        $accountEmail = $this->hasData(self::ACCOUNT_EMAIL) ? $this->getData(self::ACCOUNT_EMAIL) : null;
+
+        return ($accountEmail && is_scalar($accountEmail)) ? (string)$accountEmail : null;
+    }
+
+    /**
+     * @param string|null $accountEmail
+     * @return void
+     */
+    public function setAccountEmail(?string $accountEmail): void
+    {
+        $this->setData(self::ACCOUNT_EMAIL, $accountEmail);
+    }
+
+    /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface
      */
     public function getClientAddress(): ClientAddressInterface

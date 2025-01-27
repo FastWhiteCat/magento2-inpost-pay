@@ -12,6 +12,7 @@ interface AccountInfoInterface
     public const SURNAME = 'surname';
     public const PHONE_NUMBER = 'phone_number';
     public const MAIL = 'mail';
+    public const ACCOUNT_EMAIL = 'account_email';
     public const CLIENT_ADDRESS = 'client_address';
 
     /**
@@ -57,6 +58,17 @@ interface AccountInfoInterface
      * @return void
      */
     public function setMail(string $mail): void;
+
+    /**
+     * @return string|null
+     */
+    public function getAccountEmail(): ?string;
+
+    /**
+     * @param string|null $accountEmail
+     * @return void
+     */
+    public function setAccountEmail(?string $accountEmail): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface

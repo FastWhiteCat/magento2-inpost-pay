@@ -24,25 +24,51 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
     public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
         // @phpstan-ignore-next-line
-        $quoteCustomerId = (int)$quote->getCustomer()->getId();
-        $email = $inPostOrder->getAccountInfo()->getMail();
+        $quoteCustomerId = is_scalar($quote->getCustomer()->getId()) ? (int)$quote->getCustomer()->getId() : null;
+        $accountEmail = $inPostOrder->getAccountInfo()->getAccountEmail();
         $websiteId = (int)$quote->getStore()->getWebsiteId();
+
         try {
-            $customer = $this->customerRepository->get($email, $websiteId);
-            $foundCustomerId = (int)$customer->getId();
-            if ($foundCustomerId && $quoteCustomerId === $foundCustomerId) {
+            if ($quoteCustomerId) {
+                $this->createLog(
+                    sprintf(
+                        'Basket has been initialized by logged-in user. Order will be assigned to customer ID: %s',
+                        (int)$quote->getCustomerId()
+                    )
+                );
+            } elseif ($accountEmail) {
+                $customer = $this->customerRepository->get($accountEmail, $websiteId);
                 $quote->assignCustomer($customer);
+                $quote->setCustomerIsGuest(false);
                 $this->createLog(
                     sprintf(
                         'Customer account found by email: %s. Order will be assigned to customer ID: %s',
-                        $email,
+                        $accountEmail,
                         (int)$customer->getId()
                     )
                 );
             }
         } catch (NoSuchEntityException | LocalizedException $e) {
             $this->createLog(
-                sprintf('Customer account not found by email: %s. Order will be processed for guest.', $email)
+                sprintf('Customer account not found by email: %s. Order will be processed for guest.', $accountEmail)
+            );
+        }
+
+        $this->updateQuoteEmailWithInPostDeliveryEmail($quote, $inPostOrder->getDelivery()->getMail());
+    }
+
+    private function updateQuoteEmailWithInPostDeliveryEmail(Quote $quote, string $inPostDeliveryEmail): void
+    {
+        if ($quote->getCustomerEmail() !== $inPostDeliveryEmail) {
+            // Even if quote has been initialized for Logged-in user, quote customer email property will be updated
+            // with delivery email chosen by customer in Mobile InPost Pay App on purpose so that the customer
+            // will have his order assigned to an email he purposely selected in Mobile App.
+            $quote->setCustomerEmail($inPostDeliveryEmail);
+            $this->createLog(
+                sprintf(
+                    'Order email will be updated with delivery email from InPost Pay account: %s',
+                    $inPostDeliveryEmail
+                )
             );
         }
     }

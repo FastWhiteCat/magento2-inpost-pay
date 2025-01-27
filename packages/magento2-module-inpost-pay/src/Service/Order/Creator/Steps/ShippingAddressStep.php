@@ -52,6 +52,11 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
             $shippingAddress->setPostcode($deliveryAddress->getPostalCode());
             $shippingAddress->setCountryId($deliveryAddress->getCountryCode());
         }
+
+        if ($quote->getCustomerId() && $shippingAddress->getCustomerId() === null) {
+            $shippingAddress->setCustomerId((int)$quote->getCustomerId());
+        }
+
         $quote->setShippingAddress($shippingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);

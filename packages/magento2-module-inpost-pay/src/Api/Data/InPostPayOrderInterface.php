@@ -25,6 +25,7 @@ interface InPostPayOrderInterface
     public const COURIER_NOTE = 'courier_note';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const ACCEPTED_CONSENTS = 'accepted_consents';
+    public const INPOST_PAY_ACCOUNT_EMAIL = 'inpost_pay_account_email';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -56,6 +57,8 @@ interface InPostPayOrderInterface
     public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface;
     public function getCourierNote(): ?string;
     public function setCourierNote(?string $courierNote): InPostPayOrderInterface;
+    public function getInPostPayAccountEmail(): ?string;
+    public function setInPostPayAccountEmail(?string $inPostPayAccountEmail): InPostPayOrderInterface;
 
     /**
      * @return AcceptedConsentInterface[]
