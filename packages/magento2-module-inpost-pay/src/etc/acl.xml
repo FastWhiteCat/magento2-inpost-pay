@@ -7,7 +7,9 @@
 				<resource id="Magento_Backend::stores">
 					<resource id="Magento_Backend::stores_settings">
 						<resource id="Magento_Config::config">
-							<resource id="InPost_InPostPay::inpostpay" title="Inpost Pay config"/>
+                            <resource id="InPost_InPostPay::inpostpay" title="Inpost Pay config">
+                                <resource id="InPost_InPostPay::logs" title="Inpost Pay logs"/>
+                            </resource>
 						</resource>
 					</resource>
 				</resource>

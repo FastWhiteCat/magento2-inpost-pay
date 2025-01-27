@@ -26,13 +26,15 @@ class TermsAndConditionsMappingConfigProvider
     /**
      * Returns mapped terms and conditions
      *
+     * @param int|null $storeId
      * @return array
      */
-    public function getTermsAndConditionsMapping(): array
+    public function getTermsAndConditionsMapping(?int $storeId = null): array
     {
         $value = $this->scopeConfig->getValue(
             self::XML_PATH_TERMS_AND_CONDITIONS_MAPPING,
-            ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         $termsAndConditions = null;

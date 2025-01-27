@@ -10,7 +10,8 @@ use Magento\Framework\Logger\Handler\Base;
 
 class Handler extends Base
 {
-    public const LOG_FILE_PATH = 'var/log/inpost-pay';
+    public const VAR_LOG_PATH = 'var/log';
+    public const INPOST_PAY_LOG_CATALOG = 'inpost-pay';
 
     private ?string $logId = null;
 
@@ -20,7 +21,12 @@ class Handler extends Base
         ?string $fileName = null,
         private readonly ?DebugConfigProvider $debugConfigProvider = null
     ) {
-        $this->fileName = sprintf('%s/%s.log', self::LOG_FILE_PATH, date('Y-m-d'));
+        $this->fileName = sprintf(
+            '%s/%s/%s.log',
+            self::VAR_LOG_PATH,
+            self::INPOST_PAY_LOG_CATALOG,
+            date('Y-m-d')
+        );
         parent::__construct($filesystem, $filePath, $fileName);
         $this->bubble = false;
     }
