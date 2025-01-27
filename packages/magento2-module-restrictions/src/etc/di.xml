@@ -42,14 +42,4 @@
             </argument>
         </arguments>
     </type>
-    <type name="InPost\Restrictions\Service\RefreshRestrictionRulesService">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
-    <type name="InPost\Restrictions\Cron\RefreshRestrictionRulesCron">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
 </config>
