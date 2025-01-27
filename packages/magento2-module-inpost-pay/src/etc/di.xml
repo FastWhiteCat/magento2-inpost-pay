@@ -181,6 +181,10 @@
         <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
                 type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
     </type>
+    <type name="Magento\Sales\Api\OrderCustomerDelegateInterface">
+        <plugin name="InPost_InPostPay::changeNewCustomerDelegateDataPlugin"
+                type="InPost\InPostPay\Plugin\ChangeNewCustomerDelegateDataPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
