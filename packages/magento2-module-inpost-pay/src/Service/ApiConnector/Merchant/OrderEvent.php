@@ -13,7 +13,9 @@ use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterfaceFactory;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
+use InPost\InPostPay\Model\Config\Payment\TitleUpdater;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
+use InPost\InPostPay\Service\GetOrderById;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -23,7 +25,6 @@ use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface as TransactionBuilder;
 use Psr\Log\LoggerInterface;
 
@@ -38,16 +39,32 @@ class OrderEvent implements OrderEventInterface
     public const ORDER_STATUS_REJECTED = 'ORDER_REJECTED';
     public const ORDER_STATUS_COMPLETED = 'ORDER_COMPLETED';
 
+    /**
+     * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
+     * @param OrderRepositoryInterface $orderRepository
+     * @param GeneralConfigProvider $generalConfigProvider
+     * @param OrderUpdateInterfaceFactory $orderUpdateFactory
+     * @param GetOrderByIncrementId $getOrderByIncrementId
+     * @param GetOrderById $getOrderById
+     * @param EventManager $eventManager
+     * @param TransactionBuilder $transactionBuilder
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param LoggerInterface $logger
+     * @param TitleUpdater $titleUpdater
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly OrderUpdateInterfaceFactory $orderUpdateFactory,
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
+        private readonly GetOrderById $getOrderById,
         private readonly EventManager $eventManager,
         private readonly TransactionBuilder $transactionBuilder,
         private readonly TransactionRepositoryInterface $transactionRepository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly TitleUpdater $titleUpdater
     ) {
     }
 
@@ -68,7 +85,7 @@ class OrderEvent implements OrderEventInterface
             ]);
 
             /** @var Order $order */
-            $order = $this->getOrderByIncrementId->get($orderId);
+            $order = $this->getOrder($orderId);
             $this->checkIfCanProcess($order, $phoneNumber);
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
 
@@ -96,6 +113,32 @@ class OrderEvent implements OrderEventInterface
 
             throw new OrderNotUpdateException();
         }
+    }
+
+    /**
+     * @param string $orderIdentificationNr
+     * @return OrderInterface
+     * @throws NoSuchEntityException
+     */
+    private function getOrder(string $orderIdentificationNr): OrderInterface
+    {
+        try {
+            $orderId = (int)$orderIdentificationNr;
+
+            if ((string)$orderId === $orderIdentificationNr) {
+                $order = $this->getOrderById->get($orderId);
+            } else {
+                $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
+            }
+        } catch (NoSuchEntityException $e) {
+            $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
+        }
+
+        if (!isset($order)) {
+            throw new NoSuchEntityException(__('Order %1 not found.', $orderId));
+        }
+
+        return $order;
     }
 
     private function checkIfCanProcess(Order $order, ?PhoneNumberInterface $phoneNumber): void
@@ -157,6 +200,7 @@ class OrderEvent implements OrderEventInterface
                 $payment->capture();
 
                 $this->addTransaction($payment, $order, $eventData);
+                $this->updateOrderPaymentType($payment, $order, $eventData);
 
                 $order->setIsInProcess(true);
 
@@ -165,6 +209,15 @@ class OrderEvent implements OrderEventInterface
         }
 
         throw new OrderNotUpdateException();
+    }
+
+    private function updateOrderPaymentType(
+        OrderPaymentInterface $payment,
+        Order $order,
+        EventDataInterface $eventData
+    ): void {
+        $paymentType = $eventData->getPaymentType();
+        $this->titleUpdater->updatePaymentTitleByType($payment, $order, $paymentType);
     }
 
     private function updateOrderStatus(Order $order): void
