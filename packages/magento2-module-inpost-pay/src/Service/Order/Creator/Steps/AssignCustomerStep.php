@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -16,6 +17,7 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
 {
     public function __construct(
         private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly GeneralConfigProvider $generalConfigProvider,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -36,7 +38,9 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
                         (int)$quote->getCustomerId()
                     )
                 );
-            } elseif ($accountEmail) {
+            } elseif ($this->generalConfigProvider->isAssigningGuestCartsToAccountByEmailEnabled($quote->getStoreId())
+                && $accountEmail
+            ) {
                 $customer = $this->customerRepository->get($accountEmail, $websiteId);
                 $quote->assignCustomer($customer);
                 $quote->setCustomerIsGuest(false);
