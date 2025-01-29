@@ -35,7 +35,7 @@ class IziOrderCreateBeforeEventObserver extends MerchantEndpointEventObserver im
             }
 
             $accountInfoData = [];
-            $accountInfo = $event->getData(OrderInterface::ORDER_DETAILS);
+            $accountInfo = $event->getData(OrderInterface::ACCOUNT_INFO);
             if ($accountInfo instanceof ExtensibleDataInterface) {
                 $accountInfoData = $this->objectConverter->toNestedArray(
                     $accountInfo,
@@ -45,13 +45,13 @@ class IziOrderCreateBeforeEventObserver extends MerchantEndpointEventObserver im
             }
 
             $deliveryData = [];
-            $delivery = $event->getData(OrderInterface::ORDER_DETAILS);
+            $delivery = $event->getData(OrderInterface::DELIVERY);
             if ($delivery instanceof ExtensibleDataInterface) {
                 $deliveryData = $this->objectConverter->toNestedArray($delivery, [], DeliveryInterface::class);
             }
 
             $invoiceDetailsData = [];
-            $invoiceDetails = $event->getData(OrderInterface::ORDER_DETAILS);
+            $invoiceDetails = $event->getData(OrderInterface::INVOICE_DETAILS);
             if ($invoiceDetails instanceof ExtensibleDataInterface) {
                 $invoiceDetailsData = $this->objectConverter->toNestedArray(
                     $invoiceDetails,

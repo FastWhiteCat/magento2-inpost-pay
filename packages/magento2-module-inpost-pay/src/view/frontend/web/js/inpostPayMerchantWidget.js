@@ -20,7 +20,17 @@ define([
         ORDER_CREATED: 'orderCreated'
     }
 
+    var PRODUCT_TYPES = {
+        CONFIGURABLE: 'configurable',
+        SIMPLE: 'simple',
+        GROUPED: 'grouped',
+        VIRTUAL: 'virtual',
+        DOWNLOADABLE: 'downloadable',
+        BUNDLE: 'bundle'
+    };
+
     var CHECKOUT_BINDING_PLACE = 'CHECKOUT_PAGE'
+    var MINICART_BINDING_PLACE = 'BASKET_POPUP'
 
     return Component.extend({
         /**
@@ -42,6 +52,12 @@ define([
             this.configuration = config.bindingPlace && config.bindingPlace !== CHECKOUT_BINDING_PLACE
                 ? config
                 : (window.checkoutConfig ? window.checkoutConfig.inPostConfig : {});
+            this.checkIfProductIsAdded = this.checkIfProductIsAdded.bind(this);
+            this.sectionData = customerData.get("cart")
+
+            if (!this.sectionData().hasOwnProperty('summary_count')) {
+                customerData.reload(['cart'])
+            }
 
             if (this.configuration) {
                 stepNavigator.steps.subscribe(function (steps) {
@@ -90,7 +106,7 @@ define([
             var widgetOptions = $.extend({
                 merchantClientId: config.merchantClientId,
                 basketBindingApiKey: this.retrieveBasketBindingApiKey(config.basketBindingApiKey),
-                unboundWidgetClicked: this.unboundWidgetClicked,
+                unboundWidgetClicked: this.unboundWidgetClicked.bind(this),
                 handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
                 language: config.language ? config.language : undefined,
@@ -99,10 +115,80 @@ define([
             });
 
             var widget = InPostPayWidget.init(widgetOptions);
+
+            this.bindEvents();
         },
 
         getConfiguration: function() {
             return this.checkoutConfiguration;
+        },
+
+        bindEvents: function() {
+            customerData.get('cart').subscribe(function (cartData) {
+                checkCartWidget(cartData);
+            });
+
+            checkCartWidget(this.sectionData());
+
+            function checkCartWidget(cartData = "") {
+                var wrapperClass = "inpay-widget-wrapper";
+                var popupBindingPlace = MINICART_BINDING_PLACE;
+                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
+                var counter = cartData ? cartData.summary_count : 0;
+
+                if ($inpayWrapperOnBasket.length) {
+                    if (counter === 0) {
+                        $inpayWrapperOnBasket.hide()
+                    } else {
+                        $inpayWrapperOnBasket.show()
+                    }
+                }
+            }
+        },
+
+        checkIfProductIsAdded: function (id, cartData, $productForm) {
+            if (!cartData.items) return false;
+
+            if (cartData.items
+                && cartData.items.some((item) => item.product_id === id && item.product_type === PRODUCT_TYPES.SIMPLE))
+                return true;
+
+            var $configurableProductOptions = $productForm.find('[data-attribute-code]')
+
+            if ($configurableProductOptions.length) {
+                var configurableProducts = cartData.items.filter(function (item) {
+                    return item.product_id === id;
+                })
+                var productOptions = 0;
+
+                return configurableProducts.some(function (item) {
+                    _.each(item.options, function (option, index) {
+                        if (option.option_id.toString() === $configurableProductOptions[index].dataset.attributeId
+                            && option.option_value === $configurableProductOptions[index].dataset.optionSelected)
+                            productOptions++;
+                    })
+
+                    var isAddedProduct = productOptions === $configurableProductOptions.length;
+                    productOptions = 0;
+
+                    return isAddedProduct
+                })
+            }
+
+            var $groupedProductElements = $productForm.find('[name*="super_group"]')
+            var simpleProductsInGrouped = $groupedProductElements.filter(function () {
+                return this.value > 0;
+            })
+
+            if (simpleProductsInGrouped.length) {
+                var addedSimpleProducts = 0;
+                _.each(simpleProductsInGrouped, function (item) {
+                    if (cartData.items.some(function (cartItem) {
+                        return cartItem.product_id === $(item).attr('name').match(/\[(.*?)\]/)[1];
+                    })) addedSimpleProducts++
+                })
+                return addedSimpleProducts === simpleProductsInGrouped.length;
+            }
         },
 
         initAfterRender: function() {
@@ -121,6 +207,30 @@ define([
             }
         },
 
+        getBasketBindingApiKey: function() {
+            var self = this;
+
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
+                    method: 'GET',
+                })
+                    .done(function (data) {
+                        if (data && data.success && data.basket_binding_api_key) {
+                            self.basketBindingApiKey = data.basket_binding_api_key;
+                            resolve(data.basket_binding_api_key)
+                        } else if (data.error) {
+                            reject(data.error)
+                        } else {
+                            reject(new Error('Something went wrong, refresh the page and try again'))
+                        }
+                    })
+                    .fail(function () {
+                        reject(new Error('Something went wrong, refresh the page and try again'));
+                    });
+            })
+        },
+
         /**
          * Handle user clicks on the unbound basket
          *
@@ -129,20 +239,48 @@ define([
          * @return {promise<string>}
          */
         unboundWidgetClicked: function (productId) {
-            if (!productId) {
-                return Promise.reject('Product id not found');
+            var self = this;
+
+            if (this.sectionData().summary_count > 0 && !productId) {
+                return new Promise(function (resolve, reject) {
+                    self.getBasketBindingApiKey(resolve, reject)
+                        .then((data) => {
+                            resolve(data)
+                        })
+                        .catch(function(error) {
+                            reject(error)
+                        });
+                });
             }
 
-            var self = this;
+            if (!productId) {
+                return Promise.reject(new Error('Product id not found'));
+            }
+
             var $productInput = $('[name="product"][value="' + productId + '"]');
             var $productForm = $productInput.parent('#product_addtocart_form');
 
             if (!$productForm.length) {
-                return Promise.reject('Problem with product configuration');
+                return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'))
+
             }
 
             if (!$productForm.validation('isValid')) {
-                return Promise.reject('Product is invalid');
+                return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'))
+            }
+
+            var isProductAdded = this.checkIfProductIsAdded(productId, customerData.get("cart")(), $productForm)
+
+            if (isProductAdded) {
+                return new Promise(function (resolve, reject) {
+                    self.getBasketBindingApiKey(resolve, reject)
+                        .then((data) => {
+                            resolve(data)
+                        })
+                        .catch(function(error) {
+                            reject(error)
+                        });
+                });
             }
 
             return ajaxSubmit($productForm).then().catch(function (err) {
@@ -165,15 +303,17 @@ define([
                                 method: 'GET',
                             })
                                 .done(function (data) {
-                                    if (!data || !data.basket_binding_api_key) {
-                                        resolve(undefined)
-                                    } else {
+                                    if (data && data.success && data.basket_binding_api_key) {
                                         self.basketBindingApiKey = data.basket_binding_api_key;
                                         resolve(data.basket_binding_api_key)
+                                    } else if (data.error) {
+                                        reject(data.error)
+                                    } else {
+                                        reject(new Error('Something went wrong, refresh the page and try again'))
                                     }
                                 })
                                 .fail(function () {
-                                    reject();
+                                    reject(new Error('Something went wrong, refresh the page and try again'));
                                 });
                         },
                         error: function () {
@@ -193,26 +333,11 @@ define([
          * @return {undefined|string|promise<string>}
          */
         retrieveBasketBindingApiKey: function (apiKey = undefined) {
-            var self = this;
             if (apiKey) return apiKey;
 
-            return new Promise(function (resolve, reject) {
-                $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
-                    method: 'GET',
-                })
-                    .done(function (data) {
-                        if (!data || !data.basket_binding_api_key) {
-                            resolve(undefined)
-                        } else {
-                            self.basketBindingApiKey = data.basket_binding_api_key;
-                            resolve(data.basket_binding_api_key)
-                        }
-                    })
-                    .fail(function () {
-                        reject(new Error($.mage.__('Network problem')));
-                    });
-            });
+            var basketBindingApiKeyFromCookies = $.mage.cookies.get('basketBindingApiKey');
+
+            return basketBindingApiKeyFromCookies ? basketBindingApiKeyFromCookies : undefined
         },
 
         /**
@@ -225,11 +350,8 @@ define([
          * @return {boolean}
          */
         handleBasketEvent: function (widgetBasketEvent) {
-            var self = this;
-
             if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
                 customerData.invalidate(['cart', 'messages']);
-
                 return false;
             }
 
@@ -239,7 +361,7 @@ define([
                             + '/form_key/'
                             + $.mage.cookies.get('form_key'))
                         + '/?basket_binding_api_key='
-                        + self.basketBindingApiKey,
+                        + $.mage.cookies.get('basketBindingApiKey'),
                     method: 'GET',
                 })
                     .done(function (data) {

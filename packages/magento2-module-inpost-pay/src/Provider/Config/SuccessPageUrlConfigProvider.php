@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
+use InPost\InPostPay\Provider\TestModeProvider;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -19,10 +20,12 @@ class SuccessPageUrlConfigProvider
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
+     * @param TestModeProvider $testModeProvider
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly TestModeProvider $testModeProvider
     ) {
     }
 
@@ -48,6 +51,24 @@ class SuccessPageUrlConfigProvider
             is_scalar($url) ? (string)$url : ''
         );
         $url = str_replace(self::SUCCESS_PAGE_URL_ORDER_INCREMENT_ID_VARIABLE, $incrementId, $url);
+
+        if ($this->testModeProvider->isTestModeEnabled()) {
+            if (str_contains($url, '?')) {
+                $url = sprintf(
+                    '%s&%s=%s',
+                    trim($url, '/'),
+                    TestModeProvider::URL_PARAMETER_NAME,
+                    TestModeProvider::VALID_VALUE
+                );
+            } else {
+                $url = sprintf(
+                    '%s?%s=%s',
+                    trim($url, '/'),
+                    TestModeProvider::URL_PARAMETER_NAME,
+                    TestModeProvider::VALID_VALUE
+                );
+            }
+        }
 
         $baseUrl = $this->storeManager->getStore((int)$order->getStoreId())->getBaseUrl();
 
