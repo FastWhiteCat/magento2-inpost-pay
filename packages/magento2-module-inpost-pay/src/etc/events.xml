@@ -80,4 +80,30 @@
     <event name="izi_basket_confirmation_after">
         <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
     </event>
+
+    <!-- Email Events:: observer set InPost Pay Order in process registry so that email copy can be also sent to InPost Pay Account email address -->
+    <event name="email_order_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_order_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_shipment_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_shipment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_invoice_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_invoice_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_creditmemo_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_creditmemo_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
 </config>

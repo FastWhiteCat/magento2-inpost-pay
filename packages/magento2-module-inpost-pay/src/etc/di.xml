@@ -185,6 +185,10 @@
         <plugin name="InPost_InPostPay::changeNewCustomerDelegateDataPlugin"
                 type="InPost\InPostPay\Plugin\ChangeNewCustomerDelegateDataPlugin" />
     </type>
+    <type name="Magento\Sales\Model\Order\Email\Container\OrderIdentity">
+        <plugin name="InPost_InPostPay::addCopyToOrderEmailsForInPostPayAccountEmailPlugin"
+                type="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
