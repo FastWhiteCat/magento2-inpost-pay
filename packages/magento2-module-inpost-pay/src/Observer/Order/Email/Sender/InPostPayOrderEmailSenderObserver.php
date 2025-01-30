@@ -62,35 +62,24 @@ class InPostPayOrderEmailSenderObserver implements ObserverInterface
 
     private function getInPostPayOrder(Order $order): ?InPostPayOrderInterface
     {
-        try {
-            $orderId = is_scalar($order->getId()) ? (int)$order->getId() : null;
+        $orderId = is_scalar($order->getId()) ? (int)$order->getId() : null;
 
+        try {
             if ($orderId) {
                 return $this->inPostPayOrderRepository->getByOrderId($orderId);
-            } else {
-                $orderId = $this->getOrderIdByIncrementId((string)$order->getIncrementId());
             }
 
             return $this->inPostPayOrderRepository->getByOrderId((int)$orderId);
         } catch (NoSuchEntityException $e) {
+            $inPostPayOrder = $this->inPostPayOrderEmailSenderRegistry->registry();
+
+            if ($inPostPayOrder) {
+                $inPostPayOrder->setOrderId($orderId);
+
+                return $inPostPayOrder;
+            }
+
             return null;
         }
-    }
-
-    /**
-     * @param string $incrementId
-     * @return Order|null
-     */
-    private function getOrderIdByIncrementId(string $incrementId): ?int
-    {
-        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
-        $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-        $criteria = $searchCriteriaBuilder
-            ->addFilter(OrderInterface::INCREMENT_ID, $incrementId)
-            ->create();
-        $orders = $this->orderRepository->getList($criteria)->getItems();
-        $order = count($orders) ? $orders[0] : null;
-
-        return ($order && is_scalar($order->getId())) ? (int)$order->getId() : null;
     }
 }
