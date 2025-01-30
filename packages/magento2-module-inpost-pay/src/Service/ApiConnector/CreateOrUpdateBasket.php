@@ -33,17 +33,19 @@ class CreateOrUpdateBasket
 
     /**
      * @param Quote $quote
+     * @param string $browserId
      * @param string $basketId
      * @return BasketResponse
      * @throws LocalizedException
      */
-    public function execute(Quote $quote, string $basketId): BasketResponse
+    public function execute(Quote $quote, string $browserId, string $basketId): BasketResponse
     {
         /** @var BasketRequest $request */
         $request = $this->basketRequestFactory->create();
 
         /** @var BasketInterface $basket */
         $basket = $this->basketFactory->create();
+        $basket->setBrowserId($browserId);
         $basket->setBasketId($basketId);
         $this->quoteToBasketDataTransfer->transfer($quote, $basket);
         $basketData = $this->inPostBasketToArrayConverter->convert($basket);

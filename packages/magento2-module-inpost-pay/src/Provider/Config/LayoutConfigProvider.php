@@ -9,7 +9,12 @@ use Magento\Store\Model\ScopeInterface;
 
 class LayoutConfigProvider
 {
-    private const XML_PATH_SIZE = 'payment/inpost_pay/widget_size';
+    private const XML_PATH_COLOR_VARIANT = 'payment/inpost_pay/widget_color_variant';
+    private const XML_PATH_DARK_MODE = 'payment/inpost_pay/widget_dark_mode';
+
+    private const XML_PATH_MAX_WIDTH = 'payment/inpost_pay/widget_max_width';
+    private const XML_PATH_MIN_HEIGHT = 'payment/inpost_pay/widget_min_height';
+
     private const XML_PATH_FRAME_STYLE = 'payment/inpost_pay/widget_frame_style';
 
     /**
@@ -20,43 +25,67 @@ class LayoutConfigProvider
     }
 
     /**
-     * @param int|null $websiteId
      * @return string
      */
-    public function getWidgetStyles(?int $websiteId = null): string
-    {
-        $styles = array_merge($this->getFrameStyles($websiteId), [$this->getSize($websiteId)]);
-
-        return implode(' ', $styles);
-    }
-
-    /**
-     * @param int|null $websiteId
-     * @return string
-     */
-    public function getSize(?int $websiteId = null): string
+    public function getColorVariant(): string
     {
         $value = $this->scopeConfig->getValue(
-            self::XML_PATH_SIZE,
-            ScopeInterface::SCOPE_WEBSITE,
-            $websiteId
+            self::XML_PATH_COLOR_VARIANT,
+            ScopeInterface::SCOPE_WEBSITE
         );
 
-        return is_scalar($value) ? (string)$value :'';
+        return is_scalar($value) ? (string)$value : '';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDarkModeEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_DARK_MODE,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxWidth(): int
+    {
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_MAX_WIDTH,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        return is_scalar($value) ? (int)$value : 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinHeight(): int
+    {
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_MIN_HEIGHT,
+            ScopeInterface::SCOPE_WEBSITE
+        );
+
+        return is_scalar($value) ? (int)$value : 0;
     }
 
     /**
      * @param int|null $websiteId
-     * @return string[]
+     * @return string
      */
-    public function getFrameStyles(?int $websiteId = null): array
+    public function getFrameStyle(?int $websiteId = null): string
     {
-        $values = $this->scopeConfig->getValue(
+        $value = $this->scopeConfig->getValue(
             self::XML_PATH_FRAME_STYLE,
             ScopeInterface::SCOPE_WEBSITE,
             $websiteId
         );
 
-        return explode(',', is_scalar($values) ? (string)$values : '');
+        return is_scalar($value) ? (string)$value : '';
     }
 }

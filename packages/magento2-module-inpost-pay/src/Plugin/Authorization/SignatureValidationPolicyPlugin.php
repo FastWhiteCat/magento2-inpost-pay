@@ -10,8 +10,6 @@ use Magento\Framework\Authorization\PolicyInterface;
 use InPost\InPostPay\Api\Validator\SignatureValidatorInterface;
 use Magento\Framework\Exception\AuthorizationException;
 use Magento\Framework\Webapi\Rest\Request as RestRequest;
-use InPost\InPostPay\Provider\Config\DebugConfigProvider;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 class SignatureValidationPolicyPlugin
@@ -27,7 +25,6 @@ class SignatureValidationPolicyPlugin
         private readonly SwaggerRegistry $swaggerRegistry,
         private readonly RestRequest $restRequest,
         private readonly SignatureValidatorInterface $signatureValidator,
-        private readonly DebugConfigProvider $debugConfigProvider,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -104,10 +101,6 @@ class SignatureValidationPolicyPlugin
 
     private function logRequest(string $endpoint, array $requestData, string $errorMsg = ''): void
     {
-        if (!$this->canDebug()) {
-            $requestData = [];
-        }
-
         $logMessage = sprintf('Endpoint: %s', $endpoint);
         if (!empty($errorMsg)) {
             $logMessage = sprintf('%s. Error: %s', $logMessage, $errorMsg);
@@ -115,10 +108,5 @@ class SignatureValidationPolicyPlugin
         } else {
             $this->logger->debug($logMessage, $requestData);
         }
-    }
-
-    private function canDebug(): bool
-    {
-        return $this->debugConfigProvider->getMinLogLevel() <= Logger::DEBUG;
     }
 }
