@@ -17,6 +17,10 @@ $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 $apiBaseUrl = $widgetViewModel->getApiBaseUrl();
+
+if (!$widgetViewModel->canShowForWholeCart()) {
+    return;
+}
 ?>
 
 <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">

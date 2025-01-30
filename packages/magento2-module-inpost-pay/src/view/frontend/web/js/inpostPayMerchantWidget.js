@@ -30,7 +30,6 @@ define([
     };
 
     var CHECKOUT_BINDING_PLACE = 'CHECKOUT_PAGE'
-    var MINICART_BINDING_PLACE = 'BASKET_POPUP'
 
     return Component.extend({
         /**
@@ -55,7 +54,7 @@ define([
             this.checkIfProductIsAdded = this.checkIfProductIsAdded.bind(this);
             this.sectionData = customerData.get("cart")
 
-            if (!this.sectionData().hasOwnProperty('summary_count')) {
+            if (!this.sectionData.hasOwnProperty('summary_count')) {
                 customerData.reload(['cart'])
             }
 
@@ -115,35 +114,10 @@ define([
             });
 
             var widget = InPostPayWidget.init(widgetOptions);
-
-            this.bindEvents();
         },
 
         getConfiguration: function() {
             return this.checkoutConfiguration;
-        },
-
-        bindEvents: function() {
-            customerData.get('cart').subscribe(function (cartData) {
-                checkCartWidget(cartData);
-            });
-
-            checkCartWidget(this.sectionData());
-
-            function checkCartWidget(cartData = "") {
-                var wrapperClass = "inpay-widget-wrapper";
-                var popupBindingPlace = MINICART_BINDING_PLACE;
-                var $inpayWrapperOnBasket = $("." + wrapperClass + "." + popupBindingPlace);
-                var counter = cartData ? cartData.summary_count : 0;
-
-                if ($inpayWrapperOnBasket.length) {
-                    if (counter === 0) {
-                        $inpayWrapperOnBasket.hide()
-                    } else {
-                        $inpayWrapperOnBasket.show()
-                    }
-                }
-            }
         },
 
         checkIfProductIsAdded: function (id, cartData, $productForm) {
@@ -216,17 +190,15 @@ define([
                     method: 'GET',
                 })
                     .done(function (data) {
-                        if (data && data.success && data.basket_binding_api_key) {
+                        if (!data || !data.basket_binding_api_key) {
+                            reject();
+                        } else {
                             self.basketBindingApiKey = data.basket_binding_api_key;
                             resolve(data.basket_binding_api_key)
-                        } else if (data.error) {
-                            reject(data.error)
-                        } else {
-                            reject(new Error('Something went wrong, refresh the page and try again'))
                         }
                     })
                     .fail(function () {
-                        reject(new Error('Something went wrong, refresh the page and try again'));
+                        reject();
                     });
             })
         },
@@ -303,17 +275,15 @@ define([
                                 method: 'GET',
                             })
                                 .done(function (data) {
-                                    if (data && data.success && data.basket_binding_api_key) {
+                                    if (!data || !data.basket_binding_api_key) {
+                                        resolve(undefined)
+                                    } else {
                                         self.basketBindingApiKey = data.basket_binding_api_key;
                                         resolve(data.basket_binding_api_key)
-                                    } else if (data.error) {
-                                        reject(data.error)
-                                    } else {
-                                        reject(new Error('Something went wrong, refresh the page and try again'))
                                     }
                                 })
                                 .fail(function () {
-                                    reject(new Error('Something went wrong, refresh the page and try again'));
+                                    reject();
                                 });
                         },
                         error: function () {

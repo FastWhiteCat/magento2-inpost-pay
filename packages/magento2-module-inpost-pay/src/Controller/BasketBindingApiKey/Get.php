@@ -6,7 +6,9 @@ namespace InPost\InPostPay\Controller\BasketBindingApiKey;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Controller\WidgetController;
+use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Service\InitBasketProcessor;
+use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -33,6 +35,7 @@ class Get extends WidgetController implements HttpGetActionInterface
      * @param JsonFactory $jsonFactory
      * @param LoggerInterface $logger
      * @param CartRepositoryInterface $quoteRepository
+     * @param QuoteRestrictionsValidator $quoteRestrictionsValidator
      * @param InitBasketProcessor $initBasketProcessor
      * @param QuoteManagement $quoteManagement
      */
@@ -43,6 +46,7 @@ class Get extends WidgetController implements HttpGetActionInterface
         JsonFactory $jsonFactory,
         LoggerInterface $logger,
         private readonly CartRepositoryInterface $quoteRepository,
+        private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly InitBasketProcessor $initBasketProcessor,
         private readonly QuoteManagement $quoteManagement
     ) {
@@ -58,6 +62,8 @@ class Get extends WidgetController implements HttpGetActionInterface
         $result = [];
         try {
             $quote = $this->getQuote();
+            // @phpstan-ignore-next-line
+            $this->quoteRestrictionsValidator->validate($quote);
             if ($quote->getId()) {
                 $quoteId = (int)$quote->getId();
                 $this->quoteRepository->getActive($quoteId);
@@ -68,6 +74,14 @@ class Get extends WidgetController implements HttpGetActionInterface
                     InPostPayQuoteInterface::BASKET_BINDING_API_KEY => $inPostPayQuote->getBasketBindingApiKey()
                 ];
             }
+        } catch (InPostPayRestrictedProductException $e) {
+            $this->messageManager->addWarningMessage(__('InPost Pay Basket contains restricted product.')->render());
+            $this->logger->warning($e->getMessage(), $e->getTrace());
+
+            $result = [
+                self::SUCCESS_RESULT_KEY  => false,
+                self::ERROR_RESULT_KEY  => $e->getMessage()
+            ];
         } catch (LocalizedException $e) {
             $this->messageManager->addWarningMessage(__('Connecting to InPost Pay failed.')->render());
             $this->logger->error($e->getMessage(), $e->getTrace());

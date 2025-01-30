@@ -59,7 +59,7 @@ class RefundDataBuilder implements BuilderInterface
 
         if (empty($inPostPayTransactionList->getItems())) {
             $errorMsg = __('Empty InPost Pay Transaction list for OrderId: %1', $orderId);
-            $this->logger->error($errorMsg->render());
+            $this->logger->error($errorMsg->getText());
 
             throw new LocalizedException($errorMsg);
         }

@@ -6,7 +6,6 @@ namespace InPost\InPostPay\Provider;
 
 use InPost\InPostPay\Model\IziApi\Response\PublicKeyResponse;
 use InPost\InPostPay\Model\Cache\PublicKey\Type as PublicKeyCacheType;
-use Magento\Framework\App\CacheInterface;
 use InPost\InPostPay\Service\ApiConnector\PublicKeyGenerator;
 use InPost\InPostPay\Service\DataTransfer\PublicKeyResponseDataTransfer;
 use Magento\Framework\Exception\LocalizedException;
@@ -19,7 +18,7 @@ class PublicKeyProvider
     private array $cachedResponses = [];
 
     public function __construct(
-        private readonly CacheInterface $cache,
+        private readonly PublicKeyCacheType $publicKeyCacheType,
         private readonly PublicKeyGenerator $publicKeyGenerator,
         private readonly PublicKeyResponseDataTransfer $publicKeyResponseDataTransfer,
         private readonly SerializerInterface $serializer,
@@ -62,33 +61,33 @@ class PublicKeyProvider
     private function getPublicKeyResponse(string $version): PublicKeyResponse
     {
         $currentStoreId = $this->getCurrentStoreId();
-        $cacheIdentifier = sprintf('%s_%s_%s', PublicKeyCacheType::TYPE_IDENTIFIER, $version, $currentStoreId);
+        $versionWithStoreId = sprintf('%s_%s', $version, $currentStoreId);
 
-        if (isset($this->cachedResponses[$cacheIdentifier])
-            && $this->cachedResponses[$cacheIdentifier] instanceof PublicKeyResponse
+        if (isset($this->cachedResponses[$versionWithStoreId])
+            && $this->cachedResponses[$versionWithStoreId] instanceof PublicKeyResponse
         ) {
-            return $this->cachedResponses[$cacheIdentifier];
+            return $this->cachedResponses[$versionWithStoreId];
         }
 
-        $encodedPublicKeyData = (string)$this->cache->load($cacheIdentifier);
+        $encodedPublicKeyData = (string)$this->publicKeyCacheType->load($version);
         if (empty($encodedPublicKeyData)) {
             $publicKeyResponse = $this->publicKeyGenerator->generate($version);
             $encodedPublicKeyData = (string)$this->serializer->serialize(
                 $this->publicKeyResponseDataTransfer->convertToArray($publicKeyResponse)
             );
-            $this->cache->save(
+            $this->publicKeyCacheType->save(
                 $encodedPublicKeyData,
-                $cacheIdentifier,
+                $versionWithStoreId,
                 [PublicKeyCacheType::CACHE_TAG],
                 PublicKeyCacheType::TTL
             );
         }
 
-        $this->cachedResponses[$cacheIdentifier] = $this->publicKeyResponseDataTransfer->convertToResponseObject(
+        $this->cachedResponses[$versionWithStoreId] = $this->publicKeyResponseDataTransfer->convertToResponseObject(
             (array)$this->serializer->unserialize($encodedPublicKeyData)
         );
 
-        return $this->cachedResponses[$cacheIdentifier];
+        return $this->cachedResponses[$versionWithStoreId];
     }
 
     private function getCurrentStoreId(): int

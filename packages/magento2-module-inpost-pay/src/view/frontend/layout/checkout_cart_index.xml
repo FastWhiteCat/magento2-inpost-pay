@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="checkout.cart.methods">
+        <referenceBlock name="checkout.cart.methods">
             <block name="inpost.init.widget.cart"
                    template="InPost_InPostPay::initialize-widget-cart.phtml"
                    after="checkout.cart.methods.onepage.bottom"
@@ -14,6 +14,6 @@
                     <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
                 </arguments>
             </block>
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>

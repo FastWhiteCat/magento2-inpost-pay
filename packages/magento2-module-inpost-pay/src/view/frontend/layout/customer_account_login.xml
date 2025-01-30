@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="customer.login.container">
+        <referenceBlock name="customer.login.container">
             <block name="inpost.init.widget.login"
                    template="InPost_InPostPay::initialize-widget-login.phtml" after="customer.new"
                    ifconfig="payment/inpost_pay/show_on_login_page">
@@ -13,6 +13,6 @@
                     <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
                 </arguments>
             </block>
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>
