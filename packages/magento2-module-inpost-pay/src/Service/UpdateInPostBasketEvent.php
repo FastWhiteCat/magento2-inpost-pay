@@ -77,7 +77,7 @@ class UpdateInPostBasketEvent
             $browserId = $inPostPayQuote->getBrowserId();
             $basketId = $inPostPayQuote->getBasketId();
             if ($browserId && $basketId) {
-                $this->createOrUpdateBasket->execute($quote, $basketId);
+                $this->createOrUpdateBasket->execute($quote, $browserId, $basketId);
                 $this->logger->debug(
                     sprintf('Basket for quote ID %s has been synchronously updated.', $quoteId)
                 );

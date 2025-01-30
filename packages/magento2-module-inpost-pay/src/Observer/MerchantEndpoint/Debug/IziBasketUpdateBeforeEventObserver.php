@@ -66,7 +66,7 @@ class IziBasketUpdateBeforeEventObserver extends MerchantEndpointEventObserver i
     private function getRelatedProductsEventDataArray(Event $event): array
     {
         $relatedProductsEventDataRecords = [];
-        $relatedProductsEventData = $event->getData(BasketUpdateInterface::RELATED_PRODUCTS_EVENT_DATA);
+        $relatedProductsEventData = $event->getData(BasketUpdateInterface::QUANTITY_EVENT_DATA);
         if (is_array($relatedProductsEventData)) {
             foreach ($relatedProductsEventData as $relatedProductsEventDataRecord) {
                 if ($relatedProductsEventDataRecord instanceof ExtensibleDataInterface) {

@@ -37,13 +37,6 @@ interface InPostPayOrderRepositoryInterface
     public function getByOrderId(int $orderId, bool $forceReload = false): InPostPayOrderInterface;
 
     /**
-     * @param string $basketBindingApiKey
-     * @return InPostPayOrderInterface
-     * @throws NoSuchEntityException
-     */
-    public function getByBasketBindingApiKey(string $basketBindingApiKey): InPostPayOrderInterface;
-
-    /**
      * @param string $basketId
      * @return InPostPayOrderInterface
      * @throws NoSuchEntityException

@@ -97,24 +97,6 @@ class InPostPayOrderRepository implements InPostPayOrderRepositoryInterface
         return $inPostPayOrder;
     }
 
-    public function getByBasketBindingApiKey(string $basketBindingApiKey): InPostPayOrderInterface
-    {
-        /** @var InPostPayOrderInterface $inPostPayOrder */
-        $inPostPayOrder = $this->inPostPayOrderInterfaceFactory->create();
-        // @phpstan-ignore-next-line
-        $this->resource->load($inPostPayOrder, $basketBindingApiKey, InPostPayOrderInterface::BASKET_BINDING_API_KEY);
-        if (!$inPostPayOrder->getInPostPayOrderId()) {
-            throw new NoSuchEntityException(
-                __('InPost Pay Order with Basket Binding API Key "%1" does not exist.', $basketBindingApiKey)
-            );
-        }
-
-        $this->inPostPayOrdersByIds[(int)$inPostPayOrder->getInPostPayOrderId()] = $inPostPayOrder;
-        $this->inPostPayOrdersByOrderIds[$inPostPayOrder->getOrderId()] = $inPostPayOrder;
-
-        return $inPostPayOrder;
-    }
-
     public function getByBasketId(string $basketId): InPostPayOrderInterface
     {
         /** @var InPostPayOrderInterface $inPostPayOrder */

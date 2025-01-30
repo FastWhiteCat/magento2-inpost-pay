@@ -15,7 +15,6 @@ interface InPostPayOrderInterface
     public const INPOST_PAY_ORDER_ID = 'inpost_pay_order_id';
     public const ORDER_ID = 'order_id';
     public const BASKET_ID = 'basket_id';
-    public const BASKET_BINDING_API_KEY = 'basket_binding_api_key';
     public const PAYMENT_TYPE = 'payment_type';
     public const LOCKER_ID = 'locker_id';
     public const ORDER_STATUS = 'order_status';
@@ -39,8 +38,6 @@ interface InPostPayOrderInterface
     public function setOrderId(int $orderId): InPostPayOrderInterface;
     public function getBasketId(): ?string;
     public function setBasketId(?string $basketId): InPostPayOrderInterface;
-    public function getBasketBindingApiKey(): ?string;
-    public function setBasketBindingApiKey(?string $basketBindingApiKey): InPostPayOrderInterface;
     public function getPaymentType(): ?string;
     public function setPaymentType(?string $paymentType): InPostPayOrderInterface;
     public function getLockerId(): ?string;

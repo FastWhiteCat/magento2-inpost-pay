@@ -18,7 +18,7 @@ class QuoteRestrictionsValidator
     /**
      * @throws InPostPayRestrictedProductException
      */
-    public function validate(Quote $quote, bool $everyOccurrenceMode = false): void
+    public function validate(Quote $quote, bool $everyOccurenceMode = false): void
     {
         $websiteId = (int)$quote->getStore()->getWebsiteId();
         $restrictedProduct = null;
@@ -26,7 +26,7 @@ class QuoteRestrictionsValidator
             $product = $item->getProduct();
             $productId = (int)$product->getId();
             if ($this->isProductRestricted($productId, $websiteId)) {
-                if ($everyOccurrenceMode) {
+                if ($everyOccurenceMode) {
                     $this->createExceptionForRestrictedProduct((string)$product->getName());
                 } else {
                     $restrictedProduct = $product;
