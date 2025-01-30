@@ -3,8 +3,17 @@
     <div data-bind="class: 'inpay-widget-wrapper ' + getConfiguration().bindingPlace">
         <inpost-izi-button
             data-bind="attr: {
+            name: getConfiguration().name,
+            'data-product-id': getConfiguration().productId,
             language: getConfiguration().language,
-            variation: getConfiguration().variation,
+            variant: getConfiguration().variant,
+            dark_mode: getConfiguration().darkMode,
+            max_width: getConfiguration().maxWidth,
+            min_height: getConfiguration().minHeight,
+            frame_style: getConfiguration().frameStyle,
+            count: getConfiguration().count,
+            basket: false,
+            masked_phone_number: getConfiguration().maskedPhoneNumber,
             binding_place: getConfiguration().bindingPlace
         }"
         >

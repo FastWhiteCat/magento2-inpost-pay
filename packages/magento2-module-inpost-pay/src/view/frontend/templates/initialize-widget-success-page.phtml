@@ -13,9 +13,7 @@ if (!$widgetViewModel->isEnabled()
 }
 $widgetWrapperClass = "inpay-widget-wrapper";
 $sandboxMode = $widgetViewModel->isSandboxEnabled();
-$scriptUrl = $sandboxMode
-    ? "https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js"
-    : "https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js";
+$scriptUrl = $sandboxMode ? "https://izi-sandbox.inpost.pl/inpostizi.js" : "https://izi.inpost.pl/inpostizi.js";
 ?>
 
 <script src="<?= $escaper->escapeUrl($scriptUrl) ?>"></script>
