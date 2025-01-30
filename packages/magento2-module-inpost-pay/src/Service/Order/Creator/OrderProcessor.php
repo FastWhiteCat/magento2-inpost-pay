@@ -8,21 +8,15 @@ use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
-use InPost\InPostPay\Exception\QuoteChangedDuringOrderProcessingException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartManagementInterface;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class OrderProcessor implements OrderProcessorInterface
 {
     /**
@@ -39,7 +33,6 @@ class OrderProcessor implements OrderProcessorInterface
         private readonly CartManagementInterface $cartManagement,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly PaymentMethodManagementInterface $paymentMethodManagement,
-        private readonly CartRepositoryInterface $cartRepository,
         private readonly LoggerInterface $logger,
         array $orderProcessingSteps,
         array $orderPostProcessingSteps
@@ -76,12 +69,6 @@ class OrderProcessor implements OrderProcessorInterface
             );
 
             return $order;
-        } catch (NoSuchEntityException $e) {
-            if ($this->isCouponCanceled($quote)) {
-                throw new QuoteChangedDuringOrderProcessingException();
-            }
-
-            throw $e;
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
@@ -145,18 +132,5 @@ class OrderProcessor implements OrderProcessorInterface
         if (empty($this->orderPostProcessingSteps)) {
             throw new LocalizedException(__('InPost Pay order post processing steps are undefined.'));
         }
-    }
-
-    private function isCouponCanceled(Quote $quote): bool
-    {
-        $cartId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
-        try {
-            $reloadedQuote = $this->cartRepository->get($cartId);
-        } catch (NoSuchEntityException $e) {
-            return false;
-        }
-
-        // @phpstan-ignore-next-line
-        return $reloadedQuote->getCouponCode() !== $quote->getCouponCode();
     }
 }
