@@ -26,6 +26,7 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
         // @phpstan-ignore-next-line
         $quoteCustomerId = is_scalar($quote->getCustomer()->getId()) ? (int)$quote->getCustomer()->getId() : null;
         $accountEmail = $inPostOrder->getAccountInfo()->getAccountEmail();
+        $accountEmail = $accountEmail ?? $inPostOrder->getAccountInfo()->getMail();
         $websiteId = (int)$quote->getStore()->getWebsiteId();
 
         try {
