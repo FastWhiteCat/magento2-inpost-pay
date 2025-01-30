@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="product.info.form.content">
+        <referenceBlock name="product.info.form.content">
             <block name="inpost.init.widget.product"
                    template="InPost_InPostPay::initialize-widget-product.phtml" after="product.info.addtocart"
                    ifconfig="payment/inpost_pay/show_on_product_cart">
@@ -13,6 +13,6 @@
                     <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
                 </arguments>
             </block>
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>

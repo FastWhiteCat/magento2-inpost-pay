@@ -1,27 +1,23 @@
 {
     "name": "inpost/magento2-module-inpost-pay-graph-ql",
     "description": "Module implements GraphQL endpoints for InPost_InPostPay module.",
-    "version": "2.0.3",
+    "version": "1.0.12",
     "type": "magento2-module",
-    "license": ["CC-BY-NC-ND-4.0"],
+    "license": [
+        "Commercial"
+    ],
     "require": {
         "php": ">=8.1",
-        "monolog/monolog": "*",
-        "psr/log": "*",
-        "inpost/magento2-module-inpost-pay": ">=2.0.0",
+        "inpost/magento2-module-inpost-pay": ">=1.0.0",
         "magento/module-quote-graph-ql": ">=100.4.6",
         "magento/module-store-graph-ql": ">=100.4.4"
     },
     "autoload": {
         "files": [
-            "src/registration.php"
+            "registration.php"
         ],
         "psr-4": {
-            "InPost\\InPostPayGraphQl\\": "src"
+            "InPost\\InPostPayGraphQl\\": ""
         }
-    },
-    "keywords": [
-        "magento2",
-        "inpostpay"
-    ]
+    }
 }
