@@ -13,7 +13,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Container\OrderIdentity;
+use Magento\Sales\Model\Order\Email\Container\IdentityInterface;
 use Psr\Log\LoggerInterface;
 
 class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
@@ -33,11 +33,11 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
     }
 
     /**
-     * @param OrderIdentity $subject
+     * @param IdentityInterface $subject
      * @param array|bool $result
      * @return array|bool
      */
-    public function afterGetEmailCopyTo(OrderIdentity $subject, array|bool $result): array|bool
+    public function afterGetEmailCopyTo(IdentityInterface $subject, array|bool $result): array|bool
     {
         $inPostPayOrder = $this->inPostPayOrderEmailSenderRegistry->registry();
 
@@ -84,6 +84,7 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
     private function getOrderByInPostPayOrder(InPostPayOrderInterface $inPostPayOrder): ?Order
     {
         try {
+            /** @var Order $order */
             $order = $this->orderRepository->get($inPostPayOrder->getOrderId());
         } catch (LocalizedException $e) {
             $order = null;

@@ -185,7 +185,7 @@
         <plugin name="InPost_InPostPay::changeNewCustomerDelegateDataPlugin"
                 type="InPost\InPostPay\Plugin\ChangeNewCustomerDelegateDataPlugin" />
     </type>
-    <type name="Magento\Sales\Model\Order\Email\Container\OrderIdentity">
+    <type name="Magento\Sales\Model\Order\Email\Container\IdentityInterface">
         <plugin name="InPost_InPostPay::addCopyToOrderEmailsForInPostPayAccountEmailPlugin"
                 type="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin" />
     </type>
