@@ -66,7 +66,8 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
             $result[] = $customerEmail;
             $this->logger->debug(
                 sprintf(
-                    'Additional InPost Pay order related email will be send [mode:%s] for %s [in addition to: %s]',
+                    'Additional InPost Pay Order [#%s] related email will be sent [as:%s] for %s [originally to: %s]',
+                    (string)$order->getIncrementId(),
                     is_scalar($subject->getCopyMethod()) ? (string)$subject->getCopyMethod() : '',
                     $customerEmail,
                     $order->getCustomerEmail()
