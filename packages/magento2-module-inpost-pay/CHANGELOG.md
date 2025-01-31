@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.4] - 2025-01-31
+
+### Added
+
+- configuration that allows to select if customer account should be assigned to guest quote based on InPost Pay App Account email address
+
+### Fixed
+
+- assigning guest cart to Magento Account based on InPost Pay Account email
+- order creation process when after guest cart was assigned to an account total amount has changed resulting in InPost Pay App error
+
 ## [2.0.3] - 2025-01-17
 
 ### Fixed
