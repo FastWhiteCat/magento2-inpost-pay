@@ -29,6 +29,8 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use InPost\InPostPay\Exception\QuoteChangedDuringOrderProcessingException;
+use InPost\InPostPay\Service\UpdateInPostBasketEvent;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
@@ -50,6 +52,7 @@ class OrderCreate implements OrderCreateInterface
         private readonly OrderInterfaceFactory $orderFactory,
         private readonly EventManager $eventManager,
         private readonly CreateBasketNotice $createBasketNotice,
+        private readonly UpdateInPostBasketEvent $updateInPostBasketEvent,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -66,6 +69,7 @@ class OrderCreate implements OrderCreateInterface
      * @throws BasketNotFoundException
      * @throws InPostPayInternalException
      * @throws OrderNotCreateException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function execute(
         OrderDetailsInterface $orderDetails,
@@ -109,6 +113,15 @@ class OrderCreate implements OrderCreateInterface
             } else {
                 throw new NoSuchEntityException(__('Quote not found.'));
             }
+        } catch (QuoteChangedDuringOrderProcessingException $e) {
+            $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
+
+            // @phpstan-ignore-next-line
+            if (isset($quote) && $quote->getId()) {
+                $this->forceBasketUpdate($quote);
+            }
+
+            throw new OrderNotCreateException(__($e->getMessage()));
         } catch (NoSuchEntityException $e) {
             $this->logger->error($e->getMessage());
 
@@ -171,5 +184,22 @@ class OrderCreate implements OrderCreateInterface
             InPostPayBasketNoticeInterface::ERROR,
             $message
         );
+    }
+
+    /**
+     * @param Quote $quote
+     * @return void
+     * @throws BasketNotFoundException
+     */
+    private function forceBasketUpdate(Quote $quote): void
+    {
+        try {
+            $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+            /** @var Quote $quote */
+            $quote = $this->cartRepository->get($quoteId);
+            $this->updateInPostBasketEvent->execute($quote);
+        } catch (NoSuchEntityException $e) {
+            throw new BasketNotFoundException();
+        }
     }
 }
