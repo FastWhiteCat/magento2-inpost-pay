@@ -43,7 +43,7 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
 
         $inPostPayAccountEmail = $this->getInPostPayAccountEmailByOrder($order);
         if ($inPostPayAccountEmail) {
-            $accountInfo->setAccountEmail($inPostPayAccountEmail);
+            $accountInfo->setMail($inPostPayAccountEmail);
         }
 
         $inPostOrder->setAccountInfo($accountInfo);

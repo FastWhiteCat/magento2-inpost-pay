@@ -30,15 +30,15 @@ class RegisterInPostPayOrderAccountEmailObserver implements ObserverInterface
     {
         $accountInfo = $observer->getEvent()->getData(OrderInterface::ACCOUNT_INFO);
 
-        if ($accountInfo instanceof AccountInfoInterface && $accountInfo->getAccountEmail()) {
+        if ($accountInfo instanceof AccountInfoInterface && $accountInfo->getMail()) {
             /**
-             * Simplified object of InPost Pay Order is created and only filled with Account Email
+             * Simplified object of InPost Pay Order is created and only filled with Account Mail
              * because that is the only required info to make sure an email copy to is sent to InPost Account Owner.
              * That object is not going to be saved.
              */
             /** @var InPostPayOrderInterface $inPostPayOrderSimplifiedObject */
             $inPostPayOrderSimplifiedObject = $this->inPostPayOrderFactory->create();
-            $inPostPayOrderSimplifiedObject->setInPostPayAccountEmail($accountInfo->getAccountEmail());
+            $inPostPayOrderSimplifiedObject->setInPostPayAccountEmail($accountInfo->getMail());
             $this->inPostPayOrderEmailSenderRegistry->register($inPostPayOrderSimplifiedObject);
         }
     }
