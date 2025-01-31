@@ -78,6 +78,7 @@ class ArrayToBestsellersResultConverter
         $bestsellerProduct = $this->bestsellerProductFactory->create();
 
         $productId = $productData[BestsellerProductInterface::PRODUCT_ID] ?? '';
+        $status = $productData[BestsellerProductInterface::STATUS] ?? '';
         $ean = $productData[BestsellerProductInterface::EAN] ?? '';
         $qrCode = $productData[BestsellerProductInterface::QR_CODE] ?? '';
         $deepLink = $productData[BestsellerProductInterface::DEEP_LINK] ?? '';
@@ -110,6 +111,10 @@ class ArrayToBestsellersResultConverter
         $bestsellerProduct->setPrice($price);
         $quantity = $this->convertQuantity($bestsellerProduct->getQuantity(), (array)$quantityData);
         $bestsellerProduct->setQuantity($quantity);
+
+        if ($status) {
+            $bestsellerProduct->setStatus($status);
+        }
 
         return $bestsellerProduct;
     }

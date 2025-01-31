@@ -11,6 +11,7 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInte
 interface BestsellerProductInterface
 {
     public const PRODUCT_ID = 'product_id';
+    public const STATUS = 'status';
     public const EAN = 'ean';
     public const QR_CODE = 'qr_code';
     public const DEEP_LINK = 'deep_link';
@@ -35,6 +36,17 @@ interface BestsellerProductInterface
      * @return void
      */
     public function setProductId(string $productId): void;
+
+    /**
+     * @return string|null
+     */
+    public function getStatus(): ?string;
+
+    /**
+     * @param string|null $status
+     * @return void
+     */
+    public function setStatus(?string $status): void;
 
     /**
      * @return string|null

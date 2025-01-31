@@ -16,6 +16,7 @@ interface InPostPayBestsellerProductInterface
     public const SYNCHRONIZED_AT = 'synchronized_at';
     public const QR_CODE = 'qr_code';
     public const DEEP_LINK = 'deep_link';
+    public const INPOST_PAY_STATUS = 'inpost_pay_status';
     public const ERROR = 'error';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
@@ -119,6 +120,17 @@ interface InPostPayBestsellerProductInterface
      * @return InPostPayBestsellerProductInterface
      */
     public function setDeepLink(?string $deepLink = null): InPostPayBestsellerProductInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getInPostPayStatus(): ?string;
+
+    /**
+     * @param string|null $inPostPayStatus
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setInPostPayStatus(?string $inPostPayStatus = null): InPostPayBestsellerProductInterface;
 
     /**
      * @return string|null

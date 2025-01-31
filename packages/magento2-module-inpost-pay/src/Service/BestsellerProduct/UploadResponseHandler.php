@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\BestsellerProduct;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
+use InPost\InPostPay\Enum\InPostBestsellerProductStatus;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -68,8 +69,9 @@ class UploadResponseHandler
 
         foreach ($successfulData as $successfulProductData) {
             $productId = (int)($successfulProductData[BestsellerProductInterface::PRODUCT_ID] ?? 0);
-            $qrCode = (string)($successfulProductData[InPostPayBestsellerProductInterface::QR_CODE] ?? '');
-            $deepLink = (string)($successfulProductData[InPostPayBestsellerProductInterface::DEEP_LINK] ?? '');
+            $qrCode = (string)($successfulProductData[BestsellerProductInterface::QR_CODE] ?? '');
+            $deepLink = (string)($successfulProductData[BestsellerProductInterface::DEEP_LINK] ?? '');
+            $status = (string)($successfulProductData[BestsellerProductInterface::STATUS] ?? '');
             $sku = $this->getProductSkuById($productId);
 
             if ($sku === null) {
@@ -82,8 +84,10 @@ class UploadResponseHandler
                 continue;
             }
 
+            $status = !empty($status) ? $status : InPostBestsellerProductStatus::INACTIVE->value;
             $inPostPayBestsellerProduct->setQrCode($qrCode);
             $inPostPayBestsellerProduct->setDeepLink($deepLink);
+            $inPostPayBestsellerProduct->setInPostPayStatus($status);
             $inPostPayBestsellerProduct->setSynchronizedAt(date(DateTime::DATETIME_PHP_FORMAT));
 
             try {

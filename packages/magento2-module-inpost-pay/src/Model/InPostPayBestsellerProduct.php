@@ -195,6 +195,25 @@ class InPostPayBestsellerProduct extends AbstractModel implements InPostPayBests
     /**
      * @return string|null
      */
+    public function getInPostPayStatus(): ?string
+    {
+        $inPostPayStatus = ($this->hasData(self::INPOST_PAY_STATUS)) ? $this->getData(self::INPOST_PAY_STATUS) : null;
+
+        return ($inPostPayStatus && is_scalar($inPostPayStatus)) ? (string)$inPostPayStatus : null;
+    }
+
+    /**
+     * @param string|null $inPostPayStatus
+     * @return InPostPayBestsellerProductInterface
+     */
+    public function setInPostPayStatus(?string $inPostPayStatus = null): InPostPayBestsellerProductInterface
+    {
+        return $this->setData(self::INPOST_PAY_STATUS, $inPostPayStatus);
+    }
+
+    /**
+     * @return string|null
+     */
     public function getError(): ?string
     {
         $error = ($this->hasData(self::ERROR)) ? $this->getData(self::ERROR) : null;

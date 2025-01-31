@@ -102,6 +102,7 @@
             "synchronized_at": true,
             "qr_code": true,
             "deep_link": true,
+            "inpost_pay_status": true,
             "error": true,
             "created_at": true,
             "updated_at": true

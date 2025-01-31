@@ -47,6 +47,26 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
         $this->setData(self::PRODUCT_ID, $productId);
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getStatus(): ?string
+    {
+        $status = $this->getData(self::STATUS);
+
+        return is_scalar($status) ? (string)$status : null;
+    }
+
+    /**
+     * @param string|null $status
+     * @return void
+     */
+    public function setStatus(?string $status): void
+    {
+        $this->setData(self::STATUS, $status);
+    }
+
     /**
      * @return string|null
      */

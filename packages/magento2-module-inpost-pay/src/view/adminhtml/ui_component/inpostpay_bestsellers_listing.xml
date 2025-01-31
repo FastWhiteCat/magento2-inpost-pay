@@ -92,6 +92,20 @@
                 <sortable>false</sortable>
             </settings>
         </column>
+        <column name="inpost_pay_status" class="InPost\InPostPay\Ui\Component\Listing\Column\InPostPayBestsellerProductStatus">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="label" xsi:type="string" translate="true">InPost Pay Status</item>
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+            <settings>
+                <filter>text</filter>
+                <label translate="true">InPost Pay Status</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
         <column name="website_id" class="InPost\InPostPay\Ui\Component\Listing\Column\WebsiteOptions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
