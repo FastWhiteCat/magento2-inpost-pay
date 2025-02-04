@@ -47,7 +47,6 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
         $this->setData(self::PRODUCT_ID, $productId);
     }
 
-
     /**
      * @return string|null
      */
