@@ -63,7 +63,7 @@ class AdditionalProductImagesDataTransfer
             // @phpstan-ignore-next-line
             $file = (string)$galleryImage->getFile();
 
-            if ($totalImages > self::MAX_ADDITIONAL_IMAGES_COUNT) {
+            if ($totalImages >= self::MAX_ADDITIONAL_IMAGES_COUNT) {
                 break;
             }
 
