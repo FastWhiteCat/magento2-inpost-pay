@@ -99,7 +99,6 @@ class Upload extends BestsellerProductService
                     $inPostPayBestsellerProductIds
                 );
 
-
                 $bestsellerProductsToCreate = array_intersect_key(
                     $bestsellerProducts,
                     array_flip($productIdsToCreateInInPostPay)
