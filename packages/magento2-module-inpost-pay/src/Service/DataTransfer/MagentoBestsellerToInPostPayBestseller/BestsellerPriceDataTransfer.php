@@ -47,8 +47,8 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
         $finalPriceInclTax = DecimalCalculator::round((float)$finalPrice->getValue());
         $finalPriceTaxAmount = DecimalCalculator::sub($finalPriceInclTax, $finalPriceExclTax);
 
-        $price->setGross($finalPriceExclTax);
-        $price->setNet($finalPriceInclTax);
+        $price->setNet($finalPriceExclTax);
+        $price->setGross($finalPriceInclTax);
         $price->setVat($finalPriceTaxAmount);
 
         $bestsellerProduct->setPrice($price);
