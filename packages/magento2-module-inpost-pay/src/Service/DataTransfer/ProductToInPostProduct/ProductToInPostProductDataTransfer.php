@@ -16,6 +16,9 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Product\Type;
+use InPost\InPostPay\Enum\InPostProductType;
+use Magento\Catalog\Model\Product\Type as ProductType;
+use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
@@ -49,7 +52,8 @@ class ProductToInPostProductDataTransfer
 
     public const ALL_DELIVERY_TYPES = [
         RestrictionsRuleInterface::APPLIES_TO_COURIER => InPostDeliveryType::COURIER,
-        RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM
+        RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM,
+        RestrictionsRuleInterface::APPLIES_TO_DIGITAL => InPostDeliveryType::DIGITAL
     ];
 
     private WriteInterface $mediaDirectory;
@@ -124,6 +128,11 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setProductDescription($this->prepareProductDescription($product));
         $inPostProduct->setProductLink($this->prepareProductUrl($product));
         $inPostProduct->setProductImage($this->prepareProductImageUrl($product));
+
+        if ($this->isDigitalProduct($product)) {
+            $inPostProduct->setProductType(InPostProductType::DIGITAL->value);
+        }
+
         $basePrice = $inPostProduct->getBasePrice();
         $basePrice->setNet($regularPriceExclTax);
         $basePrice->setGross($regularPriceInclTax);
@@ -351,6 +360,20 @@ class ProductToInPostProductDataTransfer
         $deliveryProductArr = [];
         foreach (self::ALL_DELIVERY_TYPES as $key => $enum) {
             $deliveryProduct = $this->deliveryProductFactory->create();
+            $deliveryProduct->setDeliveryType($enum->value);
+
+            if ($this->isDigitalProduct($product)) {
+                if ($key !== RestrictionsRuleInterface::APPLIES_TO_DIGITAL) {
+                    $deliveryProduct->setIfDeliveryAvailable(false);
+                } else {
+                    $deliveryProduct->setIfDeliveryAvailable(!$productRestricted);
+                }
+
+                $deliveryProductArr[] = $deliveryProduct;
+
+                continue;
+            }
+
             if ($productRestricted) {
                 $available = false;
             } else {
@@ -359,7 +382,7 @@ class ProductToInPostProductDataTransfer
                     || $this->isProductRestricted($simpleProductId, $websiteId, $key)
                 );
             }
-            $deliveryProduct->setDeliveryType($enum->value);
+
             $deliveryProduct->setIfDeliveryAvailable($available);
             $deliveryProductArr[] = $deliveryProduct;
         }
@@ -373,5 +396,12 @@ class ProductToInPostProductDataTransfer
             $productId,
             $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
         );
+    }
+
+    private function isDigitalProduct(Product $product): bool
+    {
+        $type = $product->getTypeId();
+
+        return $type === DownloadableType::TYPE_DOWNLOADABLE || $type === ProductType::TYPE_VIRTUAL;
     }
 }

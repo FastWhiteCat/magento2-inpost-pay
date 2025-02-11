@@ -14,6 +14,7 @@ interface ProductInterface
     public const PRODUCT_NAME = 'product_name';
     public const PRODUCT_DESCRIPTION = 'product_description';
     public const PRODUCT_LINK = 'product_link';
+    public const PRODUCT_TYPE = 'product_type';
     public const PRODUCT_IMAGE = 'product_image';
     public const BASE_PRICE = 'base_price';
     public const PROMO_PRICE = 'promo_price';
@@ -87,6 +88,17 @@ interface ProductInterface
      * @return void
      */
     public function setProductLink(string $productLink): void;
+
+    /**
+     * @return string|null
+     */
+    public function getProductType(): ?string;
+
+    /**
+     * @param string|null $productType
+     * @return void
+     */
+    public function setProductType(?string $productType): void;
 
     /**
      * @return string

@@ -143,6 +143,25 @@ class Product extends DataObject implements ProductInterface, ExtensibleDataInte
     }
 
     /**
+     * @return string|null
+     */
+    public function getProductType(): ?string
+    {
+        $productType = $this->hasData(self::PRODUCT_TYPE) ? $this->getData(self::PRODUCT_TYPE) : null;
+
+        return is_scalar($productType) ? (string)$productType : null;
+    }
+
+    /**
+     * @param string|null $productType
+     * @return void
+     */
+    public function setProductType(?string $productType): void
+    {
+        $this->setData(self::PRODUCT_TYPE, $productType);
+    }
+
+    /**
      * @return string
      */
     public function getProductImage(): string
