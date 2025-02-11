@@ -12,4 +12,5 @@ enum InPostDeliveryType: string
 {
     case APM = 'APM';
     case COURIER = 'COURIER';
+    case DIGITAL = 'DIGITAL';
 }
