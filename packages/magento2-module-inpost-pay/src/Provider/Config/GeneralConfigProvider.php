@@ -77,11 +77,12 @@ class GeneralConfigProvider
         return is_scalar($orderStatus) ? (string)$orderStatus : 'small_image';
     }
 
-    public function isAdditionalImagesEnabled(): bool
+    public function isAdditionalImagesEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_INPOST_PAY_ADDITIONAL_IMAGES_ENABLED,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 
