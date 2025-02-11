@@ -15,18 +15,25 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInte
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBestsellerDataTransferInterface
 {
     /**
      * @param ProductRepositoryInterface $productRepository
+     * @param StoreManagerInterface $storeManager
      * @param ProductToInPostProductDataTransfer $productToInPostProductDataTransfer
      * @param InPostProductFactory $inPostProductFactory
      * @param ProductAvailabilityInterfaceFactory $productAvailabilityFactory
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
+        private readonly StoreManagerInterface $storeManager,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly InPostProductFactory $inPostProductFactory,
         private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory
@@ -67,8 +74,14 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
      */
     private function initInPostProduct(string $sku, int $websiteId): InPostProduct
     {
+        try {
+            $storeId = $this->storeManager->getWebsite($websiteId)->getDefaultStore()->getStoreId();
+        } catch (LocalizedException $e) {
+            $storeId = 0;
+        }
+
         /** @var Product $product */
-        $product = $this->productRepository->get($sku);
+        $product = $this->productRepository->get($sku, false, $storeId, true);
 
         /** @var InPostProduct $inPostProduct */
         $inPostProduct = $this->inPostProductFactory->create();
