@@ -6,12 +6,16 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
+use InPost\InPostPay\Provider\Product\Attribute\InPostPayProductAttributesProvider;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Link;
 use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\Link\Collection as ProductLinkCollection;
 use Magento\Catalog\Model\ResourceModel\Product\Link\CollectionFactory as ProductLinkCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as ProductCollection;
@@ -34,6 +38,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         private readonly ProductLinkCollectionFactory $productLinkCollectionFactory,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
+        private readonly InPostPayProductAttributesProvider $inPostPayProductAttributesProvider,
         private readonly CatalogConfig $catalogConfig,
         private readonly StatusFactory $stockStatusFactory
     ) {
@@ -50,6 +55,10 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
 
         if ($cartProductIds) {
             foreach ($this->getCrossSellProducts($cartProductIds, $quote->getStore()) as $crossSellProduct) {
+                if (!$crossSellProduct instanceof Product) {
+                    continue;
+                }
+
                 $inPostCrossSellProduct = $this->productFactory->create();
                 $this->productToInPostProductDataTransfer->transfer(
                     $crossSellProduct,
@@ -66,7 +75,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
     /**
      * @param int[] $productIds
      * @param Store $store
-     * @return Product[]
+     * @return array
      */
     private function getCrossSellProducts(array $productIds, Store $store): array
     {
@@ -77,9 +86,12 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         if ($linkedProductIds) {
             /** @var ProductCollection $productsCollection */
             $productsCollection = $this->productCollectionFactory->create();
-            $productsCollection->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            $productsCollection->addAttributeToSelect($this->prepareProductAttributesList($storeId))
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
+                ->addAttributeToFilter(ProductInterface::TYPE_ID, ['eq' => Type::TYPE_SIMPLE])
+                ->addAttributeToFilter('status', ['eq' => Status::STATUS_ENABLED])
+                ->setVisibility([Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH])
                 ->addFieldToFilter(
                     $productsCollection->getProductEntityMetadata()->getLinkField(),
                     ['in' => $linkedProductIds]
@@ -88,23 +100,14 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                     ['nin' => $this->restrictedProductIdsProvider->getList(
                         $websiteId
                     )]
-                );
+                )
+                ->setPageSize(self::MAX_CROSS_SELL_PRODUCTS);
 
             $stockStatusResource = $this->stockStatusFactory->create();
             $stockStatusResource->addStockDataToCollection($productsCollection, true);
             $productsCollection->setFlag('has_stock_status_filter', true);
-
-            foreach ($productsCollection->load() as $crossSellProduct) {
-                if ($crossSellProduct instanceof Product
-                    && $crossSellProduct->getTypeId() === Type::TYPE_SIMPLE
-                    && $crossSellProduct->isVisibleInCatalog()
-                ) {
-                    $crossSellProducts[] = $crossSellProduct;
-                    if (count($crossSellProducts) >= self::MAX_CROSS_SELL_PRODUCTS) {
-                        break;
-                    }
-                }
-            }
+            $productsCollection->load();
+            $crossSellProducts = $productsCollection->getItems();
         }
 
         return $crossSellProducts;
@@ -131,5 +134,15 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         }
 
         return $linkedProductIds;
+    }
+
+    private function prepareProductAttributesList(int $storeId): array
+    {
+        return array_unique(
+            array_merge(
+                $this->catalogConfig->getProductAttributes(),
+                $this->inPostPayProductAttributesProvider->getProductAttributeCodes($storeId)
+            )
+        );
     }
 }

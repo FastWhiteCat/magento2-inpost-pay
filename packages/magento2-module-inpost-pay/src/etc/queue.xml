@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue.xsd">
+    <broker topic="inpost_pay.basket.create_or_update" exchange="magento">
+        <queue name="inpost_pay.basket.create_or_update" consumer="inpost_pay.basket.create_or_update"/>
+    </broker>
+</config>
