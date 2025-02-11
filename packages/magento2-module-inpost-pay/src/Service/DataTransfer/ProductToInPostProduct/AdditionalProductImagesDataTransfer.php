@@ -30,7 +30,7 @@ class AdditionalProductImagesDataTransfer
         Product $product,
         ProductInterface $inPostProduct
     ): void {
-        if (!$this->generalConfigProvider->isAdditionalImagesEnabled()) {
+        if (!$this->generalConfigProvider->isAdditionalImagesEnabled((int)$product->getStoreId())) {
             return;
         }
 
