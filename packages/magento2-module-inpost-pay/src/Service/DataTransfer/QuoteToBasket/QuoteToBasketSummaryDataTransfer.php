@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
 use DateTime;
 use DateTimeZone;
+use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
@@ -22,6 +23,26 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
+        if (!$quote->isVirtual()) {
+            $summary = $this->transferNonVirtualQuote($quote, $basket);
+        } else {
+            $summary = $this->transferVirtualQuote($quote, $basket);
+        }
+
+        $summary->setCurrency($quote->getQuoteCurrencyCode());
+        $summary->setBasketAdditionalInformation('');
+        $summary->setPaymentType($this->iziApiConfigProvider->getAcceptedPaymentTypes());
+
+        $basketExpirationDate = $this->calculateBasketExpirationDate();
+        if ($basketExpirationDate) {
+            $summary->setBasketExpirationDate($basketExpirationDate);
+        }
+
+        $basket->setSummary($summary);
+    }
+
+    private function transferNonVirtualQuote(Quote $quote, BasketInterface $basket): SummaryInterface
+    {
         $address = $quote->getShippingAddress();
         $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
         $discountExclTax = DecimalCalculator::add(
@@ -33,23 +54,8 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         $regularPriceExclTax = $this->getTotalQuoteItemsRegularPrice($quote, false);
         $regularPriceTax = DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax);
 
-        if ($quote->isVirtual() || (int)$quote->getItemsCount() === 0) {
-            $totals = $quote->getTotals();
-
-            $grandTotal = is_scalar($totals['grand_total']['value']) ? (float)$totals['grand_total']['value'] : 0;
-            $tax = is_scalar($totals['tax']['value']) ? (float)$totals['tax']['value'] : 0;
-            $subTotalIncTax = is_scalar($totals['subtotal']['value_incl_tax'])
-                ? (float)$totals['subtotal']['value_incl_tax'] : 0;
-            $subTotalExcTax = is_scalar($totals['subtotal']['value_excl_tax'])
-                ? (float)$totals['subtotal']['value_excl_tax'] : 0;
-
-            $finalPriceExclTax = DecimalCalculator::round(DecimalCalculator::sub($grandTotal, $tax));
-            $finalPriceInclTax = DecimalCalculator::round($grandTotal);
-            $finalPriceTax = DecimalCalculator::round($tax);
-
-            $promoPriceInclTax = DecimalCalculator::round($subTotalIncTax);
-            $promoPriceExclTax = DecimalCalculator::round($subTotalExcTax);
-            $promoPriceTax = DecimalCalculator::sub($subTotalIncTax, $subTotalExcTax);
+        if ((int)$quote->getItemsCount() === 0) {
+            return $this->getEmptyQuoteSummary($quote, $basket);
         } else {
             $finalPriceExclTax = DecimalCalculator::round(
                 DecimalCalculator::add((float)$address->getSubtotal(), $discountExclTax)
@@ -65,6 +71,141 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         }
 
         $summary = $basket->getSummary();
+        $this->fillSummaryWithPrices(
+            $summary,
+            $regularPriceExclTax,
+            $regularPriceInclTax,
+            $regularPriceTax,
+            $finalPriceExclTax,
+            $finalPriceInclTax,
+            $finalPriceTax,
+            $promoPriceExclTax,
+            $promoPriceInclTax,
+            $promoPriceTax
+        );
+
+        return $summary;
+    }
+
+    private function transferVirtualQuote(Quote $quote, BasketInterface $basket): SummaryInterface
+    {
+        $address = $quote->getShippingAddress();
+        $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
+        $discountExclTax = DecimalCalculator::add(
+            (float)$address->getDiscountAmount(),
+            (float)$address->getDiscountTaxCompensationAmount()
+        );
+
+        $regularPriceInclTax = $this->getTotalQuoteItemsRegularPrice($quote, true);
+        $regularPriceExclTax = $this->getTotalQuoteItemsRegularPrice($quote, false);
+        $regularPriceTax = DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax);
+
+        if ((int)$quote->getItemsCount() === 0) {
+            return $this->getEmptyQuoteSummary($quote, $basket);
+        } else {
+            $finalPriceExclTax = DecimalCalculator::round(
+                DecimalCalculator::add((float)$quote->getSubtotal(), $discountExclTax)
+            );
+            $finalPriceInclTax = DecimalCalculator::round(
+                DecimalCalculator::add((float)$quote->getGrandTotal(), $discountInclTax)
+            );
+            $finalPriceTax = DecimalCalculator::round(
+                DecimalCalculator::sub($finalPriceInclTax, $finalPriceExclTax)
+            );
+
+            $promoPriceExclTax = DecimalCalculator::round(
+                DecimalCalculator::sub((float)$quote->getSubtotal(), $discountExclTax)
+            );
+            $promoPriceInclTax = DecimalCalculator::round(
+                DecimalCalculator::sub((float)$quote->getGrandTotal(), $discountInclTax)
+            );
+            $promoPriceTax = DecimalCalculator::round(
+                DecimalCalculator::sub($promoPriceInclTax, $promoPriceExclTax)
+            );
+        }
+
+        $summary = $basket->getSummary();
+        $this->fillSummaryWithPrices(
+            $summary,
+            $regularPriceExclTax,
+            $regularPriceInclTax,
+            $regularPriceTax,
+            $finalPriceExclTax,
+            $finalPriceInclTax,
+            $finalPriceTax,
+            $promoPriceExclTax,
+            $promoPriceInclTax,
+            $promoPriceTax
+        );
+
+        return $summary;
+    }
+
+    private function getEmptyQuoteSummary(Quote $quote, BasketInterface $basket): SummaryInterface
+    {
+        $regularPriceInclTax = $this->getTotalQuoteItemsRegularPrice($quote, true);
+        $regularPriceExclTax = $this->getTotalQuoteItemsRegularPrice($quote, false);
+        $regularPriceTax = DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax);
+        $totals = $quote->getTotals();
+
+        $grandTotal = is_scalar($totals['grand_total']['value']) ? (float)$totals['grand_total']['value'] : 0;
+        $tax = is_scalar($totals['tax']['value']) ? (float)$totals['tax']['value'] : 0;
+        $subTotalIncTax = is_scalar($totals['subtotal']['value_incl_tax'])
+            ? (float)$totals['subtotal']['value_incl_tax'] : 0;
+        $subTotalExcTax = is_scalar($totals['subtotal']['value_excl_tax'])
+            ? (float)$totals['subtotal']['value_excl_tax'] : 0;
+
+        $finalPriceExclTax = DecimalCalculator::round(DecimalCalculator::sub($grandTotal, $tax));
+        $finalPriceInclTax = DecimalCalculator::round($grandTotal);
+        $finalPriceTax = DecimalCalculator::round($tax);
+
+        $promoPriceInclTax = DecimalCalculator::round($subTotalIncTax);
+        $promoPriceExclTax = DecimalCalculator::round($subTotalExcTax);
+        $promoPriceTax = DecimalCalculator::sub($subTotalIncTax, $subTotalExcTax);
+
+        $summary = $basket->getSummary();
+        $this->fillSummaryWithPrices(
+            $summary,
+            $regularPriceExclTax,
+            $regularPriceInclTax,
+            $regularPriceTax,
+            $finalPriceExclTax,
+            $finalPriceInclTax,
+            $finalPriceTax,
+            $promoPriceExclTax,
+            $promoPriceInclTax,
+            $promoPriceTax
+        );
+
+        return $summary;
+    }
+
+    /**
+     * @param SummaryInterface $summary
+     * @param float $regularPriceExclTax
+     * @param float $regularPriceInclTax
+     * @param float $regularPriceTax
+     * @param float $finalPriceExclTax
+     * @param float $finalPriceInclTax
+     * @param float $finalPriceTax
+     * @param float $promoPriceExclTax
+     * @param float $promoPriceInclTax
+     * @param float $promoPriceTax
+     * @return void
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
+    private function fillSummaryWithPrices(
+        SummaryInterface $summary,
+        float $regularPriceExclTax,
+        float $regularPriceInclTax,
+        float $regularPriceTax,
+        float $finalPriceExclTax,
+        float $finalPriceInclTax,
+        float $finalPriceTax,
+        float $promoPriceExclTax,
+        float $promoPriceInclTax,
+        float $promoPriceTax
+    ): void {
         $basketBasePrice = $summary->getBasketBasePrice();
         $basketBasePrice->setNet($regularPriceExclTax);
         $basketBasePrice->setGross($regularPriceInclTax);
@@ -82,17 +223,6 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         $basketPromoPrice->setGross($promoPriceInclTax);
         $basketPromoPrice->setVat($promoPriceTax);
         $summary->setBasketPromoPrice($basketPromoPrice);
-
-        $summary->setCurrency($quote->getQuoteCurrencyCode());
-        $summary->setBasketAdditionalInformation('');
-        $summary->setPaymentType($this->iziApiConfigProvider->getAcceptedPaymentTypes());
-
-        $basketExpirationDate = $this->calculateBasketExpirationDate();
-        if ($basketExpirationDate) {
-            $summary->setBasketExpirationDate($basketExpirationDate);
-        }
-
-        $basket->setSummary($summary);
     }
 
     private function calculateBasketExpirationDate(): ?string

@@ -17,8 +17,6 @@ use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Product\Type;
 use InPost\InPostPay\Enum\InPostProductType;
-use Magento\Catalog\Model\Product\Type as ProductType;
-use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
@@ -89,9 +87,7 @@ class ProductToInPostProductDataTransfer
         array $quoteItemsQuantity = []
     ): void {
         if ($product->getTypeId() === Type::TYPE_BUNDLE) {
-            if ($quantity === null) {
-                $quantity = 1.0;
-            }
+            $quantity = $quantity ?? 1.0;
             $bundleQuantity = $this->getBundleQuantity($product, $quantity, $websiteId, $quoteItemsQuantity);
             $canCastQtyToInt = $this->canCastToInteger($quantity);
             $maxQuantity = $bundleQuantity['maxQuantity'];
@@ -99,13 +95,11 @@ class ProductToInPostProductDataTransfer
         } else {
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
-            if ($quantity === null) {
-                $quantity = $stockItemConfiguration->getMinSaleQty();
-            }
+            $quantity = $quantity ?? $stockItemConfiguration->getMinSaleQty();
             $canCastQtyToInt = $this->canCastToInteger($quantity);
-
             $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $product, $quantity, $canCastQtyToInt);
             $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
+
             if ($quoteItemsQuantity) {
                 $maxQuantity -= ($quoteItemsQuantity[$product->getId()] - $quantity);
                 $stockQuantity -= ($quoteItemsQuantity[$product->getId()] - $quantity);
@@ -129,7 +123,7 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setProductLink($this->prepareProductUrl($product));
         $inPostProduct->setProductImage($this->prepareProductImageUrl($product));
 
-        if ($this->isDigitalProduct($product)) {
+        if ($product->isVirtual()) {
             $inPostProduct->setProductType(InPostProductType::DIGITAL->value);
         }
 
@@ -139,8 +133,13 @@ class ProductToInPostProductDataTransfer
         $basePrice->setVat(DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax));
         $inPostProduct->setBasePrice($basePrice);
         $quantityObj = $inPostProduct->getQuantity();
-        $quantityObj->setQuantity($canCastQtyToInt ? (int)$quantity : $quantity);
-        $quantityObj->setQuantityType($canCastQtyToInt ? self::INT_QTY : self::FLOAT_QTY);
+        if ($canCastQtyToInt) {
+            $quantityObj->setQuantity((int)$quantity);
+            $quantityObj->setQuantityType(self::INT_QTY);
+        } else {
+            $quantityObj->setQuantity($quantity);
+            $quantityObj->setQuantityType(self::FLOAT_QTY);
+        }
         $unit = Quantity::DEFAULT_UNIT;
         $quantityObj->setQuantityUnit(__($unit)->render());
         $quantityObj->setAvailableQuantity($stockQuantity);
@@ -362,7 +361,7 @@ class ProductToInPostProductDataTransfer
             $deliveryProduct = $this->deliveryProductFactory->create();
             $deliveryProduct->setDeliveryType($enum->value);
 
-            if ($this->isDigitalProduct($product)) {
+            if ($product->isVirtual()) {
                 if ($key !== RestrictionsRuleInterface::APPLIES_TO_DIGITAL) {
                     $deliveryProduct->setIfDeliveryAvailable(false);
                 } else {
@@ -396,12 +395,5 @@ class ProductToInPostProductDataTransfer
             $productId,
             $this->restrictedProductIdsProvider->getList($websiteId, $appliesTo)
         );
-    }
-
-    private function isDigitalProduct(Product $product): bool
-    {
-        $type = $product->getTypeId();
-
-        return $type === DownloadableType::TYPE_DOWNLOADABLE || $type === ProductType::TYPE_VIRTUAL;
     }
 }

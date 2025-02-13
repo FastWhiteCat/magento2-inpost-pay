@@ -16,6 +16,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
 
 class DeliveryValidator implements OrderValidatorInterface
 {
@@ -37,7 +38,29 @@ class DeliveryValidator implements OrderValidatorInterface
      */
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
-        if ($inPostOrder->getDelivery()->getDeliveryType() !== InPostDeliveryType::APM->name) {
+        $requestedDeliveryType = $inPostOrder->getDelivery()->getDeliveryType();
+
+        if ($requestedDeliveryType === InPostDeliveryType::DIGITAL->value && !$quote->isVirtual()) {
+            throw new LocalizedException(
+                __('Digital delivery is not allowed if cart contains non-digital products.')
+            );
+        }
+
+        if ($requestedDeliveryType !== InPostDeliveryType::DIGITAL->value && $quote->isVirtual()) {
+            throw new LocalizedException(
+                __('Digital delivery is the only allowed method if cart contains only digital products.')
+            );
+        }
+
+        if ($this->checkIfCartContainsDigitalProducts($quote)
+            && empty($inPostOrder->getDelivery()->getDigitalDeliveryEmail())
+        ) {
+            throw new LocalizedException(
+                __('Digital Delivery Email address is required to purchase digital products.')
+            );
+        }
+
+        if ($requestedDeliveryType !== InPostDeliveryType::APM->value) {
             $this->validateDeliveryAddress($inPostOrder->getDelivery()->getDeliveryAddress());
         }
         $this->validateDeliveryMethod($inPostOrder->getDelivery(), $quote);
@@ -117,6 +140,18 @@ class DeliveryValidator implements OrderValidatorInterface
         foreach ($shippingMethods as $shippingMethod) {
             $allowedMethodCode = sprintf('%s_%s', $shippingMethod->getCarrierCode(), $shippingMethod->getMethodCode());
             if ($shippingMethod instanceof ShippingMethodInterface && $allowedMethodCode === $deliveryMethod) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function checkIfCartContainsDigitalProducts(Quote $quote): bool
+    {
+        foreach ($quote->getAllItems() as $item) {
+            /** @var Item $item */
+            if ($item->getProduct()->isVirtual()) {
                 return true;
             }
         }
