@@ -164,6 +164,29 @@ class Delivery extends DataObject implements DeliveryInterface, ExtensibleDataIn
     /**
      * @return string|null
      */
+    public function getDigitalDeliveryEmail(): ?string
+    {
+        $digitalDeliveryEmail = null;
+
+        if ($this->hasData(self::DIGITAL_DELIVERY_EMAIL)) {
+            $digitalDeliveryEmail = $this->getData(self::DIGITAL_DELIVERY_EMAIL);
+        }
+
+        return ($digitalDeliveryEmail && is_scalar($digitalDeliveryEmail)) ? (string)$digitalDeliveryEmail : null;
+    }
+
+    /**
+     * @param string|null $digitalDeliveryEmail
+     * @return void
+     */
+    public function setDigitalDeliveryEmail(?string $digitalDeliveryEmail): void
+    {
+        $this->setData(self::DIGITAL_DELIVERY_EMAIL, $digitalDeliveryEmail);
+    }
+
+    /**
+     * @return string|null
+     */
     public function getDeliveryPoint(): ?string
     {
         $deliveryPoint = $this->getData(self::DELIVERY_POINT);

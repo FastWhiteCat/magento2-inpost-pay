@@ -18,6 +18,7 @@ use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\CreateBasketNotice;
+use InPost\InPostPay\Validator\DigitalQuoteValidator;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
@@ -35,6 +36,19 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
 {
     private const DEFAULT_COUNTRY_ID = 'PL';
 
+    /**
+     * @param DeliveryInterfaceFactory $deliveryFactory
+     * @param DeliveryOptionInterfaceFactory $deliveryOptionFactory
+     * @param DeliveryDateProvider $deliveryDateProvider
+     * @param ShipmentMappingConfigProvider $shipmentMappingConfigProvider
+     * @param AddressRepositoryInterface $addressRepository
+     * @param CreateBasketNotice $createBasketNotice
+     * @param QuoteRestrictionsValidator $quoteRestrictionsValidator
+     * @param ShippingMethodConverter $shippingMethodConverter
+     * @param DigitalQuoteValidator $digitalQuoteValidator
+     * @param LoggerInterface $logger
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly DeliveryInterfaceFactory $deliveryFactory,
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
@@ -44,6 +58,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly ShippingMethodConverter $shippingMethodConverter,
+        private readonly DigitalQuoteValidator $digitalQuoteValidator,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -52,10 +67,14 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     {
         $storeId = $quote->getStoreId();
 
-        if ($quote->isVirtual()) {
-            $this->logger->error('Quote is virtual. Setting empty delivery.');
+        if (!$this->digitalQuoteValidator->isDigitalQuoteAllowed($quote)) {
+            $this->logger->error(
+                'Quote contains digital products and Magento config does not allow guest orders.'
+                . ' Setting empty delivery.'
+            );
             $basket->setDelivery([]);
-            $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
+            $this->setBasketNoticeForGuestUnavailableDigitalProducts((string)$basket->getBasketId());
+
             return;
         }
 
@@ -73,13 +92,6 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             $this->logger->error('Empty cart. Setting empty delivery.');
             $basket->setDelivery([]);
             return;
-        }
-
-        foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getIsVirtual()) {
-                $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
-                break;
-            }
         }
 
         $shippingMethods = $this->getShippingMethodsForQuote($quote);
@@ -246,12 +258,15 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         return $limit;
     }
 
-    private function setBasketNoticeVirtualProducts(string $basketId): void
+    private function setBasketNoticeForGuestUnavailableDigitalProducts(string $basketId): void
     {
         $this->createBasketNotice->execute(
             $basketId,
             InPostPayBasketNoticeInterface::ATTENTION,
-            __('Order contains products that cannot be shipped.')->render()
+            __(
+                'Cart contains digital products that cannot be ordered as a not logged in user.'
+                . ' Please create account in Merchants website in order to complete this purchase.'
+            )->render()
         );
     }
 
