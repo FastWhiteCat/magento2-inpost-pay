@@ -11,5 +11,11 @@
             <config_path>payment/inpost_pay/delivery_deadline_in_days</config_path>
             <comment>This value is used to calculate delivery date for InPost Pay mobile app.</comment>
         </field>
+        <field id="digital_delivery_deadline_in_days" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+            <label>Digital Delivery Deadline in Seconds</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/digital_delivery_deadline_in_days</config_path>
+            <comment>This value is used to calculate digital delivery date for InPost Pay mobile app.</comment>
+        </field>
     </group>
 </include>

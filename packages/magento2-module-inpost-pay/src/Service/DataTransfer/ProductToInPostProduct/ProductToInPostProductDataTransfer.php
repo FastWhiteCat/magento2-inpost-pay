@@ -122,6 +122,7 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setProductDescription($this->prepareProductDescription($product));
         $inPostProduct->setProductLink($this->prepareProductUrl($product));
         $inPostProduct->setProductImage($this->prepareProductImageUrl($product));
+        $inPostProduct->setProductType(InPostProductType::PRODUCT->value);
 
         if ($product->isVirtual()) {
             $inPostProduct->setProductType(InPostProductType::DIGITAL->value);
@@ -353,40 +354,56 @@ class ProductToInPostProductDataTransfer
         $productId = (int)$product->getId();
         $simpleProductId = (int)$this->extractProductId($product);
 
-        $productRestricted = $this->isProductRestricted($productId, $websiteId);
-        $productRestricted = $productRestricted || $this->isProductRestricted($simpleProductId, $websiteId);
+        $isRestricted = $this->isProductRestricted($productId, $websiteId);
+        $isRestricted = $isRestricted || $this->isProductRestricted($simpleProductId, $websiteId);
 
         $deliveryProductArr = [];
         foreach (self::ALL_DELIVERY_TYPES as $key => $enum) {
+            $available = $this->isDeliveryForProductAvailable(
+                $product,
+                $websiteId,
+                $key,
+                $isRestricted,
+                $simpleProductId
+            );
             $deliveryProduct = $this->deliveryProductFactory->create();
             $deliveryProduct->setDeliveryType($enum->value);
-
-            if ($product->isVirtual()) {
-                if ($key !== RestrictionsRuleInterface::APPLIES_TO_DIGITAL) {
-                    $deliveryProduct->setIfDeliveryAvailable(false);
-                } else {
-                    $deliveryProduct->setIfDeliveryAvailable(!$productRestricted);
-                }
-
-                $deliveryProductArr[] = $deliveryProduct;
-
-                continue;
-            }
-
-            if ($productRestricted) {
-                $available = false;
-            } else {
-                $available = !(
-                    $this->isProductRestricted($productId, $websiteId, $key)
-                    || $this->isProductRestricted($simpleProductId, $websiteId, $key)
-                );
-            }
-
             $deliveryProduct->setIfDeliveryAvailable($available);
             $deliveryProductArr[] = $deliveryProduct;
         }
 
         return $deliveryProductArr;
+    }
+
+    private function isDeliveryForProductAvailable(
+        Product $product,
+        int $websiteId,
+        int $deliveryType,
+        bool $isRestricted,
+        int $simpleProductId
+    ): bool {
+        $productId = (int)$product->getId();
+
+        if ($product->isVirtual()) {
+            if ($deliveryType !== RestrictionsRuleInterface::APPLIES_TO_DIGITAL) {
+                $available = false;
+            } else {
+                $available = !$isRestricted;
+            }
+        } else {
+            if ($isRestricted) {
+                $available = false;
+            } else {
+                $available = !(
+                    $this->isProductRestricted($productId, $websiteId, $deliveryType)
+                    || $this->isProductRestricted($simpleProductId, $websiteId, $deliveryType)
+                );
+            }
+
+            $available = ($deliveryType === RestrictionsRuleInterface::APPLIES_TO_DIGITAL) ? false : $available;
+        }
+
+        return $available;
     }
 
     private function isProductRestricted(int $productId, int $websiteId, int $appliesTo = 0): bool
