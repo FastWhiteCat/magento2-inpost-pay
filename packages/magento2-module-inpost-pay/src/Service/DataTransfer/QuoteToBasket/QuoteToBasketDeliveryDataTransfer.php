@@ -12,6 +12,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFa
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
@@ -94,8 +95,13 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             return;
         }
 
-        $shippingMethods = $this->getShippingMethodsForQuote($quote);
-        $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
+        if (!$quote->isVirtual()) {
+            $shippingMethods = $this->getShippingMethodsForQuote($quote);
+            $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
+            $deliveries = array_merge($deliveries, $this->prepareDigitalDeliveryData($storeId));
+        } else {
+            $deliveries = $this->prepareDigitalDeliveryData($storeId);
+        }
 
         if (empty($deliveries)) {
             $this->createBasketNotice->execute(
@@ -184,6 +190,28 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             $delivery->setDeliveryOptions($optionsData);
             $deliveryData[] = $delivery;
         }
+
+        return $deliveryData;
+    }
+
+    /**
+     * @param int $storeId
+     * @return array
+     */
+    private function prepareDigitalDeliveryData(int $storeId): array
+    {
+        $deliveryData = [];
+        /** @var DeliveryInterface $delivery */
+        $delivery = $this->deliveryFactory->create();
+        $delivery->setDeliveryType(InPostDeliveryType::DIGITAL->value);
+        $delivery->setDeliveryDate($this->deliveryDateProvider->calculateDigitalDeliveryDate($storeId));
+        $deliverPrice = $delivery->getDeliveryPrice();
+        $deliverPrice->setNet(0);
+        $deliverPrice->setGross(0);
+        $deliverPrice->setVat(0);
+        $delivery->setDeliveryPrice($deliverPrice);
+        $delivery->setDeliveryOptions([]);
+        $deliveryData[] = $delivery;
 
         return $deliveryData;
     }

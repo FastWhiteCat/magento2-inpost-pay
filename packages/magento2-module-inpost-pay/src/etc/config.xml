@@ -16,6 +16,7 @@
                 <min_order_total>0</min_order_total>
                 <max_order_total>99999</max_order_total>
                 <delivery_deadline_in_days>7</delivery_deadline_in_days>
+                <digital_delivery_deadline_in_days>86400</digital_delivery_deadline_in_days>
                 <basket_lifetime>604800</basket_lifetime>
                 <client_id></client_id>
                 <client_secret></client_secret>

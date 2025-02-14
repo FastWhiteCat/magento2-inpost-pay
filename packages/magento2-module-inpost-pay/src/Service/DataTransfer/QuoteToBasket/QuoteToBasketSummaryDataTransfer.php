@@ -13,6 +13,8 @@ use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Address;
+use Magento\Quote\Model\Quote\Address\Total;
 
 class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInterface
 {
@@ -23,12 +25,7 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        if (!$quote->isVirtual()) {
-            $summary = $this->transferNonVirtualQuote($quote, $basket);
-        } else {
-            $summary = $this->transferVirtualQuote($quote, $basket);
-        }
-
+        $summary = $this->transferQuoteSummary($quote, $basket);
         $summary->setCurrency($quote->getQuoteCurrencyCode());
         $summary->setBasketAdditionalInformation('');
         $summary->setPaymentType($this->iziApiConfigProvider->getAcceptedPaymentTypes());
@@ -41,9 +38,9 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         $basket->setSummary($summary);
     }
 
-    private function transferNonVirtualQuote(Quote $quote, BasketInterface $basket): SummaryInterface
+    private function transferQuoteSummary(Quote $quote, BasketInterface $basket): SummaryInterface
     {
-        $address = $quote->getShippingAddress();
+        $address = $quote->isVirtual() ? $quote->getBillingAddress() : $quote->getShippingAddress();
         $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
         $discountExclTax = DecimalCalculator::add(
             (float)$address->getDiscountAmount(),
@@ -68,60 +65,6 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
             $promoPriceInclTax = DecimalCalculator::round((float)$address->getSubtotalInclTax());
             $promoPriceExclTax = DecimalCalculator::round((float)$address->getSubtotal());
             $promoPriceTax = DecimalCalculator::sub($promoPriceInclTax, $promoPriceExclTax);
-        }
-
-        $summary = $basket->getSummary();
-        $this->fillSummaryWithPrices(
-            $summary,
-            $regularPriceExclTax,
-            $regularPriceInclTax,
-            $regularPriceTax,
-            $finalPriceExclTax,
-            $finalPriceInclTax,
-            $finalPriceTax,
-            $promoPriceExclTax,
-            $promoPriceInclTax,
-            $promoPriceTax
-        );
-
-        return $summary;
-    }
-
-    private function transferVirtualQuote(Quote $quote, BasketInterface $basket): SummaryInterface
-    {
-        $address = $quote->getShippingAddress();
-        $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
-        $discountExclTax = DecimalCalculator::add(
-            (float)$address->getDiscountAmount(),
-            (float)$address->getDiscountTaxCompensationAmount()
-        );
-
-        $regularPriceInclTax = $this->getTotalQuoteItemsRegularPrice($quote, true);
-        $regularPriceExclTax = $this->getTotalQuoteItemsRegularPrice($quote, false);
-        $regularPriceTax = DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax);
-
-        if ((int)$quote->getItemsCount() === 0) {
-            return $this->getEmptyQuoteSummary($quote, $basket);
-        } else {
-            $finalPriceExclTax = DecimalCalculator::round(
-                DecimalCalculator::add((float)$quote->getSubtotal(), $discountExclTax)
-            );
-            $finalPriceInclTax = DecimalCalculator::round(
-                DecimalCalculator::add((float)$quote->getGrandTotal(), $discountInclTax)
-            );
-            $finalPriceTax = DecimalCalculator::round(
-                DecimalCalculator::sub($finalPriceInclTax, $finalPriceExclTax)
-            );
-
-            $promoPriceExclTax = DecimalCalculator::round(
-                DecimalCalculator::sub((float)$quote->getSubtotal(), $discountExclTax)
-            );
-            $promoPriceInclTax = DecimalCalculator::round(
-                DecimalCalculator::sub((float)$quote->getGrandTotal(), $discountInclTax)
-            );
-            $promoPriceTax = DecimalCalculator::round(
-                DecimalCalculator::sub($promoPriceInclTax, $promoPriceExclTax)
-            );
         }
 
         $summary = $basket->getSummary();
