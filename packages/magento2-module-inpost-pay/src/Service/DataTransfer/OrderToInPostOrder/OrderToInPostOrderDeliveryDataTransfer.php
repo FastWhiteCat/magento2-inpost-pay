@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use \Magento\Quote\Api\Data\ShippingMethodInterfaceFactory;
 use \Magento\Quote\Api\Data\ShippingMethodInterface;
@@ -39,6 +40,13 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
     {
         $delivery = $inPostOrder->getDelivery();
         $orderShippingMethodCode = $this->getOrderShippingMethodCode($order);
+
+        if ($order->getIsVirtual()) {
+            $this->appendDigitalDeliveryData($order, $delivery);
+            $inPostOrder->setDelivery($delivery);
+
+            return;
+        }
 
         foreach ($this->shipmentMappingConfigProvider->getAllDeliveryTypes() as $deliveryType) {
             foreach ($this->getAllDeliveryOptions() as $deliveryOptionCode) {
@@ -103,6 +111,10 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         $delivery->setMail($order->getCustomerEmail());
         $delivery->setPhoneNumber($inPostPayOrder->getPhoneNumber());
 
+        if ($inPostPayOrder->getDigitalDeliveryEmail()) {
+            $delivery->setDigitalDeliveryEmail($inPostPayOrder->getDigitalDeliveryEmail());
+        }
+
         if ($inPostPayOrder->getCourierNote()) {
             $delivery->setCourierNote($inPostPayOrder->getCourierNote());
         }
@@ -118,6 +130,25 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         if ($deliveryOptionCode !== ShipmentMappingConfigProvider::OPTION_STANDARD) {
             $this->appendDeliveryOptionData($order, $deliveryOptionCode, $delivery);
         }
+    }
+
+    private function appendDigitalDeliveryData(Order $order, DeliveryInterface $delivery): void
+    {
+        $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
+        $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
+        $delivery->setDeliveryType(InPostDeliveryType::DIGITAL->value);
+
+        $deliveryPrice = $delivery->getDeliveryPrice();
+        if ($deliveryPrice instanceof PriceInterface) {
+            $deliveryPrice->setNet(0);
+            $deliveryPrice->setGross(0);
+            $deliveryPrice->setVat(0);
+            $delivery->setDeliveryPrice($deliveryPrice);
+        }
+
+        $delivery->setMail($order->getCustomerEmail());
+        $delivery->setDigitalDeliveryEmail($inPostPayOrder->getDigitalDeliveryEmail());
+        $delivery->setPhoneNumber($inPostPayOrder->getPhoneNumber());
     }
 
     private function appendDeliveryAddressData(Address $orderShippingAddress, DeliveryInterface $delivery): void
