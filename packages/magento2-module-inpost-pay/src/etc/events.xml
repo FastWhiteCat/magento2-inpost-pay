@@ -11,6 +11,9 @@
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
     </event>
+    <event name="sales_quote_item_collection_products_after_load">
+        <observer name="InPost_InPostPay::addImageGalleryToProductsCollectionEventObserver" instance="InPost\InPostPay\Observer\Quote\AddImageGalleryToProductsCollectionEventObserver"/>
+    </event>
     <event name="customer_logout">
         <observer name="InPost_InPostPay::deleteBasketBidingApiCookieAfterCustomerLogout" instance="InPost\InPostPay\Observer\Customer\DeleteBasketBidingApiCookieAfterCustomerLogout" />
     </event>
@@ -29,6 +32,12 @@
     <event name="checkout_onepage_controller_success_action">
         <observer name="InPost_InPostPay::deleteBindingAfterPlaceOrderObserver" instance="InPost\InPostPay\Observer\Order\PlaceOrderEventObserver" />
         <observer name="InPost_InPostPay::forceStatusUpdateObserver" instance="InPost\InPostPay\Observer\Order\ForceStatusUpdateObserver" />
+    </event>
+    <event name="inpost_pay_bestseller_product_save_before">
+        <observer name="InPost_InPostPay::validateInPostPayBestsellerProductBeforeSaveObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\ValidateInPostPayBestsellerProductBeforeSaveObserver" />
+    </event>
+    <event name="inpost_pay_bestseller_product_delete_after">
+        <observer name="InPost_InPostPay::inPostPayBestsellerProductAfterDeleteObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\InPostPayBestsellerProductAfterDeleteObserver" />
     </event>
     <!-- Events triggered when sending requests to IZI API Endpoints -->
     <event name="izi_api_send_request_before">
@@ -80,6 +89,12 @@
     </event>
     <event name="izi_basket_confirmation_after">
         <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_before">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetBeforeEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_after">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetAfterEventObserver" />
     </event>
 
     <!-- Email Events:: observer set InPost Pay Order in process registry so that email copy can be also sent to InPost Pay Account email address -->

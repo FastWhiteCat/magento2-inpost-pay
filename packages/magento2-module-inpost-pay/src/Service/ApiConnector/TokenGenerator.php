@@ -153,6 +153,11 @@ class TokenGenerator
         );
     }
 
+    public function cleanTokenCache(): void
+    {
+        $this->tokenResponses = [];
+    }
+
     private function handle(array $result): TokenResponse
     {
         $accessToken = (string)($result[TokenResponse::ACCESS_TOKEN] ?? '');

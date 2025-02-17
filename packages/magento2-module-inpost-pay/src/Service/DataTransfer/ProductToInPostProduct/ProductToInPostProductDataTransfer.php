@@ -70,6 +70,7 @@ class ProductToInPostProductDataTransfer
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper,
+        private readonly AdditionalProductImagesDataTransfer $additionalProductImagesDataTransfer,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
         private readonly LoggerInterface $logger,
@@ -148,6 +149,7 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
         $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
+        $this->additionalProductImagesDataTransfer->transfer($product, $inPostProduct);
     }
 
     /**

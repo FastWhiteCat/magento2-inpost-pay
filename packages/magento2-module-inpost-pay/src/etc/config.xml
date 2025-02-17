@@ -12,6 +12,8 @@
                 <order_status>pending</order_status>
                 <allowspecific>0</allowspecific>
                 <image_role>small_image</image_role>
+                <additional_images_enabled>0</additional_images_enabled>
+                <prepare_resized_additional_images>0</prepare_resized_additional_images>
                 <sort_order>5</sort_order>
                 <min_order_total>0</min_order_total>
                 <max_order_total>99999</max_order_total>
@@ -44,6 +46,9 @@
                 <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
                 <assign_quote_to_customer_by_email>1</assign_quote_to_customer_by_email>
+                <bestsellers_synchronize_cron_enabled>0</bestsellers_synchronize_cron_enabled>
+                <bestsellers_synchronize_mode>upload</bestsellers_synchronize_mode>
+                <bestsellers_synchronize_cron_schedule>30 6 * * *</bestsellers_synchronize_cron_schedule>
             </inpost_pay>
         </payment>
     </default>

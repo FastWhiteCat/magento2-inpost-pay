@@ -15,6 +15,8 @@ class GeneralConfigProvider
     private const XML_PATH_ORDER_ADDRESS_SOURCE_FLAG = 'payment/inpost_pay/use_address_as_firstname_source';
     private const XML_PATH_INPOST_PAY_IMAGE_ROLE = 'payment/inpost_pay/image_role';
     private const XML_PATH_INPOST_PAY_ASSIGN_QUOTE_ENABLED = 'payment/inpost_pay/assign_quote_to_customer_by_email';
+    private const XML_PATH_INPOST_PAY_ADDITIONAL_IMAGES_ENABLED = 'payment/inpost_pay/additional_images_enabled';
+    private const XML_PATH_INPOST_PAY_PREPARE_RESIZED_IMAGES = 'payment/inpost_pay/prepare_resized_additional_images';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -73,6 +75,23 @@ class GeneralConfigProvider
         );
 
         return is_scalar($orderStatus) ? (string)$orderStatus : 'small_image';
+    }
+
+    public function isAdditionalImagesEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_INPOST_PAY_ADDITIONAL_IMAGES_ENABLED,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function isPrepareResizedImagesEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_INPOST_PAY_PREPARE_RESIZED_IMAGES,
+            ScopeInterface::SCOPE_WEBSITE
+        );
     }
 
     public function isAssigningGuestCartsToAccountByEmailEnabled(?int $storeId = null): bool

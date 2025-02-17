@@ -309,4 +309,23 @@ class Product extends DataObject implements ProductInterface, ExtensibleDataInte
     {
         $this->setData(self::DELIVERY_PRODUCT, $deliveryProduct);
     }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[]
+     */
+    public function getAdditionalProductImages(): array
+    {
+        $additionalProductImages = $this->getData(self::ADDITIONAL_PRODUCT_IMAGES);
+
+        return is_array($additionalProductImages) ? $additionalProductImages : [];
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[] $additionalProductImages
+     * @return void
+     */
+    public function setAdditionalProductImages(array $additionalProductImages): void
+    {
+        $this->setData(self::ADDITIONAL_PRODUCT_IMAGES, $additionalProductImages);
+    }
 }

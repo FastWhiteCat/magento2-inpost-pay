@@ -1,0 +1,152 @@
+<?php
+
+declare(strict_types=1);
+
+namespace InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller;
+
+use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
+use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
+use InPost\InPostPay\Api\DataTransfer\MagentoBestsellerToInPostPayBestsellerDataTransferInterface;
+use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface as InPostProduct;
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory as InPostProductFactory;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBestsellerDataTransferInterface
+{
+    /**
+     * @param ProductRepositoryInterface $productRepository
+     * @param StoreManagerInterface $storeManager
+     * @param ProductToInPostProductDataTransfer $productToInPostProductDataTransfer
+     * @param InPostProductFactory $inPostProductFactory
+     * @param ProductAvailabilityInterfaceFactory $productAvailabilityFactory
+     */
+    public function __construct(
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
+        private readonly InPostProductFactory $inPostProductFactory,
+        private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory
+    ) {
+    }
+
+    /**
+     * @param InPostPayBestsellerProductInterface $magentoBestsellerProduct
+     * @param BestsellerProductInterface $bestsellerProduct
+     * @return void
+     * @throws NoSuchEntityException
+     */
+    public function transfer(
+        InPostPayBestsellerProductInterface $magentoBestsellerProduct,
+        BestsellerProductInterface $bestsellerProduct
+    ): void {
+        $inPostProduct = $this->initInPostProduct(
+            $magentoBestsellerProduct->getSku(),
+            $magentoBestsellerProduct->getWebsiteId()
+        );
+
+        $bestsellerProduct->setProductId($inPostProduct->getProductId());
+        $bestsellerProduct->setEan($inPostProduct->getEan());
+        $bestsellerProduct->setProductName($inPostProduct->getProductName());
+        $bestsellerProduct->setProductDescription($inPostProduct->getProductDescription());
+        $bestsellerProduct->setProductAttributes($inPostProduct->getProductAttributes());
+        $bestsellerProduct->setProductImage($inPostProduct->getProductImage());
+        $bestsellerProduct->setAdditionalProductImages($inPostProduct->getAdditionalProductImages());
+        $this->transferQuantityData($inPostProduct, $bestsellerProduct);
+        $this->transferAvailabilityData($magentoBestsellerProduct, $bestsellerProduct);
+    }
+
+    /**
+     * @param string $sku
+     * @param int $websiteId
+     * @return InPostProduct
+     * @throws NoSuchEntityException
+     */
+    private function initInPostProduct(string $sku, int $websiteId): InPostProduct
+    {
+        try {
+            $storeId = $this->storeManager->getWebsite($websiteId)->getDefaultStore()->getStoreId();
+        } catch (LocalizedException $e) {
+            $storeId = 0;
+        }
+
+        /** @var Product $product */
+        $product = $this->productRepository->get($sku, false, $storeId, true);
+
+        /** @var InPostProduct $inPostProduct */
+        $inPostProduct = $this->inPostProductFactory->create();
+        $this->productToInPostProductDataTransfer->transfer($product, $inPostProduct, $websiteId, 1);
+
+        return $inPostProduct;
+    }
+
+    /**
+     * @param InPostPayBestsellerProductInterface $magentoBestsellerProduct
+     * @param BestsellerProductInterface $bestsellerProduct
+     * @return void
+     */
+    private function transferAvailabilityData(
+        InPostPayBestsellerProductInterface $magentoBestsellerProduct,
+        BestsellerProductInterface $bestsellerProduct
+    ): void {
+        /** @var ProductAvailabilityInterface $productAvailability */
+        $productAvailability = $this->productAvailabilityFactory->create();
+
+        if ($magentoBestsellerProduct->getAvailableStartDate()) {
+            $productAvailability->setStartDate(
+                $this->convertDateToInPostPayFormat(
+                    (string)$magentoBestsellerProduct->getAvailableStartDate()
+                )
+            );
+        }
+
+        if ($magentoBestsellerProduct->getAvailableEndDate()) {
+            $productAvailability->setEndDate(
+                $this->convertDateToInPostPayFormat(
+                    (string)$magentoBestsellerProduct->getAvailableEndDate()
+                )
+            );
+        }
+
+        if ($productAvailability->getStartDate() || $productAvailability->getEndDate()) {
+            $bestsellerProduct->setProductAvailability($productAvailability);
+        }
+    }
+
+    /**
+     * @param InPostProduct $inPostProduct
+     * @param BestsellerProductInterface $bestsellerProduct
+     * @return void
+     */
+    private function transferQuantityData(
+        InPostProduct $inPostProduct,
+        BestsellerProductInterface $bestsellerProduct
+    ): void {
+        $bestsellerQuantity = $bestsellerProduct->getQuantity();
+        $bestsellerQuantity->setQuantityType($inPostProduct->getQuantity()->getQuantityType());
+        $bestsellerQuantity->setQuantityUnit($inPostProduct->getQuantity()->getQuantityUnit());
+        $bestsellerQuantity->setAvailableQuantity($inPostProduct->getQuantity()->getAvailableQuantity());
+        $bestsellerProduct->setQuantity($bestsellerQuantity);
+    }
+
+    /**
+     * @param string $originalDate
+     * @return string
+     */
+    private function convertDateToInPostPayFormat(string $originalDate): string
+    {
+        $strToTime = strtotime($originalDate);
+
+        return $strToTime ? date(BasketInterface::INPOST_DATE_FORMAT, $strToTime) : '';
+    }
+}
