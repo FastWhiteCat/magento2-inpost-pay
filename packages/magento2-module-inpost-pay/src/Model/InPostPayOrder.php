@@ -233,6 +233,19 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::INPOST_PAY_ACCOUNT_EMAIL, $inPostPayAccountEmail);
     }
 
+    public function getDigitalDeliveryEmail(): ?string
+    {
+        $hasDigitalDeliveryEmail = $this->hasData(self::DIGITAL_DELIVERY_EMAIL);
+        $digitalDeliveryEmail = $hasDigitalDeliveryEmail ? $this->getData(self::DIGITAL_DELIVERY_EMAIL) : null;
+
+        return ($digitalDeliveryEmail && is_scalar($digitalDeliveryEmail)) ? (string)$digitalDeliveryEmail : null;
+    }
+
+    public function setDigitalDeliveryEmail(?string $digitalDeliveryEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::DIGITAL_DELIVERY_EMAIL, $digitalDeliveryEmail);
+    }
+
     public function getCountryPrefix(): ?string
     {
         $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
