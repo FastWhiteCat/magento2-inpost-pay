@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
@@ -32,6 +33,10 @@ class DeliveryMethodStep extends OrderProcessingStep implements OrderProcessingS
      */
     public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
+        if ($inPostOrder->getDelivery()->getDeliveryType() === InPostDeliveryType::DIGITAL->value) {
+            return;
+        }
+
         $deliveryType = $inPostOrder->getDelivery()->getDeliveryType();
         if ($inPostOrder->getDelivery()->getDeliveryCodes()) {
             $deliveryOption = implode('', $inPostOrder->getDelivery()->getDeliveryCodes());
