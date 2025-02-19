@@ -18,6 +18,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\Website;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -75,7 +76,9 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
     private function initInPostProduct(string $sku, int $websiteId): InPostProduct
     {
         try {
-            $storeId = $this->storeManager->getWebsite($websiteId)->getDefaultStore()->getStoreId();
+            /** @var Website $website */
+            $website = $this->storeManager->getWebsite($websiteId);
+            $storeId = $website->getDefaultStore()->getStoreId();
         } catch (LocalizedException $e) {
             $storeId = 0;
         }

@@ -80,6 +80,7 @@
 "Show on cart","Pokaż na koszyku",module,InPost_InPostPay
 "Show in minicart","Pokaż w minikoszyku",module,InPost_InPostPay
 "Show on thank you page","Pokaż na stronie z podziękowaniami",module,InPost_InPostPay
+"Success Page URL","Adres URL strony z podziękowaniem za zamówienie",module,InPost_InPostPay
 "Button Layout Settings","Ustawienia układu przycisków",module,InPost_InPostPay
 "Default value of the button color variant","Domyślna wartość wariantu kolorystycznego przycisku",module,InPost_InPostPay
 "Widget dark mode enabled by default","Domyślnie włączony tryb ciemny widgetu",module,InPost_InPostPay

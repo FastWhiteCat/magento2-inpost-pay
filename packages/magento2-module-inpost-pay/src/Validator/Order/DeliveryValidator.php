@@ -60,10 +60,13 @@ class DeliveryValidator implements OrderValidatorInterface
             );
         }
 
-        if ($requestedDeliveryType !== InPostDeliveryType::APM->value) {
+        if ($requestedDeliveryType === InPostDeliveryType::COURIER->value) {
             $this->validateDeliveryAddress($inPostOrder->getDelivery()->getDeliveryAddress());
         }
-        $this->validateDeliveryMethod($inPostOrder->getDelivery(), $quote);
+
+        if ($requestedDeliveryType !== InPostDeliveryType::DIGITAL->value) {
+            $this->validateDeliveryMethod($inPostOrder->getDelivery(), $quote);
+        }
     }
 
     /**

@@ -54,22 +54,44 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
             );
         }
 
-        $this->updateQuoteEmailWithInPostDeliveryEmail($quote, $inPostOrder->getDelivery()->getMail());
+        $this->updateQuoteEmailWithInPostDeliveryInfo(
+            $quote,
+            $inPostOrder->getDelivery()->getMail(),
+            $inPostOrder->getDelivery()->getDigitalDeliveryEmail()
+        );
     }
 
-    private function updateQuoteEmailWithInPostDeliveryEmail(Quote $quote, string $inPostDeliveryEmail): void
-    {
-        if ($quote->getCustomerEmail() !== $inPostDeliveryEmail) {
-            // Even if quote has been initialized for Logged-in user, quote customer email property will be updated
-            // with delivery email chosen by customer in Mobile InPost Pay App on purpose so that the customer
-            // will have his order assigned to an email he purposely selected in Mobile App.
-            $quote->setCustomerEmail($inPostDeliveryEmail);
-            $this->createLog(
-                sprintf(
-                    'Order email will be updated with delivery email from InPost Pay account: %s',
-                    $inPostDeliveryEmail
-                )
-            );
+    private function updateQuoteEmailWithInPostDeliveryInfo(
+        Quote $quote,
+        string $inPostDeliveryEmail,
+        ?string $digitalDeliveryEmail = null
+    ): void {
+        if (!$quote->isVirtual()) {
+            if ($quote->getCustomerEmail() !== $inPostDeliveryEmail) {
+                // Even if quote has been initialized for Logged-in user, quote customer email property will be updated
+                // with delivery email chosen by customer in Mobile InPost Pay App on purpose so that the customer
+                // will have his order assigned to an email he purposely selected in Mobile App.
+                $quote->setCustomerEmail($inPostDeliveryEmail);
+                $this->createLog(
+                    sprintf(
+                        'Order email will be updated with delivery email from InPost Pay account: %s',
+                        $inPostDeliveryEmail
+                    )
+                );
+            }
+        } else {
+            if ($digitalDeliveryEmail && $quote->getCustomerEmail() !== $digitalDeliveryEmail) {
+                // Even if quote has been initialized for Logged-in user, quote customer email property will be updated
+                // with digital delivery email chosen by customer in Mobile InPost Pay App on purpose
+                // so that the customer will have his order assigned to an email he purposely selected in Mobile App.
+                $quote->setCustomerEmail($digitalDeliveryEmail);
+                $this->createLog(
+                    sprintf(
+                        'Virtual Order email will be updated with digital delivery email from InPost Pay: %s',
+                        $digitalDeliveryEmail
+                    )
+                );
+            }
         }
     }
 }
