@@ -434,9 +434,6 @@ class ProductToInPostProductDataTransfer
             $file = $galleryImage->getFile();
             if ($file && $totalImages < self::MAX_ADDITIONAL_IMAGES_COUNT) {
                 $normalImage = $smallImage = $galleryImage->getUrl();
-                if ($normalImage === $inpostProduct->getProductImage()) {
-                    continue;
-                }
 
                 if ($this->generalConfigProvider->isPrepareResizedImagesEnabled()) {
                     $smallImage = $this->imageHelper->init($product, 'product_page_image_large')
