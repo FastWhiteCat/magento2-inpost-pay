@@ -9,8 +9,8 @@ use InPost\InPostPay\Registry\Order\Email\Sender\InPostPayOrderEmailSenderRegist
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Customer;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Container\IdentityInterface;
@@ -19,6 +19,9 @@ use Psr\Log\LoggerInterface;
 
 class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
 {
+    public const ORIGINAL_RESULT = 'original_result';
+    public const MODIFIED_RESULT = 'modified_result';
+
     /**
      * @param InPostPayOrderEmailSenderRegistry $inPostPayOrderEmailSenderRegistry
      * @param CustomerRepositoryInterface $customerRepository
@@ -49,21 +52,20 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
     public function afterGetEmailCopyTo(IdentityInterface $subject, array|bool $result): array|bool
     {
         $originalResult = $result;
-        $result = is_array($result) ? $result : [];
+        $modifiedResult = is_array($result) ? $result : [];
         $inPostPayOrder = $this->inPostPayOrderEmailSenderRegistry->registry();
 
         if ($inPostPayOrder === null) {
-            return $result;
+            return $modifiedResult;
         }
 
         $order = $this->getOrderByInPostPayOrder($inPostPayOrder);
 
         if ($order === null) {
-            return $result;
+            return $modifiedResult;
         }
 
         $inPostPayAccountEmail = $inPostPayOrder->getInPostPayAccountEmail();
-        $inPostDeliveryEmail = $inPostPayOrder->getDeliveryEmail();
         $inPostDigitalDeliveryEmail = $inPostPayOrder->getDigitalDeliveryEmail();
         $magentoCustomerEmail = null;
 
@@ -73,36 +75,41 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
 
         $result = $this->prepareNotifyEmails(
             $order,
-            $result,
+            $modifiedResult,
             $inPostPayAccountEmail,
-            $inPostDeliveryEmail,
             $inPostDigitalDeliveryEmail,
             $magentoCustomerEmail
         );
+
+        $resultObject = new DataObject();
+        $resultObject->setData(self::ORIGINAL_RESULT, $originalResult);
+        $resultObject->setData(self::MODIFIED_RESULT, $modifiedResult);
 
         $this->eventManager->dispatch(
             'inpost_pay_order_sales_email_copy_to_before_send',
             [
                 'order' => $order,
                 'inpost_pay_order' => $inPostPayOrder,
-                'original_result' => $originalResult,
-                'result' => $result,
+                'result' => $resultObject,
             ]
         );
 
-        if (!empty($result) && (array)$originalResult !== $result) {
+        $modifiedResult = $resultObject->getData(self::MODIFIED_RESULT);
+        $modifiedResult = is_array($modifiedResult) ? $modifiedResult : [];
+
+        if (!empty($modifiedResult) && (array)$originalResult !== $modifiedResult) {
             $this->logger->debug(
                 sprintf(
                     'Additional InPost Pay Order [#%s] related email will be sent [as:%s] for %s [originally to: %s]',
                     (string)$order->getIncrementId(),
                     is_scalar($subject->getCopyMethod()) ? (string)$subject->getCopyMethod() : '',
-                    implode(',', $result),
+                    implode(',', $modifiedResult),
                     $order->getCustomerEmail()
                 )
             );
         }
 
-        return $result;
+        return $modifiedResult;
     }
 
     /**
@@ -132,7 +139,7 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
             if ($customer instanceof CustomerInterface || $customer instanceof Customer) {
                 $customerEmail = $customer->getEmail();
             }
-        } catch (NoSuchEntityException | LocalizedException $e) {
+        } catch (LocalizedException $e) {
             return null;
         }
 
@@ -153,13 +160,11 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
         Order $order,
         array $originalNotifyEmails,
         ?string $inPostPayAccountEmail,
-        ?string $inPostDeliveryEmail,
         ?string $inPostDigitalDeliveryEmail,
         ?string $magentoCustomerEmail
     ): array {
         $emailsToNotify = [];
         !empty($inPostPayAccountEmail) && $emailsToNotify[] = $inPostPayAccountEmail;
-        !empty($inPostDeliveryEmail) && $emailsToNotify[] = $inPostDeliveryEmail;
         !empty($inPostDigitalDeliveryEmail) && $emailsToNotify[] = $inPostDigitalDeliveryEmail;
         !empty($magentoCustomerEmail) && $emailsToNotify[] = $magentoCustomerEmail;
         $emailsToNotify = $this->cleanOrderEmailCopyTo($order, $emailsToNotify);
