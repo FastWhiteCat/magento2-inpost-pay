@@ -22,6 +22,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as Produ
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use Magento\Store\Model\Store;
 
@@ -76,6 +77,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
      * @param int[] $productIds
      * @param Store $store
      * @return array
+     * @throws LocalizedException
      */
     private function getCrossSellProducts(array $productIds, Store $store): array
     {
@@ -88,6 +90,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
             $productsCollection = $this->productCollectionFactory->create();
             $restrictedProductIds = $this->restrictedProductIdsProvider->getList($websiteId);
             $productsCollection->addAttributeToSelect($this->prepareProductAttributesList($storeId))
+
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
                 ->addAttributeToFilter(ProductInterface::TYPE_ID, ['eq' => Type::TYPE_SIMPLE])
@@ -110,6 +113,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
             $stockStatusResource->addStockDataToCollection($productsCollection, true);
             $productsCollection->setFlag('has_stock_status_filter', true);
             $productsCollection->load();
+            $productsCollection->addMediaGalleryData();
             $crossSellProducts = $productsCollection->getItems();
         }
 
