@@ -74,10 +74,6 @@ class AdditionalProductImagesDataTransfer
             $normalImage = $galleryImage->getUrl(); // @phpstan-ignore-line
             $smallImage = $galleryImage->getUrl(); // @phpstan-ignore-line
 
-            if ($normalImage === $inPostProduct->getProductImage()) {
-                continue;
-            }
-
             if ($this->generalConfigProvider->isPrepareResizedImagesEnabled($storeId)) {
                 $smallImage = $this->prepareResizedImageUrl(
                     $product,
