@@ -86,6 +86,7 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
         if ($linkedProductIds) {
             /** @var ProductCollection $productsCollection */
             $productsCollection = $this->productCollectionFactory->create();
+            $restrictedProductIds = $this->restrictedProductIdsProvider->getList($websiteId);
             $productsCollection->addAttributeToSelect($this->prepareProductAttributesList($storeId))
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
@@ -95,13 +96,15 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                 ->addFieldToFilter(
                     $productsCollection->getProductEntityMetadata()->getLinkField(),
                     ['in' => $linkedProductIds]
-                )->addFieldToFilter(
-                    $productsCollection->getProductEntityMetadata()->getLinkField(),
-                    ['nin' => $this->restrictedProductIdsProvider->getList(
-                        $websiteId
-                    )]
                 )
                 ->setPageSize(self::MAX_CROSS_SELL_PRODUCTS);
+
+            if (!empty($restrictedProductIds)) {
+                $productsCollection->addFieldToFilter(
+                    $productsCollection->getProductEntityMetadata()->getLinkField(),
+                    ['nin' => $restrictedProductIds]
+                );
+            }
 
             $stockStatusResource = $this->stockStatusFactory->create();
             $stockStatusResource->addStockDataToCollection($productsCollection, true);
