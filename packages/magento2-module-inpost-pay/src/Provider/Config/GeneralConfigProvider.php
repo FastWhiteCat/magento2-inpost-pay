@@ -86,11 +86,12 @@ class GeneralConfigProvider
         );
     }
 
-    public function isPrepareResizedImagesEnabled(): bool
+    public function isPrepareResizedImagesEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_INPOST_PAY_PREPARE_RESIZED_IMAGES,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 

@@ -78,7 +78,7 @@ class AdditionalProductImagesDataTransfer
                 continue;
             }
 
-            if ($this->generalConfigProvider->isPrepareResizedImagesEnabled()) {
+            if ($this->generalConfigProvider->isPrepareResizedImagesEnabled($storeId)) {
                 $smallImage = $this->prepareResizedImageUrl(
                     $product,
                     $file,
