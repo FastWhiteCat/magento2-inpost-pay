@@ -25,13 +25,15 @@ class AddImageGalleryToProductsCollectionEventObserver implements ObserverInterf
 
     public function execute(Observer $observer): void
     {
-        if (!$this->generalConfigProvider->isAdditionalImagesEnabled()) {
-            return;
-        }
-
         try {
             /** @var ProductCollection $productCollection */
             $productCollection = $observer->getData('collection');
+            $storeId = is_scalar($productCollection->getStoreId()) ? (int)$productCollection->getStoreId() : null;
+
+            if (!$this->generalConfigProvider->isAdditionalImagesEnabled($storeId)) {
+                return;
+            }
+
             $productCollection->addMediaGalleryData();
         } catch (LocalizedException $e) {
             $this->logger->error(
