@@ -59,6 +59,7 @@ class AdditionalProductImagesDataTransfer
 
         $images = [];
         $totalImages = 0;
+        $firstAdditionalImage = null;
         foreach ($mediaGalleryImages as $galleryImage) {
             // @phpstan-ignore-next-line
             $file = (string)$galleryImage->getFile();
@@ -93,13 +94,20 @@ class AdditionalProductImagesDataTransfer
             $additionalImage = $this->additionalImageFactory->create();
             $additionalImage->setSmallSize($smallImage ?? '');
             $additionalImage->setNormalSize($normalImage ?? '');
+
+            if ($normalImage === $inPostProduct->getProductImage()) {
+                $firstAdditionalImage = $additionalImage;
+
+                continue;
+            }
+
             $images[] = $additionalImage;
             $totalImages++;
         }
 
         $this->emulation->stopEnvironmentEmulation();
 
-        return $images;
+        return $firstAdditionalImage ? array_merge([$firstAdditionalImage], $images) : $images;
     }
 
     private function getMediaGalleryImages(Product $product): array
