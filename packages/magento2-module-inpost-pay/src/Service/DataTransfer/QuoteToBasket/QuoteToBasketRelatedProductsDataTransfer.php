@@ -90,7 +90,6 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
             $productsCollection = $this->productCollectionFactory->create();
             $restrictedProductIds = $this->restrictedProductIdsProvider->getList($websiteId);
             $productsCollection->addAttributeToSelect($this->prepareProductAttributesList($storeId))
-
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
                 ->addAttributeToFilter(ProductInterface::TYPE_ID, ['eq' => Type::TYPE_SIMPLE])
