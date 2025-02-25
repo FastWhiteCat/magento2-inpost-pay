@@ -17,9 +17,9 @@ use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
+use InPost\InPostPay\Registry\Quote\DigitalQuoteAllowRegistry;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\CreateBasketNotice;
-use InPost\InPostPay\Validator\DigitalQuoteValidator;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
 use Magento\Framework\Exception\LocalizedException;
@@ -46,7 +46,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
      * @param CreateBasketNotice $createBasketNotice
      * @param QuoteRestrictionsValidator $quoteRestrictionsValidator
      * @param ShippingMethodConverter $shippingMethodConverter
-     * @param DigitalQuoteValidator $digitalQuoteValidator
+     * @param DigitalQuoteAllowRegistry $digitalQuoteAllowRegistry
      * @param LoggerInterface $logger
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -59,7 +59,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly ShippingMethodConverter $shippingMethodConverter,
-        private readonly DigitalQuoteValidator $digitalQuoteValidator,
+        private readonly DigitalQuoteAllowRegistry $digitalQuoteAllowRegistry,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -68,13 +68,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     {
         $storeId = $quote->getStoreId();
 
-        if (!$this->digitalQuoteValidator->isDigitalQuoteAllowed($quote)) {
-            $this->logger->error(
-                'Quote contains digital products and Magento config does not allow guest orders.'
-                . ' Setting empty delivery.'
-            );
+        if (!$this->digitalQuoteAllowRegistry->isCurrentlyProcessedDigitalQuoteAllowed()) {
             $basket->setDelivery([]);
-            $this->setBasketNoticeForGuestUnavailableDigitalProducts((string)$basket->getBasketId());
 
             return;
         }
@@ -284,18 +279,6 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         return $limit;
-    }
-
-    private function setBasketNoticeForGuestUnavailableDigitalProducts(string $basketId): void
-    {
-        $this->createBasketNotice->execute(
-            $basketId,
-            InPostPayBasketNoticeInterface::ATTENTION,
-            __(
-                'Cart contains digital products that cannot be ordered as a not logged in user.'
-                . ' Please create account in Merchants website in order to complete this purchase.'
-            )->render()
-        );
     }
 
     private function getShippingAddress(Quote $quote): AddressInterface

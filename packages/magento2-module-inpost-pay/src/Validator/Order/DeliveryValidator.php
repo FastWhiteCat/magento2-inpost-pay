@@ -12,6 +12,7 @@ use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
+use InPost\InPostPay\Validator\DigitalQuoteValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
@@ -24,7 +25,8 @@ class DeliveryValidator implements OrderValidatorInterface
 
     public function __construct(
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
-        private readonly ShippingMethodManagementInterface $shippingManager
+        private readonly ShippingMethodManagementInterface $shippingManager,
+        private readonly DigitalQuoteValidator $digitalQuoteValidator
     ) {
     }
 
@@ -52,12 +54,8 @@ class DeliveryValidator implements OrderValidatorInterface
             );
         }
 
-        if ($this->checkIfCartContainsDigitalProducts($quote)
-            && empty($inPostOrder->getDelivery()->getDigitalDeliveryEmail())
-        ) {
-            throw new LocalizedException(
-                __('Digital Delivery Email address is required to purchase digital products.')
-            );
+        if ($this->checkIfCartContainsDigitalProducts($quote)) {
+            $this->validateDigitalDeliveryQuote($quote, $inPostOrder);
         }
 
         if ($requestedDeliveryType === InPostDeliveryType::COURIER->value) {
@@ -160,5 +158,26 @@ class DeliveryValidator implements OrderValidatorInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param OrderInterface $inPostOrder
+     * @return void
+     * @throws LocalizedException
+     */
+    private function validateDigitalDeliveryQuote(Quote $quote, OrderInterface $inPostOrder): void
+    {
+        if (!$this->digitalQuoteValidator->isDigitalQuoteAllowed($quote)) {
+            throw new LocalizedException(
+                __('Digital Delivery is not available for this cart.')
+            );
+        }
+
+        if (empty($inPostOrder->getDelivery()->getDigitalDeliveryEmail())) {
+            throw new LocalizedException(
+                __('Digital Delivery Email address is required to purchase digital products.')
+            );
+        }
     }
 }

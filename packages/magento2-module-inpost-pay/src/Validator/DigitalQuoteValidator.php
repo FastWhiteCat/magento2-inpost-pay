@@ -72,7 +72,7 @@ class DigitalQuoteValidator
      * @param int|null $storeId
      * @return bool
      */
-    private function isLoggedInAccountRequiredForDigitalQuotes(?int $storeId = null): bool
+    public function isLoggedInAccountRequiredForDigitalQuotes(?int $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_DISABLE_GUEST_CHECKOUT,
