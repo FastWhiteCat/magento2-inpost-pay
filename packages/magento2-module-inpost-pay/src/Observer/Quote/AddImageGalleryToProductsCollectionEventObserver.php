@@ -28,9 +28,8 @@ class AddImageGalleryToProductsCollectionEventObserver implements ObserverInterf
         try {
             /** @var ProductCollection $productCollection */
             $productCollection = $observer->getData('collection');
-            $storeId = is_scalar($productCollection->getStoreId()) ? (int)$productCollection->getStoreId() : null;
 
-            if (!$this->generalConfigProvider->isAdditionalImagesEnabled($storeId)) {
+            if (!$this->generalConfigProvider->isAdditionalImagesEnabled((int)$productCollection->getStoreId())) {
                 return;
             }
 
