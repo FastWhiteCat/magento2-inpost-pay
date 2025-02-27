@@ -32,18 +32,8 @@ class IziApiEndpointEventObserver
 
     protected function createEventDataLog(array $eventData): void
     {
-        if ($this->debugConfigProvider->isAnonymisingEnabled()) {
-            $this->logger->debug(
-                sprintf(
-                    '%s. Context [Anonymised]: %s',
-                    $this->eventDescription,
-                    $this->serializer->serialize($this->anonymizeArray($eventData))
-                )
-            );
-        } else {
-            $this->logger->debug(
-                sprintf('%s. Context: %s', $this->eventDescription, $this->serializer->serialize($eventData))
-            );
-        }
+        $this->logger->debug(
+            sprintf('%s. Context: %s', $this->eventDescription, $this->serializer->serialize($eventData))
+        );
     }
 }
