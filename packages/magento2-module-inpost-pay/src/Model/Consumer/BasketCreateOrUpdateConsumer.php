@@ -74,7 +74,6 @@ class BasketCreateOrUpdateConsumer
             try {
                 $this->area->load(AreaInterface::PART_TRANSLATE);
                 $this->emulation->startEnvironmentEmulation($quote->getStoreId(), 'frontend', true);
-                $this->logger->debug('Consumer store pcs: ' . __('pcs')->render());
                 $this->createOrUpdateBasket->execute($quote, $basketId);
                 $this->emulation->stopEnvironmentEmulation();
             } catch (LocalizedException $e) {

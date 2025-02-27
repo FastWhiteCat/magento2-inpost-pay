@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Service\Order\Creator\Steps;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
+use InPost\InPostPay\Traits\AnonymizerTrait;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -15,6 +16,8 @@ use Psr\Log\LoggerInterface;
 
 class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingStepInterface
 {
+    use AnonymizerTrait;
+
     public function __construct(
         private readonly CustomerRepositoryInterface $customerRepository,
         private readonly GeneralConfigProvider $generalConfigProvider,
@@ -47,14 +50,17 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
                 $this->createLog(
                     sprintf(
                         'Customer account found by email: %s. Order will be assigned to customer ID: %s',
-                        $accountEmail,
+                        $this->anonymizeEmail($accountEmail),
                         (int)$customer->getId()
                     )
                 );
             }
         } catch (NoSuchEntityException | LocalizedException $e) {
             $this->createLog(
-                sprintf('Customer account not found by email: %s. Order will be processed for guest.', $accountEmail)
+                sprintf(
+                    'Customer account not found by email: %s. Order will be processed for guest.',
+                    $this->anonymizeEmail($accountEmail),
+                )
             );
         }
     }
