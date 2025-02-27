@@ -237,3 +237,4 @@
 "Active [Approved by InPost]","Aktywny [Potwierdzony przez InPost]"
 "Inactive [InPost Approval Required]","Nieaktywny [Wymaga akceptacji przez InPost]"
 "Unknown [Synchronization Required]","Nieznany [Wymaga synchronizacji]"
+"Enable Logs Anonymisation","Włącz Anonimizację Logów",module,InPost_InPostPay
