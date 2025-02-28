@@ -47,10 +47,11 @@ class RefundDataBuilder implements BuilderInterface
 
         $refundId = $this->uuidGenerator->uuidv4();
         $orderId = $order->getIncrementId();
+        $storeId = is_scalar($order->getStoreId()) ? (int)$order->getStoreId() : 0;
         $refundAmount = (float)($buildSubject['amount']);
         $refundAdditionalInfo = null;
 
-        $inPostPayTransactionList = $this->transactionList->execute(orderId: $orderId);
+        $inPostPayTransactionList = $this->transactionList->execute(orderId: $orderId, storeId: $storeId);
 
         if (!$inPostPayTransactionList instanceof TransactionListResponse) {
             $this->logger->error("Invalid Transaction List response for OrderId: $orderId");
@@ -81,7 +82,8 @@ class RefundDataBuilder implements BuilderInterface
                     RefundInterface::TRANSACTION_ID => $inPostPayTransactionId,
                     RefundInterface::EXTERNAL_REFUND_ID => $refundId,
                     RefundInterface::REFUND_AMOUNT => $refundAmount,
-                    RefundInterface::ADDITIONAL_BUSINESS_DATA => $refundAdditionalInfo
+                    RefundInterface::ADDITIONAL_BUSINESS_DATA => $refundAdditionalInfo,
+                    'store_id' => $storeId
                 ];
                 break;
             }
