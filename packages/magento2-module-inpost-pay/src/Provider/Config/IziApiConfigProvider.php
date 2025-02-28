@@ -6,7 +6,6 @@ namespace InPost\InPostPay\Provider\Config;
 
 use InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayInternalException;
-use InPost\InPostPay\Service\SynchronizePaymentMethods as SynchronizePaymentMethodsService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -25,25 +24,26 @@ class IziApiConfigProvider
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly SandboxConfigProvider $sandboxConfigProvider,
-        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository,
-        private readonly SynchronizePaymentMethodsService $synchronizePaymentMethods
+        private readonly InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository
     ) {
     }
 
     /**
      * Returns production or sandbox Izi API URL
      *
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getIziApiUrl(): string
+    public function getIziApiUrl(?int $storeId = null): string
     {
         $iziApiUrl = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_IZI_API_URL,
                 $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($iziApiUrl) || !is_scalar($iziApiUrl)) {
@@ -94,13 +94,6 @@ class IziApiConfigProvider
     private function getAvailablePaymentMethodsCodes(): array
     {
         $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
-
-        if (empty($availablePaymentTypes)
-            || strtotime($availablePaymentTypes[0]['created_at']) < strtotime("-1 day")
-        ) {
-            $this->synchronizePaymentMethods->execute();
-            $availablePaymentTypes = $this->availablePaymentMethodRepository->getAllValuesAsArray();
-        }
 
         return !empty($availablePaymentTypes) ? array_column($availablePaymentTypes, 'payment_code') : [];
     }
