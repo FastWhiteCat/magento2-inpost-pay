@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface;
+use InPost\InPostPay\Service\GetOrderById;
 use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Sales\Api\Data\OrderInterface as MagentoOrderInterface;
 use Throwable;
 use InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterfaceFactory;
@@ -28,6 +30,7 @@ class OrderGet implements OrderGetInterface
 {
     public function __construct(
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
+        private readonly GetOrderById $getOrderById,
         private readonly OrderToInPostOrderDataTransfer $orderToInPostOrderDataTransfer,
         private readonly OrderInterfaceFactory $orderFactory,
         private readonly EventManager $eventManager,
@@ -48,7 +51,8 @@ class OrderGet implements OrderGetInterface
         try {
             $this->eventManager->dispatch('izi_order_get_before', [OrderGetInterface::ORDER_ID => $orderId]);
 
-            $order = $this->getOrderByIncrementId->get($orderId);
+            $order = $this->getOrder($orderId);
+
             if ($order instanceof Order) {
                 /** @var OrderInterface $inPostOrder */
                 $inPostOrder = $this->orderFactory->create();
@@ -80,5 +84,31 @@ class OrderGet implements OrderGetInterface
 
             throw new InPostPayInternalException();
         }
+    }
+
+    /**
+     * @param string $orderIdentificationNr
+     * @return MagentoOrderInterface
+     * @throws NoSuchEntityException
+     */
+    private function getOrder(string $orderIdentificationNr): MagentoOrderInterface
+    {
+        try {
+            $orderId = (int)$orderIdentificationNr;
+
+            if ((string)$orderId === $orderIdentificationNr) {
+                $order = $this->getOrderById->get($orderId);
+            } else {
+                $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
+            }
+        } catch (NoSuchEntityException $e) {
+            $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
+        }
+
+        if (!isset($order)) {
+            throw new NoSuchEntityException(__('Order %1 not found.', $orderId));
+        }
+
+        return $order;
     }
 }

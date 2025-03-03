@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2025-01-17
+
+### Fixed
+
+- Fixed modules dependencies by moving custom logger injection from InPost_Restriction module to InPost_InPostPay module
+
 ## [1.0.8] - 2024-09-05
 
 ### Added

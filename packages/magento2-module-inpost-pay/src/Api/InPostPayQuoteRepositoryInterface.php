@@ -35,6 +35,13 @@ interface InPostPayQuoteRepositoryInterface
     public function getByQuoteId(int $quoteId): InPostPayQuoteInterface;
 
     /**
+     * @param string $basketBindingApiKey
+     * @return InPostPayQuoteInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByBasketBindingApiKey(string $basketBindingApiKey): InPostPayQuoteInterface;
+
+    /**
      * @param string $basketId
      * @return InPostPayQuoteInterface
      * @throws NoSuchEntityException
