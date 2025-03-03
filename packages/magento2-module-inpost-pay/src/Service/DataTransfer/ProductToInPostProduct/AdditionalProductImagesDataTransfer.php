@@ -110,7 +110,7 @@ class AdditionalProductImagesDataTransfer
         return array_slice(
             $firstAdditionalImage ? array_merge([$firstAdditionalImage], $images) : $images,
             0,
-            10
+            self::MAX_ADDITIONAL_IMAGES_COUNT
         );
     }
 
