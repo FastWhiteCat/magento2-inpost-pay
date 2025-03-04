@@ -12,7 +12,10 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterfac
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Provider\PromotionsProvider;
+use InPost\InPostPay\Validator\Quote\SalesRule\IsSalesRuleApplicableToQuoteValidator;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
+use Magento\SalesRule\Model\Rule;
 
 class QuoteToBasketPromotionsAvailableDataTransfer implements QuoteToBasketDataTransferInterface
 {
@@ -20,6 +23,7 @@ class QuoteToBasketPromotionsAvailableDataTransfer implements QuoteToBasketDataT
     public function __construct(
         private readonly PromotionAvailableInterfaceFactory $promotionAvailableInterfaceFactory,
         private readonly DetailsInterfaceFactory $detailsInterfaceFactory,
+        private readonly IsSalesRuleApplicableToQuoteValidator $isSalesRuleApplicableToQuoteValidator,
         private readonly PromotionsProvider $promotionsProvider
     ) {
     }
@@ -34,6 +38,12 @@ class QuoteToBasketPromotionsAvailableDataTransfer implements QuoteToBasketDataT
         $limit = 0;
 
         foreach ($this->promotionsProvider->getPromotions($customerGroupId) as $promotionData) {
+            $ruleId = (int)($promotionData['rule_id'] ?? null);
+
+            if (!$this->isRuleValidForQuote($ruleId, $quote)) {
+                continue;
+            }
+
             $limit++;
             if ($limit > self::PROMOTION_LIMIT) {
                 break;
@@ -63,5 +73,25 @@ class QuoteToBasketPromotionsAvailableDataTransfer implements QuoteToBasketDataT
         }
 
         $basket->setPromotionsAvailable($promotions);
+    }
+
+    private function isRuleValidForQuote(int $ruleId, Quote $quote): bool
+    {
+        try {
+            $rules = $this->promotionsProvider->getPromotionsList([$ruleId], (int)$quote->getCustomerGroupId());
+            /** @var Rule|null $rule */
+            $rule = $rules[$ruleId] ?? null;
+
+            if ($rule === null) {
+                return false;
+            }
+
+            $rule = $rules[$ruleId];
+            $this->isSalesRuleApplicableToQuoteValidator->validate($quote, $rule);
+
+            return true;
+        } catch (LocalizedException $e) {
+            return false;
+        }
     }
 }

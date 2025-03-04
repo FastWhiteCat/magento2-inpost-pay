@@ -73,6 +73,38 @@ class PromotionsProvider
     }
 
     /**
+     * @param array $ids
+     * @param int $customerGroupId
+     * @return array
+     */
+    public function getPromotionsList(array $ids, int $customerGroupId): array
+    {
+        $salesRuleCollection = $this->salesRuleCollectionFactory->create();
+        $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
+        $currentDateTime = $currentDateTime->format('Y-m-d');
+
+        $salesRuleCollection
+            ->addFieldToFilter(Rule::KEY_IS_ACTIVE, '1')
+            ->addFieldToFilter(Rule::KEY_COUPON_TYPE, ['eq' => RuleModel::COUPON_TYPE_SPECIFIC])
+            ->addFieldToFilter(Rule::KEY_RULE_ID, ['in' => $ids])
+            ->addFieldToFilter(Rule::KEY_FROM_DATE, [['lteq' => $currentDateTime], ['null' => true]])
+            ->addFieldToFilter(Rule::KEY_TO_DATE, [['gteq' => $currentDateTime], ['null' => true]])
+            ->addCustomerGroupFilter($customerGroupId);
+
+        $salesRuleCollection->addOrder(Rule::KEY_SORT_ORDER, Collection::SORT_ORDER_ASC);
+        $salesRuleCollection->load();
+        $salesRules = [];
+
+        foreach ($salesRuleCollection->getItems() as $salesRule) {
+            if ($salesRule instanceof RuleModel) {
+                $salesRules[$salesRule->getRuleId()] = $salesRule;
+            }
+        }
+
+        return $salesRules;
+    }
+
+    /**
      * @param int $customerGroupId
      * @return RuleModel[]
      */
@@ -141,38 +173,6 @@ class PromotionsProvider
         }
 
         return $promotions;
-    }
-
-    /**
-     * @param array $ids
-     * @param int $customerGroupId
-     * @return array
-     */
-    private function getPromotionsList(array $ids, int $customerGroupId): array
-    {
-        $salesRuleCollection = $this->salesRuleCollectionFactory->create();
-        $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
-        $currentDateTime = $currentDateTime->format('Y-m-d');
-
-        $salesRuleCollection
-            ->addFieldToFilter(Rule::KEY_IS_ACTIVE, '1')
-            ->addFieldToFilter(Rule::KEY_COUPON_TYPE, ['eq' => RuleModel::COUPON_TYPE_SPECIFIC])
-            ->addFieldToFilter(Rule::KEY_RULE_ID, ['in' => $ids])
-            ->addFieldToFilter(Rule::KEY_FROM_DATE, [['lteq' => $currentDateTime], ['null' => true]])
-            ->addFieldToFilter(Rule::KEY_TO_DATE, [['gteq' => $currentDateTime], ['null' => true]])
-            ->addCustomerGroupFilter($customerGroupId);
-
-        $salesRuleCollection->addOrder(Rule::KEY_SORT_ORDER, Collection::SORT_ORDER_ASC);
-        $salesRuleCollection->load();
-        $salesRules = [];
-
-        foreach ($salesRuleCollection->getItems() as $salesRule) {
-            if ($salesRule instanceof RuleModel) {
-                $salesRules[$salesRule->getRuleId()] = $salesRule;
-            }
-        }
-
-        return $salesRules;
     }
 
     /**
