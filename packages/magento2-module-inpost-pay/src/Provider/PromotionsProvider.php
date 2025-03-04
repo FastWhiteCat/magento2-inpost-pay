@@ -16,6 +16,9 @@ use Magento\SalesRule\Model\Data\Rule;
 use Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory as SalesRuleCollectionFactory;
 use Magento\SalesRule\Model\Rule as RuleModel;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class PromotionsProvider
 {
     private const PROMOTION_DESCRIPTION_MAX_LENGTH = 60;
@@ -69,6 +72,35 @@ class PromotionsProvider
         return is_array($promotions) ? $promotions : (array)$this->serializer->unserialize($promotions);
     }
 
+    /**
+     * @param int $customerGroupId
+     * @return RuleModel[]
+     */
+    public function getConfiguredSalesRules(int $customerGroupId): array
+    {
+        if ($this->promotionsMappingConfigProvider->isPromotionsEnabled() === false) {
+            return [];
+        }
+
+        try {
+            $promotionsMapping = $this->promotionsMappingConfigProvider->getPromotionsMapping();
+            if (!$promotionsMapping) {
+                return [];
+            }
+            $ids = array_column($promotionsMapping, PromotionsField::MAGENTO_CART_RULE_ID_FIELD);
+
+            return $this->getPromotionsList($ids, $customerGroupId);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * @param array $promotionsMapping
+     * @param array $promotionsArray
+     * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function preparePromotionsData(array $promotionsMapping, array $promotionsArray): array
     {
         $promotions = [];
@@ -80,7 +112,10 @@ class PromotionsProvider
             /** @var RuleModel $salesRule */
             $salesRule = $promotionsArray[$item[PromotionsField::MAGENTO_CART_RULE_ID_FIELD]];
 
-            if ($salesRule->getUsesPerCoupon() && $salesRule->getTimesUsed() >= $salesRule->getUsesPerCoupon()) {
+            $usesPerCoupon = is_scalar($salesRule->getUsesPerCoupon()) ? (int)$salesRule->getUsesPerCoupon() : 0;
+            $timesUsed = is_scalar($salesRule->getTimesUsed()) ? (int)$salesRule->getTimesUsed() : 0;
+
+            if ($usesPerCoupon && $timesUsed >= $usesPerCoupon) {
                 continue;
             }
 
@@ -100,7 +135,8 @@ class PromotionsProvider
                 'priority' => $salesRule->getSortOrder(),
                 'details' => [
                     'link' => $item[PromotionsField::PROMOTION_URL_FIELD]
-                ]
+                ],
+                'rule_id' => is_scalar($salesRule->getRuleId()) ? (int)$salesRule->getRuleId() : 0,
             ];
         }
 

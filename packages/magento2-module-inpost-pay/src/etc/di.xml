@@ -168,6 +168,8 @@
     <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <plugin name="InPost_InPostPay::addErrorsToBasketPlugin"
                 type="InPost\InPostPay\Plugin\AddErrorsToBasketPlugin" />
+        <plugin name="InPost_InPostPay::checkAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin"
+                type="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin" />
     </type>
     <type name="Magento\ConfigurableProduct\Model\Quote\Item\CartItemProcessor">
         <plugin name="InPost_InPostPay::CartItemProcessorPlugin"
@@ -595,6 +597,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Model\Config\Payment\TitleUpdater">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
