@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.5] - 2025-03-04
+
+### Fixed
+
+- obtaining correct Bearer Token for Transaction List for Refunds using order's Store ID instead of Default Store ID to access credentials 
+- removed overriding BaseUrl for Frontend Widget with configurable value
+
 ## [2.0.4] - 2025-01-31
 
 ### Added
