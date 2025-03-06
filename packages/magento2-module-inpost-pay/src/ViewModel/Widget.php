@@ -259,11 +259,6 @@ class Widget implements ArgumentInterface
         return $scriptUrl;
     }
 
-    public function getApiBaseUrl(): string
-    {
-        return trim($this->iziApiConfigProvider->getIziApiUrl(), '/');
-    }
-
     /**
      * @return string
      * @throws InPostPayInternalException
