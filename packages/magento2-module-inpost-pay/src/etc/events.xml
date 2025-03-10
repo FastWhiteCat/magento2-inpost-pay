@@ -95,6 +95,12 @@
     <event name="izi_bestseller_products_get_after">
         <observer name="InPost_InPostPay::iziBestsellerProductsGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetAfterEventObserver" />
     </event>
+    <event name="catalog_product_save_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="catalog_product_delete_before">
+        <observer name="InPost_InPostPay::deleteInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\DeleteInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
     <event name="izi_init_basket_before">
         <observer name="InPost_InPostPay::iziInitBasketBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketBeforeEventObserver" />
     </event>
