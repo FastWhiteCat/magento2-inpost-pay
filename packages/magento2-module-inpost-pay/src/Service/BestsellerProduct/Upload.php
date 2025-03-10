@@ -140,7 +140,7 @@ class Upload extends BestsellerProductService
      * @param int $websiteId
      * @return InPostPayBestsellerProductInterface[]
      */
-    private function getBestsellersByWebsiteId(int $websiteId): array
+    public function getBestsellersByWebsiteId(int $websiteId): array
     {
         $collection = $this->bestsellersCollectionFactory->create();
         $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, ['eq' => $websiteId]);
@@ -159,7 +159,7 @@ class Upload extends BestsellerProductService
     /**
      * @return int[]
      */
-    private function getExistingInPostBestsellerProductIds(int $storeId): array
+    public function getExistingInPostBestsellerProductIds(int $storeId): array
     {
         $inPostPayBestsellerProductIds = [];
 
@@ -181,7 +181,7 @@ class Upload extends BestsellerProductService
      * @param int $storeId
      * @return void
      */
-    private function deleteProductIdsFromInPostPay(array $productIdsToDeleteFromInPostPay, int $storeId): void
+    public function deleteProductIdsFromInPostPay(array $productIdsToDeleteFromInPostPay, int $storeId): void
     {
         foreach ($productIdsToDeleteFromInPostPay as $productIdToDeleteFromInPostPay) {
             try {
@@ -206,7 +206,7 @@ class Upload extends BestsellerProductService
      * @return bool
      * @throws LocalizedException
      */
-    private function postInPostBestsellerProducts(array $bestsellerProducts, Store $store): bool
+    public function postInPostBestsellerProducts(array $bestsellerProducts, Store $store): bool
     {
         $storeId = (int)$store->getId();
         $websiteId = (int)$store->getWebsiteId();
@@ -228,7 +228,7 @@ class Upload extends BestsellerProductService
      * @return bool
      * @throws LocalizedException
      */
-    private function putInPostBestsellerProducts(array $bestsellerProducts, Store $store): bool
+    public function putInPostBestsellerProducts(array $bestsellerProducts, Store $store): bool
     {
         $fullSuccess = true;
 
