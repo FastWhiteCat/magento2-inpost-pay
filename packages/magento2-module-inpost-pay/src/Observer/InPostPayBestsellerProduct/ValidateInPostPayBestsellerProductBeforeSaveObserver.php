@@ -96,6 +96,16 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
                 __('Product "%1" is currently not available for sale.', $product->getName())
             );
         }
+
+        $productTypeId = is_string($product->getTypeId()) ? (string)$product->getTypeId() : null;
+
+        if (in_array($productTypeId, ['configurable', 'grouped', 'bundle'], true)) {
+            throw new InvalidBestsellerProductDataException(
+                __(
+                    'InPost Bestsellers currently cannot handle bundle, configurable or grouped product types.'
+                )
+            );
+        }
     }
 
     /**

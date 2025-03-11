@@ -184,6 +184,7 @@
 "Select","Wybierz",module,InPost_InPostPay
 "Save Bestseller Product","Zapisz Produkt Bestsellerowy",module,InPost_InPostPay
 "InPost Pay Bestseller Products","Produkty Bestsellerowe InPost Pay",module,InPost_InPostPay
+"InPost Bestsellers currently cannot handle bundle, configurable or grouped product types.","Bestsellery w Aplikacji InPost Pay aktualnie nie obsługują produktów typu zestawy, grupowych ani konfigurowalnych.",module,InPost_InPostPay
 "You are not allowed to view this page. Please contact Administrators.","Nie masz uprawnień do podglądu tej strony. Prosimy o kontakt z Administratorami.",module,InPost_InPostPay
 "You have deleted InPost Pay Bestseller Product with ID %1.","Bestseller InPost Pay o ID %1 został usunięty.",module,InPost_InPostPay
 "Bestseller Products configured in InPost Pay have been downloaded into Magento.","Bestsellery skonfigurowane po stronie InPost Pay zostały pobrane do Magento.",module,InPost_InPostPay

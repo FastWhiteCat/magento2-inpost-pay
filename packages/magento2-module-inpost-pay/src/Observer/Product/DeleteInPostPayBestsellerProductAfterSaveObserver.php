@@ -29,12 +29,12 @@ class DeleteInPostPayBestsellerProductAfterSaveObserver extends UpdateInPostPayB
         foreach ($this->storeManager->getStores() as $store) {
             /** @var Store $store */
             $defaultStore = $this->getDefaultStoreOfWebsite($store) ?? $product->getStore();
-            $websiteId = $defaultStore->getWebsiteId() ?? 0;
+            $websiteId = (int)($defaultStore->getWebsiteId() ?? 0);
 
             try {
                 $magentoBestsellerProduct = $this->inPostPayBestsellerProductRepository->getBySkuAndWebsiteId(
                     $sku,
-                    (int)$websiteId
+                    $websiteId
                 );
 
                 if ($websiteId === $magentoBestsellerProduct->getWebsiteId()) {
