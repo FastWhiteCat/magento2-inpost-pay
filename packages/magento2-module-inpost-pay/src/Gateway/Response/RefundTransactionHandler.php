@@ -37,7 +37,7 @@ class RefundTransactionHandler implements HandlerInterface
         $creditmemo = $payment->getCreditmemo();
 
         if ($creditmemo && !$creditmemo->getDoTransaction()) {
-            $creditmemo->addComment(__('InPost Pay order offline refund has been processed.')->render());
+            $creditmemo->addComment(__('InPost Pay order offline refund has been initialised.')->render());
             $creditmemo->setState($this->getMappedCreditmemoState(InPostRefundStatus::SUCCESS->value));
 
             return;
