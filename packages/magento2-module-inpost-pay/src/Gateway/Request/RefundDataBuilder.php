@@ -42,6 +42,12 @@ class RefundDataBuilder implements BuilderInterface
 
         /** @var Payment $payment */
         $payment = $paymentDataObject->getPayment();
+        $creditmemo = $payment->getCreditmemo();
+
+        if (!$creditmemo?->getDoTransaction()) {
+            return ['body' => ['refund_request_data' => []]];
+        }
+
         /** @var Order $order */
         $order = $payment->getOrder();
 
@@ -52,11 +58,6 @@ class RefundDataBuilder implements BuilderInterface
         $refundAdditionalInfo = null;
 
         $inPostPayTransactionList = $this->transactionList->execute(orderId: $orderId, storeId: $storeId);
-
-        if (!$inPostPayTransactionList instanceof TransactionListResponse) {
-            $this->logger->error("Invalid Transaction List response for OrderId: $orderId");
-            return [];
-        }
 
         if (empty($inPostPayTransactionList->getItems())) {
             $errorMsg = __('Empty InPost Pay Transaction list for OrderId: %1', $orderId);
