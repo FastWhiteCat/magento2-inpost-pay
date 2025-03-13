@@ -359,6 +359,11 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="InPost\InPostPay\ViewModel\Widget">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\Restrictions\Service\RefreshRestrictionRulesService">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
