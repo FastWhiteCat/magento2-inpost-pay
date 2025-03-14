@@ -21,17 +21,15 @@ class PrepareQuoteProductsQuantity
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
             if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
                 foreach ($quoteItem->getChildren() as $child) {
-                    $quoteItemQty = is_scalar($quoteItem->getQty()) ? (float)$quoteItem->getQty() : 1.00;
-                    $childQty = (float)$child->getQty();
-                    $qty = $childQty * $quoteItemQty;
+                    $qty = (float)$child->getQty() * (float)$quoteItem->getQty();
                     $this->setQuoteItemQuantity((int)$child->getProduct()->getId(), $qty, $quoteItemsQuantity);
                 }
             } elseif ($quoteItem->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
-                $qty = is_scalar($quoteItem->getQty()) ? (float)$quoteItem->getQty() : 1.00;
+                $qty = (float)$quoteItem->getQty();
                 $product = $this->quoteItemProductExtractor->extractProductFromQuoteItem($quoteItem);
                 $this->setQuoteItemQuantity((int)$product->getId(), $qty, $quoteItemsQuantity);
             } else {
-                $qty = is_scalar($quoteItem->getQty()) ? (float)$quoteItem->getQty() : 1.00;
+                $qty = (float)$quoteItem->getQty();
                 $this->setQuoteItemQuantity((int)$quoteItem->getProduct()->getId(), $qty, $quoteItemsQuantity);
             }
         }
