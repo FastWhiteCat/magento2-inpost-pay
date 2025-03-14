@@ -7,15 +7,16 @@ namespace InPost\InPostPay\Observer\Product;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
+use InPost\InPostPay\Service\BestsellerProduct\BestsellerChecker;
 use InPost\InPostPay\Service\BestsellerProduct\Upload as UploadService;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
 use InPost\InPostPay\Service\DataTransfer\BestsellerProductDataTransfer;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
@@ -27,9 +28,11 @@ use Psr\Log\LoggerInterface;
 class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInterface
 {
     public function __construct(
+        protected readonly BestsellerChecker $bestsellerChecker,
         protected readonly InPostPayBestsellerProductRepositoryInterface $inPostPayBestsellerProductRepository,
         protected readonly BestsellerProductInterfaceFactory $bestsellerProductFactory,
         protected readonly BestsellerProductDataTransfer $bestsellerProductDataTransfer,
+        protected readonly ProductRepositoryInterface $productRepository,
         protected readonly UploadService $uploadService,
         protected readonly StoreManagerInterface $storeManager,
         protected readonly LoggerInterface $logger
@@ -44,7 +47,28 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
             return;
         }
 
+        if (!$this->bestsellerChecker->isSynchronizationEnabled()
+            || !$this->bestsellerChecker->isBestsellerProductBySku($product->getSku())
+        ) {
+            return;
+        }
+
+        try {
+            $this->updateBestsellerProduct($product);
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
+        }
+    }
+
+    /**
+     * @param Product $product
+     * @return void
+     * @throws NoSuchEntityException
+     */
+    public function updateBestsellerProduct(Product $product): void
+    {
         $sku = (string)$product->getSku();
+
         /** @var Store $store */
         foreach ($this->storeManager->getStores() as $store) {
             $defaultStore = $this->getDefaultStoreOfWebsite($store) ?? $product->getStore();
@@ -134,6 +158,11 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
         }
     }
 
+    /**
+     * @param Store $store
+     * @return Store|null
+     * @throws NoSuchEntityException
+     */
     protected function getDefaultStoreOfWebsite(Store $store): ?Store
     {
         $website = $store->getWebsite();

@@ -6,6 +6,7 @@ namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
+use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Provider\TestModeProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
@@ -44,6 +45,7 @@ class Widget implements ArgumentInterface
      * @param RestrictedProductIdsProvider $restrictedProductIdsProvider
      * @param LoggerInterface $logger
      * @param AuthConfigProvider $authConfigProvider
+     * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TestModeProvider $testModeProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -60,6 +62,7 @@ class Widget implements ArgumentInterface
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly LoggerInterface $logger,
         private readonly AuthConfigProvider $authConfigProvider,
+        private readonly IziApiConfigProvider $iziApiConfigProvider,
         private readonly TestModeProvider $testModeProvider
     ) {
     }
