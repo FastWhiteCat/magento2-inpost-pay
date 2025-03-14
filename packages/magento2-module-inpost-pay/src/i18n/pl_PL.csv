@@ -177,6 +177,7 @@
 "Assign Quote to Customer by Email","Przypisz Koszyk do Klient po Adresie Email",module,InPost_InPostPay
 "If set to YES, cart initiated by guest user, bound to InPost Pay Mobile Aap on order processing will be assigned to an existing Magento account if found by InPost Pay account email address.","Jeśli wybrano opcję TAK, koszyk zainicjowany przez użytkownika niezalogowanego, powiązany z Aplikacją Mobilną InPost Pay podczas procesowania zamówienia zostanie przypisany do konta Magento jeśli takie zostanie znalezione po adresie email konta InPost Pay.",module,InPost_InPostPay
 "Delete Bestseller Product","Usuń Produkt Bestsellerowy",module,InPost_InPostPay
+"When enabled any save of selected bestseller product or inventory will trigger update of Bestseller Product. Also, any reservation append will check if configured Bestseller Product is still saleable, if not update will be performed.","Po włączeniu tej opcji każdy zapis stanu magazynowego i produktu będącego Bestsellerem InPost Pay uruchomi aktualizację danych produktowych. Ponadtwo każda rezerwacja, skutkująca wyłączeniem produktu ze sprzedaży również uruchomi aktualizację danych Produktu Bestsellerowego.",module,InPost_InPostPay
 "Are you sure?","Czy jesteś pewny?",module,InPost_InPostPay
 "Back","Powrót",module,InPost_InPostPay
 "New","Nowy",module,InPost_InPostPay

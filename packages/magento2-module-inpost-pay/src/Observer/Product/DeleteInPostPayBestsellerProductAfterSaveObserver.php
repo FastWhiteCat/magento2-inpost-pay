@@ -33,7 +33,7 @@ class DeleteInPostPayBestsellerProductAfterSaveObserver extends ParentObserver i
 
         try {
             $this->deleteBestsellerProduct($product);
-        } catch (NoSuchEntityException $e) {
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
     }

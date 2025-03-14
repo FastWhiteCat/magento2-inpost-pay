@@ -10,6 +10,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\NoSuchEntityException;
 use InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver as ParentObserver;
+use Throwable;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -40,7 +41,7 @@ class UpdateInPostPayBestsellerProductAfterStockItemSaveObserver extends ParentO
 
         try {
             $this->updateBestsellerProduct($product);
-        } catch (NoSuchEntityException $e) {
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
     }

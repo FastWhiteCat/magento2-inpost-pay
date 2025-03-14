@@ -21,6 +21,7 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -55,7 +56,7 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
 
         try {
             $this->updateBestsellerProduct($product);
-        } catch (NoSuchEntityException $e) {
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }
     }
