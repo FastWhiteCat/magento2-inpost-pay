@@ -8,13 +8,14 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
 use Magento\Framework\Event\Observer;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\Store;
-use Magento\Store\Model\Website;
+use InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver as ParentObserver;
 use Throwable;
 
-class DeleteInPostPayBestsellerProductAfterSaveObserver extends UpdateInPostPayBestsellerProductAfterSaveObserver
+class DeleteInPostPayBestsellerProductAfterSaveObserver extends ParentObserver implements ObserverInterface
 {
     public function execute(Observer $observer): void
     {
@@ -24,6 +25,26 @@ class DeleteInPostPayBestsellerProductAfterSaveObserver extends UpdateInPostPayB
             return;
         }
 
+        if (!$this->bestsellerChecker->isSynchronizationEnabled()
+            || !$this->bestsellerChecker->isBestsellerProductBySku($product->getSku())
+        ) {
+            return;
+        }
+
+        try {
+            $this->deleteBestsellerProduct($product);
+        } catch (Throwable $e) {
+            $this->logger->error($e->getMessage());
+        }
+    }
+
+    /**
+     * @param Product $product
+     * @return void
+     * @throws NoSuchEntityException
+     */
+    private function deleteBestsellerProduct(Product $product): void
+    {
         $sku = (string)$product->getSku();
 
         foreach ($this->storeManager->getStores() as $store) {

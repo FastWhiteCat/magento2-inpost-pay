@@ -91,7 +91,7 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
             );
         }
 
-        if (!$product->isSalable()) {
+        if ($bestsellerProduct->getBestsellerProductId() === null && !$product->isSalable()) {
             throw new InvalidBestsellerProductDataException(
                 __('Product "%1" is currently not available for sale.', $product->getName())
             );

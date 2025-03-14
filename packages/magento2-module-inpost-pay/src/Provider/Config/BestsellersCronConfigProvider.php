@@ -9,7 +9,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class BestsellersCronConfigProvider
 {
-    public const SANDBOX_PREFIX = 'sandbox_';
+    private const XML_PATH_SYNCHRONIZATION_ENABLED = 'payment/inpost_pay/bestsellers_synchronize_enabled';
     private const XML_PATH_CRON_ENABLED = 'payment/inpost_pay/bestsellers_synchronize_cron_enabled';
     private const XML_PATH_SYNCHRO_MODE = 'payment/inpost_pay/bestsellers_synchronize_mode';
 
@@ -19,6 +19,14 @@ class BestsellersCronConfigProvider
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
     ) {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSynchronizationEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_SYNCHRONIZATION_ENABLED);
     }
 
     /**
