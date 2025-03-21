@@ -1,0 +1,113 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">inpostpay_checkoutagreement_listing.inpostpay_checkoutagreement_listing_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>inpostpay_checkoutagreement_columns</spinner>
+		<deps>
+			<dep>inpostpay_checkoutagreement_listing.inpostpay_checkoutagreement_listing_listing_data_source</dep>
+		</deps>
+		<buttons>
+			<button name="add">
+				<url path="*/*/new"/>
+				<class>primary</class>
+				<label translate="true">Add New Agreement</label>
+			</button>
+		</buttons>
+	</settings>
+	<dataSource name="inpostpay_checkoutagreement_listing_listing_data_source" component="Magento_Ui/js/grid/provider">
+		<settings>
+			<storageConfig>
+				<param name="indexField" xsi:type="string">agreement_id</param>
+			</storageConfig>
+			<updateUrl path="mui/index/render"/>
+		</settings>
+		<dataProvider name="inpostpay_checkoutagreement_listing_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+			<settings>
+				<requestFieldName>agreement_id</requestFieldName>
+				<primaryFieldName>agreement_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+	</listingToolbar>
+	<columns name="inpostpay_checkoutagreement_columns">
+		<settings>
+			<childDefaults>
+				<param name="fieldAction" xsi:type="array">
+					<item name="provider" xsi:type="string">inpostpay_checkoutagreement_listing.inpostpay_checkoutagreement_listing.inpostpay_checkoutagreement_columns</item>
+					<item name="target" xsi:type="string">startEdit</item>
+					<item name="params" xsi:type="array">
+						<item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+						<item name="1" xsi:type="boolean">true</item>
+					</item>
+				</param>
+			</childDefaults>
+		</settings>
+		<selectionsColumn name="ids">
+			<settings>
+				<indexField>agreement_id</indexField>
+			</settings>
+		</selectionsColumn>
+		<column name="agreement_id">
+			<settings>
+				<filter>text</filter>
+				<sorting>asc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
+        <column name="is_enabled" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Is Enabled</label>
+            </settings>
+        </column>
+        <column name="store_ids" class="InPost\InPostPay\Ui\Component\Listing\Column\Stores">
+            <settings>
+                <label translate="true">Store View</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="title">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Title</label>
+			</settings>
+		</column>
+        <column name="checkbox_text">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Checkbox Text</label>
+			</settings>
+		</column>
+        <column name="requirement" class="InPost\InPostPay\Ui\Component\Listing\Column\Requirement">
+            <settings>
+                <label translate="true">Requirement</label>
+            </settings>
+        </column>
+        <column name="visibility" class="InPost\InPostPay\Ui\Component\Listing\Column\Visibility">
+            <settings>
+                <label translate="true">Visible As</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="InPost\InPostPay\Ui\Component\Listing\Column\CheckoutAgreementActions">
+            <settings>
+                <indexField>agreement_id</indexField>
+            </settings>
+        </actionsColumn>
+	</columns>
+</listing>

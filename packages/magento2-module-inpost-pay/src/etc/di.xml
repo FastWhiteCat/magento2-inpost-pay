@@ -103,6 +103,14 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreement"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementStoreInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementStore"/>
+    <preference for="InPost\InPostPay\Api\InPostPayCheckoutAgreementRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayCheckoutAgreementStoreRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementStoreRepository"/>
     <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface"
@@ -296,6 +304,24 @@
             </argument>
         </arguments>
     </type>
+    <!-- Grid data source and collections -->
+    <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_pay_checkout_agreement</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostpay_checkoutagreement_listing_listing_data_source"
+                      xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- END Grid data source and collections -->
+
     <type name="InPost\InPostPay\Logger\Handler">
         <arguments>
             <argument name="debugConfigProvider" xsi:type="object">InPost\InPostPay\Provider\Config\DebugConfigProvider</argument>
@@ -345,6 +371,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CheckoutAgreement\DeleteInPostPayCheckoutAgreementAssignedStoresEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CheckoutAgreement\InsertInPostPayCheckoutAgreementAssignedStoresEventObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

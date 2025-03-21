@@ -8,7 +8,8 @@
 					<resource id="Magento_Backend::stores_settings">
 						<resource id="Magento_Config::config">
                             <resource id="InPost_InPostPay::inpostpay" title="Inpost Pay config">
-                                <resource id="InPost_InPostPay::logs" title="Inpost Pay logs"/>
+                                <resource id="InPost_InPostPay::logs" title="InPost Pay Logs"/>
+                                <resource id="InPost_InPostPay::checkoutagreement" title="InPost Pay Checkout Agreements"/>
                             </resource>
 						</resource>
 					</resource>
