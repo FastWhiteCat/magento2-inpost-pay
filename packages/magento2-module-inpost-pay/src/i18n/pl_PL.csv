@@ -12,6 +12,7 @@
 "Title","Tytuł",module,InPost_InPostPay
 "Version","Wersja",module,InPost_InPostPay
 "Visible As","Widoczna Jako",module,InPost_InPostPay
+"URL Label","Etykieta URL",module,InPost_InPostPay
 "Sub-Agreements","Pod-Zgody",module,InPost_InPostPay
 "Main Agreement","Zgoda Główna",module,InPost_InPostPay
 "Sub-Agreement","Pod-Zgoda",module,InPost_InPostPay
@@ -29,7 +30,7 @@
 "Determines if this agreement will be displayed as a separated checkbox or as a sub-agreement with link attached to other main agreement.","Określa czy zgoda ma zostać zaprezentowana jako osobna zgoda, czy jako Pod-Zgoda do innej zgody głównej.",module,InPost_InPostPay
 "Determines if this agreement requires to be checked every time order is placed, once until changed or it is optional.","Określa czy zgoda ma być wymagana za każdym razem zamówienie jest składane przez klienta, raz do momentu zmiany, czy jako opcjonalna.",module,InPost_InPostPay
 "You can optionally add sub-agreements to this main agreement. In order to display them modify Checkbox Text field.","Lista powyżej pozwala wybrać zapisane i włączone Pod-Zgody do Zgody Głównej. Aby zostały wyświetlone należy zmodyfikować pole Tekstu Checkboxa.",module,InPost_InPostPay
-"Check the tooltip for advanced configuration including Sub-Agreements.","Opis zaawansowanej konfiguracji z uwzględnieniem Pod-Zgód wyjaśniony w tooltipie.",module,InPost_InPostPay
+"You can use {URL} variable to determine where in checkbox text content link to agreement will be displayed with value from URL Label field. Check the tooltip for advanced configuration including Sub-Agreements.","Można wykorzystać zmienną {URL} do określenia gdzie w tekście checkboxa zostanie umieszczony link do zgody pod wartością z pola Etykieta URL. Opis zaawansowanej konfiguracji z uwzględnieniem Pod-Zgód wyjaśniony w tooltipie.",module,InPost_InPostPay
 "<p>This text will be displayed next to agreement checkbox in InPost Pay Mobile App before order placement.</p>
 <p>In order to add more links to sub-agreements for a single checkbox:</p>
 <p>Create new InPost Pay Agreement with Visible As: Sub-Agreement</p>
@@ -104,8 +105,10 @@
 "Deferred payment","Opóźniona płatność",module,InPost_InPostPay
 "Cash on delivery","Płatność przy odbiorze",module,InPost_InPostPay
 "Empty selection will allow all payment types in mobile application.","Nie wybranie żadnej opcji spowoduje umożliwienie wszystkich form płatności w aplikacji mobilnej.",module,InPost_InPostPay
-"Terms and Conditions Mapping", "Mapowanie zgód",module,InPost_InPostPay
+"Legacy Terms and Conditions Mapping", "Starsza Konfiguracja Mapowania zgód",module,InPost_InPostPay
 "Terms and Conditions Mapping Settings","Ustawienia mapowania zgód",module,InPost_InPostPay
+"Parent Terms and Conditions","Nadrzędna Zgoda",module,InPost_InPostPay
+"Link Label","Etykieta Linku",module,InPost_InPostPay
 "Magento Terms and Conditions","Zgody Magento",module,InPost_InPostPay
 "Requirement","Wymagalność",module,InPost_InPostPay
 "Agreement url","Link do zgody",module,InPost_InPostPay

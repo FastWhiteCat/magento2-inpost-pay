@@ -4,6 +4,7 @@
     </event>
     <event name="inpost_pay_checkout_agreement_save_commit_after">
         <observer name="InPost_InPostPay::insertInPostPayCheckoutAgreementAssignedStoresEventObserver" instance="InPost\InPostPay\Observer\CheckoutAgreement\InsertInPostPayCheckoutAgreementAssignedStoresEventObserver" />
+        <observer name="InPost_InPostPay::clearCacheAfterInPostPayCheckoutAgreementSaveEventObserver" instance="InPost\InPostPay\Observer\CheckoutAgreement\ClearCacheAfterInPostPayCheckoutAgreementSaveEventObserver" />
     </event>
     <event name="sales_quote_save_after">
         <observer name="InPost_InPostPay::updateInPostBasketEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver" />

@@ -113,8 +113,8 @@
         <column xsi:type="varchar" name="requirement" nullable="false" length="40" default="OPTIONAL"  comment="Requirement"/>
         <column xsi:type="varchar" name="children_ids" nullable="true" comment="Children IDs"/>
         <column xsi:type="varchar" name="checkbox_text" nullable="false" comment="Checkbox Text"/>
-        <column xsi:type="text" name="content" nullable="true" comment="Content"/>
         <column xsi:type="varchar" name="agreement_url" length="500" nullable="false" comment="Agreement URL"/>
+        <column xsi:type="varchar" name="url_label" length="500" nullable="false" comment="URL Label"/>
         <column xsi:type="varchar" name="version" length="255" nullable="false" comment="Version Hash"/>
         <column name="created_at" xsi:type="timestamp" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column name="updated_at" xsi:type="timestamp" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>

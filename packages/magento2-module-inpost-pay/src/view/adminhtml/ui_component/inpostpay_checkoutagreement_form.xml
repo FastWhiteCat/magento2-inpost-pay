@@ -128,11 +128,11 @@
                                     <callback>show</callback>
                                 </action>
                                 <action name="2">
-                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.content</target>
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.version</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="3">
-                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.version</target>
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.checkbox_text</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -149,11 +149,11 @@
                                     <callback>hide</callback>
                                 </action>
                                 <action name="2">
-                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.content</target>
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.version</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="3">
-                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.version</target>
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.checkbox_text</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -207,7 +207,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
-                    <item name="notice" xsi:type="string" translate="true">Check the tooltip for advanced configuration including Sub-Agreements.</item>
+                    <item name="notice" xsi:type="string" translate="true">You can use {URL} variable to determine where in checkbox text content link to agreement will be displayed with value from URL Label field. Check the tooltip for advanced configuration including Sub-Agreements.</item>
                 </item>
             </argument>
             <settings>
@@ -216,6 +216,7 @@
                 <dataScope>checkbox_text</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">500</rule>
                 </validation>
                 <tooltip>
                     <description translate="true"><![CDATA[<p>This text will be displayed next to agreement checkbox in InPost Pay Mobile App before order placement.</p>
@@ -235,22 +236,6 @@
             </settings>
         </field>
 
-        <field name="content" formElement="textarea" sortOrder="35">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Content</label>
-                <dataScope>content</dataScope>
-                <validation>
-                    <rule name="max_text_length" xsi:type="number">500</rule>
-                </validation>
-            </settings>
-        </field>
-
         <field name="agreement_url" formElement="input" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -264,7 +249,23 @@
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                     <rule name="validate-url" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
 
+        <field name="url_label" formElement="input" sortOrder="41">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">URL Label</label>
+                <dataScope>url_label</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">100</rule>
                 </validation>
             </settings>
         </field>

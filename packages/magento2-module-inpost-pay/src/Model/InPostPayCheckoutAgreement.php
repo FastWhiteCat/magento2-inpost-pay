@@ -229,50 +229,38 @@ class InPostPayCheckoutAgreement extends AbstractModel implements InPostPayCheck
         $this->setData(self::CHECKBOX_TEXT, $checkboxText);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getContent(): ?string
-    {
-        return is_scalar($this->getData(self::CONTENT)) ? (string) $this->getData(self::CONTENT) : null;
-    }
-
-    /**
-     * @param string|null $content
-     * @return void
-     */
-    public function setContent(?string $content): void
-    {
-        $this->setData(self::CONTENT, $content);
-    }
-
     public function getChildrenAgreements(): ?array
     {
         /** @var InPostPayCheckoutAgreementInterface[]|null $childAgreements */
         $childAgreements = $this->getData(self::CHILDREN_AGREEMENTS);
-        $agreementId = $this->getAgreementId();
 
-        if ($agreementId === null) {
+        if (!empty($childAgreements)) {
+            return $childAgreements;
+        }
+
+        $childrenAgreementIds = is_scalar($this->getChildrenIds()) ? (string)$this->getChildrenIds() : null;
+
+        if ($childrenAgreementIds === null) {
             return [];
         }
 
-        if (empty($childAgreements)) {
-            /** @var AgreementCollection $agreementCollection */
-            $agreementCollection = $this->agreementCollectionFactory->create();
-            $agreementCollection->addFieldToFilter(
-                InPostPayCheckoutAgreementInterface::AGREEMENT_ID,
-                ['eq' => $agreementId]
-            );
-            $childAgreements = [];
+        $childrenAgreementIdsArray = array_map('intval', explode(',', $childrenAgreementIds));
 
-            foreach ($agreementCollection->getItems() as $item) {
-                if ($item instanceof InPostPayCheckoutAgreementInterface) {
-                    $childAgreements[] = $item;
-                }
+        /** @var AgreementCollection $agreementCollection */
+        $agreementCollection = $this->agreementCollectionFactory->create();
+        $agreementCollection->addFieldToFilter(
+            InPostPayCheckoutAgreementInterface::AGREEMENT_ID,
+            ['in' => $childrenAgreementIdsArray]
+        );
+        $childAgreements = [];
+
+        foreach ($agreementCollection->getItems() as $item) {
+            if ($item instanceof InPostPayCheckoutAgreementInterface) {
+                $childAgreements[] = $item;
             }
-
-            $this->setData(self::CHILDREN_AGREEMENTS, $childAgreements);
         }
+
+        $this->setData(self::CHILDREN_AGREEMENTS, $childAgreements);
 
         return $childAgreements;
     }
@@ -285,6 +273,16 @@ class InPostPayCheckoutAgreement extends AbstractModel implements InPostPayCheck
     public function setAgreementUrl(string $agreementUrl): void
     {
         $this->setData(self::AGREEMENT_URL, $agreementUrl);
+    }
+
+    public function getUrlLabel(): string
+    {
+        return is_scalar($this->getData(self::URL_LABEL)) ? (string)$this->getData(self::URL_LABEL) : '';
+    }
+
+    public function setUrlLabel(string $urlLabel): void
+    {
+        $this->setData(self::URL_LABEL, $urlLabel);
     }
 
     /**

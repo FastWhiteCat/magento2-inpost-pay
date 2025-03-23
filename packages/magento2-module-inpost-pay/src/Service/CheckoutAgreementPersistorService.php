@@ -40,8 +40,8 @@ class CheckoutAgreementPersistorService
         $isEnabled = (bool) ($data[AgreementInterface::IS_ENABLED] ?? false);
         $visibility = (int) ($data[AgreementInterface::VISIBILITY] ?? AgreementInterface::VISIBILITY_MAIN);
         $agreementUrl = (string) ($data[AgreementInterface::AGREEMENT_URL] ?? '');
+        $urlLabel = (string) ($data[AgreementInterface::URL_LABEL] ?? '');
         $requirement = (string) ($data[AgreementInterface::REQUIREMENT] ?? AgreementInterface::REQUIREMENT_OPTIONAL);
-        $content = (string) ($data[AgreementInterface::CONTENT] ?? '');
         $checkboxText = (string) ($data[AgreementInterface::CHECKBOX_TEXT] ?? '');
 
         $childrenIds = ($data[AgreementInterface::CHILDREN_IDS] ?? []);
@@ -52,8 +52,8 @@ class CheckoutAgreementPersistorService
         $agreement->setIsEnabled($isEnabled);
         $agreement->setVisibility($visibility);
         $agreement->setAgreementUrl($agreementUrl);
+        $agreement->setUrlLabel($urlLabel);
         $agreement->setRequirement($requirement);
-        $agreement->setContent($content);
         $agreement->setCheckboxText($checkboxText);
         $agreement->setStoreIds($storeIds);
 

@@ -23,7 +23,8 @@ interface InPostPayCheckoutAgreementInterface
     public const CHILDREN_IDS = 'children_ids';
     public const CHILDREN_AGREEMENTS = 'children_agreements';
     public const CHECKBOX_TEXT = 'checkbox_text';
-    public const CONTENT = 'content';
+    public const URL_LABEL = 'url_label';
+    public const URL_LABEL_PATTERN = '{URL}';
     public const AGREEMENT_URL = 'agreement_url';
     public const VERSION = 'version';
     public const CREATED_AT = 'created_at';
@@ -128,17 +129,6 @@ interface InPostPayCheckoutAgreementInterface
     public function setCheckboxText(string $checkboxText): void;
 
     /**
-     * @return string|null
-     */
-    public function getContent(): ?string;
-
-    /**
-     * @param string|null $content
-     * @return void
-     */
-    public function setContent(?string $content): void;
-
-    /**
      * @return string
      */
     public function getAgreementUrl(): string;
@@ -148,6 +138,17 @@ interface InPostPayCheckoutAgreementInterface
      * @return void
      */
     public function setAgreementUrl(string $agreementUrl): void;
+
+    /**
+     * @return string
+     */
+    public function getUrlLabel(): string;
+
+    /**
+     * @param string $urlLabel
+     * @return void
+     */
+    public function setUrlLabel(string $urlLabel): void;
 
     /**
      * @return string

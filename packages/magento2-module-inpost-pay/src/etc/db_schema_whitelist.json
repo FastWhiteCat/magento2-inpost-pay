@@ -102,6 +102,7 @@
             "checkbox_text": true,
             "content": true,
             "agreement_url": true,
+            "url_label": true,
             "version": true,
             "created_at": true,
             "updated_at": true
