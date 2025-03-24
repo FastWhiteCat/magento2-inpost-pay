@@ -5,7 +5,6 @@ namespace InPost\InPostPay\Provider;
 
 use InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementInterface;
 use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
-use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\CollectionFactory
@@ -17,12 +16,6 @@ class ConsentsProvider
 {
     private const CONSENT_DESCRIPTION_MAX_LENGTH = 150;
     private const CONSENT_LIMIT = 10;
-    private const SORT_ORDER = [
-        TermsAndConditionsRequirements::ALWAYS => 1,
-        TermsAndConditionsRequirements::ONLY_IN_NEW_VERSION => 2,
-        TermsAndConditionsRequirements::OPTIONAL => 3,
-        TermsAndConditionsRequirements::ADDITIONAL_LINK => 4
-    ];
 
     /**
      * @param InPostPayCheckoutAgreementCollectionFactory $inPostPayCheckoutAgreementCollectionFactory
@@ -73,7 +66,6 @@ class ConsentsProvider
                 ];
             }
 
-            $consents = array_slice($consents, 0, self::CONSENT_LIMIT);
             $encodedConsentsData = (string)$this->serializer->serialize($consents);
 
             $this->cache->save(
@@ -92,15 +84,12 @@ class ConsentsProvider
      * @param int $storeId
      * @return InPostPayCheckoutAgreementInterface[]
      */
-    private function getAgreementsByStoreId(int $storeId): array
+    public function getAgreementsByStoreId(int $storeId): array
     {
         /** @var InPostPayCheckoutAgreementCollection $collection */
         $collection = $this->inPostPayCheckoutAgreementCollectionFactory->create();
-        $collection->addFieldToFilter(InPostPayCheckoutAgreementInterface::IS_ENABLED, ['eq' => 1]);
-        $collection->addFieldToFilter(
-            InPostPayCheckoutAgreementInterface::VISIBILITY,
-            ['eq' => InPostPayCheckoutAgreementInterface::VISIBILITY_MAIN]
-        );
+        $collection->addSortingByRequirement();
+        $collection->addVisibilityFilter();
         $agreements = [];
 
         foreach ($collection->getItems() as $agreement) {
@@ -115,7 +104,7 @@ class ConsentsProvider
             }
         }
 
-        return $agreements;
+        return array_slice($agreements, 0, self::CONSENT_LIMIT);
     }
 
     /**
@@ -171,11 +160,12 @@ class ConsentsProvider
 
     private function limitString(string $text): string
     {
-        $maxLength = 500;
         $ellipsis = '...';
 
-        if (mb_strlen($text, 'UTF-8') > $maxLength) {
-            return mb_substr($text, 0, $maxLength - mb_strlen($ellipsis, 'UTF-8'), 'UTF-8') . $ellipsis;
+        if (mb_strlen($text, 'UTF-8') > self::CONSENT_DESCRIPTION_MAX_LENGTH) {
+            $ellipsisLength = mb_strlen($ellipsis, 'UTF-8');
+
+            return mb_substr($text, 0, self::CONSENT_DESCRIPTION_MAX_LENGTH - $ellipsisLength, 'UTF-8') . $ellipsis;
         }
 
         return $text;

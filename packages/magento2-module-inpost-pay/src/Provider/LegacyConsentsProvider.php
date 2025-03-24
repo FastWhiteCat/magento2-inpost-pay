@@ -6,7 +6,7 @@ namespace InPost\InPostPay\Provider;
 use InPost\InPostPay\Block\Adminhtml\Form\Field\TermsAndConditionsField;
 use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
 use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
-use InPost\InPostPay\Provider\Config\TermsAndConditionsMappingConfigProvider;
+use InPost\InPostPay\Provider\Config\TermsAndConditionsConfigProvider;
 use InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface;
 use Magento\CheckoutAgreements\Api\CheckoutAgreementsListInterface;
 use Magento\Framework\App\CacheInterface;
@@ -14,7 +14,7 @@ use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Serialize\SerializerInterface;
 
-class ConsentsProvider
+class LegacyConsentsProvider
 {
     private const CONSENT_DESCRIPTION_MAX_LENGTH = 150;
     private const CONSENT_LIMIT = 10;
@@ -26,7 +26,7 @@ class ConsentsProvider
     ];
 
     /**
-     * @param TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider
+     * @param TermsAndConditionsConfigProvider $termsAndConditionsMappingConfigProvider
      * @param CheckoutAgreementsListInterface $checkoutAgreementsList
      * @param FilterBuilder $filterBuilder
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -35,7 +35,7 @@ class ConsentsProvider
      * @param CacheInterface $cache
      */
     public function __construct(
-        private readonly TermsAndConditionsMappingConfigProvider $termsAndConditionsMappingConfigProvider,
+        private readonly TermsAndConditionsConfigProvider $termsAndConditionsMappingConfigProvider,
         private readonly CheckoutAgreementsListInterface $checkoutAgreementsList,
         private readonly FilterBuilder $filterBuilder,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
@@ -160,13 +160,13 @@ class ConsentsProvider
     private function sortTermsAndConditions(array $termsAndConditionsMapping): array
     {
         $termsAndConditions = [];
-        foreach ($termsAndConditionsMapping as $key =>  $item) {
+        foreach ($termsAndConditionsMapping as $key => $item) {
             $termsAndConditions[$key] = self::SORT_ORDER[$item[TermsAndConditionsField::REQUIREMENT_FIELD]];
         }
         asort($termsAndConditions);
 
         $sortedTermsAndConditions = [];
-        foreach ($termsAndConditions as $key =>  $item) {
+        foreach ($termsAndConditions as $key => $item) {
             $sortedTermsAndConditions[] = $termsAndConditionsMapping[$key];
         }
 
