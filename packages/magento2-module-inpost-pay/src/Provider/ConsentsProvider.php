@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Provider;
 
 use InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementInterface;
 use InPost\InPostPay\Model\Cache\TermsAndConditions\Type as TermsAndConditionsCacheType;
+use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\CollectionFactory
@@ -14,7 +15,14 @@ use InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Collection
 
 class ConsentsProvider
 {
-    public const MAX_CONSENTS = 10;
+    private const CONSENT_DESCRIPTION_MAX_LENGTH = 150;
+    private const CONSENT_LIMIT = 10;
+    private const SORT_ORDER = [
+        TermsAndConditionsRequirements::ALWAYS => 1,
+        TermsAndConditionsRequirements::ONLY_IN_NEW_VERSION => 2,
+        TermsAndConditionsRequirements::OPTIONAL => 3,
+        TermsAndConditionsRequirements::ADDITIONAL_LINK => 4
+    ];
 
     /**
      * @param InPostPayCheckoutAgreementCollectionFactory $inPostPayCheckoutAgreementCollectionFactory
@@ -65,7 +73,7 @@ class ConsentsProvider
                 ];
             }
 
-            $consents = array_slice($consents, 0, self::MAX_CONSENTS);
+            $consents = array_slice($consents, 0, self::CONSENT_LIMIT);
             $encodedConsentsData = (string)$this->serializer->serialize($consents);
 
             $this->cache->save(
