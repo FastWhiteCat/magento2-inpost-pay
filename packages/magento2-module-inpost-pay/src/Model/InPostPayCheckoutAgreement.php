@@ -252,6 +252,11 @@ class InPostPayCheckoutAgreement extends AbstractModel implements InPostPayCheck
             InPostPayCheckoutAgreementInterface::AGREEMENT_ID,
             ['in' => $childrenAgreementIdsArray]
         );
+        $agreementCollection->addFieldToFilter(
+            InPostPayCheckoutAgreementInterface::VISIBILITY,
+            ['eq' => InPostPayCheckoutAgreementInterface::VISIBILITY_CHILD]
+        );
+        $agreementCollection->addFieldToFilter(InPostPayCheckoutAgreementInterface::IS_ENABLED, ['eq' => 1]);
         $childAgreements = [];
 
         foreach ($agreementCollection->getItems() as $item) {
