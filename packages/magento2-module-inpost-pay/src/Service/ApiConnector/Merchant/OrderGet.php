@@ -105,10 +105,6 @@ class OrderGet implements OrderGetInterface
             $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
         }
 
-        if (!isset($order)) {
-            throw new NoSuchEntityException(__('Order %1 not found.', $orderId));
-        }
-
         return $order;
     }
 }
