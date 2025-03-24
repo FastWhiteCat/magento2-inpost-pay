@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.7] - 2025-03-24
+
+### Fixed
+
+- handling of New Order Status payment method configuration for multistore with different values for each website
+
 ## [2.0.6] - 2025-03-13
 
 ### Added
