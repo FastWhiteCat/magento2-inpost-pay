@@ -37,7 +37,7 @@ class SubAgreements implements OptionSourceInterface
             if ($item instanceof InPostPayCheckoutAgreementInterface) {
                 $options[] = [
                     'value' => (int)$item->getAgreementId(),
-                    'label' => sprintf('{%s|%s}', $item->getAgreementId(), $item->getCheckboxText())
+                    'label' => sprintf('{%s|%s}', $item->getAgreementId(), $item->getUrlLabel())
                 ];
             }
         }

@@ -5,7 +5,7 @@
         <label>Terms and Conditions Mapping Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
         <field id="use_legacy_terms_and_conditions_mapping" translate="label" type="select" sortOrder="5"
-               showInDefault="1" showInWebsite="1" canRestore="1">
+               showInDefault="1" canRestore="1">
             <label>Use Legacy Terms And Conditions Mapping</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/inpost_pay/use_legacy_terms_and_conditions_mapping</config_path>
