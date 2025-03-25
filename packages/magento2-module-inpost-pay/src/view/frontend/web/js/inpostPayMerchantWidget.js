@@ -209,8 +209,17 @@ define([
             var self = this;
 
             return new Promise((resolve, reject) => {
+                var url = self.configuration.enabledAnalyticsParams ?
+                    urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
+                        + '/form_key/' + $.mage.cookies.get('form_key')
+                        + '?gclid=' + $.localStorage.get('gclid')
+                        + '&fbclid=' + $.localStorage.get('fbclid')
+                        + '&client_id=' + $.localStorage.get('client_id')
+                    ) : urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
+                        + '/form_key/' + $.mage.cookies.get('form_key'));
+
                 $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
+                    url: url,
                     method: 'GET',
                 })
                     .done(function (data) {
@@ -287,6 +296,15 @@ define([
 
             function ajaxSubmit($form) {
                 return new Promise(function (resolve, reject) {
+                    var url = self.configuration.enabledAnalyticsParams ?
+                        urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
+                            + '/form_key/' + $.mage.cookies.get('form_key')
+                            + '?gclid=' + $.localStorage.get('gclid')
+                            + '&fbclid=' + $.localStorage.get('fbclid')
+                            + '&client_id=' + $.localStorage.get('client_id')
+                    ) : urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
+                            + '/form_key/' + $.mage.cookies.get('form_key'));
+
                     $.ajax({
                         url: $form.attr('action'),
                         data: new FormData($form[0]),
@@ -297,7 +315,7 @@ define([
                         processData: false,
                         success: function () {
                             $.ajax({
-                                url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
+                                url: url,
                                 method: 'GET',
                             })
                                 .done(function (data) {
