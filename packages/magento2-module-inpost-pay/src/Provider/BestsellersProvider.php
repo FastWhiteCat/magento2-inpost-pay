@@ -72,7 +72,6 @@ class BestsellersProvider
             $pageSize = $pageSize ? $pageSize : 1;
         }
 
-        $collection->setOrder(InPostPayBestsellerProductInterface::PRIORITY, Collection::SORT_ORDER_ASC);
         $collection->setPageSize($pageSize);
         $collection->setCurPage($pageIndex);
 

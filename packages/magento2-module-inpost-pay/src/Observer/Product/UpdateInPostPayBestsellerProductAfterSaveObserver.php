@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Observer\Product;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
+use InPost\InPostPay\Model\Registry\SkipFurtherBestsellerUploadRegistry;
 use InPost\InPostPay\Service\BestsellerProduct\BestsellerChecker;
 use InPost\InPostPay\Service\BestsellerProduct\Upload as UploadService;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
@@ -36,6 +37,7 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
         protected readonly ProductRepositoryInterface $productRepository,
         protected readonly UploadService $uploadService,
         protected readonly StoreManagerInterface $storeManager,
+        protected readonly SkipFurtherBestsellerUploadRegistry $skipFurtherBestsellerUploadRegistry,
         protected readonly LoggerInterface $logger
     ) {
     }
@@ -49,6 +51,7 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
         }
 
         if (!$this->bestsellerChecker->isSynchronizationEnabled()
+            || $this->skipFurtherBestsellerUploadRegistry->canSkipFurtherBestsellerUploadFlag()
             || !$this->bestsellerChecker->isBestsellerProductBySku($product->getSku())
         ) {
             return;

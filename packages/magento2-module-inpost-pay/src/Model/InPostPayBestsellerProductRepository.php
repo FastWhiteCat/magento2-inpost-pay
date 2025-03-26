@@ -143,39 +143,6 @@ class InPostPayBestsellerProductRepository implements InPostPayBestsellerProduct
     }
 
     /**
-     * @param int $websiteId
-     * @param int $priority
-     * @return InPostPayBestsellerProductInterface
-     * @throws NoSuchEntityException
-     */
-    public function getByWebsiteIdAndPriority(int $websiteId, int $priority): InPostPayBestsellerProductInterface
-    {
-        /** @var Collection $collection */
-        $collection = $this->inPostPayBestsellerProductCollectionFactory->create();
-        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, (string)$websiteId);
-        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::PRIORITY, (string)$priority);
-        $items = $collection->getItems();
-
-        if (!empty($items)) {
-            $inPostPayBestsellerProduct = current($items);
-        }
-
-        if (!isset($inPostPayBestsellerProduct)
-            || !$inPostPayBestsellerProduct instanceof InPostPayBestsellerProductInterface
-        ) {
-            throw new NoSuchEntityException(
-                __(
-                    'InPost Pay Bestseller Product with Priority:%1 and Website ID:%2 does not exist.',
-                    $priority,
-                    $websiteId
-                )
-            );
-        }
-
-        return $inPostPayBestsellerProduct;
-    }
-
-    /**
      * @param SearchCriteriaInterface $searchCriteria
      * @return SearchResults
      */

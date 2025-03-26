@@ -41,6 +41,7 @@ class UpdateInPostPayBestsellerProductAfterStockItemSaveObserver extends ParentO
 
         try {
             $this->updateBestsellerProduct($product);
+            $this->skipFurtherBestsellerUploadRegistry->setSkipFurtherBestsellerUploadFlag();
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
         }

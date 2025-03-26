@@ -7,7 +7,6 @@ namespace InPost\InPostPay\Observer\InPostPayBestsellerProduct;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Exception\InvalidBestsellerProductDataException;
 use InPost\InPostPay\Model\InPostPayBestsellerProductRepository;
-use InPost\InPostPay\Model\Source\Store\BestsellerProductPriority;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
@@ -16,6 +15,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
+use InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\CollectionFactory as BestsellersCollectionFactory;
 
 class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverInterface
 {
@@ -23,11 +23,13 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
      * @param InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository
+     * @param BestsellersCollectionFactory $bestsellersCollectionFactory
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly StoreManagerInterface $storeManager,
-        private readonly InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository
+        private readonly InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository,
+        private readonly BestsellersCollectionFactory $bestsellersCollectionFactory
     ) {
     }
 
@@ -41,29 +43,21 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
         $bestsellerProduct = $observer->getEvent()->getData(InPostPayBestsellerProductInterface::ENTITY_NAME);
 
         if ($bestsellerProduct instanceof InPostPayBestsellerProductInterface) {
-            $this->validatePriority($bestsellerProduct);
             $this->validateSku($bestsellerProduct);
-            $this->validatePriorityAndWebsiteConflict($bestsellerProduct);
             $this->validateSkuAndWebsiteConflict($bestsellerProduct);
-        }
-    }
+            $this->validateAvailableFromToDates($bestsellerProduct);
 
-    /**
-     * @param InPostPayBestsellerProductInterface $bestsellerProduct
-     * @return void
-     * @throws InvalidBestsellerProductDataException
-     */
-    private function validatePriority(InPostPayBestsellerProductInterface $bestsellerProduct): void
-    {
-        if ($bestsellerProduct->getPriority() < BestsellerProductPriority::MIN_PRIORITY
-            || $bestsellerProduct->getPriority() > BestsellerProductPriority::MAX_PRIORITY
-        ) {
-            throw new InvalidBestsellerProductDataException(
-                __(
-                    'InPost Pay Bestseller Product must have a priority value between 1 and 5. %1 given.',
-                    $bestsellerProduct->getPriority()
-                )
-            );
+            if ($bestsellerProduct->getBestsellerProductId()) {
+                $this->validateLimitOfBestsellersPerWebsite(
+                    $bestsellerProduct->getWebsiteId(),
+                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE
+                );
+            } else {
+                $this->validateLimitOfBestsellersPerWebsite(
+                    $bestsellerProduct->getWebsiteId(),
+                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE - 1
+                );
+            }
         }
     }
 
@@ -91,12 +85,6 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
             );
         }
 
-        if ($bestsellerProduct->getBestsellerProductId() === null && !$product->isSalable()) {
-            throw new InvalidBestsellerProductDataException(
-                __('Product "%1" is currently not available for sale.', $product->getName())
-            );
-        }
-
         $productTypeId = is_string($product->getTypeId()) ? (string)$product->getTypeId() : null;
 
         if (in_array($productTypeId, ['configurable', 'grouped', 'bundle'], true)) {
@@ -105,37 +93,6 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
                     'InPost Bestsellers currently cannot handle bundle, configurable or grouped product types.'
                 )
             );
-        }
-    }
-
-    /**
-     * @param InPostPayBestsellerProductInterface $bestsellerProduct
-     * @return void
-     * @throws InvalidBestsellerProductDataException
-     */
-    private function validatePriorityAndWebsiteConflict(InPostPayBestsellerProductInterface $bestsellerProduct): void
-    {
-        try {
-            $existingRecord = $this->inPostPayBestsellerProductRepository->getByWebsiteIdAndPriority(
-                $bestsellerProduct->getWebsiteId(),
-                $bestsellerProduct->getPriority()
-            );
-
-            if ($bestsellerProduct->getBestsellerProductId() !== $existingRecord->getBestsellerProductId()) {
-                $errorMsg = __(
-                    'Bestseller with Priority:%1 for Website ID:%2 already exists. Remove or edit that record.',
-                    $existingRecord->getPriority(),
-                    $existingRecord->getWebsiteId()
-                );
-            } else {
-                $errorMsg = null;
-            }
-        } catch (NoSuchEntityException $e) {
-            $errorMsg = null;
-        }
-
-        if ($errorMsg) {
-            throw new InvalidBestsellerProductDataException($errorMsg);
         }
     }
 
@@ -168,5 +125,56 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
         if ($errorMsg) {
             throw new InvalidBestsellerProductDataException($errorMsg);
         }
+    }
+
+    private function validateAvailableFromToDates(InPostPayBestsellerProductInterface $bestsellerProduct): void
+    {
+        $availableFrom = $bestsellerProduct->getAvailableStartDate();
+        $availableTo = $bestsellerProduct->getAvailableEndDate();
+
+        if ($availableFrom && $availableTo && $availableFrom >= $availableTo) {
+            throw new InvalidBestsellerProductDataException(
+                __('Bad availability date range. Available end date must be greater than available start date.')
+            );
+        }
+    }
+
+    /**
+     * @param int $websiteId
+     * @param int $limit
+     * @return void
+     * @throws InvalidBestsellerProductDataException
+     */
+    private function validateLimitOfBestsellersPerWebsite(int $websiteId, int $limit): void
+    {
+        $existingBestsellersCount = count($this->getBestsellersByWebsiteId($websiteId));
+
+        if ($existingBestsellersCount > $limit) {
+            throw new InvalidBestsellerProductDataException(
+                __(
+                    'Limit of %1 bestsellers per website has been reached.',
+                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE
+                )
+            );
+        }
+    }
+
+    /**
+     * @param int $websiteId
+     * @return InPostPayBestsellerProductInterface[]
+     */
+    public function getBestsellersByWebsiteId(int $websiteId): array
+    {
+        $collection = $this->bestsellersCollectionFactory->create();
+        $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, ['eq' => $websiteId]);
+        $bestsellers = [];
+
+        foreach ($collection->getItems() as $item) {
+            if ($item instanceof InPostPayBestsellerProductInterface) {
+                $bestsellers[] = $item;
+            }
+        }
+
+        return $bestsellers;
     }
 }

@@ -118,20 +118,12 @@ class Save extends BestsellersController implements HttpPostActionInterface
         $websiteId = (int)($data[InPostPayBestsellerProductInterface::WEBSITE_ID] ?? 0);
         $availableStartDate = (string)($data[InPostPayBestsellerProductInterface::AVAILABLE_START_DATE] ?? '');
         $availableEndDate = (string)($data[InPostPayBestsellerProductInterface::AVAILABLE_END_DATE] ?? '');
-        $priority = (int)($data[InPostPayBestsellerProductInterface::PRIORITY] ?? 1);
 
         $bestsellerProduct->setSku($sku);
         $bestsellerProduct->setWebsiteId($websiteId);
-        $bestsellerProduct->setPriority($priority);
         $bestsellerProduct->setSynchronizedAt(null);
-
-        if ($availableStartDate) {
-            $bestsellerProduct->setAvailableStartDate($availableStartDate);
-        }
-
-        if ($availableEndDate) {
-            $bestsellerProduct->setAvailableEndDate($availableEndDate);
-        }
+        $bestsellerProduct->setAvailableStartDate(!empty($availableStartDate) ? $availableStartDate : null);
+        $bestsellerProduct->setAvailableEndDate(!empty($availableEndDate) ? $availableEndDate : null);
 
         return $this->inPostPayBestsellerProductRepository->save($bestsellerProduct);
     }

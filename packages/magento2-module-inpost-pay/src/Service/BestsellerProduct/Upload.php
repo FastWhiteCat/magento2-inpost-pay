@@ -144,7 +144,6 @@ class Upload extends BestsellerProductService
     {
         $collection = $this->bestsellersCollectionFactory->create();
         $collection->addFieldToFilter(InPostPayBestsellerProductInterface::WEBSITE_ID, ['eq' => $websiteId]);
-        $collection->addOrder(InPostPayBestsellerProductInterface::PRIORITY, 'ASC');
         $bestsellers = [];
 
         foreach ($collection->getItems() as $item) {

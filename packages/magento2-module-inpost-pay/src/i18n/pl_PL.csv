@@ -203,12 +203,9 @@
 "Saving InPost Pay Bestseller Product failed.","Zapis Produktu Bestsellerowego InPost Pay nie powiódł się.",module,InPost_InPostPay
 "InPost Pay Bestseller Product with ID ""%1"" does not exist.","Produkt Bestsellerowy InPost Pay o ID ""%1"" nie istnieje.",module,InPost_InPostPay
 "InPost Pay Bestseller Product with SKU ""%1"" for Website ID:%2 does not exist.","Produkt Bestsellerowy InPost Pay o SKU ""%1"" dla Webstite o ID:%2 nie istnieje.",module,InPost_InPostPay
-"InPost Pay Bestseller Product with Priority:%1 and Website ID:%2 does not exist.","Produkt Bestsellerowy InPost Pay o Priorytecie:%1 dla Website o ID:%2 nie istnieje.",module,InPost_InPostPay
 "Could not delete InPost Pay Bestseller Product: %1","Nie udało się usunąć Produktu Bestsellerowego InPost Pay: %1",module,InPost_InPostPay
-"InPost Pay Bestseller Product must have a priority value between 1 and 5. %1 given.","Produkt Bestsellerowy InPost Pay musi mieć priorytet o wartości pomiędzy 1 a 5. Otrzymano: %1.",module,InPost_InPostPay
 "Product with SKU:%1 does not exist.","Produkt o SKU:%1 nie istnieje.",module,InPost_InPostPay
 "Product ""%1"" is currently not available for sale.","Produkt ""%1"" nie jest obecnie dostępny w sprzedaży.",module,InPost_InPostPay
-"Bestseller with Priority:%1 for Website ID:%2 already exists. Remove or edit that record.","Bestseller o Priorytecie:%1 dla Website o ID:%2 już istnieje. Usuń tamten rekord lub go edytuj.",module,InPost_InPostPay
 "Could not delete Bestseller [Product ID:%1] from InPost Pay API. Reason: %2.","Nie udało się usunąć Produktu Bestsellerowego [ID Produktu:%1] z API InPost Pay. Powód: %2",module,InPost_InPostPay
 "Please log in to InPost Pay Panel and delete this Bestseller Product manually.","Prosimy o zalogowanie się do Panelu InPost Pay i usunięcie Produktu Bestsellerowego manualnie.",module,InPost_InPostPay
 "There was a problem with downloading bestsellers. Details: %1","Wystąpił problem z pobieraniem bestsellerów. Szczegóły: %1",module,InPost_InPostPay
@@ -217,8 +214,9 @@
 "Uploading Bestsellers to InPost Pay was completed but some products have errors.","Proces wysyłania Produktów Bestsellerowych do InPost Pay zakończył się, lecz niektóre produkty zawierają błędy.",module,InPost_InPostPay
 "Deleting Bestseller Product ""%1"","Usuwanie Produktu Bestsellerowego ""%1""",module,InPost_InPostPay
 "Are you sure you want to delete ""%1"" bestseller?","Czy jesteś pewien, że chcesz usunąć produkt bestsellerowy ""%1""?",module,InPost_InPostPay
-"Upload Products to InPost Pay","Wyślij Produkty do InPost Pay",module,InPost_InPostPay
-"Remove All And Download Products from InPost Pay","Usuń Wszystkie Oraz Pobierz Produkty z InPost Pay",module,InPost_InPostPay
+"Synchronise With InPost Pay","Zsynchronizuj z InPost Pay",module,InPost_InPostPay
+"Bestseller with SKU:%1 for Website ID:%2 already exists. Remove or edit that record.","Bestseller o SKU:%1 Dla Website o ID:%2 już istnieje. Usuń bądź edytuj tamten rekord.",module,InPost_InPostPay
+"Limit of %1 bestsellers per website has been reached.","Limit %1 bestsellerów został osiągnięty.",module,InPost_InPostPay
 "Add New Bestseller Product","Dodaj Nowy Produkt Bestsellerowy",module,InPost_InPostPay
 "InPost Pay Bestsellers Settings","Ustawienia Bestsellerów InPost Pay",module,InPost_InPostPay
 "Enabled Bestsellers Synchronize CRON","Włącz Synchronizacje Bestsellerów w CRON",module,InPost_InPostPay
@@ -228,12 +226,12 @@
 "Upload Magento Bestsellers into InPost Pay API.","Wysyłaj Produkty Bestsellerowe z Magento do InPost Pay API",module,InPost_InPostPay
 "Product Name","Nazwa Produktu",module,InPost_InPostPay
 "Available Start Date","Dostępny Od",module,InPost_InPostPay
+"Bad availability date range. Available end date must be greater than available start date.","Błędny zakres dat dostępności. Data do musi być późniejsza niż data do.",module,InPost_InPostPay
 "Available End Date","Dostępny Do",module,InPost_InPostPay
 "Synchronized At","Data Synchronizacji",module,InPost_InPostPay
 "Created At","Data Utworzenia",module,InPost_InPostPay
 "General Information","Ogólne Informacje",module,InPost_InPostPay
 "General Configuration","Ogólna Konfiguracja",module,InPost_InPostPay
-"Priority","Priorytet",module,InPost_InPostPay
 "Synchronization Error","Błąd Synchronizacji",module,InPost_InPostPay
 "QR Code","Kod QR",module,InPost_InPostPay
 "InPost Pay Status","Status InPost Pay",module,InPost_InPostPay

@@ -12,7 +12,6 @@ interface InPostPayBestsellerProductInterface
     public const WEBSITE_ID = 'website_id';
     public const AVAILABLE_START_DATE = 'available_start_date';
     public const AVAILABLE_END_DATE = 'available_end_date';
-    public const PRIORITY = 'priority';
     public const SYNCHRONIZED_AT = 'synchronized_at';
     public const QR_CODE = 'qr_code';
     public const DEEP_LINK = 'deep_link';
@@ -21,6 +20,7 @@ interface InPostPayBestsellerProductInterface
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
     public const SKIP_UPDATE_FLAG = 'skip_update_flag';
+    public const BESTSELLERS_LIMIT_PER_WEBSITE = 5;
 
     /**
      * @return int|null
@@ -76,17 +76,6 @@ interface InPostPayBestsellerProductInterface
      * @return InPostPayBestsellerProductInterface
      */
     public function setAvailableEndDate(?string $availableEndDate = null): InPostPayBestsellerProductInterface;
-
-    /**
-     * @return int
-     */
-    public function getPriority(): int;
-
-    /**
-     * @param int $priority
-     * @return InPostPayBestsellerProductInterface
-     */
-    public function setPriority(int $priority): InPostPayBestsellerProductInterface;
 
     /**
      * @return string|null
