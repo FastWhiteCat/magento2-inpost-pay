@@ -101,6 +101,7 @@ define([
              * @property {string} language
              * @property {unboundWidgetClicked} unboundWidgetClicked
              * @property {handleBasketEvent} handleBasketEvent
+             * @property {string} apiBaseUrl
              * @property {boolean} webView
              */
             var widgetOptions = $.extend({
@@ -110,6 +111,7 @@ define([
                 handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
                 language: config.language ? config.language : undefined,
+                apiBaseUrl: config.apiBaseUrl ? config.apiBaseUrl : undefined,
                 webView: config.webView ? config.webView : undefined,
             });
 
