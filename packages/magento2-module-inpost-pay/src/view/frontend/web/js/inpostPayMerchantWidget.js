@@ -31,6 +31,7 @@ define([
 
     var CHECKOUT_BINDING_PLACE = 'CHECKOUT_PAGE'
     var PRODUCT_CARD_BINDING_PLACE = 'PRODUCT_CARD'
+    var SUCCESS_PAGE_BINDING_PLACE = 'ORDER_CREATE'
 
     return Component.extend({
         /**
@@ -100,7 +101,6 @@ define([
              * @property {string} language
              * @property {unboundWidgetClicked} unboundWidgetClicked
              * @property {handleBasketEvent} handleBasketEvent
-             * @property {string} apiBaseUrl
              * @property {boolean} webView
              */
             var widgetOptions = $.extend({
@@ -110,7 +110,6 @@ define([
                 handleBasketEvent: this.handleBasketEvent.bind(this),
             }, {
                 language: config.language ? config.language : undefined,
-                apiBaseUrl: config.apiBaseUrl ? config.apiBaseUrl : undefined,
                 webView: config.webView ? config.webView : undefined,
             });
 
@@ -137,7 +136,10 @@ define([
 
                 if ($inpayWrapperOnBasket.length) {
                     $inpayWrapperOnBasket.each(function() {
-                        if ($(this).hasClass(PRODUCT_CARD_BINDING_PLACE)) return;
+                        if ($(this).hasClass(PRODUCT_CARD_BINDING_PLACE)
+                            || $(this).hasClass(SUCCESS_PAGE_BINDING_PLACE)) {
+                            return;
+                        }
 
                         if (counter === 0) {
                             $(this).hide()
@@ -145,7 +147,6 @@ define([
                             $(this).show()
                         }
                     })
-
                 }
             }
         },

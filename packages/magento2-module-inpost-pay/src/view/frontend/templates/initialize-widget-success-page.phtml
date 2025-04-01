@@ -12,6 +12,7 @@ if (!$widgetViewModel->isEnabled()
     return;
 }
 $widgetWrapperClass = "inpay-widget-wrapper";
+$bindingPlace = $block->getBindingPlace();
 $sandboxMode = $widgetViewModel->isSandboxEnabled();
 $scriptUrl = $sandboxMode
     ? "https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js"
@@ -20,6 +21,6 @@ $scriptUrl = $sandboxMode
 
 <script src="<?= $escaper->escapeUrl($scriptUrl) ?>"></script>
 
-<div class="<?= /* @noEscape */ $widgetWrapperClass ?>">
+<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-thank-you/>
 </div>
