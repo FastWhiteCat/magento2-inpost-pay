@@ -43,6 +43,9 @@
                 <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
                 <assign_quote_to_customer_by_email>1</assign_quote_to_customer_by_email>
+                <analytics_enabled>0</analytics_enabled>
+                <sending_fbclid_enabled>0</sending_fbclid_enabled>
+                <sending_gclid_enabled>0</sending_gclid_enabled>
             </inpost_pay>
         </payment>
     </default>

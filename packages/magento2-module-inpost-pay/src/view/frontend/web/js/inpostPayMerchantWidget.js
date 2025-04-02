@@ -209,18 +209,34 @@ define([
             var self = this;
 
             return new Promise((resolve, reject) => {
-                var url = self.configuration.enabledAnalyticsParams ?
-                    urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
-                        + '/form_key/' + $.mage.cookies.get('form_key')
-                        + '?gclid=' + $.localStorage.get('gclid')
-                        + '&fbclid=' + $.localStorage.get('fbclid')
-                        + '&client_id=' + $.localStorage.get('client_id')
-                    ) : urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
-                        + '/form_key/' + $.mage.cookies.get('form_key'));
+                var formData = {
+                    form_key: $.mage.cookies.get('form_key')
+                };
+
+                if (self.configuration.enabledAnalyticsParams) {
+                    var gaClientId = $.localStorage.get('client_id');
+                    var fbclid = $.localStorage.get('fbclid');
+                    var gclid = $.localStorage.get('gclid');
+
+                    if (gaClientId !== null) {
+                        formData.ga_client_id = gaClientId;
+                    }
+
+                    if (fbclid !== null) {
+                        formData.fbclid = fbclid;
+                    }
+
+                    if (gclid !== null) {
+                        formData.gclid = gclid;
+                    }
+                }
+
+                var url = urlBuilder.build('inpostizi/BasketBindingApiKey/Get');
 
                 $.ajax({
                     url: url,
-                    method: 'GET',
+                    method: 'POST',
+                    data: formData,
                 })
                     .done(function (data) {
                         if (data && data.success && data.basket_binding_api_key) {
@@ -296,14 +312,29 @@ define([
 
             function ajaxSubmit($form) {
                 return new Promise(function (resolve, reject) {
-                    var url = self.configuration.enabledAnalyticsParams ?
-                        urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
-                            + '/form_key/' + $.mage.cookies.get('form_key')
-                            + '?gclid=' + $.localStorage.get('gclid')
-                            + '&fbclid=' + $.localStorage.get('fbclid')
-                            + '&client_id=' + $.localStorage.get('client_id')
-                    ) : urlBuilder.build('inpostizi/BasketBindingApiKey/Get'
-                            + '/form_key/' + $.mage.cookies.get('form_key'));
+                    var formData = {
+                        form_key: $.mage.cookies.get('form_key')
+                    };
+
+                    if (self.configuration.enabledAnalyticsParams) {
+                        var gaClientId = $.localStorage.get('client_id');
+                        var fbclid = $.localStorage.get('fbclid');
+                        var gclid = $.localStorage.get('gclid');
+
+                        if (gaClientId !== null) {
+                            formData.ga_client_id = gaClientId;
+                        }
+
+                        if (fbclid !== null) {
+                            formData.fbclid = fbclid;
+                        }
+
+                        if (gclid !== null) {
+                            formData.gclid = gclid;
+                        }
+                    }
+
+                    var url = urlBuilder.build('inpostizi/BasketBindingApiKey/Get');
 
                     $.ajax({
                         url: $form.attr('action'),
@@ -316,7 +347,8 @@ define([
                         success: function () {
                             $.ajax({
                                 url: url,
-                                method: 'GET',
+                                method: 'POST',
+                                data: formData
                             })
                                 .done(function (data) {
                                     if (data && data.success && data.basket_binding_api_key) {

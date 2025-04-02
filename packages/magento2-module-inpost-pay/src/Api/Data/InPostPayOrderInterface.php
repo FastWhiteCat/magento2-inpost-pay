@@ -23,6 +23,9 @@ interface InPostPayOrderInterface
     public const PHONE = 'phone';
     public const PHONE_NUMBER = 'phone';
     public const COURIER_NOTE = 'courier_note';
+    public const GA_CLIENT_ID = 'ga_client_id';
+    public const FBCLID = 'fbclid';
+    public const GCLID = 'gclid';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const ACCEPTED_CONSENTS = 'accepted_consents';
     public const CREATED_AT = 'created_at';
@@ -56,6 +59,15 @@ interface InPostPayOrderInterface
     public function setDeliveryOptions(array $deliveryOptions): InPostPayOrderInterface;
     public function getCourierNote(): ?string;
     public function setCourierNote(?string $courierNote): InPostPayOrderInterface;
+
+    public function getGaClientId(): ?string;
+    public function setGaClientId(?string $gaClientId): InPostPayOrderInterface;
+
+    public function getFbclid(): ?string;
+    public function setFbclid(?string $fbclid): InPostPayOrderInterface;
+
+    public function getGclid(): ?string;
+    public function setGclid(?string $gclid): InPostPayOrderInterface;
 
     /**
      * @return AcceptedConsentInterface[]
