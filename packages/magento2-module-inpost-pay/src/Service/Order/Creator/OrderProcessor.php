@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Creator;
 
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Exception\QuoteChangedDuringOrderProcessingException;
-use InPost\InPostPay\Model\InPostPayQuote;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -53,7 +53,7 @@ class OrderProcessor implements OrderProcessorInterface
 
     /**
      * @param Quote $quote
-     * @param InPostPayQuote $inPostPayQuote
+     * @param InPostPayQuoteInterface $inPostPayQuote
      * @param OrderInterface $inPostOrder
      * @return Order
      * @throws CouldNotSaveException
@@ -61,7 +61,7 @@ class OrderProcessor implements OrderProcessorInterface
      * @throws NoSuchEntityException
      * @throws QuoteChangedDuringOrderProcessingException
      */
-    public function execute(Quote $quote, InPostPayQuote $inPostPayQuote, OrderInterface $inPostOrder): Order
+    public function execute(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): Order
     {
         try {
             foreach ($this->orderProcessingSteps as $orderProcessingStep) {

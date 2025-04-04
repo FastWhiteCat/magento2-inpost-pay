@@ -26,6 +26,8 @@ interface InPostPayOrderInterface
     public const GA_CLIENT_ID = 'ga_client_id';
     public const FBCLID = 'fbclid';
     public const GCLID = 'gclid';
+    public const SERIALIZED_ANALYTICS_DATA = 'serialized_analytics_data';
+    public const ANALYTICS_SENT_AT = 'analytics_sent_at';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const ACCEPTED_CONSENTS = 'accepted_consents';
     public const CREATED_AT = 'created_at';
@@ -68,6 +70,12 @@ interface InPostPayOrderInterface
 
     public function getGclid(): ?string;
     public function setGclid(?string $gclid): InPostPayOrderInterface;
+
+    public function getSerializedAnalyticsData(): ?string;
+    public function setSerializedAnalyticsData(?string $serializedAnalyticsData): InPostPayOrderInterface;
+
+    public function getAnalyticsSentAt(): ?string;
+    public function setAnalyticsSentAt(?string $analyticsSentAt): InPostPayOrderInterface;
 
     /**
      * @return AcceptedConsentInterface[]

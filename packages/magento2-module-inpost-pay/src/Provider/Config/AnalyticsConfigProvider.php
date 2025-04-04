@@ -12,8 +12,10 @@ class AnalyticsConfigProvider
     private const XML_PATH_ANALYTICS_ENABLED = 'payment/inpost_pay/analytics_enabled';
     private const XML_PATH_GA_MEASUREMENT_ID = 'payment/inpost_pay/ga_measurement_id';
     private const XML_PATH_GA_API_SECRET = 'payment/inpost_pay/ga_api_secret';
+    private const XML_PATH_GA_API_URL = 'payment/inpost_pay/ga_api_url';
     private const XML_PATH_FBCLID_SENDING_ENABLED = 'payment/inpost_pay/sending_fbclid_enabled';
     private const XML_PATH_GCLID_SENDING_ENABLED = 'payment/inpost_pay/sending_gclid_enabled';
+    private const XML_PATH_ASYNC_SENDING_ENABLED = 'payment/inpost_pay/analytics_async_sending_enabled';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -34,6 +36,14 @@ class AnalyticsConfigProvider
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAsyncSendingEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_ASYNC_SENDING_ENABLED);
     }
 
     /**
@@ -64,6 +74,16 @@ class AnalyticsConfigProvider
         );
 
         return is_scalar($gaApiSecret) && !empty($gaApiSecret) ? (string)$gaApiSecret : null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGaApiUrl(): ?string
+    {
+        $gaApiUrl = $this->scopeConfig->getValue(self::XML_PATH_GA_API_URL);
+
+        return is_scalar($gaApiUrl) && !empty($gaApiUrl) ? (string)$gaApiUrl : null;
     }
 
     /**

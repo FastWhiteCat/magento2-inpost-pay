@@ -280,6 +280,20 @@
             </argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Model\Data\Order\Analytics\Event\PurchaseEventDataBuilder">
+        <arguments>
+            <argument name="purchaseEvents" xsi:type="array">
+                <item name="ga4_purchase_event" xsi:type="object">InPost\InPostPay\Model\Data\Order\Analytics\Event\Purchase\Ga4PurchaseEvent</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\PurchaseEventDataSender">
+        <arguments>
+            <argument name="eventDataHandlers" xsi:type="array">
+                <item name="ga4_purchase_event" xsi:type="object">InPost\InPostPay\Service\Order\Analytics\Event\Purchase\Ga4PurchaseEventHandler</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Model\Config\Payment\TitleMapper">
         <arguments>
             <argument name="mappings" xsi:type="array">
@@ -376,6 +390,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Plugin\Adminhtml\Order\View\RegisterCurrentOrderPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\PurchaseEventDataSender">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\Purchase\Ga4PurchaseEventHandler">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

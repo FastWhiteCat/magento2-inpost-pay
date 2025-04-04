@@ -57,6 +57,7 @@
         <observer name="InPost_InPostPay::copyAnalyticsDataFromInPostPayQuoteToOrderEventObserver" instance="InPost\InPostPay\Observer\Order\CopyAnalyticsDataFromInPostPayQuoteToOrderEventObserver" />
     </event>
     <event name="izi_order_create_after">
+        <observer name="InPost_InPostPay::sendAnalyticsPurchaseAfterOrderCreateEventObserver" instance="InPost\InPostPay\Observer\Order\Analytics\SendAnalyticsPurchaseAfterOrderCreateEventObserver" />
         <observer name="InPost_InPostPay::iziOrderCreateAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderCreateAfterEventObserver" />
     </event>
     <event name="izi_basket_update_before">

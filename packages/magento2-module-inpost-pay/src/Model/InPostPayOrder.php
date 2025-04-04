@@ -257,6 +257,30 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::GCLID, $gclid);
     }
 
+    public function getSerializedAnalyticsData(): ?string
+    {
+        $serializedData = $this->getData(self::SERIALIZED_ANALYTICS_DATA);
+
+        return (is_scalar($serializedData) && !empty($serializedData)) ? (string)$serializedData : null;
+    }
+
+    public function setSerializedAnalyticsData(?string $serializedAnalyticsData): InPostPayOrderInterface
+    {
+        return $this->setData(self::SERIALIZED_ANALYTICS_DATA, $serializedAnalyticsData);
+    }
+
+    public function getAnalyticsSentAt(): ?string
+    {
+        $sentAt = $this->getData(self::ANALYTICS_SENT_AT);
+
+        return (is_scalar($sentAt) && !empty($sentAt)) ? (string)$sentAt : null;
+    }
+
+    public function setAnalyticsSentAt(?string $analyticsSentAt): InPostPayOrderInterface
+    {
+        return $this->setData(self::ANALYTICS_SENT_AT, $analyticsSentAt);
+    }
+
     public function getCountryPrefix(): ?string
     {
         $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
