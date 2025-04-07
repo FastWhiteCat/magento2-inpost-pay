@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Provider\Config\AnalyticsConfigProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
@@ -33,7 +34,7 @@ class CopyAnalyticsDataFromInPostPayQuoteToOrderEventObserver implements Observe
 
         if ($order instanceof Order
             && $inPostPayQuote instanceof InPostPayQuoteInterface
-            && $this->analyticsConfigProvider->isAnalyticsEnabled()
+            && $this->analyticsConfigProvider->isAnalyticsEnabled((int)$order->getStoreId())
         ) {
             try {
                 $inPostPayOrder = $this->inPostPayOrderRepository->getByBasketId($inPostPayQuote->getBasketId());
@@ -44,6 +45,14 @@ class CopyAnalyticsDataFromInPostPayQuoteToOrderEventObserver implements Observe
             } catch (NoSuchEntityException $e) {
                 $this->logger->error(
                     sprintf('InPost Pay Order not found by basket ID: %s.', $inPostPayQuote->getBasketId())
+                );
+            } catch (CouldNotSaveException $e) {
+                $this->logger->error(
+                    sprintf(
+                        'Could not save InPost Pay Order [Basket ID: %s] analytics params. Reason: %s.',
+                        $inPostPayQuote->getBasketId(),
+                        $e->getMessage()
+                    )
                 );
             }
         }

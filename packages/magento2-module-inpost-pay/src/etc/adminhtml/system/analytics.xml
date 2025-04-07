@@ -18,7 +18,7 @@
             </depends>
         </field>
         <field id="analytics_async_sending_cron_schedule" translate="label" type="text" sortOrder="3" showInDefault="1" canRestore="1">
-            <label>Restrictions Refresh CRON Schedule</label>
+            <label>Analytics Data Sending CRON CRON Schedule</label>
             <comment>*/5 * * * * for example causes this CRON to run every 5 minutes</comment>
             <config_path>payment/inpost_pay/analytics_async_sending_cron_schedule</config_path>
             <depends>

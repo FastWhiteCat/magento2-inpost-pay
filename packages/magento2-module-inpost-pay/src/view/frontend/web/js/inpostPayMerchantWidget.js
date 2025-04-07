@@ -214,9 +214,9 @@ define([
                 };
 
                 if (self.configuration.enabledAnalyticsParams) {
-                    var gaClientId = $.localStorage.get('client_id');
-                    var fbclid = $.localStorage.get('fbclid');
-                    var gclid = $.localStorage.get('gclid');
+                    var gaClientId = window.localStorage.getItem('client_id');
+                    var fbclid = window.localStorage.getItem('fbclid');
+                    var gclid = window.localStorage.getItem('gclid');
 
                     if (gaClientId !== null) {
                         formData.ga_client_id = gaClientId;
@@ -317,9 +317,9 @@ define([
                     };
 
                     if (self.configuration.enabledAnalyticsParams) {
-                        var gaClientId = $.localStorage.get('client_id');
-                        var fbclid = $.localStorage.get('fbclid');
-                        var gclid = $.localStorage.get('gclid');
+                        var gaClientId = window.localStorage.getItem('client_id');
+                        var fbclid = window.localStorage.getItem('fbclid');
+                        var gclid = window.localStorage.getItem('gclid');
 
                         if (gaClientId !== null) {
                             formData.ga_client_id = gaClientId;

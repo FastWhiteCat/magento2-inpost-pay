@@ -64,18 +64,26 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
         $gaClientId = $inPostPayOrder->getGaClientId();
         $fbclid = $this->analyticsConfigProvider->isSendingFbclidEnabled($storeId)
             ? $inPostPayOrder->getFbclid() : null;
-        $gclid = $this->analyticsConfigProvider->isSendingFbclidEnabled($storeId)
+        $gclid = $this->analyticsConfigProvider->isSendingGclidEnabled($storeId)
             ? $inPostPayOrder->getGclid() : null;
 
-        return [
-            'ga_client_id' => $gaClientId,
-            'fbclid' => $fbclid,
-            'gclid' => $gclid,
-            'events' => [
-                'name' => 'purchase',
-                'params' => $this->preparePurchaseEventParams($order)
-            ]
+        $eventData['client_id'] = $gaClientId;
+
+        if ($gclid) {
+            $eventData['gclid'] = $gclid;
+        }
+
+        if ($fbclid) {
+            $eventData['fbclid'] = $fbclid;
+        }
+
+        $eventData['events'] = [];
+        $eventData['events'][] = [
+            'name' => 'purchase',
+            'params' => $this->preparePurchaseEventParams($order)
         ];
+
+        return $eventData;
     }
 
     /**

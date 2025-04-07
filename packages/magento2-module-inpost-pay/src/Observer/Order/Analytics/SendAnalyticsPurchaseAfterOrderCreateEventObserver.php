@@ -41,13 +41,10 @@ class SendAnalyticsPurchaseAfterOrderCreateEventObserver implements ObserverInte
     /**
      * @param Observer $observer
      * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function execute(Observer $observer): void
     {
-        if ($this->analyticsConfigProvider->isAnalyticsEnabled() === false) {
-            return;
-        }
-
         $inPostOrder = $observer->getEvent()->getData(OrderCreateInterface::INPOST_ORDER);
 
         if (!$inPostOrder instanceof OrderInterface) {
@@ -58,7 +55,9 @@ class SendAnalyticsPurchaseAfterOrderCreateEventObserver implements ObserverInte
             $orderId = (int)$inPostOrder->getOrderDetails()->getOrderId();
             $magentoOrder = $this->orderRepository->get($orderId);
 
-            if (!$magentoOrder instanceof Order) {
+            if (!$magentoOrder instanceof Order
+                || !$this->analyticsConfigProvider->isAnalyticsEnabled((int)$magentoOrder->getStoreId())
+            ) {
                 return;
             }
 
@@ -68,9 +67,13 @@ class SendAnalyticsPurchaseAfterOrderCreateEventObserver implements ObserverInte
             $inPostPayOrder->setSerializedAnalyticsData($this->prepareSerializedAnalyticsDataForOrder($magentoOrder));
             $this->inPostPayOrderRepository->save($inPostPayOrder);
 
-            if (!$this->analyticsConfigProvider->isAsyncSendingEnabled()) {
-                $eventsData = $this->serializer->unserialize((string)$inPostPayOrder->getSerializedAnalyticsData());
-                $eventsData = is_array($eventsData) ? $eventsData : [];
+            $serializedAnalyticsData = $inPostPayOrder->getSerializedAnalyticsData();
+            $eventsData = $this->serializer->unserialize(
+                is_scalar($serializedAnalyticsData) ? (string)$serializedAnalyticsData : '[]'
+            );
+            $eventsData = is_array($eventsData) ? $eventsData : [];
+
+            if (!$this->analyticsConfigProvider->isAsyncSendingEnabled() && !empty($eventsData)) {
                 $this->purchaseEventDataSender->sendEventsData(
                     $eventsData,
                     $orderId,

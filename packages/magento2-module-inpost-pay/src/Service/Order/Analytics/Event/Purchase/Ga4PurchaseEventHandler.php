@@ -129,11 +129,21 @@ class Ga4PurchaseEventHandler implements EventDataHandlerInterface
      * @param array $headers
      * @param string $method
      * @param array $params
-     * @return array
+     * @return void
      * @throws UnableToSendInPostPayAnalyticsDataException
      */
-    public function sendRequest(string $url, array $headers, string $method, array $params): array
+    public function sendRequest(string $url, array $headers, string $method, array $params): void
     {
+        $this->logger->debug(
+            'SENDING Google Analytics API REQUEST',
+            [
+                'method' => $method,
+                'url' => $url,
+                'headers' => $headers,
+                'params' => $params
+            ]
+        );
+
         $client = $this->getClient($headers);
 
         try {
@@ -151,7 +161,8 @@ class Ga4PurchaseEventHandler implements EventDataHandlerInterface
             throw new UnableToSendInPostPayAnalyticsDataException(__($errorMsg));
         }
 
-        return $this->handleResponse($response, $url);
+        $response = $this->handleResponse($response, $url);
+        $this->logger->debug('SENDING Google Analytics API RESPONSE', $response);
     }
 
     /**
@@ -195,16 +206,12 @@ class Ga4PurchaseEventHandler implements EventDataHandlerInterface
             );
         }
 
-        $resultData = [];
         $result = $responseBody ? $this->serializer->unserialize($responseBody) : [];
 
-        if (is_scalar($result)) {
-            $resultData['result'] = (string)$result;
-        } elseif (is_array($result)) {
-            $resultData = $result;
-        }
-
-        return $resultData;
+        return [
+            'code' => $statusCode,
+            'content' => (is_scalar($result) || is_array($result)) ? $result : 'unknown',
+        ];
     }
 
     /**
