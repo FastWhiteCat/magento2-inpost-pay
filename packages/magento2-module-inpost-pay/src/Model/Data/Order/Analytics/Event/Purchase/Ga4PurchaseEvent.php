@@ -104,16 +104,21 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
             ];
         }
 
-        return [
+        $eventParams = [
             'transaction_id' => $order->getIncrementId(),
             'affiliation' => self::AFFILIATION,
             'value' => (float)$order->getGrandTotal(),
             'currency' => $order->getOrderCurrencyCode(),
             'tax' => (float)$order->getTaxAmount(),
             'shipping' => (float)$order->getShippingInclTax(),
-            'coupon' => $order->getCouponCode() ?? null,
             'engagement_time_msec' => self::ENGAGEMENT_TIME,
             'items' => $items
         ];
+
+        if ($order->getCouponCode()) {
+            $eventParams['coupon'] = (string)$order->getCouponCode();
+        }
+
+        return $eventParams;
     }
 }
