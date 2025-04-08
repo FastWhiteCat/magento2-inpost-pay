@@ -59,6 +59,7 @@ class TokenGenerator
      */
     public function generate(?bool $forceNew = false, ?int $storeId = null): TokenResponse
     {
+        $storeId = $storeId ?? $this->getCurrentStoreId();
         $cacheIdentifier = $this->getTokenCacheIdentifier($storeId);
         $tokenResponse = $this->getCachedTokenResponse($cacheIdentifier);
 

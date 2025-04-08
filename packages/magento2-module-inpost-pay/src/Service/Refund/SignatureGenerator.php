@@ -28,11 +28,10 @@ class SignatureGenerator
         $this->hashAlgorithmPrefix = $hashAlgorithmPrefix;
     }
 
-    public function generate(
-        RefundInterface $refund
-    ): string {
+    public function generate(RefundInterface $refund, ?int $storeId = null): string
+    {
         try {
-            $merchantSecret = $this->authConfigProvider->getMerchantSecret();
+            $merchantSecret = $this->authConfigProvider->getMerchantSecret($storeId);
             $refundAdditionalBusinessData = $refund->getAdditionalBusinessData()?->getAdditionalData();
             $preparedAdditionalData = $this->getPreparedAdditionalData($refundAdditionalBusinessData);
 
