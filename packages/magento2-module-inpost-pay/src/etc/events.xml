@@ -1,5 +1,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="sales_quote_save_after">
+    <event name="sales_quote_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostBasketEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver" />
     </event>
     <event name="checkout_cart_save_after">
@@ -11,13 +11,16 @@
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
     </event>
+    <event name="sales_quote_item_collection_products_after_load">
+        <observer name="InPost_InPostPay::addImageGalleryToProductsCollectionEventObserver" instance="InPost\InPostPay\Observer\Quote\AddImageGalleryToProductsCollectionEventObserver"/>
+    </event>
     <event name="customer_logout">
         <observer name="InPost_InPostPay::deleteBasketBidingApiCookieAfterCustomerLogout" instance="InPost\InPostPay\Observer\Customer\DeleteBasketBidingApiCookieAfterCustomerLogout" />
     </event>
     <event name="customer_login">
         <observer name="InPost_InPostPay::createOrUpdateBasketBidingApiCookieAfterCustomerLogin" instance="InPost\InPostPay\Observer\Customer\CreateOrUpdateBasketBidingApiCookieAfterCustomerLogin" />
     </event>
-    <event name="sales_order_save_after">
+    <event name="sales_order_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
     <event name="sales_order_shipment_track_save_after">
@@ -29,6 +32,12 @@
     <event name="checkout_onepage_controller_success_action">
         <observer name="InPost_InPostPay::deleteBindingAfterPlaceOrderObserver" instance="InPost\InPostPay\Observer\Order\PlaceOrderEventObserver" />
         <observer name="InPost_InPostPay::forceStatusUpdateObserver" instance="InPost\InPostPay\Observer\Order\ForceStatusUpdateObserver" />
+    </event>
+    <event name="inpost_pay_bestseller_product_save_before">
+        <observer name="InPost_InPostPay::validateInPostPayBestsellerProductBeforeSaveObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\ValidateInPostPayBestsellerProductBeforeSaveObserver" />
+    </event>
+    <event name="inpost_pay_bestseller_product_delete_after">
+        <observer name="InPost_InPostPay::inPostPayBestsellerProductAfterDeleteObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\InPostPayBestsellerProductAfterDeleteObserver" />
     </event>
     <!-- Events triggered when sending requests to IZI API Endpoints -->
     <event name="izi_api_send_request_before">
@@ -79,5 +88,26 @@
     </event>
     <event name="izi_basket_confirmation_after">
         <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_before">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetBeforeEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_after">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetAfterEventObserver" />
+    </event>
+    <event name="catalog_product_save_commit_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="cataloginventory_stock_item_save_commit_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterStockItemSaveObserver" />
+    </event>
+    <event name="catalog_product_delete_before">
+        <observer name="InPost_InPostPay::deleteInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\DeleteInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="izi_init_basket_before">
+        <observer name="InPost_InPostPay::iziInitBasketBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketBeforeEventObserver" />
+    </event>
+    <event name="izi_init_basket_after">
+        <observer name="InPost_InPostPay::iziInitBasketAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketAfterEventObserver" />
     </event>
 </config>

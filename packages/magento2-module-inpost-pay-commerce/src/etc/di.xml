@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="InPost\InPostPay\Validator\Order\BasketPriceValidator"
+                type="InPost\InPostPayCommerce\Validator\Order\BasketPriceIncludingGiftWrappingValidator"/>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="promo_codes" xsi:type="object">InPost\InPostPayCommerce\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer</item>
+                <item name="related_products" xsi:type="object">InPost\InPostPayCommerce\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer</item>
+                <item name="gift_wrapping" xsi:type="object">InPost\InPostPayCommerce\Service\DataTransfer\QuoteToBasket\QuoteGiftWrappingDataTransfer</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="gift_wrapping_base_price" xsi:type="object">InPost\InPostPayCommerce\Service\DataTransfer\OrderToInPostOrder\OrderGiftWrappingBasePriceDataTransfer</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPayCommerce\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+</config>
