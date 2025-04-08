@@ -21,13 +21,15 @@ class SandboxConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return bool
      */
-    public function isSandboxEnabled(): bool
+    public function isSandboxEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_SANDBOX_ENABLED,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 }

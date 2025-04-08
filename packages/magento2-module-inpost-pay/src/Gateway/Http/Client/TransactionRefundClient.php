@@ -30,11 +30,16 @@ class TransactionRefundClient implements ClientInterface
         try {
             $refundData = $body['refund_request_data'] ?? [];
 
+            if (empty($refundData)) {
+                return [];
+            }
+
             $response['body'] = $this->refund->execute(
                 $refundData[RefundInterface::TRANSACTION_ID] ?? null,
                 $refundData[RefundInterface::EXTERNAL_REFUND_ID] ?? null,
                 $refundData[RefundInterface::ADDITIONAL_BUSINESS_DATA] ?? null,
                 $refundData[RefundInterface::REFUND_AMOUNT] ?? null,
+                $refundData['store_id'] ?? null,
             );
         } catch (Exception $e) {
             $response = ['error' => $e->getMessage()];

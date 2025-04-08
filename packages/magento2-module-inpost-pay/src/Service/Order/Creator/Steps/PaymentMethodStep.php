@@ -8,6 +8,10 @@ use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
+use InPost\InPostPay\Validator\Order\BasketPriceValidator;
+use Magento\Framework\Exception\LocalizedException;
+use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Exception\QuoteChangedDuringOrderProcessingException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
@@ -18,6 +22,8 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
 
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
+        private readonly BasketPriceValidator $basketPriceValidator,
+        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -42,6 +48,8 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
                 (int)(is_scalar($quote->getId()) ? $quote->getId() : null)
             )
         );
+
+        $this->validateBasketTotal($quote, $inPostOrder);
     }
 
     public function addCustomerNote(Quote $quote, OrderInterface $inPostOrder): void
@@ -65,5 +73,25 @@ class PaymentMethodStep extends OrderProcessingStep implements OrderProcessingSt
                 $customerNote
             )
         );
+    }
+
+    /**
+     * @param Quote $quote
+     * @param OrderInterface $inPostOrder
+     * @return void
+     * @throws QuoteChangedDuringOrderProcessingException
+     */
+    private function validateBasketTotal(Quote $quote, OrderInterface $inPostOrder): void
+    {
+        $cartId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+
+        try {
+            /** @var Quote $reloadedQuote */
+            $reloadedQuote = $this->cartRepository->get($cartId);
+            $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($cartId);
+            $this->basketPriceValidator->validate($reloadedQuote, $inPostPayQuote, $inPostOrder);
+        } catch (LocalizedException $e) {
+            throw new QuoteChangedDuringOrderProcessingException();
+        }
     }
 }

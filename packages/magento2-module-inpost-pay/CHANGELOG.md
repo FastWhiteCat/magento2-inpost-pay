@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.7] - 2025-03-24
+
+### Fixed
+
+- handling of New Order Status payment method configuration for multistore with different values for each website
+
+## [2.0.6] - 2025-03-13
+
+### Added
+
+- separated handling for Refund and Offline Refund Admin Panel Actions, one that refunds InPost Pay transaction, second that only creates Magento Credit Memo with no online transaction refunds
+
+### Fixed
+
+- fixed error when module is installed but not configured (empty: client ID, secret, merchant client ID, pos ID, Auth and API URLs)
+
+## [2.0.5] - 2025-03-04
+
+### Fixed
+
+- obtaining correct Bearer Token for Transaction List for Refunds using order's Store ID instead of Default Store ID to access credentials 
+- removed overriding BaseUrl for Frontend Widget with configurable value
+
+## [2.0.4] - 2025-01-31
+
+### Added
+
+- configuration that allows to select if customer account should be assigned to guest quote based on InPost Pay App Account email address
+
+### Fixed
+
+- assigning guest cart to Magento Account based on InPost Pay Account email
+- order creation process when after guest cart was assigned to an account total amount has changed resulting in InPost Pay App error
+
 ## [2.0.3] - 2025-01-17
 
 ### Fixed
