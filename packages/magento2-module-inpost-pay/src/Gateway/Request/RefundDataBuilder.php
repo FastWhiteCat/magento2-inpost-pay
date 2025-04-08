@@ -42,20 +42,22 @@ class RefundDataBuilder implements BuilderInterface
 
         /** @var Payment $payment */
         $payment = $paymentDataObject->getPayment();
+        $creditmemo = $payment->getCreditmemo();
+
+        if (!$creditmemo?->getDoTransaction()) {
+            return ['body' => ['refund_request_data' => []]];
+        }
+
         /** @var Order $order */
         $order = $payment->getOrder();
 
         $refundId = $this->uuidGenerator->uuidv4();
         $orderId = $order->getIncrementId();
+        $storeId = is_scalar($order->getStoreId()) ? (int)$order->getStoreId() : 0;
         $refundAmount = (float)($buildSubject['amount']);
         $refundAdditionalInfo = null;
 
-        $inPostPayTransactionList = $this->transactionList->execute(orderId: $orderId);
-
-        if (!$inPostPayTransactionList instanceof TransactionListResponse) {
-            $this->logger->error("Invalid Transaction List response for OrderId: $orderId");
-            return [];
-        }
+        $inPostPayTransactionList = $this->transactionList->execute(orderId: $orderId, storeId: $storeId);
 
         if (empty($inPostPayTransactionList->getItems())) {
             $errorMsg = __('Empty InPost Pay Transaction list for OrderId: %1', $orderId);
@@ -81,7 +83,8 @@ class RefundDataBuilder implements BuilderInterface
                     RefundInterface::TRANSACTION_ID => $inPostPayTransactionId,
                     RefundInterface::EXTERNAL_REFUND_ID => $refundId,
                     RefundInterface::REFUND_AMOUNT => $refundAmount,
-                    RefundInterface::ADDITIONAL_BUSINESS_DATA => $refundAdditionalInfo
+                    RefundInterface::ADDITIONAL_BUSINESS_DATA => $refundAdditionalInfo,
+                    'store_id' => $storeId
                 ];
                 break;
             }

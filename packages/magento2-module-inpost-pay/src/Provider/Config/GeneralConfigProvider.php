@@ -50,13 +50,15 @@ class GeneralConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return string
      */
-    public function getNewOrderStatus(): string
+    public function getNewOrderStatus(?int $storeId = null): string
     {
         $orderStatus = $this->scopeConfig->getValue(
             self::XML_PATH_INPOST_PAY_NEW_ORDER_STATUS,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         return is_scalar($orderStatus) ? (string)$orderStatus : 'pending';
