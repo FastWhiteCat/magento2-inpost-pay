@@ -71,7 +71,8 @@ class Widget implements ArgumentInterface
     {
         return $this->generalConfigProvider->isEnabled()
             && $this->displayConfigProvider->isWidgetEnabled()
-            && $this->isDisplayAllowed();
+            && $this->isDisplayAllowed()
+            && $this->isAuthConfigComplete();
     }
 
     /**
@@ -259,17 +260,47 @@ class Widget implements ArgumentInterface
         return $scriptUrl;
     }
 
-    public function getApiBaseUrl(): string
-    {
-        return trim($this->iziApiConfigProvider->getIziApiUrl(), '/');
-    }
-
     /**
      * @return string
-     * @throws InPostPayInternalException
      */
     public function getClientMerchantId(): string
     {
-        return $this->authConfigProvider->getClientMerchantId();
+        try {
+            return $this->authConfigProvider->getClientMerchantId();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+
+            return '';
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function isAuthConfigComplete(): bool
+    {
+        try {
+            $merchantClientId = $this->authConfigProvider->getClientMerchantId();
+            $posId = $this->authConfigProvider->getPosId();
+            $clientId = $this->authConfigProvider->getClientId();
+            $clientSecret = $this->authConfigProvider->getClientSecret();
+            $authTokenUrl = $this->authConfigProvider->getAuthTokenUrl();
+            $iziApiUrl = $this->iziApiConfigProvider->getIziApiUrl();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+            $merchantClientId = '';
+            $posId = '';
+            $clientId = '';
+            $clientSecret = '';
+            $authTokenUrl = '';
+            $iziApiUrl = '';
+        }
+
+        return !empty($posId)
+            && !empty($clientId)
+            && !empty($merchantClientId)
+            && !empty($clientSecret)
+            && !empty($authTokenUrl)
+            && !empty($iziApiUrl);
     }
 }
