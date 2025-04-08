@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.7] - 2025-03-24
+
+### Fixed
+
+- handling of New Order Status payment method configuration for multistore with different values for each website
+
+## [2.0.6] - 2025-03-13
+
+### Added
+
+- separated handling for Refund and Offline Refund Admin Panel Actions, one that refunds InPost Pay transaction, second that only creates Magento Credit Memo with no online transaction refunds
+
+### Fixed
+
+- fixed error when module is installed but not configured (empty: client ID, secret, merchant client ID, pos ID, Auth and API URLs)
+
 ## [2.0.5] - 2025-03-04
 
 ### Fixed
