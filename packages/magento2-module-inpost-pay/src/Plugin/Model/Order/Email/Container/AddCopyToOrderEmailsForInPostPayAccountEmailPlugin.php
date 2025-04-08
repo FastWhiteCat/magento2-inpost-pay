@@ -73,7 +73,7 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
             $magentoCustomerEmail = $this->extractMagentoCustomerAccountEmailFromOrder($order);
         }
 
-        $result = $this->prepareNotifyEmails(
+        $modifiedResult = $this->prepareNotifyEmails(
             $order,
             $modifiedResult,
             $inPostPayAccountEmail,
