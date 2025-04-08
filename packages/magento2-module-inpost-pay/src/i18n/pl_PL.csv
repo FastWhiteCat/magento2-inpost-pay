@@ -245,3 +245,4 @@
 "Enable In-app Promotions","Włącz promocje w aplikacji",module,InPost_InPostPay
 "Promotion description url","Url opisu promocji",module,InPost_InPostPay
 "Coupon code ""%1"" expired or that promotion is not applicable to this cart.","Kod rabatowy ""%1"" wygasł lub koszyk nie spełnia warunków tej promocji",module,InPost_InPostPay
+"A maximum of 10 overriding consents will be transferred to the application","Maksymalnie do aplikacji przekazane zostanie 10 nadrzędnych zgód",module,InPost_InPostPay
