@@ -227,6 +227,14 @@
         <plugin name="InPost_InPostPay::checkProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin"
                 type="InPost\InPostPay\Plugin\InventoryReservations\CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin" />
     </type>
+    <type name="Magento\Sales\Api\OrderCustomerDelegateInterface">
+        <plugin name="InPost_InPostPay::changeNewCustomerDelegateDataPlugin"
+                type="InPost\InPostPay\Plugin\ChangeNewCustomerDelegateDataPlugin" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Email\Container\IdentityInterface">
+        <plugin name="InPost_InPostPay::addCopyToOrderEmailsForInPostPayAccountEmailPlugin"
+                type="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
@@ -720,6 +728,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Model\Config\Payment\TitleUpdater">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
