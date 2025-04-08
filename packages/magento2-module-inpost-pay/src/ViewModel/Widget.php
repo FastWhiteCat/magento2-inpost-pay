@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\ViewModel;
 
-use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Model\ResourceModel\InPostPayQuote;
-use InPost\InPostPay\Provider\Config\PollingConfigProvider;
+use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Provider\Config\AuthConfigProvider;
+use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
+use InPost\InPostPay\Provider\TestModeProvider;
 use InPost\InPostPay\Provider\Config\SandboxConfigProvider;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
@@ -29,47 +30,60 @@ use Psr\Log\LoggerInterface;
  */
 class Widget implements ArgumentInterface
 {
-    private const VARIANT = 'variant';
-    private const DARK_MODE = 'darkMode';
-    private const MAX_WIDTH = 'maxWidth';
-    private const MIN_HEIGHT = 'minHeight';
-    private const FRAME_STYLE = 'frameStyle';
+    private const CHECKOUT_DESCRIPTOR = 'checkout_index_index';
 
     /**
      * @param SandboxConfigProvider $sandboxConfigProvider
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
-     * @param PollingConfigProvider $pollingConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
      * @param GeneralConfigProvider $generalConfigProvider
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
+     * @param RestrictedProductIdsProvider $restrictedProductIdsProvider
      * @param LoggerInterface $logger
+     * @param AuthConfigProvider $authConfigProvider
+     * @param IziApiConfigProvider $iziApiConfigProvider
+     * @param TestModeProvider $testModeProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        private readonly SandboxConfigProvider             $sandboxConfigProvider,
-        private readonly LayoutConfigProvider              $layoutConfigProvider,
-        private readonly DisplayConfigProvider             $displayConfigProvider,
-        private readonly PollingConfigProvider             $pollingConfigProvider,
-        private readonly ResolverInterface                 $localeResolver,
-        private readonly CheckoutSession                   $checkoutSession,
-        private readonly GeneralConfigProvider             $generalConfigProvider,
+        private readonly SandboxConfigProvider $sandboxConfigProvider,
+        private readonly LayoutConfigProvider $layoutConfigProvider,
+        private readonly DisplayConfigProvider $displayConfigProvider,
+        private readonly ResolverInterface $localeResolver,
+        private readonly CheckoutSession $checkoutSession,
+        private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly ProductRepositoryInterface        $productRepository,
-        private readonly StoreManagerInterface             $storeManager,
-        private readonly RestrictedProductIdsProvider      $restrictedProductIdsProvider,
-        private readonly LoggerInterface                   $logger,
-        private readonly InPostPayQuote                    $inPostPayQuote,
-        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
+        private readonly LoggerInterface $logger,
+        private readonly AuthConfigProvider $authConfigProvider,
+        private readonly IziApiConfigProvider $iziApiConfigProvider,
+        private readonly TestModeProvider $testModeProvider
     ) {
     }
 
     public function isEnabled(): bool
     {
-        return $this->generalConfigProvider->isEnabled() && $this->displayConfigProvider->isWidgetEnabled();
+        return $this->generalConfigProvider->isEnabled()
+            && $this->displayConfigProvider->isWidgetEnabled()
+            && $this->isDisplayAllowed()
+            && $this->isAuthConfigComplete();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isDisplayAllowed(): bool
+    {
+        if ($this->testModeProvider->isTestModeEnabled()) {
+            return $this->testModeProvider->isTestModeRequested();
+        }
+        return true;
     }
 
     /**
@@ -84,23 +98,11 @@ class Widget implements ArgumentInterface
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getLayoutConfig(): array
+    public function getLayoutConfig(): string
     {
-        $variant = $this->layoutConfigProvider->getColorVariant();
-        $darkMode = $this->layoutConfigProvider->isDarkModeEnabled();
-        $maxWidth = $this->layoutConfigProvider->getMaxWidth();
-        $minHeight = $this->layoutConfigProvider->getMinHeight();
-        $frameStyle = $this->layoutConfigProvider->getFrameStyle();
-
-        return [
-            self::VARIANT => $variant,
-            self::DARK_MODE => $darkMode,
-            self::MAX_WIDTH => $maxWidth,
-            self::MIN_HEIGHT => $minHeight,
-            self::FRAME_STYLE => $frameStyle
-        ];
+        return $this->layoutConfigProvider->getWidgetStyles();
     }
 
     /**
@@ -164,59 +166,7 @@ class Widget implements ArgumentInterface
      */
     public function isEnabledOnCheckoutPage(): bool
     {
-        return $this->displayConfigProvider->isEnabledOnCheckoutPage();
-    }
-
-    /**
-     * @return int
-     */
-    public function getLongPollingTimeForInactiveTab(): int
-    {
-        return $this->pollingConfigProvider->getLongPollingTimeForInactiveTab();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEnabledLongPollingForInactiveTab(): bool
-    {
-        return $this->pollingConfigProvider->isEnabledLongPollingForInactiveTab();
-    }
-
-    /**
-     * @return float|int
-     */
-    public function getCartItemsCount(): float|int
-    {
-        try {
-            return $this->checkoutSession->getQuote()->getItemsSummaryQty();
-        } catch (NoSuchEntityException|LocalizedException $e) {
-            return 0;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getMaskedPhoneNumber(): string
-    {
-        try {
-            $quote = $this->checkoutSession->getQuote();
-
-            if ($quote->getId()) {
-                $quoteId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
-
-                if ($this->inPostPayQuote->isBasketConnected($quoteId)) {
-                    $inpostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
-
-                    return $inpostPayQuote->getMaskedPhoneNumber()?: "";
-                }
-            }
-        } catch (LocalizedException) {
-            return "";
-        }
-
-        return "";
+        return $this->displayConfigProvider->isEnabledOnCheckoutPage() && $this->isEnabled();
     }
 
     public function isProductRestricted(int $productId): bool
@@ -290,13 +240,67 @@ class Widget implements ArgumentInterface
         return ($product instanceof Product) ? $product : null;
     }
 
-    public function getScriptUrl(string $bindingPlace): string
+    public function getScriptUrl(string $bindingPlace, array $layout = null): string
     {
         $sandboxMode = $this->isSandboxEnabled();
-        $shouldInitializeScript = !$this->isEnabledInMiniCart()
-            || $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME;
-        return $shouldInitializeScript
-            ? ($sandboxMode ? "https://izi-sandbox.inpost.pl/inpostizi.js" : "https://izi.inpost.pl/inpostizi.js")
-            : '';
+        $scriptUrl = $sandboxMode
+            ? "https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js"
+            : "https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js";
+
+        if (!$this->isEnabledInMiniCart() || !$layout) {
+            return $scriptUrl;
+        }
+
+        $isCheckoutPage = in_array(self::CHECKOUT_DESCRIPTOR, $layout);
+
+        if ($isCheckoutPage && $bindingPlace === DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME) {
+            return '';
+        }
+
+        return $scriptUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientMerchantId(): string
+    {
+        try {
+            return $this->authConfigProvider->getClientMerchantId();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+
+            return '';
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function isAuthConfigComplete(): bool
+    {
+        try {
+            $merchantClientId = $this->authConfigProvider->getClientMerchantId();
+            $posId = $this->authConfigProvider->getPosId();
+            $clientId = $this->authConfigProvider->getClientId();
+            $clientSecret = $this->authConfigProvider->getClientSecret();
+            $authTokenUrl = $this->authConfigProvider->getAuthTokenUrl();
+            $iziApiUrl = $this->iziApiConfigProvider->getIziApiUrl();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+            $merchantClientId = '';
+            $posId = '';
+            $clientId = '';
+            $clientSecret = '';
+            $authTokenUrl = '';
+            $iziApiUrl = '';
+        }
+
+        return !empty($posId)
+            && !empty($clientId)
+            && !empty($merchantClientId)
+            && !empty($clientSecret)
+            && !empty($authTokenUrl)
+            && !empty($iziApiUrl);
     }
 }

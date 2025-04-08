@@ -46,14 +46,17 @@ class ConsentsProvider
     }
 
     /**
+     * @param int $storeId
      * @return array
      */
-    public function getConsents(): array
+    public function getConsents(int $storeId): array
     {
-        $consents = $this->cache->load(TermsAndConditionsCacheType::TYPE_IDENTIFIER);
+        $cacheIdentifier = sprintf('%s_%s', TermsAndConditionsCacheType::TYPE_IDENTIFIER, $storeId);
+        $consents = $this->cache->load($cacheIdentifier);
 
         if (empty($consents)) {
-            $termsAndConditionsMapping = $this->termsAndConditionsMappingConfigProvider->getTermsAndConditionsMapping();
+            $termsAndConditionsMapping = $this->termsAndConditionsMappingConfigProvider
+                ->getTermsAndConditionsMapping($storeId);
 
             if (!$termsAndConditionsMapping) {
                 return [];
@@ -104,7 +107,7 @@ class ConsentsProvider
 
             $this->cache->save(
                 $encodedConsentsData,
-                TermsAndConditionsCacheType::TYPE_IDENTIFIER,
+                $cacheIdentifier,
                 [TermsAndConditionsCacheType::CACHE_TAG],
                 TermsAndConditionsCacheType::TTL
             );

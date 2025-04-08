@@ -41,7 +41,8 @@ class TransactionRefund
         ?string $transactionId = null,
         ?string $refundId = null,
         ?string $refundAdditionalInfo = null,
-        ?float $refundAmount = null
+        ?float $refundAmount = null,
+        ?int $storeId = null
     ): TransactionRefundResponse {
         /** @var TransactionRefundRequest $request */
         $request = $this->transactionRefundRequestFactory->create();
@@ -53,9 +54,13 @@ class TransactionRefund
         $refund->setTransactionId($transactionId);
         $refund->setExternalRefundId($refundId);
         $refund->setRefundAmount($refundAmount);
-        $refund->setSignature($this->signatureGenerator->generate($refund));
+        $refund->setSignature($this->signatureGenerator->generate($refund, $storeId));
 
         $refundParams = $this->inPostRefundToArrayConverter->convert($refund);
+
+        if ($storeId) {
+            $request->setStoreId($storeId);
+        }
 
         $request->setParams($refundParams);
 

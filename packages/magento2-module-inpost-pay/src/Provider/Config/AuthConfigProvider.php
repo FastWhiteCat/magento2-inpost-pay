@@ -15,6 +15,7 @@ class AuthConfigProvider
     private const XML_PATH_MERCHANT_SECRET = 'payment/inpost_pay/%smerchant_secret';
     private const XML_PATH_AUTH_TOKEN_URL = 'payment/inpost_pay/%sauth_token_url';
     private const XML_PATH_POS_ID = 'payment/inpost_pay/%spos_id';
+    private const XML_PATH_CLIENT_MERCHANT_ID = 'payment/inpost_pay/%sclient_merchant_id';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -29,17 +30,19 @@ class AuthConfigProvider
     /**
      * Returns production or sandbox Client ID
      *
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getClientId(): string
+    public function getClientId(?int $storeId = null): string
     {
         $clientId = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_CLIENT_ID,
-                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+                $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($clientId) || !is_scalar($clientId)) {
@@ -52,17 +55,19 @@ class AuthConfigProvider
     /**
      * Returns production or sandbox Client Secret
      *
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getClientSecret(): string
+    public function getClientSecret(?int $storeId = null): string
     {
         $clientSecret = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_CLIENT_SECRET,
-                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+                $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($clientSecret) || !is_scalar($clientSecret)) {
@@ -72,14 +77,15 @@ class AuthConfigProvider
         return (string)$clientSecret;
     }
 
-    public function getMerchantSecret(): string
+    public function getMerchantSecret(?int $storeId = null): string
     {
         $merchantSecret = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_MERCHANT_SECRET,
-                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+                $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($merchantSecret) || !is_scalar($merchantSecret)) {
@@ -92,17 +98,19 @@ class AuthConfigProvider
     /**
      * Returns production or sandbox Token providing API URL
      *
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getAuthTokenUrl(): string
+    public function getAuthTokenUrl(?int $storeId = null): string
     {
         $authTokenUrl = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_AUTH_TOKEN_URL,
-                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+                $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($authTokenUrl) || !is_scalar($authTokenUrl)) {
@@ -115,17 +123,19 @@ class AuthConfigProvider
     /**
      * Returns production or sandbox POS ID
      *
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getPosId(): string
+    public function getPosId(?int $storeId = null): string
     {
         $posId = $this->scopeConfig->getValue(
             sprintf(
                 self::XML_PATH_POS_ID,
-                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+                $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
             ),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         if (empty($posId) || !is_scalar($posId)) {
@@ -133,5 +143,30 @@ class AuthConfigProvider
         }
 
         return (string)$posId;
+    }
+
+    /**
+     * Returns Client Merchant Id
+     *
+     * @param int|null $storeId
+     * @return string
+     * @throws InPostPayInternalException
+     */
+    public function getClientMerchantId(?int $storeId = null): string
+    {
+        $clientMerchantId = $this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_CLIENT_MERCHANT_ID,
+                $this->sandboxConfigProvider->isSandboxEnabled($storeId) ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            ),
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        if (empty($clientMerchantId) || !is_scalar($clientMerchantId)) {
+            throw new InPostPayInternalException(__('Empty Client Merchant Id'));
+        }
+
+        return (string)$clientMerchantId ;
     }
 }
