@@ -49,6 +49,7 @@
                 <bestsellers_synchronize_cron_enabled>0</bestsellers_synchronize_cron_enabled>
                 <bestsellers_synchronize_mode>upload</bestsellers_synchronize_mode>
                 <bestsellers_synchronize_cron_schedule>30 6 * * *</bestsellers_synchronize_cron_schedule>
+                <promotions_enabled>0</promotions_enabled>
             </inpost_pay>
         </payment>
     </default>
