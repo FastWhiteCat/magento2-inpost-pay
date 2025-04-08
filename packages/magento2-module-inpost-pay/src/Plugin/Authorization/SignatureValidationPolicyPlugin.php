@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Plugin\Authorization;
 
 use InPost\InPostPay\Exception\InPostPayAuthorizationException;
 use InPost\InPostPay\Model\Registry\SwaggerRegistry;
+use InPost\InPostPay\Traits\AnonymizerTrait;
 use Magento\Framework\Authorization\PolicyInterface;
 use InPost\InPostPay\Api\Validator\SignatureValidatorInterface;
 use Magento\Framework\Exception\AuthorizationException;
@@ -16,6 +17,8 @@ use Psr\Log\LoggerInterface;
 
 class SignatureValidationPolicyPlugin
 {
+    use AnonymizerTrait;
+
     public const INPOST_PAY_SIGNATURE_VALIDATED_RESOURCE = 'inpost_pay_signature_validated_resource';
     public const X_SIGNATURE_HEADER = 'x-signature';
     public const X_SIGNATURE_TIMESTAMP_HEADER = 'x-signature-timestamp';
@@ -108,12 +111,22 @@ class SignatureValidationPolicyPlugin
             $requestData = [];
         }
 
-        $logMessage = sprintf('Endpoint: %s', $endpoint);
-        if (!empty($errorMsg)) {
-            $logMessage = sprintf('%s. Error: %s', $logMessage, $errorMsg);
-            $this->logger->error($logMessage, $requestData);
+        if ($this->debugConfigProvider->isAnonymisingEnabled()) {
+            $logMessage = sprintf('Endpoint: %s [Anonymised]', $endpoint);
+            if (!empty($errorMsg)) {
+                $logMessage = sprintf('%s. Error: %s', $logMessage, $errorMsg);
+                $this->logger->error($logMessage, $this->anonymizeArray($requestData));
+            } else {
+                $this->logger->debug($logMessage, $this->anonymizeArray($requestData));
+            }
         } else {
-            $this->logger->debug($logMessage, $requestData);
+            $logMessage = sprintf('Endpoint: %s', $endpoint);
+            if (!empty($errorMsg)) {
+                $logMessage = sprintf('%s. Error: %s', $logMessage, $errorMsg);
+                $this->logger->error($logMessage, $requestData);
+            } else {
+                $this->logger->debug($logMessage, $requestData);
+            }
         }
     }
 
