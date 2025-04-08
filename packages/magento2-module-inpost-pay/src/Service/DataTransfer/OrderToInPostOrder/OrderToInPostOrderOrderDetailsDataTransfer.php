@@ -33,7 +33,8 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
         $storeId = (is_scalar($order->getStoreId())) ? (int)$order->getStoreId() : null;
         $inPostPayOrderEntity = $this->getInPostPayOrderByOrderId($orderId);
 
-        $orderDetails->setOrderId((string)$order->getIncrementId());
+        $orderDetails->setOrderId((string)$orderId);
+        $orderDetails->setCustomerOrderId((string)$order->getIncrementId());
         $orderDetails->setBasketId((string)$inPostPayOrderEntity->getBasketId());
         $orderDetails->setCurrency((string)$order->getOrderCurrencyCode());
         $orderDetails->setPaymentType((string)$inPostPayOrderEntity->getPaymentType());

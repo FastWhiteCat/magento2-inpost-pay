@@ -15,6 +15,7 @@ use InPost\InPostPay\Exception\OrderNotFoundException;
 use InPost\InPostPay\Exception\OrderNotUpdateException;
 use InPost\InPostPay\Model\Config\Payment\TitleUpdater;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
+use InPost\InPostPay\Service\GetOrderById;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -44,6 +45,7 @@ class OrderEvent implements OrderEventInterface
      * @param GeneralConfigProvider $generalConfigProvider
      * @param OrderUpdateInterfaceFactory $orderUpdateFactory
      * @param GetOrderByIncrementId $getOrderByIncrementId
+     * @param GetOrderById $getOrderById
      * @param EventManager $eventManager
      * @param TransactionBuilder $transactionBuilder
      * @param TransactionRepositoryInterface $transactionRepository
@@ -57,6 +59,7 @@ class OrderEvent implements OrderEventInterface
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly OrderUpdateInterfaceFactory $orderUpdateFactory,
         private readonly GetOrderByIncrementId $getOrderByIncrementId,
+        private readonly GetOrderById $getOrderById,
         private readonly EventManager $eventManager,
         private readonly TransactionBuilder $transactionBuilder,
         private readonly TransactionRepositoryInterface $transactionRepository,
@@ -82,7 +85,7 @@ class OrderEvent implements OrderEventInterface
             ]);
 
             /** @var Order $order */
-            $order = $this->getOrderByIncrementId->get($orderId);
+            $order = $this->getOrder($orderId);
             $this->checkIfCanProcess($order, $phoneNumber);
             $inPostPayOrderStatus = $this->updateOrder($order, $eventData);
 
@@ -110,6 +113,28 @@ class OrderEvent implements OrderEventInterface
 
             throw new OrderNotUpdateException();
         }
+    }
+
+    /**
+     * @param string $orderIdentificationNr
+     * @return OrderInterface
+     * @throws NoSuchEntityException
+     */
+    private function getOrder(string $orderIdentificationNr): OrderInterface
+    {
+        try {
+            $orderId = (int)$orderIdentificationNr;
+
+            if ((string)$orderId === $orderIdentificationNr) {
+                $order = $this->getOrderById->get($orderId);
+            } else {
+                $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
+            }
+        } catch (NoSuchEntityException $e) {
+            $order = $this->getOrderByIncrementId->get($orderIdentificationNr);
+        }
+
+        return $order;
     }
 
     private function checkIfCanProcess(Order $order, ?PhoneNumberInterface $phoneNumber): void
@@ -149,22 +174,41 @@ class OrderEvent implements OrderEventInterface
             $this->updateOrderPayment($order, $eventData);
             $this->addOrderCommentAndSave($order, $eventData);
             $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_COMPLETED);
+
+            $this->logger->debug(
+                sprintf('Payment for order #%s has been authorized.', (string)$order->getIncrementId())
+            );
+
             return self::ORDER_STATUS_COMPLETED;
         }
 
         if ($orderStatus === self::ORDER_STATUS_REJECTED) {
-            $this->updateOrderStatus($order);
+            $this->rejectOrder($order);
             $this->addOrderCommentAndSave($order, $eventData);
             $this->updateInPostPayOrderStatus($inPostPayOrder, self::ORDER_STATUS_REJECTED);
+
+            $this->logger->debug(sprintf('Order #%s has been rejected.', (string)$order->getIncrementId()));
+
             return self::ORDER_STATUS_REJECTED;
         }
+
+        $this->logger->error(
+            sprintf(
+                'Payment status[%s] is not authorized and order status[%s] is not rejected. Skipping update.',
+                $paymentStatus,
+                $orderStatus
+            )
+        );
 
         throw new OrderNotUpdateException();
     }
 
     private function updateOrderPayment(Order $order, EventDataInterface $eventData): void
     {
-        if ($order->getStatus() === $this->generalConfigProvider->getNewOrderStatus()) {
+        $storeId = is_scalar($order->getStoreId()) ? (int)$order->getStoreId() : null;
+        $newOrderStatus = $this->generalConfigProvider->getNewOrderStatus($storeId);
+
+        if ($order->getStatus() === $newOrderStatus) {
             $payment = $order->getPayment();
             if ($payment) {
                 /** @var \Magento\Sales\Model\Order\Payment $payment */
@@ -176,7 +220,19 @@ class OrderEvent implements OrderEventInterface
                 $order->setIsInProcess(true);
 
                 return;
+            } else {
+                $this->logger->error(
+                    sprintf('Order #%s has no payment to authorize.', (string)$order->getIncrementId())
+                );
             }
+        } else {
+            $this->logger->error(
+                sprintf(
+                    'Order status[%s] is different than status configured for new InPost Pay orders[%s]',
+                    $order->getStatus(),
+                    $newOrderStatus
+                )
+            );
         }
 
         throw new OrderNotUpdateException();
@@ -191,7 +247,7 @@ class OrderEvent implements OrderEventInterface
         $this->titleUpdater->updatePaymentTitleByType($payment, $order, $paymentType);
     }
 
-    private function updateOrderStatus(Order $order): void
+    private function rejectOrder(Order $order): void
     {
         if (!$order->isCanceled()) {
             if ($order->canCancel()) {
@@ -200,6 +256,8 @@ class OrderEvent implements OrderEventInterface
                 return;
             }
         }
+
+        $this->logger->error('Order cannot be canceled, it is either already canceled or not cancelable.');
 
         throw new OrderNotUpdateException();
     }

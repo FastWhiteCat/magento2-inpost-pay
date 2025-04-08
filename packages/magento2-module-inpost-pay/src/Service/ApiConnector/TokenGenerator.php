@@ -59,6 +59,7 @@ class TokenGenerator
      */
     public function generate(?bool $forceNew = false, ?int $storeId = null): TokenResponse
     {
+        $storeId = $storeId ?? $this->getCurrentStoreId();
         $cacheIdentifier = $this->getTokenCacheIdentifier($storeId);
         $tokenResponse = $this->getCachedTokenResponse($cacheIdentifier);
 
@@ -151,6 +152,11 @@ class TokenGenerator
             OAuthTokenCache::TYPE_IDENTIFIER,
             $storeId
         );
+    }
+
+    public function cleanTokenCache(): void
+    {
+        $this->tokenResponses = [];
     }
 
     private function handle(array $result): TokenResponse

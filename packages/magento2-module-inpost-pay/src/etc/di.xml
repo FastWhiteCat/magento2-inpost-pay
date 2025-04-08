@@ -177,6 +177,10 @@
         <plugin name="InPost_InPostPay::applyCustomPromoPriceForCustomerGroupPlugin"
                 type="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ApplyCustomPromoPriceForCustomerGroupPlugin" />
     </type>
+    <type name="InPost\InPostPay\Model\Request">
+        <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
@@ -310,6 +314,11 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="InPost\InPostPay\ViewModel\Widget">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\Restrictions\Service\RefreshRestrictionRulesService">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -367,6 +376,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Plugin\Adminhtml\Order\View\RegisterCurrentOrderPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

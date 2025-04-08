@@ -24,6 +24,8 @@ class TransactionRefundRequest extends Request implements RequestInterface
     protected ?string $contentType = 'application/json';
     protected string $uri = '/v1/izi/transaction/{transaction_id}/refund';
 
+    private ?int $storeId = null;
+
     /**
      * @param IziApiConfigProvider $iziApiConfigProvider
      * @param TokenGenerator $tokenGenerator
@@ -68,11 +70,24 @@ class TransactionRefundRequest extends Request implements RequestInterface
 
     public function getApiUrl(): string
     {
-        return $this->iziApiConfigProvider->getIziApiUrl();
+        $storeId = $this->storeId ?? 0;
+
+        return $this->iziApiConfigProvider->getIziApiUrl($storeId);
     }
 
     public function getBearerToken(): ?string
     {
-        return $this->tokenGenerator->generate()->getAccessToken();
+        $storeId = $this->storeId ?? 0;
+
+        return $this->tokenGenerator->generate(false, $storeId)->getAccessToken();
+    }
+
+    /**
+     * @param int $storeId
+     * @return void
+     */
+    public function setStoreId(int $storeId): void
+    {
+        $this->storeId = $storeId;
     }
 }

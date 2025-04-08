@@ -2,6 +2,87 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.7] - 2025-03-24
+
+### Fixed
+
+- handling of New Order Status payment method configuration for multistore with different values for each website
+
+## [2.0.6] - 2025-03-13
+
+### Added
+
+- separated handling for Refund and Offline Refund Admin Panel Actions, one that refunds InPost Pay transaction, second that only creates Magento Credit Memo with no online transaction refunds
+
+### Fixed
+
+- fixed error when module is installed but not configured (empty: client ID, secret, merchant client ID, pos ID, Auth and API URLs)
+
+## [2.0.5] - 2025-03-04
+
+### Fixed
+
+- obtaining correct Bearer Token for Transaction List for Refunds using order's Store ID instead of Default Store ID to access credentials 
+- removed overriding BaseUrl for Frontend Widget with configurable value
+
+## [2.0.4] - 2025-01-31
+
+### Added
+
+- configuration that allows to select if customer account should be assigned to guest quote based on InPost Pay App Account email address
+
+### Fixed
+
+- assigning guest cart to Magento Account based on InPost Pay Account email
+- order creation process when after guest cart was assigned to an account total amount has changed resulting in InPost Pay App error
+
+## [2.0.3] - 2025-01-17
+
+### Fixed
+
+- handling of order update event for legacy identification
+
+## [2.0.2] - 2025-01-17
+
+### Added
+
+- sending of module version in header of requests to InPost Pay API
+
+### Changed
+
+- handling both order ID and order Increment ID in communication with InPost Pay API 
+
+## [2.0.1] - 2025-01-17
+
+### Fixed
+
+- reference block has been changed to reference container in layout XMLs to correctly display widget in all areas
+
+## [2.0.0] - 2025-01-17
+
+### Removed
+
+- Removed backend code responsible for creating, checking and deleting bindings of browser and basket between Magento and InPost Pay API
+- Removed no longer handled by backend controllers 
+
+### Added
+
+- Added new configuration fields for authorization and display sections
+- Added controller that initiates basket and returns binding API key for frontend
+- Added new webapi endpoint that provides debugging logs
+- Added test mode handling for production use to hide InPost Pay unless a special param is present in URL
+
+### Changed
+
+- Frontend code is now responsible for keeping widget bound and up to date with customer mobile App basket
+- Backend controllers are no longer being constantly requested to keep InPost Widget up to date
+- Communication between Magento frontend and backend has been reduced and replace with communication between frontend and InPost Pay API directly
+- Payment method title from now on contains also information about chosen payment type by customer (BLIK, Card, Cash on delivery, etc.)
+
+### Fixed
+
+- Public Key for signature validation cache key now contains store ID to handle correctly multistore Magento instances with separated InPost Pay Client Credentials
+
 ## [1.0.12] - 2024-12-17
 
 ### Fixed

@@ -8,8 +8,8 @@ use Exception;
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
-use InPost\InPostPay\Model\IziApi\Request\PublicKeyRequest;
 use InPost\InPostPay\Model\IziApi\Request\UpdateOrderRequestFactory;
+use InPost\InPostPay\Model\IziApi\Request\UpdateOrderRequest;
 use InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -37,7 +37,7 @@ class UpdateOrder
      */
     public function execute(Order $order, InPostPayOrderInterface $inPostPayOrder): void
     {
-        /** @var PublicKeyRequest $request */
+        /** @var UpdateOrderRequest $request */
         $request = $this->updateOrderRequestFactory->create();
         $eventData = [
             'order_merchant_status_description' => $order->getStatusLabel(),
@@ -54,8 +54,10 @@ class UpdateOrder
             }
         }
 
+        $storeId = is_scalar($order->getStoreId()) ? (int)$order->getStoreId() : 0;
+        $request->setStoreId($storeId);
         $request->setParams([
-            'order_id' => $order->getIncrementId(),
+            'order_id' => (string)$order->getId(), //@phpstan-ignore-line
             'event_id' => uniqid(),
             'event_data_time' => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             'phone_number' => [
