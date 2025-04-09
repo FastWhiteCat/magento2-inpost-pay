@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2025-04-09
+
+### Added
+
+- More than one product images will be sent to InPost Pay as gallery if set in Magento
+- Limit of 10x for configured terms and agreements handled by InPost Pay integration has been added
+- Limit of 255 characters for product attributes labels and values sent to InPost Pay API
+- Available in Mobile App Coupon Promotion configuration has been added
+- Configuration of Bestseller Products in Magento has been added. Those products (if accepted by InPost) will be displayed to customers in their Mobile Apps.
+- Quote remote initiation has been added - if Customer adds configured Bestseller Product in Mobile App the cart will be initialized and bound with InPost Pay. Previously all the carts had to be initiated in browser.
+- If not configured otherwise logs will be anonymised hiding firstnames, lastnames, emails, addresses, etc.
+
+### Updated
+
+- Optimized shipping methods loading time
+- Optimized products data loading time
+- Optimized cross-sell products loading time
+
+### Fixed
+
+- handling of AMQP RabbitMQ integration for cart updates initiated by Magento. If configured - cart data will be sent to InPost Pay indirectly, first into RabbitMQ queue, than consumer will send data to InPost Pay API to reduce downtime of cart actions such as adding products, updating quantity, removing products
+- handling of bearer token generation in asynchronous cart update mode
+- handling of new order status configuration if different values has been saved for more than one website
+
 ## [2.0.7] - 2025-03-24
 
 ### Fixed
