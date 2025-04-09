@@ -160,13 +160,13 @@ class ConsentsProvider
     private function sortTermsAndConditions(array $termsAndConditionsMapping): array
     {
         $termsAndConditions = [];
-        foreach ($termsAndConditionsMapping as $key =>  $item) {
+        foreach ($termsAndConditionsMapping as $key => $item) {
             $termsAndConditions[$key] = self::SORT_ORDER[$item[TermsAndConditionsField::REQUIREMENT_FIELD]];
         }
         asort($termsAndConditions);
 
         $sortedTermsAndConditions = [];
-        foreach ($termsAndConditions as $key =>  $item) {
+        foreach ($termsAndConditions as $key => $item) {
             $sortedTermsAndConditions[] = $termsAndConditionsMapping[$key];
         }
 
