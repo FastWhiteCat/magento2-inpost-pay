@@ -117,25 +117,6 @@ class InPostPayBestsellerProduct extends AbstractModel implements InPostPayBests
     }
 
     /**
-     * @return int
-     */
-    public function getPriority(): int
-    {
-        $priority = $this->getData(self::PRIORITY);
-
-        return ($priority && is_scalar($priority)) ? (int)$priority : 1;
-    }
-
-    /**
-     * @param int $priority
-     * @return InPostPayBestsellerProductInterface
-     */
-    public function setPriority(int $priority): InPostPayBestsellerProductInterface
-    {
-        return $this->setData(self::PRIORITY, $priority);
-    }
-
-    /**
      * @return string|null
      */
     public function getSynchronizedAt(): ?string

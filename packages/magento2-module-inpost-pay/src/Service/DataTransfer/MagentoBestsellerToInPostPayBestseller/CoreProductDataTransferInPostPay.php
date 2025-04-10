@@ -51,8 +51,12 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         InPostPayBestsellerProductInterface $magentoBestsellerProduct,
         BestsellerProductInterface $bestsellerProduct
     ): void {
-        $inPostProduct = $this->initInPostProduct(
+        $product = $this->getMagentoProductBySkuAndWebsiteId(
             $magentoBestsellerProduct->getSku(),
+            $magentoBestsellerProduct->getWebsiteId()
+        );
+        $inPostProduct = $this->initInPostProduct(
+            $product,
             $magentoBestsellerProduct->getWebsiteId()
         );
 
@@ -63,17 +67,32 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         $bestsellerProduct->setProductAttributes($inPostProduct->getProductAttributes());
         $bestsellerProduct->setProductImage($inPostProduct->getProductImage());
         $bestsellerProduct->setAdditionalProductImages($inPostProduct->getAdditionalProductImages());
-        $this->transferQuantityData($inPostProduct, $bestsellerProduct);
+        $this->transferQuantityData($product, $inPostProduct, $bestsellerProduct);
         $this->transferAvailabilityData($magentoBestsellerProduct, $bestsellerProduct);
+    }
+
+    /**
+     * @param Product $product
+     * @param int $websiteId
+     * @return InPostProduct
+     * @throws NoSuchEntityException
+     */
+    private function initInPostProduct(Product $product, int $websiteId): InPostProduct
+    {
+        /** @var InPostProduct $inPostProduct */
+        $inPostProduct = $this->inPostProductFactory->create();
+        $this->productToInPostProductDataTransfer->transfer($product, $inPostProduct, $websiteId, 1);
+
+        return $inPostProduct;
     }
 
     /**
      * @param string $sku
      * @param int $websiteId
-     * @return InPostProduct
+     * @return Product
      * @throws NoSuchEntityException
      */
-    private function initInPostProduct(string $sku, int $websiteId): InPostProduct
+    private function getMagentoProductBySkuAndWebsiteId(string $sku, int $websiteId): Product
     {
         try {
             /** @var Website $website */
@@ -86,11 +105,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         /** @var Product $product */
         $product = $this->productRepository->get($sku, false, $storeId, true);
 
-        /** @var InPostProduct $inPostProduct */
-        $inPostProduct = $this->inPostProductFactory->create();
-        $this->productToInPostProductDataTransfer->transfer($product, $inPostProduct, $websiteId, 1);
-
-        return $inPostProduct;
+        return $product;
     }
 
     /**
@@ -127,18 +142,26 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
     }
 
     /**
+     * @param Product $product
      * @param InPostProduct $inPostProduct
      * @param BestsellerProductInterface $bestsellerProduct
      * @return void
      */
     private function transferQuantityData(
+        Product $product,
         InPostProduct $inPostProduct,
         BestsellerProductInterface $bestsellerProduct
     ): void {
         $bestsellerQuantity = $bestsellerProduct->getQuantity();
         $bestsellerQuantity->setQuantityType($inPostProduct->getQuantity()->getQuantityType());
         $bestsellerQuantity->setQuantityUnit($inPostProduct->getQuantity()->getQuantityUnit());
-        $bestsellerQuantity->setAvailableQuantity($inPostProduct->getQuantity()->getAvailableQuantity());
+
+        if ($product->isSaleable()) {
+            $bestsellerQuantity->setAvailableQuantity($inPostProduct->getQuantity()->getAvailableQuantity());
+        } else {
+            $bestsellerQuantity->setAvailableQuantity(0);
+        }
+
         $bestsellerProduct->setQuantity($bestsellerQuantity);
     }
 

@@ -96,6 +96,21 @@
     <event name="izi_bestseller_products_get_after">
         <observer name="InPost_InPostPay::iziBestsellerProductsGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetAfterEventObserver" />
     </event>
+    <event name="catalog_product_save_commit_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="cataloginventory_stock_item_save_commit_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterStockItemSaveObserver" />
+    </event>
+    <event name="catalog_product_delete_before">
+        <observer name="InPost_InPostPay::deleteInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\DeleteInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="izi_init_basket_before">
+        <observer name="InPost_InPostPay::iziInitBasketBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketBeforeEventObserver" />
+    </event>
+    <event name="izi_init_basket_after">
+        <observer name="InPost_InPostPay::iziInitBasketAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketAfterEventObserver" />
+    </event>
 
     <!-- Email Events:: observer set InPost Pay Order in process registry so that email copy can be also sent to InPost Pay Account email address -->
     <event name="email_order_comment_set_template_vars_before">

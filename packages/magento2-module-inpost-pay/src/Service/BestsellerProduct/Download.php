@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\BestsellerProduct;
 
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
-use InPost\InPostPay\Model\Source\Store\BestsellerProductPriority;
 use InPost\InPostPay\Service\ApiConnector\GetBestsellers;
 use Magento\Framework\App\Area;
 use Magento\Framework\Exception\LocalizedException;
@@ -48,11 +47,9 @@ class Download extends BestsellerProductService
             try {
                 $inPostBestsellers = $this->getBestsellers->execute($storeId);
                 $this->cleanBestsellersByWebsiteId($websiteId);
-                $priority = BestsellerProductPriority::MIN_PRIORITY;
 
                 foreach ($inPostBestsellers as $inPostBestseller) {
-                    $this->createBestsellerProductForWebsiteId($websiteId, $inPostBestseller, $priority);
-                    $priority++;
+                    $this->createBestsellerProductForWebsiteId($websiteId, $inPostBestseller);
                 }
             } catch (LocalizedException $e) {
                 $this->storeEmulator->stopEnvironmentEmulation();
@@ -81,19 +78,16 @@ class Download extends BestsellerProductService
     /**
      * @param int $websiteId
      * @param BestsellerProductInterface $inPostBestseller
-     * @param int $priority
      * @return void
      * @throws LocalizedException
      */
     private function createBestsellerProductForWebsiteId(
         int $websiteId,
-        BestsellerProductInterface $inPostBestseller,
-        int $priority
+        BestsellerProductInterface $inPostBestseller
     ): void {
         $magentoBestsellerProduct = $this->creator->createMagentoBestsellerProduct(
             $websiteId,
-            $inPostBestseller,
-            $priority
+            $inPostBestseller
         );
 
         $this->logger->debug(

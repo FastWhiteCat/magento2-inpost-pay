@@ -107,7 +107,11 @@ class AdditionalProductImagesDataTransfer
 
         $this->emulation->stopEnvironmentEmulation();
 
-        return $firstAdditionalImage ? array_merge([$firstAdditionalImage], $images) : $images;
+        return array_slice(
+            $firstAdditionalImage ? array_merge([$firstAdditionalImage], $images) : $images,
+            0,
+            self::MAX_ADDITIONAL_IMAGES_COUNT
+        );
     }
 
     private function getMediaGalleryImages(Product $product): array

@@ -14,12 +14,7 @@
             <button name="upload">
                 <url path="*/*/upload"/>
                 <class>primary</class>
-                <label translate="true">Upload Products to InPost Pay</label>
-            </button>
-            <button name="download">
-                <url path="*/*/download"/>
-                <class>primary</class>
-                <label translate="true">Remove All And Download Products from InPost Pay</label>
+                <label translate="true">Synchronise With InPost Pay</label>
             </button>
             <button name="add">
                 <url path="*/*/new"/>
@@ -65,13 +60,6 @@
 				</param>
 			</childDefaults>
 		</settings>
-		<column name="bestseller_product_id">
-			<settings>
-				<filter>text</filter>
-				<sorting>asc</sorting>
-				<label translate="true">ID</label>
-			</settings>
-		</column>
         <column name="sku">
             <settings>
                 <filter>text</filter>
@@ -142,12 +130,6 @@
                 <dataType>date</dataType>
                 <label translate="true">Available End Date</label>
                 <visible>false</visible>
-            </settings>
-        </column>
-        <column name="priority">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">Priority</label>
             </settings>
         </column>
         <column name="synchronized_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">

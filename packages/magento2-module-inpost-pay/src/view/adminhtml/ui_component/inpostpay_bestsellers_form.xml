@@ -72,30 +72,19 @@
                 </item>
             </argument>
         </field>
-        <field name="priority" sortOrder="30">
-            <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">InPost\InPostPay\Model\Source\Store\BestsellerProductPriority</item>
-                <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Priority</item>
-                    <item name="dataType" xsi:type="string">select</item>
-                    <item name="formElement" xsi:type="string">select</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-            </argument>
-        </field>
         <field name="available_start_date" sortOrder="40">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">BestsellerProduct</item>
                     <item name="formElement" xsi:type="string">date</item>
+                    <item name="options" xsi:type="array">
+                        <item name="timeFormat" xsi:type="string">HH:mm:ss</item>
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                        <item name="timePicker" xsi:type="boolean">true</item>
+                    </item>
                 </item>
             </argument>
             <settings>
-                <validation>
-                    <rule name="validate-date" xsi:type="boolean">true</rule>
-                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Available Start Date</label>
                 <visible>true</visible>
@@ -107,12 +96,14 @@
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">BestsellerProduct</item>
                     <item name="formElement" xsi:type="string">date</item>
+                    <item name="options" xsi:type="array">
+                        <item name="timeFormat" xsi:type="string">HH:mm:ss</item>
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                        <item name="timePicker" xsi:type="boolean">true</item>
+                    </item>
                 </item>
             </argument>
             <settings>
-                <validation>
-                    <rule name="validate-date" xsi:type="boolean">true</rule>
-                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Available End Date</label>
                 <visible>true</visible>

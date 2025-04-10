@@ -217,6 +217,10 @@
         <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
                 type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
     </type>
+    <type name="Magento\InventoryReservationsApi\Model\AppendReservationsInterface">
+        <plugin name="InPost_InPostPay::checkProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin"
+                type="InPost\InPostPay\Plugin\InventoryReservations\CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin" />
+    </type>
     <type name="Magento\Sales\Api\OrderCustomerDelegateInterface">
         <plugin name="InPost_InPostPay::changeNewCustomerDelegateDataPlugin"
                 type="InPost\InPostPay\Plugin\ChangeNewCustomerDelegateDataPlugin" />
@@ -710,6 +714,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Cron\Bestsellers\SynchronizeBestsellers">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Product\DeleteInPostPayBestsellerProductAfterSaveObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

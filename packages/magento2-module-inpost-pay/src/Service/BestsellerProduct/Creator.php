@@ -31,15 +31,13 @@ class Creator
     /**
      * @param int $websiteId
      * @param BestsellerProductInterface $inPostBestseller
-     * @param int $priority
      * @return InPostPayBestsellerProductInterface
      * @throws NoSuchEntityException
      * @throws CouldNotSaveException
      */
     public function createMagentoBestsellerProduct(
         int $websiteId,
-        BestsellerProductInterface $inPostBestseller,
-        int $priority
+        BestsellerProductInterface $inPostBestseller
     ): InPostPayBestsellerProductInterface {
         $product = $this->getProductById((int)$inPostBestseller->getProductId());
         $productAvailability = $inPostBestseller->getProductAvailability();
@@ -53,7 +51,6 @@ class Creator
         $bestsellerProduct = $this->inPostPayBestsellerProductFactory->create();
         $bestsellerProduct->setWebsiteId($websiteId);
         $bestsellerProduct->setSku($product->getSku());
-        $bestsellerProduct->setPriority($priority);
 
         if ($productAvailability) {
             $availableStartDate = $productAvailability->getStartDate();

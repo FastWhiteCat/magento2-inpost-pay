@@ -114,7 +114,6 @@
         <column xsi:type="smallint" name="website_id" nullable="false" unsigned="true" identity="false" default="0"/>
         <column xsi:type="timestamp" name="available_start_date" nullable="true"/>
         <column xsi:type="timestamp" name="available_end_date" nullable="true"/>
-        <column xsi:type="int" name="priority" unsigned="true" nullable="false" identity="false"/>
         <column xsi:type="timestamp" name="synchronized_at" nullable="true"/>
         <column xsi:type="text" name="qr_code" nullable="true"/>
         <column xsi:type="varchar" name="deep_link" length="512" nullable="false"/>
@@ -127,10 +126,6 @@
         </constraint>
         <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID">
             <column name="sku"/>
-            <column name="website_id"/>
-        </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_PRIORITY_WEBSITE_ID">
-            <column name="priority"/>
             <column name="website_id"/>
         </constraint>
     </table>

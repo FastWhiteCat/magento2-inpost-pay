@@ -101,7 +101,6 @@
             "website_id": true,
             "available_start_date": true,
             "available_end_date": true,
-            "priority": true,
             "synchronized_at": true,
             "qr_code": true,
             "deep_link": true,
@@ -112,8 +111,7 @@
         },
         "constraint": {
             "PRIMARY": true,
-            "INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID": true,
-            "INPOST_PAY_BESTSELLER_PRODUCT_PRIORITY_WEBSITE_ID": true
+            "INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID": true
         }
     }
 }
