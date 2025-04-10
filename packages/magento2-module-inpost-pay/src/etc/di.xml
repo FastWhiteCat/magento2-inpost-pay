@@ -47,6 +47,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Order\InvoiceDetails"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetails\AdditionalOrderParametersInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails\AdditionalOrderParameters"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
@@ -152,6 +154,10 @@
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
         <plugin name="InPost_InPostPay::orderCreateIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer">
+        <plugin name="InPost_InPostPay::addAdditionalAnalyticsOrderParamsToOrderDetailsPlugin"
+                type="InPost\InPostPay\Plugin\DataTransfer\OrderToInPostOrder\AddAdditionalAnalyticsOrderParamsToOrderDetailsPlugin" />
     </type>
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface">
         <plugin name="InPost_InPostPay::orderGetIsEnablePlugin"
