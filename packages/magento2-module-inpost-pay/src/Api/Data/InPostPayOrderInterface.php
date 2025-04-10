@@ -24,6 +24,7 @@ interface InPostPayOrderInterface
     public const PHONE_NUMBER = 'phone';
     public const COURIER_NOTE = 'courier_note';
     public const GA_CLIENT_ID = 'ga_client_id';
+    public const CLIENT_ID = 'client_id';
     public const FBCLID = 'fbclid';
     public const GCLID = 'gclid';
     public const SERIALIZED_ANALYTICS_DATA = 'serialized_analytics_data';
