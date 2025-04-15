@@ -23,6 +23,7 @@ interface OrderDetailsInterface
     public const ORDER_BASE_PRICE = 'order_base_price';
     public const ORDER_FINAL_PRICE = 'order_final_price';
     public const DELIVERY_REFERENCE_LIST = 'delivery_references_list';
+    public const FREE_ORDER = 'FREE_ORDER';
 
     /**
      * @return string

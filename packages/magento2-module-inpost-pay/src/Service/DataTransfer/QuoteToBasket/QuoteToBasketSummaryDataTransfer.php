@@ -54,10 +54,12 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
             $finalPriceExclTax = DecimalCalculator::round(
                 DecimalCalculator::add((float)$address->getSubtotal(), $discountExclTax)
             );
+            $finalPriceExclTax = max(0, $finalPriceExclTax);
             $finalPriceInclTax = DecimalCalculator::round(
                 DecimalCalculator::add((float)$address->getSubtotalInclTax(), $discountInclTax)
             );
-            $finalPriceTax = DecimalCalculator::round((float)$address->getTaxAmount());
+            $finalPriceInclTax = max(0, $finalPriceInclTax);
+            $finalPriceTax = max(0, DecimalCalculator::sub($finalPriceInclTax, $finalPriceExclTax));
 
             $promoPriceInclTax = DecimalCalculator::round((float)$address->getSubtotalInclTax());
             $promoPriceExclTax = DecimalCalculator::round((float)$address->getSubtotal());
@@ -90,6 +92,12 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
         $basketExpirationDate = $this->calculateBasketExpirationDate();
         if ($basketExpirationDate) {
             $summary->setBasketExpirationDate($basketExpirationDate);
+        }
+
+        $summary->setFreeBasket(false);
+
+        if ($summary->getBasketFinalPrice()->getGross() === 0.00) {
+            $summary->setFreeBasket(true);
         }
 
         $basket->setSummary($summary);

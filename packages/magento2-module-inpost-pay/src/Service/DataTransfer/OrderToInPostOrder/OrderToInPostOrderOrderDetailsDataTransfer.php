@@ -83,10 +83,12 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
             DecimalCalculator::round((float)$order->getSubtotalInclTax()),
             $discountInclTax
         );
+        $priceInclTaxWithoutShipping = max($priceInclTaxWithoutShipping, 0);
         $priceExclTaxWithoutShipping = DecimalCalculator::add(
             DecimalCalculator::round((float)$order->getSubtotal()),
             $discountExclTax
         );
+        $priceExclTaxWithoutShipping = max($priceExclTaxWithoutShipping, 0);
         $taxWithoutShipping = DecimalCalculator::sub($priceInclTaxWithoutShipping, $priceExclTaxWithoutShipping);
 
         $orderBasePrice = $orderDetails->getOrderBasePrice();
