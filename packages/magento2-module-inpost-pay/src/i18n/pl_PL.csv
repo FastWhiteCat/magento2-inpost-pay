@@ -172,6 +172,8 @@
 "Deferred Payment (InPost Pay)","Płatność odroczona (InPost Pay)"
 "Google Pay (InPost Pay)","Google Pay (InPost Pay)"
 "Cash on delivery (InPost Pay)","Za pobraniem (InPost Pay)"
+"Free Order (InPost Pay)","Darmowe Zamówienie (InPost Pay)"
+"InPost Pay Free Order #%1 has been automatically marked as paid.","Darmowe Zamówienie InPost Pay #%1 zostało automatycznie oznaczone jako opłacone.",module,InPost_InPostPay
 "Payment Type","Rodzaj płatności"
 "Basket has been changed during order processing. Please try again.","Koszyk uległ zmianie podczas procesu składania zamówienia. Prosimy ponowić próbę.",module,InPost_InPostPay
 "Assign Quote to Customer by Email","Przypisz Koszyk do Klient po Adresie Email",module,InPost_InPostPay
