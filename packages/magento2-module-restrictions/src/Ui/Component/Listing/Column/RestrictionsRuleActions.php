@@ -67,7 +67,7 @@ class RestrictionsRuleActions extends Column
                             'confirm' => [
                                 'title' => __('Deleting Rule "%1"', (string)($item['name'] ?? '')),
                                 'message' => __(
-                                    'Are you sure you wan\'t to delete "%1" rule?',
+                                    'Are you sure you want to delete "%1" rule?',
                                     (string)($item['name'] ?? '')
                                 )
                             ]

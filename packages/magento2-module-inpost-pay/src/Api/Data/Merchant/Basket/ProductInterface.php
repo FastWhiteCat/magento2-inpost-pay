@@ -21,6 +21,7 @@ interface ProductInterface
     public const QUANTITY = 'quantity';
     public const PRODUCT_ATTRIBUTES = 'product_attributes';
     public const DELIVERY_PRODUCT = 'delivery_product';
+    public const ADDITIONAL_PRODUCT_IMAGES = 'additional_product_images';
 
     /**
      * @return string
@@ -164,4 +165,15 @@ interface ProductInterface
      * @return void
      */
     public function setDeliveryProduct(array $deliveryProduct): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[]
+     */
+    public function getAdditionalProductImages(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[] $additionalProductImages
+     * @return void
+     */
+    public function setAdditionalProductImages(array $additionalProductImages): void;
 }

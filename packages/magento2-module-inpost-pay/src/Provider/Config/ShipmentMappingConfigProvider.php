@@ -31,14 +31,15 @@ class ShipmentMappingConfigProvider
     /**
      * @param string $deliveryType
      * @param string $option
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getCarrierMethodCodeForOptions(string $deliveryType, string $option): string
+    public function getCarrierMethodCodeForOptions(string $deliveryType, string $option, ?int $storeId = null): string
     {
         $carrierConfigPattern = self::XML_PATH_DELIVERY_MAPPING_PATTERN;
         $carrierConfigPath = sprintf($carrierConfigPattern, strtolower($deliveryType), strtolower($option));
-        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_WEBSITE);
+        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_STORE, $storeId);
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInternalException(
@@ -75,7 +76,7 @@ class ShipmentMappingConfigProvider
         return $nonStandardOptions;
     }
 
-    public function isFreeShippingEnabledForCarrier(string $code, string $method = ''): bool
+    public function isFreeShippingEnabledForCarrier(string $code, string $method = '', ?int $storeId = null): bool
     {
         $configPattern = self::XML_PATH_FREE_SHIPPING_ENABLED_PATTERN;
         if (!empty($method)) {
@@ -84,10 +85,14 @@ class ShipmentMappingConfigProvider
             $methodCode = sprintf('%s', $code);
         }
 
-        return $this->scopeConfig->isSetFlag(sprintf($configPattern, $methodCode));
+        return $this->scopeConfig->isSetFlag(
+            sprintf($configPattern, $methodCode),
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
 
-    public function getFreeShippingSubtotalForCarrier(string $code, string $method = ''): ?float
+    public function getFreeShippingSubtotalForCarrier(string $code, string $method = '', ?int $storeId = null): ?float
     {
         $configPattern = self::XML_PATH_FREE_SHIPPING_SUBTOTAL_PATTERN;
         if (!empty($method)) {
@@ -98,7 +103,8 @@ class ShipmentMappingConfigProvider
 
         $subtotalValue = $this->scopeConfig->getValue(
             sprintf($configPattern, $methodCode),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         return is_scalar($subtotalValue) ? round((float)$subtotalValue, 2) : null;
