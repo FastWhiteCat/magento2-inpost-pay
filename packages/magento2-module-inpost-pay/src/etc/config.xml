@@ -50,6 +50,13 @@
                 <bestsellers_synchronize_mode>upload</bestsellers_synchronize_mode>
                 <bestsellers_synchronize_cron_schedule>30 6 * * *</bestsellers_synchronize_cron_schedule>
                 <promotions_enabled>0</promotions_enabled>
+                <analytics_enabled>0</analytics_enabled>
+                <ga_api_url>https://www.google-analytics.com/mp/collect</ga_api_url>
+                <analytics_async_sending_enabled>0</analytics_async_sending_enabled>
+                <analytics_async_sending_enabled>0</analytics_async_sending_enabled>
+                <analytics_async_sending_cron_schedule>*/5 * * * *</analytics_async_sending_cron_schedule>
+                <sending_fbclid_enabled>0</sending_fbclid_enabled>
+                <sending_gclid_enabled>0</sending_gclid_enabled>
             </inpost_pay>
         </payment>
     </default>

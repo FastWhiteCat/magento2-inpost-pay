@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Creator;
 
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
@@ -18,6 +19,7 @@ use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -40,6 +42,7 @@ class OrderProcessor implements OrderProcessorInterface
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly PaymentMethodManagementInterface $paymentMethodManagement,
         private readonly CartRepositoryInterface $cartRepository,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger,
         array $orderProcessingSteps,
         array $orderPostProcessingSteps
@@ -50,11 +53,15 @@ class OrderProcessor implements OrderProcessorInterface
 
     /**
      * @param Quote $quote
+     * @param InPostPayQuoteInterface $inPostPayQuote
      * @param OrderInterface $inPostOrder
      * @return Order
+     * @throws CouldNotSaveException
      * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @throws QuoteChangedDuringOrderProcessingException
      */
-    public function execute(Quote $quote, OrderInterface $inPostOrder): Order
+    public function execute(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): Order
     {
         try {
             foreach ($this->orderProcessingSteps as $orderProcessingStep) {
@@ -66,6 +73,15 @@ class OrderProcessor implements OrderProcessorInterface
             foreach ($this->orderPostProcessingSteps as $orderPostProcessingStep) {
                 $orderPostProcessingStep->process($order, $inPostOrder);
             }
+
+            $this->eventManager->dispatch(
+                'inpost_pay_order_post_processing_steps_after',
+                [
+                    'order' => $order,
+                    'quote' => $quote,
+                    'inpost_pay_quote' => $inPostPayQuote,
+                ]
+            );
 
             $this->logger->info(
                 sprintf(

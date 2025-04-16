@@ -91,6 +91,21 @@
 "Browser binding was not complete. Browser is not trusted.","Proces powiązania przeglądarki nie został pomyślnie ukończony. Przeglądarka nie jest zaufana.",module,InPost_InPostPay
 "Browser ID does not match value saved in merchant quote ID: %1.","ID powiązanej przeglądarki różni się od tej zapisanej w koszyku sklepu ID: %1.",module,InPost_InPostPay
 "Cannot confirm basket. Reason: %1","Nie udało się potwierdzić koszyka. Powód: %1",module,InPost_InPostPay
+"Selected shipping method is not available [%1 %2].","Wybrana metoda dostawy jest niedostępna [%1 %2].",module,InPost_InPostPay
+"Analytics param %1 is too long.","Parametr Analityczny %1 jest zbyt długi.",module,InPost_InPostPay
+"Analytics param %1 is not valid.","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API endpoint URL is invalid: %1","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API request headers are invalid!","Nagłówki w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request params are invalid!","Parametry w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request method are invalid: %1","Metoda: %1 w żądaniu API Google Analytics jest niepoprawna!",module,InPost_InPostPay
+"Google Analytics API endpoint ""%1"" responded with %2 code.","Żądanie API ""%1"" Google Analytics zwróciło kod: %2.",module,InPost_InPostPay
+"Analytics Settings","Ustawienia Analityki",module,InPost_InPostPay
+"Enable Analytics","Włącz Analitykę",module,InPost_InPostPay
+"Enable Analytics Data Asynchronous Sending by CRON","Włącz Asynchroniczne Wysyłanie danych Analitycznych przez CRON",module,InPost_InPostPay
+"Analytics Data Sending CRON CRON Schedule","Harmonogram CRON Wysyłki Danych Analitycznych",module,InPost_InPostPay
+"*/5 * * * * for example causes this CRON to run every 5 minutes","*/5 * * * * przykładowo oznacza wysyłkę przez CRON co 5 minut.",module,InPost_InPostPay
+"Enable Sending fbclid Param","Włącz Przekazywanie Parametru fbclid",module,InPost_InPostPay
+"Enable Sending gclid Param","Włącz Przekazywanie Parametru gclid",module,InPost_InPostPay
 "If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.","Jeśli włączono dane koszyka będą eksportowane z wykorzystaniem wbudowanego systemu kolejkowania wiadomości. Wymagane jest po stronie infrastruktury serwerowej utrzymywanie uruchomionego procesu przetwarzającego kolejkę inpost_pay.basket.create_or_update",module,InPost_InPostPay
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay

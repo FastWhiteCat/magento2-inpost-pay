@@ -19,6 +19,7 @@
                 <include path="InPost_InPostPay::system/promotions.xml"/>
                 <include path="InPost_InPostPay::system/omnibus.xml"/>
                 <include path="InPost_InPostPay::system/bestsellers.xml"/>
+                <include path="InPost_InPostPay::system/analytics.xml"/>
             </group>
         </section>
     </system>

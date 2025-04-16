@@ -22,8 +22,13 @@ class GetBasketId
     ) {
     }
 
-    public function get(int $quoteId, bool $generateIfEmpty = false): ?string
-    {
+    public function get(
+        int $quoteId,
+        bool $generateIfEmpty = false,
+        ?string $gaClientId = null,
+        ?string $fbclid = null,
+        ?string $gclid = null
+    ): ?string {
         if (!$this->config->isEnabled()) {
             return null;
         }
@@ -41,6 +46,9 @@ class GetBasketId
                 $inPostPayQuote->setQuoteId($quoteId);
                 $inPostPayQuote->setBasketId($this->randomDataGenerator->getUniqueHash());
                 $inPostPayQuote->setCartVersion(uniqid());
+                $inPostPayQuote->setGaClientId($gaClientId);
+                $inPostPayQuote->setFbclid($fbclid);
+                $inPostPayQuote->setGclid($gclid);
                 $this->inPostPayQuoteRepository->save($inPostPayQuote);
             }
 
