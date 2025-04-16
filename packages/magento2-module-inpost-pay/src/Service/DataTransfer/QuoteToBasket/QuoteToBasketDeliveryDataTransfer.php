@@ -93,7 +93,10 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         if (!$quote->isVirtual()) {
             $shippingMethods = $this->getShippingMethodsForQuote($quote);
             $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
-            $deliveries = array_merge($deliveries, $this->prepareDigitalDeliveryData($storeId));
+
+            if ($quote->hasVirtualItems()) {
+                $deliveries = array_merge($deliveries, $this->prepareDigitalDeliveryData($storeId));
+            }
         } else {
             $deliveries = $this->prepareDigitalDeliveryData($storeId);
         }
