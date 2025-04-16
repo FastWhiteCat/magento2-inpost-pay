@@ -238,3 +238,10 @@
 "Active [Approved by InPost]","Aktywny [Potwierdzony przez InPost]"
 "Inactive [InPost Approval Required]","Nieaktywny [Wymaga akceptacji przez InPost]"
 "Unknown [Synchronization Required]","Nieznany [Wymaga synchronizacji]"
+"Magento cart rule with coupon","Reguła koszykowa Magento z kodem",module,InPost_InPostPay
+"Available In-app Promotions","Dostępne promocje w aplikacji",module,InPost_InPostPay
+"Add another promotion","Dodaj kolejną promocję",module,InPost_InPostPay
+"Promotions limit reached. Please remove one before adding another","Osiągnięto limit promocji. Prosimy o usunięcie poprzedniej, aby dodać nową.",module,InPost_InPostPay
+"Enable In-app Promotions","Włącz promocje w aplikacji",module,InPost_InPostPay
+"Promotion description url","Url opisu promocji",module,InPost_InPostPay
+"Coupon code ""%1"" expired or that promotion is not applicable to this cart.","Kod rabatowy ""%1"" wygasł lub koszyk nie spełnia warunków tej promocji",module,InPost_InPostPay

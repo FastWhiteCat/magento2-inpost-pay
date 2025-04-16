@@ -110,4 +110,7 @@
     <event name="izi_init_basket_after">
         <observer name="InPost_InPostPay::iziInitBasketAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketAfterEventObserver" />
     </event>
+    <event name="salesrule_rule_save_after">
+        <observer name="InPost_InPostPay::cleanPromotionsCacheAfterRuleSave" instance="InPost\InPostPay\Observer\SalesRule\SalesRuleSaveEventObserver" />
+    </event>
 </config>

@@ -115,7 +115,10 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\AdditionalImage"/>
-
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable\Details"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
     <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
@@ -201,6 +204,8 @@
     <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
         <plugin name="InPost_InPostPay::addErrorsToBasketPlugin"
                 type="InPost\InPostPay\Plugin\AddErrorsToBasketPlugin" />
+        <plugin name="InPost_InPostPay::checkAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin"
+                type="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin" />
     </type>
     <type name="Magento\ConfigurableProduct\Model\Quote\Item\CartItemProcessor">
         <plugin name="InPost_InPostPay::CartItemProcessorPlugin"
@@ -273,6 +278,7 @@
                 <item name="products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer</item>
                 <item name="related_products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer</item>
+                <item name="promotions_available" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromotionsAvailableDataTransfer</item>
             </argument>
         </arguments>
     </type>
@@ -714,6 +720,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Model\Config\Payment\TitleUpdater">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
