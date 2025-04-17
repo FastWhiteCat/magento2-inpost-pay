@@ -164,7 +164,7 @@ class InPostPayCheckoutAgreement extends AbstractModel implements InPostPayCheck
     {
         $visibility = $this->getData(self::VISIBILITY);
 
-        return is_int($visibility) ? (int)$visibility : self::VISIBILITY_MAIN;
+        return is_scalar($visibility) ? (int)$visibility : self::VISIBILITY_MAIN;
     }
 
     /**
