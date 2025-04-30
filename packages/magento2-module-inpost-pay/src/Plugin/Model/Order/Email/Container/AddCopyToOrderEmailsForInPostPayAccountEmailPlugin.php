@@ -164,9 +164,36 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
         ?string $magentoCustomerEmail
     ): array {
         $emailsToNotify = [];
-        !empty($inPostPayAccountEmail) && $emailsToNotify[] = $inPostPayAccountEmail;
         !empty($inPostDigitalDeliveryEmail) && $emailsToNotify[] = $inPostDigitalDeliveryEmail;
-        !empty($magentoCustomerEmail) && $emailsToNotify[] = $magentoCustomerEmail;
+
+        if ($inPostPayAccountEmail) {
+            /**
+             * In this case InPost Pay account email was sent to Magento.
+             * In the next lines of code Magento customer email is added to notify emails ONLY IF it is different
+             * from InPost Pay account email because InPost Pay will automatically redirect emails sent to
+             * the order's assigned email address. This is done to prevent customer from getting duplicate of the same
+             * email message: first from Magento, second redirected from InPost Pay
+             */
+            if ($magentoCustomerEmail && $inPostPayAccountEmail !== $magentoCustomerEmail) {
+                $emailsToNotify[] = $magentoCustomerEmail;
+            }
+
+            /**
+             * Same logic is applied to digital delivery email
+             */
+            if ($inPostDigitalDeliveryEmail && $inPostPayAccountEmail !== $inPostDigitalDeliveryEmail) {
+                $emailsToNotify[] = $inPostDigitalDeliveryEmail;
+            }
+        } else {
+            if ($magentoCustomerEmail) {
+                $emailsToNotify[] = $magentoCustomerEmail;
+            }
+
+            if ($inPostDigitalDeliveryEmail) {
+                $emailsToNotify[] = $inPostDigitalDeliveryEmail;
+            }
+        }
+
         $emailsToNotify = $this->cleanOrderEmailCopyTo($order, $emailsToNotify);
 
         return array_unique(array_merge($originalNotifyEmails, $emailsToNotify));
