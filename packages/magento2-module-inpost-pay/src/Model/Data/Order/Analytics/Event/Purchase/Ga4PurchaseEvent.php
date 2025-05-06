@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Model\Data\Order\Analytics\Event\Purchase;
 use InPost\InPostPay\Api\Data\Order\Analytics\Event\PurchaseEventInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Provider\Config\AnalyticsConfigProvider;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Model\Order;
@@ -60,6 +61,7 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
             return [];
         }
 
+        $currentTimestampInMicroseconds = (int) (microtime(true) * 1000000);
         $storeId = (int)$order->getStoreId();
         $gaClientId = $inPostPayOrder->getGaClientId();
         $fbclid = $this->analyticsConfigProvider->isSendingFbclidEnabled($storeId)
@@ -67,7 +69,11 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
         $gclid = $this->analyticsConfigProvider->isSendingGclidEnabled($storeId)
             ? $inPostPayOrder->getGclid() : null;
 
-        $eventData['client_id'] = $gaClientId;
+        $eventData = [
+            'client_id' => $gaClientId,
+            'timestamp_micros' => $currentTimestampInMicroseconds,
+            'non_personalized_ads' => false
+        ];
         $eventParams = $this->preparePurchaseEventParams($order);
 
         if ($gclid) {
@@ -97,20 +103,38 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
 
         /** @var OrderItemInterface $item */
         foreach ($order->getAllVisibleItems() as $item) {
+            $qtyOrdered = (float)$item->getQtyOrdered() > 0 ? (float)$item->getQtyOrdered() : 1.00;
+            $itemRowTotalInclTaxAndDiscount = DecimalCalculator::sub(
+                (float)$item->getRowTotalInclTax(),
+                abs((float)$item->getDiscountAmount())
+            );
+            $finalUnitPriceInclTax = DecimalCalculator::div(
+                $itemRowTotalInclTaxAndDiscount,
+                $qtyOrdered
+            );
+
             $items[] = [
                 'item_id' => $item->getSku(),
                 'item_name' => $item->getName(),
-                'price' => (float)$item->getPriceInclTax(),
-                'quantity' => (int)$item->getQtyOrdered(),
+                'price' => $finalUnitPriceInclTax,
+                'quantity' => (int)$qtyOrdered,
             ];
         }
 
+        $totalProductsWithTaxAndDiscount = DecimalCalculator::sub(
+            (float)$order->getSubtotalInclTax(),
+            abs((float)$order->getDiscountAmount())
+        );
+        $productsTaxAmount = DecimalCalculator::sub(
+            (float)$order->getTaxAmount(),
+            (float)$order->getShippingTaxAmount()
+        );
         $eventParams = [
             'transaction_id' => $order->getIncrementId(),
             'affiliation' => self::AFFILIATION,
-            'value' => (float)$order->getGrandTotal(),
+            'value' => $totalProductsWithTaxAndDiscount,
             'currency' => $order->getOrderCurrencyCode(),
-            'tax' => (float)$order->getTaxAmount(),
+            'tax' => $productsTaxAmount,
             'shipping' => (float)$order->getShippingInclTax(),
             'engagement_time_msec' => self::ENGAGEMENT_TIME,
             'items' => $items
