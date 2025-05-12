@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Registry\SaveQuoteAddressActionRegistry;
 use InPost\InPostPay\Service\UpdateInPostBasketEvent;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -20,7 +21,8 @@ class UpdateInPostBasketAfterAddProductEventObserver implements ObserverInterfac
 
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly UpdateInPostBasketEvent $updateInPostBasketEvent
+        private readonly UpdateInPostBasketEvent $updateInPostBasketEvent,
+        private readonly SaveQuoteAddressActionRegistry $saveQuoteAddressActionRegistry
     ) {
     }
 
@@ -42,6 +44,10 @@ class UpdateInPostBasketAfterAddProductEventObserver implements ObserverInterfac
     private function canSync(Quote $quote): bool
     {
         if ($quote->getData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG)) {
+            return false;
+        }
+
+        if ($this->saveQuoteAddressActionRegistry->isSaveQuoteAddressActionRegistered()) {
             return false;
         }
 

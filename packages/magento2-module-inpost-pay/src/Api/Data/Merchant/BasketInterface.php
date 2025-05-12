@@ -17,6 +17,7 @@ interface BasketInterface
     public const PRODUCTS = 'products';
     public const RELATED_PRODUCTS = 'related_products';
     public const CONSENTS = 'consents';
+    public const PROMOTIONS_AVAILABLE = 'promotions_available';
     public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
     public const STATUS = 'status';
 
@@ -107,4 +108,15 @@ interface BasketInterface
      * @return void
      */
     public function setStatus(string|null $status): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface[]
+     */
+    public function getPromotionsAvailable(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface[] $promotionsAvailable
+     * @return void
+     */
+    public function setPromotionsAvailable(array $promotionsAvailable): void;
 }

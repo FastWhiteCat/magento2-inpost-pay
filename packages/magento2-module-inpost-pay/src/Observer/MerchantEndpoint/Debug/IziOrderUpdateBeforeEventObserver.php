@@ -46,7 +46,11 @@ class IziOrderUpdateBeforeEventObserver extends MerchantEndpointEventObserver im
                 InPostPayOrderInterface::PHONE_NUMBER => $phoneNumberData
             ];
 
-            $this->createEventDataLog($requestParams);
+            if ($this->debugConfigProvider->isAnonymisingEnabled()) {
+                $this->createEventDataLog($this->anonymizeArray($requestParams));
+            } else {
+                $this->createEventDataLog($requestParams);
+            }
         }
     }
 }

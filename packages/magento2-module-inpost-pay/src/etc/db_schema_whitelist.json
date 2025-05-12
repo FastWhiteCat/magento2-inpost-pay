@@ -11,6 +11,11 @@
             "country_prefix": true,
             "phone": true,
             "courier_note": true,
+            "ga_client_id": true,
+            "fbclid": true,
+            "gclid": true,
+            "serialized_analytics_data": true,
+            "analytics_sent_at": true,
             "delivery_options": true,
             "accepted_consents": true,
             "created_at": true,
@@ -38,6 +43,9 @@
             "name": true,
             "surname": true,
             "cart_version": true,
+            "ga_client_id": true,
+            "fbclid": true,
+            "gclid": true,
             "created_at": true,
             "updated_at": true
         },
@@ -89,6 +97,26 @@
         },
         "constraint": {
             "INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID": true
+        }
+    },
+    "inpost_pay_bestseller_product": {
+        "column": {
+            "bestseller_product_id": true,
+            "sku": true,
+            "website_id": true,
+            "available_start_date": true,
+            "available_end_date": true,
+            "synchronized_at": true,
+            "qr_code": true,
+            "deep_link": true,
+            "inpost_pay_status": true,
+            "error": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID": true
         }
     }
 }

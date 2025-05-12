@@ -29,7 +29,15 @@
         <field id="async_basket_export" translate="label comment" type="select" sortOrder="60"
                showInDefault="1" canRestore="1">
             <label>Enable asynchronous basket export</label>
-            <comment>If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.</comment>
+            <comment>
+                <![CDATA[
+                    This is an advanced configuration for optimizing cart updates.</br>
+                    If enabled basket data will be exported using AMQP messaging queue system into RabbitMQ.</br>
+                    It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update restarting and running all the time.</br>
+                    Example command:</br>
+                    <i>php {Magento2 root}/bin/magento queue:consumers:start inpost_pay.basket.create_or_update --max-messages=100 --area-code=frontend</i></br>
+                ]]>
+            </comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/inpost_pay/async_basket_export</config_path>
         </field>

@@ -19,7 +19,7 @@ class Request
         $params = $this->getParams();
         $uri = $this->uri;
         foreach ($params as $key => $value) {
-            if (str_contains($this->uri, $key)) {
+            if (str_contains($this->uri, (string)$key)) {
                 $uri = str_replace(sprintf('{%s}', (string)$key), (string)$value, $uri);
                 if (!$keepParamsIntact) {
                     unset($params[$key]);

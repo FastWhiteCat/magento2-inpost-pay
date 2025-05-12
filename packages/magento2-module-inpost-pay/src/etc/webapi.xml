@@ -19,6 +19,12 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
+    <route url="/v1/izi/basket/product/:productId" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\InitBasketInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
     <route url="/v1/izi/basket/:basketId/confirmation" method="POST">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface" method="execute"/>
         <resources>
@@ -39,6 +45,12 @@
     </route>
     <route url="/v1/izi/order/:orderId/event" method="POST">
         <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/products" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BestsellerProductsGetInterface" method="execute"/>
         <resources>
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
