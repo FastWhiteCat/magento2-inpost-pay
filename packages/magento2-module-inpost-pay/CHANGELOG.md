@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.1.0] - 2025-04-09
+## [2.1.1] - 2025-05-12
 
 ### Added
 
@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Configuration of Bestseller Products in Magento has been added. Those products (if accepted by InPost) will be displayed to customers in their Mobile Apps.
 - Quote remote initiation has been added - if Customer adds configured Bestseller Product in Mobile App the cart will be initialized and bound with InPost Pay. Previously all the carts had to be initiated in browser.
 - If not configured otherwise logs will be anonymised hiding firstnames, lastnames, emails, addresses, etc.
+- Configuration that allows setting up Google Analytics purchase event sending for orders created via InPost Pay Mobile App
 
 ### Updated
 
