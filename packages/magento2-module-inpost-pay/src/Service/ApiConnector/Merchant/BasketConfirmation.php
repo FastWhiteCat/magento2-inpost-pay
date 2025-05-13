@@ -75,7 +75,7 @@ class BasketConfirmation implements BasketConfirmationInterface
                     InPostPayQuoteInterface::PHONE_NUMBER => $phoneNumber,
                     BasketConfirmationInterface::BROWSER => $browser,
                     InPostPayQuoteInterface::MASKED_PHONE_NUMBER => $maskedPhoneNumber,
-                    InPostPayQuoteInterface::NAME => $name,
+                    sprintf('param_%s', InPostPayQuoteInterface::NAME) => $name,
                     InPostPayQuoteInterface::SURNAME => $surname
                 ]
             );

@@ -1,7 +1,7 @@
 {
     "name": "inpost/magento2-module-inpost-pay",
     "description": "Module integrates InPost Pay Mobile application with Magento store.",
-    "version": "2.0.7",
+    "version": "2.1.1",
     "type": "magento2-module",
     "license": ["CC-BY-NC-ND-4.0"],
     "require": {
@@ -10,7 +10,7 @@
         "monolog/monolog": "*",
         "psr/log": "*",
         "guzzlehttp/guzzle": "*",
-        "inpost/magento2-module-restrictions": ">=2.0.0"
+        "inpost/magento2-module-restrictions": ">=2.1.0"
     },
     "autoload": {
         "files": [

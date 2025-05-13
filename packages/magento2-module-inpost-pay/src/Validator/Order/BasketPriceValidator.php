@@ -138,7 +138,7 @@ class BasketPriceValidator implements OrderValidatorInterface
 
         throw new LocalizedException(
             __(
-                'Selected shipping method is not available [%s %s].',
+                'Selected shipping method is not available [%1 %2].',
                 $deliveryType,
                 $deliveryOption
             )

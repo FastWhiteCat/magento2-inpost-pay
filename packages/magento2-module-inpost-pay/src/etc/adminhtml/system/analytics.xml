@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_analytics" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1">
+        <label>Analytics Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="analytics_enabled" translate="label" type="select" sortOrder="1"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable Analytics</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/analytics_enabled</config_path>
+        </field>
+        <field id="analytics_async_sending_enabled" translate="label" type="select" sortOrder="2" showInDefault="1" canRestore="1">
+            <label>Enable Analytics Data Asynchronous Sending by CRON</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/analytics_async_sending_enabled</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
+        <field id="analytics_async_sending_cron_schedule" translate="label" type="text" sortOrder="3" showInDefault="1" canRestore="1">
+            <label>Analytics Data Sending CRON CRON Schedule</label>
+            <comment>*/5 * * * * for example causes this CRON to run every 5 minutes</comment>
+            <config_path>payment/inpost_pay/analytics_async_sending_cron_schedule</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+                <field id="analytics_async_sending_enabled">1</field>
+            </depends>
+        </field>
+        <field id="ga_measurement_id" translate="label" type="text" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Google Analytics Measurement ID</label>
+            <config_path>payment/inpost_pay/ga_measurement_id</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
+        <field id="ga_api_secret" translate="label" type="text" sortOrder="25"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Google Analytics API Secret</label>
+            <config_path>payment/inpost_pay/ga_api_secret</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
+        <field id="ga_api_url" translate="label" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+            <label>Google Analytics API URL</label>
+            <config_path>payment/inpost_pay/ga_api_url</config_path>
+            <validate>required-entry validate-url</validate>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
+        <field id="sending_fbclid_enabled" translate="label" type="select" sortOrder="35"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable Sending fbclid Param</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/sending_fbclid_enabled</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
+        <field id="sending_gclid_enabled" translate="label" type="select" sortOrder="40"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable Sending gclid Param</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/sending_gclid_enabled</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
+    </group>
+</include>

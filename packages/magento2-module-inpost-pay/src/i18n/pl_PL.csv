@@ -92,6 +92,21 @@
 "Browser binding was not complete. Browser is not trusted.","Proces powiązania przeglądarki nie został pomyślnie ukończony. Przeglądarka nie jest zaufana.",module,InPost_InPostPay
 "Browser ID does not match value saved in merchant quote ID: %1.","ID powiązanej przeglądarki różni się od tej zapisanej w koszyku sklepu ID: %1.",module,InPost_InPostPay
 "Cannot confirm basket. Reason: %1","Nie udało się potwierdzić koszyka. Powód: %1",module,InPost_InPostPay
+"Selected shipping method is not available [%1 %2].","Wybrana metoda dostawy jest niedostępna [%1 %2].",module,InPost_InPostPay
+"Analytics param %1 is too long.","Parametr Analityczny %1 jest zbyt długi.",module,InPost_InPostPay
+"Analytics param %1 is not valid.","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API endpoint URL is invalid: %1","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API request headers are invalid!","Nagłówki w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request params are invalid!","Parametry w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request method are invalid: %1","Metoda: %1 w żądaniu API Google Analytics jest niepoprawna!",module,InPost_InPostPay
+"Google Analytics API endpoint ""%1"" responded with %2 code.","Żądanie API ""%1"" Google Analytics zwróciło kod: %2.",module,InPost_InPostPay
+"Analytics Settings","Ustawienia Analityki",module,InPost_InPostPay
+"Enable Analytics","Włącz Analitykę",module,InPost_InPostPay
+"Enable Analytics Data Asynchronous Sending by CRON","Włącz Asynchroniczne Wysyłanie danych Analitycznych przez CRON",module,InPost_InPostPay
+"Analytics Data Sending CRON CRON Schedule","Harmonogram CRON Wysyłki Danych Analitycznych",module,InPost_InPostPay
+"*/5 * * * * for example causes this CRON to run every 5 minutes","*/5 * * * * przykładowo oznacza wysyłkę przez CRON co 5 minut.",module,InPost_InPostPay
+"Enable Sending fbclid Param","Włącz Przekazywanie Parametru fbclid",module,InPost_InPostPay
+"Enable Sending gclid Param","Włącz Przekazywanie Parametru gclid",module,InPost_InPostPay
 "If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.","Jeśli włączono dane koszyka będą eksportowane z wykorzystaniem wbudowanego systemu kolejkowania wiadomości. Wymagane jest po stronie infrastruktury serwerowej utrzymywanie uruchomionego procesu przetwarzającego kolejkę inpost_pay.basket.create_or_update",module,InPost_InPostPay
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
@@ -239,6 +254,15 @@
 "Active [Approved by InPost]","Aktywny [Potwierdzony przez InPost]"
 "Inactive [InPost Approval Required]","Nieaktywny [Wymaga akceptacji przez InPost]"
 "Unknown [Synchronization Required]","Nieznany [Wymaga synchronizacji]"
+"Magento cart rule with coupon","Reguła koszykowa Magento z kodem",module,InPost_InPostPay
+"Available In-app Promotions","Dostępne promocje w aplikacji",module,InPost_InPostPay
+"Add another promotion","Dodaj kolejną promocję",module,InPost_InPostPay
+"Promotions limit reached. Please remove one before adding another","Osiągnięto limit promocji. Prosimy o usunięcie poprzedniej, aby dodać nową.",module,InPost_InPostPay
+"Enable In-app Promotions","Włącz promocje w aplikacji",module,InPost_InPostPay
+"Promotion description url","Url opisu promocji",module,InPost_InPostPay
+"Coupon code ""%1"" expired or that promotion is not applicable to this cart.","Kod rabatowy ""%1"" wygasł lub koszyk nie spełnia warunków tej promocji",module,InPost_InPostPay
+"A maximum of 10 overriding consents will be transferred to the application","Maksymalnie do aplikacji przekazane zostanie 10 nadrzędnych zgód",module,InPost_InPostPay
+"Enable Logs Anonymisation","Włącz Anonimizację Logów",module,InPost_InPostPay
 "Cart contains digital products that cannot be ordered as a not logged in user. Please create account in Merchants website in order to complete this purchase.","Koszyk zawiera produkty cyfrowe, których nie można zamówić jako niezalogowany użytkownik. Aby sfinalizować ten zakup, utwórz konto na stronie Sprzedawcy.",module,InPost_InPostPay
 "Digital delivery is not allowed if cart contains non-digital products.","Cyfrowa dostawa nie jest dostępna gdy w koszyku znajdują się produkty nie-cyfrowe.",module,InPost_InPostPay
 "Digital delivery is the only allowed method if cart contains only digital products.","Dostawa cyfrowa jest jedyną akceptowalną metodą dla koszyków zawierających jedynie produkty cyfrowe.",module,InPost_InPostPay

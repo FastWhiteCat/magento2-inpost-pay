@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Provider\Config\AnalyticsConfigProvider;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Provider\TestModeProvider;
@@ -39,6 +40,7 @@ class Widget implements ArgumentInterface
      * @param SandboxConfigProvider $sandboxConfigProvider
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
+     * @param AnalyticsConfigProvider $analyticsConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
      * @param CustomerSession $customerSession
@@ -58,6 +60,7 @@ class Widget implements ArgumentInterface
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly LayoutConfigProvider $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
+        private readonly AnalyticsConfigProvider $analyticsConfigProvider,
         private readonly ResolverInterface $localeResolver,
         private readonly CheckoutSession $checkoutSession,
         private readonly CustomerSession $customerSession,
@@ -80,6 +83,11 @@ class Widget implements ArgumentInterface
             && $this->displayConfigProvider->isWidgetEnabled()
             && $this->isDisplayAllowed()
             && $this->isAuthConfigComplete();
+    }
+
+    public function isAnalyticsEnabled(): bool
+    {
+        return $this->analyticsConfigProvider->isAnalyticsEnabled();
     }
 
     /**
