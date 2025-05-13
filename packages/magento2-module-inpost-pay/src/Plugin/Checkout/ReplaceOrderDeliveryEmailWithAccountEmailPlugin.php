@@ -40,7 +40,10 @@ class ReplaceOrderDeliveryEmailWithAccountEmailPlugin
         $lastRealOrderId = $lastRealOrder->getEntityId();
         $paymentMethod = $lastRealOrder->getPayment() ? $lastRealOrder->getPayment()->getMethod() : '';
 
-        if (!is_scalar($lastRealOrderId) || $paymentMethod !== PaymentMethodStep::INPOST_PAY_PAYMENT_METHOD_CODE) {
+        if (!is_scalar($lastRealOrderId)
+            || $paymentMethod !== PaymentMethodStep::INPOST_PAY_PAYMENT_METHOD_CODE
+            || !empty($lastRealOrder->getCustomerId())
+        ) {
             return $result;
         }
 
