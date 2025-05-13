@@ -85,7 +85,8 @@ class ProductToInPostProductDataTransfer
         int $websiteId,
         ?float $quantity = null,
         array $selectedOptions = [],
-        array $quoteItemsQuantity = []
+        array $quoteItemsQuantity = [],
+        bool $isRelatedProduct = false
     ): void {
         if ($product->getTypeId() === Type::TYPE_BUNDLE) {
             $quantity = $quantity ?? 1.0;
@@ -148,7 +149,14 @@ class ProductToInPostProductDataTransfer
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
-        $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
+        $deliveryProductArray = $this->getDeliveryProduct($product, $websiteId);
+
+        if ($isRelatedProduct) {
+            $inPostProduct->setDeliveryRelatedProducts($deliveryProductArray);
+        } else {
+            $inPostProduct->setDeliveryProduct($deliveryProductArray);
+        }
+
         $this->additionalProductImagesDataTransfer->transfer($product, $inPostProduct);
     }
 

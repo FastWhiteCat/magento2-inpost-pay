@@ -22,6 +22,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as Produ
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
+use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use Magento\Store\Model\Store;
@@ -64,7 +65,11 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                 $this->productToInPostProductDataTransfer->transfer(
                     $crossSellProduct,
                     $inPostCrossSellProduct,
-                    $websiteId
+                    $websiteId,
+                    null,
+                    [],
+                    [],
+                    true
                 );
                 $inPostCrossSellProducts[] = $inPostCrossSellProduct;
             }
@@ -92,7 +97,16 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
             $productsCollection->addAttributeToSelect($this->prepareProductAttributesList($storeId))
                 ->setPositionOrder()
                 ->addStoreFilter($storeId)
-                ->addAttributeToFilter(ProductInterface::TYPE_ID, ['eq' => Type::TYPE_SIMPLE])
+                ->addAttributeToFilter(
+                    ProductInterface::TYPE_ID,
+                    ['in' =>
+                        [
+                            Type::TYPE_SIMPLE,
+                            Type::TYPE_VIRTUAL,
+                            DownloadableType::TYPE_DOWNLOADABLE
+                        ]
+                    ]
+                )
                 ->addAttributeToFilter('status', ['eq' => Status::STATUS_ENABLED])
                 ->setVisibility([Visibility::VISIBILITY_IN_CATALOG, Visibility::VISIBILITY_BOTH])
                 ->addFieldToFilter(

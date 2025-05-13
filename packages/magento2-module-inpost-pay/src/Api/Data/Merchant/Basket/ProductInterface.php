@@ -22,6 +22,7 @@ interface ProductInterface
     public const QUANTITY = 'quantity';
     public const PRODUCT_ATTRIBUTES = 'product_attributes';
     public const DELIVERY_PRODUCT = 'delivery_product';
+    public const DELIVERY_RELATED_PRODUCTS = 'delivery_related_products';
     public const ADDITIONAL_PRODUCT_IMAGES = 'additional_product_images';
 
     /**
@@ -177,6 +178,17 @@ interface ProductInterface
      * @return void
      */
     public function setDeliveryProduct(array $deliveryProduct): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[]|null
+     */
+    public function getDeliveryRelatedProducts(): ?array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[] $deliveryRelatedProducts
+     * @return void
+     */
+    public function setDeliveryRelatedProducts(array $deliveryRelatedProducts): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[]
