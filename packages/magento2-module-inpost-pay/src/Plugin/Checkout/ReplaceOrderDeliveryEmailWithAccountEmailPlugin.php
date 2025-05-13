@@ -42,7 +42,6 @@ class ReplaceOrderDeliveryEmailWithAccountEmailPlugin
 
         if (!is_scalar($lastRealOrderId)
             || $paymentMethod !== PaymentMethodStep::INPOST_PAY_PAYMENT_METHOD_CODE
-            || !empty($lastRealOrder->getCustomerId())
         ) {
             return $result;
         }
