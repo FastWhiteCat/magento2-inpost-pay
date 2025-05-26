@@ -185,6 +185,44 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::ACCEPTED_CONSENTS, $this->serializer->serialize($acceptedConsentsData));
     }
 
+    /**
+     * @return bool
+     */
+    public function isOrderWithInvoice(): bool
+    {
+        $orderWithInvoice = $this->getData(self::ORDER_WITH_INVOICE);
+
+        return is_scalar($orderWithInvoice) && (bool)$orderWithInvoice;
+    }
+
+    /**
+     * @param bool $orderWithInvoice
+     * @return InPostPayOrderInterface
+     */
+    public function setOrderWithInvoice(bool $orderWithInvoice): InPostPayOrderInterface
+    {
+        return $this->setData(self::ORDER_WITH_INVOICE, $orderWithInvoice);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInPostPayInvoiceEmail(): ?string
+    {
+        $inPostPayInvoiceEmail = $this->getData(self::INPOST_PAY_INVOICE_EMAIL);
+
+        return is_scalar($inPostPayInvoiceEmail) ? (string)$inPostPayInvoiceEmail : null;
+    }
+
+    /**
+     * @param string|null $inPostPayInvoiceEmail
+     * @return InPostPayOrderInterface
+     */
+    public function setInPostPayInvoiceEmail(?string $inPostPayInvoiceEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::INPOST_PAY_INVOICE_EMAIL, $inPostPayInvoiceEmail);
+    }
+
     public function getOrderStatus(): ?string
     {
         $orderStatus = ($this->hasData(self::ORDER_STATUS)) ? $this->getData(self::ORDER_STATUS) : null;

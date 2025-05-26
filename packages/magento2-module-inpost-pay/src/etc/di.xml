@@ -548,6 +548,9 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+
+    <!-- ShippingMethodMappingRegistry is used as a singleton -->
+    <type name="InPost\InPostPay\Registry\ShippingMethodMappingRegistry" shared="true" />
     <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
