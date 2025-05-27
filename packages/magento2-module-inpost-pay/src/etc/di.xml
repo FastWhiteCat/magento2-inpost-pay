@@ -713,11 +713,6 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\BestsellerProduct\Download">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
     <type name="InPost\InPostPay\Service\ApiConnector\PostBestsellers">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
