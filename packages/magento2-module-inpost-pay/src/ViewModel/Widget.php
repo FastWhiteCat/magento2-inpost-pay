@@ -250,10 +250,13 @@ class Widget implements ArgumentInterface
 
     public function getScriptUrl(string $bindingPlace, array $layout = null): string
     {
-        $sandboxMode = $this->isSandboxEnabled();
-        $scriptUrl = $sandboxMode
-            ? "https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js"
-            : "https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js";
+        try {
+            $scriptUrl = $this->iziApiConfigProvider->getWidgetUrl();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+
+            return '';
+        }
 
         if (!$this->isEnabledInMiniCart() || !$layout) {
             return $scriptUrl;

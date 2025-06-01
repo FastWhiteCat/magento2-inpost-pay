@@ -12,6 +12,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
@@ -25,12 +26,16 @@ class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
     public const SUCCESS_RESULT_KEY = 'success';
     public const ERROR_RESULT_KEY = 'error';
     public const ORDER_INCREMENT_ID_RESULT_KEY = 'increment_id';
+    public const ORDER_POSTCODE_ID_RESULT_KEY = 'postcode';
+    public const ORDER_EMAIL_ID_RESULT_KEY = 'email';
+    public const ORDER_CART_ID_RESULT_KEY = 'cart';
     public const REDIRECT_RESULT_KEY = 'redirect';
 
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly OrderRepositoryInterface $orderRepository,
+        private readonly CartRepositoryInterface $cartRepository,
         private readonly CheckoutSession $checkoutSession,
         private readonly SuccessPageUrlConfigProvider $successPageUrlConfigProvider
     ) {
@@ -48,10 +53,21 @@ class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
             $order = $this->orderRepository->get($inPostPayOrder->getOrderId());
             $this->setLastOrder($order);
 
+            $billingAddress = $order->getBillingAddress();
+            $postcode = (string)$billingAddress?->getPostcode();
+            $email = $billingAddress ? (string)$billingAddress->getEmail() : (string)$order->getCustomerEmail();
+            $cart = is_scalar($order->getQuoteId()) ? $this->cartRepository->get((int)$order->getQuoteId()) : null;
+            $a = 2;
+
             return [
                 self::SUCCESS_RESULT_KEY => true,
                 self::ORDER_INCREMENT_ID_RESULT_KEY => $order->getIncrementId(),
                 self::REDIRECT_RESULT_KEY => $this->successPageUrlConfigProvider->getOrderSuccessPageUrl($order),
+                self::ORDER_EMAIL_ID_RESULT_KEY => $email,
+                self::ORDER_POSTCODE_ID_RESULT_KEY => $postcode,
+                self::ORDER_CART_ID_RESULT_KEY => [
+                    'model' => $cart
+                ],
                 self::ERROR_RESULT_KEY => null
             ];
         } catch (BasketNotFoundException | LocalizedException $e) {
