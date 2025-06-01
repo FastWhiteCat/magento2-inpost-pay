@@ -21,6 +21,7 @@
 "Enable InPost Pay Sandbox","Przełącz InPost Pay w Tryb Sandbox",module,InPost_InPostPay
 "Mapping for InPost Courier delivery method","Mapowanie Kuriera InPost do metody dostawy",module,InPost_InPostPay
 "Mapping for InPost Paczkomat 24/7 delivery method","Mapowanie metody dostawy InPost Paczkomat 24/7",module,InPost_InPostPay
+"Shipping method ""%1"" is already used in ""%2"" configuration. Each method can only be used once.","Metoda dostawy ""%1"" jest już wykorzystawa w konfiguracji ""%2"". Każda metoda może być przypisana tylko raz.",module,InPost_InPostPay
 "Could not obtain public key.","Nie udało się uzyskać klucza publicznego.",module,InPost_InPostPay
 "Empty IZI API URL","Wartość IZI API URL jest pusta",module,InPost_InPostPay
 "InPost API endpoint ""%1"" responded with an error: %2","Procesowane zapytania API InPost ""%1"" zwróciło błąd: %2",module,InPost_InPostPay
