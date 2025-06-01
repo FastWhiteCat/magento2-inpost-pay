@@ -32,7 +32,11 @@ class IziApiEndpointSendBeforeEventObserver extends IziApiEndpointEventObserver 
                 ];
             }
 
-            $this->createEventDataLog($requestData);
+            if ($this->debugConfigProvider->isAnonymisingEnabled()) {
+                $this->createEventDataLog($this->anonymizeArray($requestData));
+            } else {
+                $this->createEventDataLog($requestData);
+            }
         }
     }
 }

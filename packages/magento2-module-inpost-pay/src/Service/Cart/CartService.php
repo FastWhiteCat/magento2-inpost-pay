@@ -12,9 +12,11 @@ use InPost\InPostPay\Service\CreateBasketNotice;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Customer\Model\GroupManagement;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\CouponManagementInterface;
 use Magento\Quote\Model\Quote;
@@ -34,8 +36,21 @@ class CartService
         private readonly CartRepositoryInterface $cartRepository,
         private readonly CouponManagementInterface $couponManagement,
         private readonly CreateBasketNotice $createBasketNotice,
+        private readonly CartManagementInterface $cartManagement,
         private readonly LoggerInterface $logger
     ) {
+    }
+
+    /**
+     * @return Quote
+     * @throws CouldNotSaveException
+     * @throws NoSuchEntityException
+     */
+    public function initCart(): Quote
+    {
+        $quoteId = $this->cartManagement->createEmptyCart();
+
+        return $this->cartRepository->get($quoteId); //@phpstan-ignore-line
     }
 
     /**

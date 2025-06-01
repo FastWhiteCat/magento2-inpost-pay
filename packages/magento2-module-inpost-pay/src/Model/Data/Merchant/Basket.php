@@ -175,4 +175,23 @@ class Basket extends DataObject implements BasketInterface, ExtensibleDataInterf
     {
         $this->setData(self::STATUS, $status);
     }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface[]
+     */
+    public function getPromotionsAvailable(): array
+    {
+        $promotionsAvailable = $this->getData(self::PROMOTIONS_AVAILABLE);
+
+        return is_array($promotionsAvailable) ? $promotionsAvailable : [];
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface[] $promotionsAvailable
+     * @return void
+     */
+    public function setPromotionsAvailable(array $promotionsAvailable): void
+    {
+        $this->setData(self::PROMOTIONS_AVAILABLE, $promotionsAvailable);
+    }
 }

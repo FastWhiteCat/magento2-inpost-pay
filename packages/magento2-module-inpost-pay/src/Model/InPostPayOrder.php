@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterfaceFactory;
@@ -218,6 +219,66 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     public function setCourierNote(?string $courierNote): InPostPayOrderInterface
     {
         return $this->setData(self::COURIER_NOTE, $courierNote);
+    }
+
+    public function getGaClientId(): ?string
+    {
+        $gaClientId = $this->getData(self::GA_CLIENT_ID);
+
+        return (is_scalar($gaClientId) && !empty($gaClientId)) ? (string)$gaClientId : null;
+    }
+
+    public function setGaClientId(?string $gaClientId): InPostPayOrderInterface
+    {
+        return $this->setData(self::GA_CLIENT_ID, $gaClientId);
+    }
+
+    public function getFbclid(): ?string
+    {
+        $fbclid = $this->getData(self::FBCLID);
+
+        return (is_scalar($fbclid) && !empty($fbclid)) ? (string)$fbclid : null;
+    }
+
+    public function setFbclid(?string $fbclid): InPostPayOrderInterface
+    {
+        return $this->setData(self::FBCLID, $fbclid);
+    }
+
+    public function getGclid(): ?string
+    {
+        $gclid = $this->getData(self::GCLID);
+
+        return (is_scalar($gclid) && !empty($gclid)) ? (string)$gclid : null;
+    }
+
+    public function setGclid(?string $gclid): InPostPayOrderInterface
+    {
+        return $this->setData(self::GCLID, $gclid);
+    }
+
+    public function getSerializedAnalyticsData(): ?string
+    {
+        $serializedData = $this->getData(self::SERIALIZED_ANALYTICS_DATA);
+
+        return (is_scalar($serializedData) && !empty($serializedData)) ? (string)$serializedData : null;
+    }
+
+    public function setSerializedAnalyticsData(?string $serializedAnalyticsData): InPostPayOrderInterface
+    {
+        return $this->setData(self::SERIALIZED_ANALYTICS_DATA, $serializedAnalyticsData);
+    }
+
+    public function getAnalyticsSentAt(): ?string
+    {
+        $sentAt = $this->getData(self::ANALYTICS_SENT_AT);
+
+        return (is_scalar($sentAt) && !empty($sentAt)) ? (string)$sentAt : null;
+    }
+
+    public function setAnalyticsSentAt(?string $analyticsSentAt): InPostPayOrderInterface
+    {
+        return $this->setData(self::ANALYTICS_SENT_AT, $analyticsSentAt);
     }
 
     public function getInPostPayAccountEmail(): ?string

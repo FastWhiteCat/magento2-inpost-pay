@@ -23,6 +23,12 @@ interface InPostPayOrderInterface
     public const PHONE = 'phone';
     public const PHONE_NUMBER = 'phone';
     public const COURIER_NOTE = 'courier_note';
+    public const GA_CLIENT_ID = 'ga_client_id';
+    public const CLIENT_ID = 'client_id';
+    public const FBCLID = 'fbclid';
+    public const GCLID = 'gclid';
+    public const SERIALIZED_ANALYTICS_DATA = 'serialized_analytics_data';
+    public const ANALYTICS_SENT_AT = 'analytics_sent_at';
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const ACCEPTED_CONSENTS = 'accepted_consents';
     public const INPOST_PAY_ACCOUNT_EMAIL = 'inpost_pay_account_email';
@@ -59,6 +65,21 @@ interface InPostPayOrderInterface
     public function setCourierNote(?string $courierNote): InPostPayOrderInterface;
     public function getInPostPayAccountEmail(): ?string;
     public function setInPostPayAccountEmail(?string $inPostPayAccountEmail): InPostPayOrderInterface;
+
+    public function getGaClientId(): ?string;
+    public function setGaClientId(?string $gaClientId): InPostPayOrderInterface;
+
+    public function getFbclid(): ?string;
+    public function setFbclid(?string $fbclid): InPostPayOrderInterface;
+
+    public function getGclid(): ?string;
+    public function setGclid(?string $gclid): InPostPayOrderInterface;
+
+    public function getSerializedAnalyticsData(): ?string;
+    public function setSerializedAnalyticsData(?string $serializedAnalyticsData): InPostPayOrderInterface;
+
+    public function getAnalyticsSentAt(): ?string;
+    public function setAnalyticsSentAt(?string $analyticsSentAt): InPostPayOrderInterface;
 
     /**
      * @return AcceptedConsentInterface[]

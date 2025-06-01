@@ -20,6 +20,7 @@ class IziApiConfigProvider
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param SandboxConfigProvider $sandboxConfigProvider
+     * @param InPostPayAvailablePaymentMethodRepositoryInterface $availablePaymentMethodRepository
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
