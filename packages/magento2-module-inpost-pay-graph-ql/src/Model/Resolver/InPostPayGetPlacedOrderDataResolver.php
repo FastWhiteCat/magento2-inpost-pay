@@ -57,7 +57,6 @@ class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
             $postcode = (string)$billingAddress?->getPostcode();
             $email = $billingAddress ? (string)$billingAddress->getEmail() : (string)$order->getCustomerEmail();
             $cart = is_scalar($order->getQuoteId()) ? $this->cartRepository->get((int)$order->getQuoteId()) : null;
-            $a = 2;
 
             return [
                 self::SUCCESS_RESULT_KEY => true,
