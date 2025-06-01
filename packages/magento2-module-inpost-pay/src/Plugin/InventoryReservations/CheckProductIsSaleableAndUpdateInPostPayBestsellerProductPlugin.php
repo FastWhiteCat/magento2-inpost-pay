@@ -38,10 +38,6 @@ class CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin
         $result,
         array $reservations
     ): void {
-        if (!$this->bestsellerChecker->isSynchronizationEnabled()) {
-            return;
-        }
-
         foreach ($reservations as $reservation) {
             $sku = $reservation->getSku();
 
@@ -51,8 +47,13 @@ class CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin
 
             try {
                 $product = $this->productRepository->get($sku);
+                // @phpstan-ignore-next-line
+                $storeId = is_scalar($product->getStoreId()) ? (int)$product->getStoreId() : null;
 
-                if ($product instanceof Product && !$product->isSaleable()) {
+                if ($product instanceof Product
+                    && !$product->isSaleable()
+                    && $this->bestsellerChecker->isSynchronizationEnabled($storeId)
+                ) {
                     $this->updateInPostPayBestsellerObserver->updateBestsellerProduct($product);
                 }
             } catch (Throwable $e) {

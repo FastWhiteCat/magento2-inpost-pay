@@ -19,9 +19,9 @@ class BestsellerChecker
     ) {
     }
 
-    public function isSynchronizationEnabled(): bool
+    public function isSynchronizationEnabled(?int $storeId = null): bool
     {
-        return $this->bestsellersCronConfigProvider->isSynchronizationEnabled();
+        return $this->bestsellersCronConfigProvider->isSynchronizationEnabled($storeId);
     }
 
     public function isBestsellerProductBySku(string $sku, ?int $websiteId = null): bool

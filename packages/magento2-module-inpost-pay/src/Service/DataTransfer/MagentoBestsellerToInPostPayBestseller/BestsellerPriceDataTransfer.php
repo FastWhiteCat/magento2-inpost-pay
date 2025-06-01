@@ -38,8 +38,10 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
         InPostPayBestsellerProductInterface $magentoBestsellerProduct,
         BestsellerProductInterface $bestsellerProduct
     ): void {
+        $storeId = $this->getDefaultStoreIdForWebsiteId($magentoBestsellerProduct->getWebsiteId());
+
         /** @var Product $product */
-        $product = $this->productRepository->get($magentoBestsellerProduct->getSku());
+        $product = $this->productRepository->get($magentoBestsellerProduct->getSku(), false, $storeId);
         $price = $bestsellerProduct->getPrice();
 
         $finalPrice = $product->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount();
@@ -69,5 +71,22 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
         } catch (LocalizedException $e) {
             return BestsellerProductInterface::DEFAULT_CURRENCY;
         }
+    }
+
+    private function getDefaultStoreIdForWebsiteId(int $websiteId): ?int
+    {
+        try {
+            $website = $this->storeManager->getWebsite($websiteId);
+            $defaultStoreId = null;
+
+            if ($website instanceof Website) {
+                $store = $website->getDefaultStore();
+                $defaultStoreId = (int)$store->getId();
+            }
+        } catch (LocalizedException $e) {
+            $defaultStoreId = null;
+        }
+
+        return $defaultStoreId;
     }
 }

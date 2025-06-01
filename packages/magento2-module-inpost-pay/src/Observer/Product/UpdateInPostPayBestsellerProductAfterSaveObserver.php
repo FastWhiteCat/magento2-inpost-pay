@@ -50,7 +50,7 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
             return;
         }
 
-        if (!$this->bestsellerChecker->isSynchronizationEnabled()
+        if (!$this->bestsellerChecker->isSynchronizationEnabled((int)$product->getStoreId())
             || $this->skipFurtherBestsellerUploadRegistry->canSkipFurtherBestsellerUploadFlag()
             || !$this->bestsellerChecker->isBestsellerProductBySku($product->getSku())
         ) {
