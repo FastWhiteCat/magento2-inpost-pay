@@ -18,6 +18,9 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
     private const SEPARATOR = ',';

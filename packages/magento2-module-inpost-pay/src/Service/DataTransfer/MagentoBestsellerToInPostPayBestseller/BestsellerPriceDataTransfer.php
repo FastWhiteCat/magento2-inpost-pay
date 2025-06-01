@@ -43,7 +43,7 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
         BestsellerProductInterface $bestsellerProduct
     ): void {
         $storeId = $this->getDefaultStoreIdForWebsiteId($magentoBestsellerProduct->getWebsiteId());
-        $this->storeEmulator->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
+        $this->storeEmulator->startEnvironmentEmulation((int)$storeId, Area::AREA_FRONTEND, true);
 
         /** @var Product $product */
         $product = $this->productRepository->get($magentoBestsellerProduct->getSku(), false, $storeId, true);
