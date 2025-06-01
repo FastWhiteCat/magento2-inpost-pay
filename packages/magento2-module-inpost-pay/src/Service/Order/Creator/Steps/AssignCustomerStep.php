@@ -63,5 +63,23 @@ class AssignCustomerStep extends OrderProcessingStep implements OrderProcessingS
                 )
             );
         }
+
+        $this->updateQuoteEmailWithInPostDeliveryEmail($quote, $inPostOrder->getDelivery()->getMail());
+    }
+
+    private function updateQuoteEmailWithInPostDeliveryEmail(Quote $quote, string $inPostDeliveryEmail): void
+    {
+        if ($quote->getCustomerEmail() !== $inPostDeliveryEmail) {
+            // Even if quote has been initialized for Logged-in user, quote customer email property will be updated
+            // with delivery email chosen by customer in Mobile InPost Pay App on purpose so that the customer
+            // will have his order assigned to an email he purposely selected in Mobile App.
+            $quote->setCustomerEmail($inPostDeliveryEmail);
+            $this->createLog(
+                sprintf(
+                    'Order email will be updated with delivery email from InPost Pay account: %s',
+                    $inPostDeliveryEmail
+                )
+            );
+        }
     }
 }

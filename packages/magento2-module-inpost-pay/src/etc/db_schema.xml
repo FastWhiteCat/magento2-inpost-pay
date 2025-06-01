@@ -19,6 +19,7 @@
         <column xsi:type="timestamp" name="analytics_sent_at" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
         <column xsi:type="varchar" length="500" name="accepted_consents" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="inpost_pay_account_email" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

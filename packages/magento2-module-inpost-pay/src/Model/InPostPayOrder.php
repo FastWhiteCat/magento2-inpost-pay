@@ -281,6 +281,19 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::ANALYTICS_SENT_AT, $analyticsSentAt);
     }
 
+    public function getInPostPayAccountEmail(): ?string
+    {
+        $hasInPostPayAccountEmail = $this->hasData(self::INPOST_PAY_ACCOUNT_EMAIL);
+        $inPostPayAccountEmail = $hasInPostPayAccountEmail ? $this->getData(self::INPOST_PAY_ACCOUNT_EMAIL) : null;
+
+        return ($inPostPayAccountEmail && is_scalar($inPostPayAccountEmail)) ? (string)$inPostPayAccountEmail : null;
+    }
+
+    public function setInPostPayAccountEmail(?string $inPostPayAccountEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::INPOST_PAY_ACCOUNT_EMAIL, $inPostPayAccountEmail);
+    }
+
     public function getCountryPrefix(): ?string
     {
         $countryPrefix = ($this->hasData(self::COUNTRY_PREFIX)) ? $this->getData(self::COUNTRY_PREFIX) : null;
