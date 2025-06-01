@@ -29,6 +29,7 @@
                 <widget_size>size-md</widget_size>
                 <widget_frame_style>primary</widget_frame_style>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
+                <widget_script_url>https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</widget_script_url>
                 <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
                 <async_basket_export>0</async_basket_export>
                 <remove_html_and_special_chars_from_attributes>1</remove_html_and_special_chars_from_attributes>
@@ -37,6 +38,7 @@
                 <sandbox_client_secret></sandbox_client_secret>
                 <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
                 <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
+                <sandbox_widget_script_url>https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</sandbox_widget_script_url>
                 <min_log_level>100</min_log_level>
                 <anonymise_objects_enabled>1</anonymise_objects_enabled>
                 <can_capture>1</can_capture>
