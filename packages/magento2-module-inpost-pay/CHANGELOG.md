@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2025-06-01
+
+### Added
+
+- Unique validator for delivery mapping settings
+- Handling for order email in InPost Pay domain
+
+### Fixed
+
+- CRON Bestseller Products synchronization process should now send correct prices
+
 ## [2.1.1] - 2025-05-12
 
 ### Added

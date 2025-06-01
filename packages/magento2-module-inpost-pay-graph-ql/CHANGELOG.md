@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2025-06-01
+
+### Added
+
+- Additional data to InPostPayPlacedOrderData: email, postcode, cart
+
+### Changed
+
+- Changed flag configs from string output to boolean tyoe 
+
 ## [2.0.0] - 2025-01-17
 
 ### Removed
