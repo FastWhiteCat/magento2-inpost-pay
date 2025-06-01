@@ -18,8 +18,8 @@
                 <item name="inpost_pay_merchant_client_id" xsi:type="string">payment/inpost_pay/client_merchant_id</item>
                 <item name="inpost_pay_sandbox_merchant_client_id" xsi:type="string">payment/inpost_pay/sandbox_client_merchant_id</item>
                 <item name="inpost_pay_is_sandbox" xsi:type="string">payment/inpost_pay/sandbox_enabled</item>
-                <item name="inpost_pay_widget_script_url" xsi:type="string">payment/inpost_pay/widget_size</item>
-                <item name="inpost_pay_sandbox_widget_script_url" xsi:type="string">payment/inpost_pay/widget_size</item>
+                <item name="inpost_pay_widget_script_url" xsi:type="string">payment/inpost_pay/widget_script_url</item>
+                <item name="inpost_pay_sandbox_widget_script_url" xsi:type="string">payment/inpost_pay/sandbox_widget_script_url</item>
             </argument>
         </arguments>
     </type>
