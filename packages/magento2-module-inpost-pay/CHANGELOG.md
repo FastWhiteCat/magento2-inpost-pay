@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - CRON Bestseller Products synchronization process should now send correct prices
+- type of accepted_consents column in inpost_pay_order DB table from varchar to text to allow longer JSONs
 
 ## [2.1.1] - 2025-05-12
 
