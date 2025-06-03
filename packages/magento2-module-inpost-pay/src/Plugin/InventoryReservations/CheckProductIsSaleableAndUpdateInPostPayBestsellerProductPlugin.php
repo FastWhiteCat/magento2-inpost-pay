@@ -50,10 +50,7 @@ class CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin
                 // @phpstan-ignore-next-line
                 $storeId = is_scalar($product->getStoreId()) ? (int)$product->getStoreId() : null;
 
-                if ($product instanceof Product
-                    && !$product->isSaleable()
-                    && $this->bestsellerChecker->isSynchronizationEnabled($storeId)
-                ) {
+                if ($product instanceof Product && !$product->isSaleable()) {
                     $this->updateInPostPayBestsellerObserver->updateBestsellerProduct($product);
                 }
             } catch (Throwable $e) {

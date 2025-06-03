@@ -26,9 +26,7 @@ class UpdateInPostPayBestsellerProductAfterStockItemSaveObserver extends ParentO
         /** @var Item $item */
         $item = $observer->getEvent()->getData('item');
 
-        if (!$this->bestsellerChecker->isSynchronizationEnabled((int)$item->getStoreId())
-            || !$this->bestsellerChecker->isBestsellerProductById($item->getProductId())
-        ) {
+        if (!$this->bestsellerChecker->isBestsellerProductById($item->getProductId())) {
             return;
         }
 
