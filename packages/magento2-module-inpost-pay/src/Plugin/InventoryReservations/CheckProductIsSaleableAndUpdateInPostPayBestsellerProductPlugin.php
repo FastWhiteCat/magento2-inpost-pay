@@ -47,8 +47,6 @@ class CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin
 
             try {
                 $product = $this->productRepository->get($sku);
-                // @phpstan-ignore-next-line
-                $storeId = is_scalar($product->getStoreId()) ? (int)$product->getStoreId() : null;
 
                 if ($product instanceof Product && !$product->isSaleable()) {
                     $this->updateInPostPayBestsellerObserver->updateBestsellerProduct($product);
