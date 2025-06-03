@@ -19,7 +19,10 @@
             "delivery_options": true,
             "accepted_consents": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "inpost_pay_account_email": true,
+            "order_with_invoice": true,
+            "inpost_pay_invoice_email": true
         },
         "constraint": {
             "PRIMARY": true,
