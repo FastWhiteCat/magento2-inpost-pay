@@ -50,8 +50,7 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
             return;
         }
 
-        if (!$this->bestsellerChecker->isSynchronizationEnabled()
-            || $this->skipFurtherBestsellerUploadRegistry->canSkipFurtherBestsellerUploadFlag()
+        if ($this->skipFurtherBestsellerUploadRegistry->canSkipFurtherBestsellerUploadFlag()
             || !$this->bestsellerChecker->isBestsellerProductBySku($product->getSku())
         ) {
             return;
@@ -77,6 +76,10 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
         foreach ($this->storeManager->getStores() as $store) {
             $defaultStore = $this->getDefaultStoreOfWebsite($store) ?? $product->getStore();
             $websiteId = (int)($defaultStore->getWebsiteId() ?? 0);
+
+            if (!$this->bestsellerChecker->isSynchronizationEnabled((int)$defaultStore->getStoreId())) {
+                continue;
+            }
 
             try {
                 $magentoBestsellerProduct = $this->inPostPayBestsellerProductRepository->getBySkuAndWebsiteId(

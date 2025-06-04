@@ -61,6 +61,11 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setCountryId($accountAddress->getCountryCode());
             $billingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getAccountInfo()->getPhoneNumber()));
         }
+
+        if ($quote->getCustomerId() && $billingAddress->getCustomerId() === null) {
+            $billingAddress->setCustomerId((int)$quote->getCustomerId());
+        }
+
         $quote->setBillingAddress($billingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);

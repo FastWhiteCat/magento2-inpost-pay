@@ -11,20 +11,24 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Framework\App\Area;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
+use Magento\Store\Model\App\Emulation as StoreEmulator;
 
 class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsellerDataTransferInterface
 {
     /**
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
+     * @param StoreEmulator $storeEmulator
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly StoreEmulator $storeEmulator
     ) {
     }
 
@@ -38,8 +42,11 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
         InPostPayBestsellerProductInterface $magentoBestsellerProduct,
         BestsellerProductInterface $bestsellerProduct
     ): void {
+        $storeId = $this->getDefaultStoreIdForWebsiteId($magentoBestsellerProduct->getWebsiteId());
+        $this->storeEmulator->startEnvironmentEmulation((int)$storeId, Area::AREA_FRONTEND, true);
+
         /** @var Product $product */
-        $product = $this->productRepository->get($magentoBestsellerProduct->getSku());
+        $product = $this->productRepository->get($magentoBestsellerProduct->getSku(), false, $storeId, true);
         $price = $bestsellerProduct->getPrice();
 
         $finalPrice = $product->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount();
@@ -53,6 +60,7 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
 
         $bestsellerProduct->setPrice($price);
         $bestsellerProduct->setCurrency($this->getWebsiteCurrencyCode($magentoBestsellerProduct->getWebsiteId()));
+        $this->storeEmulator->stopEnvironmentEmulation();
     }
 
     /**
@@ -69,5 +77,22 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
         } catch (LocalizedException $e) {
             return BestsellerProductInterface::DEFAULT_CURRENCY;
         }
+    }
+
+    private function getDefaultStoreIdForWebsiteId(int $websiteId): ?int
+    {
+        try {
+            $website = $this->storeManager->getWebsite($websiteId);
+            $defaultStoreId = null;
+
+            if ($website instanceof Website) {
+                $store = $website->getDefaultStore();
+                $defaultStoreId = (int)$store->getId();
+            }
+        } catch (LocalizedException $e) {
+            $defaultStoreId = null;
+        }
+
+        return $defaultStoreId;
     }
 }

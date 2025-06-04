@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2025-06-04
+
+### Added
+
+- Unique validator for delivery mapping settings
+- Handling for order email in InPost Pay domain
+
+### Fixed
+
+- CRON Bestseller Products synchronization process should now send correct prices
+- type of accepted_consents column in inpost_pay_order DB table from varchar to text to allow longer JSONs
+
 ## [2.1.1] - 2025-05-12
 
 ### Added

@@ -8,6 +8,10 @@
             <label>IZI API URL</label>
             <config_path>payment/inpost_pay/izi_api_url</config_path>
         </field>
+        <field id="widget_script_url" translate="label" type="text" sortOrder="35" showInDefault="1" canRestore="1">
+            <label>Widget Script URL</label>
+            <config_path>payment/inpost_pay/widget_script_url</config_path>
+        </field>
         <field id="basket_lifetime" translate="label comment" type="text" sortOrder="40" showInDefault="1">
             <label>Basket Lifetime</label>
             <validate>required-entry validate-number validate-zero-or-greater</validate>

@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
 use InPost\InPostPay\Exception\CouldNotDeleteInPostPayBestsellerProductException;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
+use InPost\InPostPay\Provider\Config\BestsellersCronConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\DeleteBestseller;
 use InPost\InPostPay\Service\ApiConnector\GetBestsellers;
 use InPost\InPostPay\Service\ApiConnector\PostBestsellers;
@@ -36,6 +37,7 @@ class Upload extends BestsellerProductService
      * @param UploadResponseHandler $uploadResponseHandler
      * @param DeleteBestseller $deleteBestseller
      * @param GetBestsellers $getBestsellers
+     * @param BestsellersCronConfigProvider $bestsellersCronConfigProvider
      * @param StoreEmulator $storeEmulator
      * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
@@ -50,6 +52,7 @@ class Upload extends BestsellerProductService
         private readonly UploadResponseHandler $uploadResponseHandler,
         private readonly DeleteBestseller $deleteBestseller,
         private readonly GetBestsellers $getBestsellers,
+        private readonly BestsellersCronConfigProvider $bestsellersCronConfigProvider,
         StoreEmulator $storeEmulator,
         StoreManagerInterface $storeManager,
         LoggerInterface $logger
@@ -68,9 +71,15 @@ class Upload extends BestsellerProductService
         foreach ($this->getDefaultStoresForWebsites() as $store) {
             $websiteId = (int)$store->getWebsiteId();
             $storeId = (int)$store->getId();
+
+            if (!$this->bestsellersCronConfigProvider->isSynchronizationEnabled($storeId)) {
+                continue;
+            }
+
             $this->storeEmulator->startEnvironmentEmulation((int)$store->getId(), Area::AREA_FRONTEND, true);
             $bestsellerProducts = [];
             $inPostPayBestsellerProductIds = $this->getExistingInPostBestsellerProductIds($storeId);
+            $this->storeEmulator->stopEnvironmentEmulation();
 
             try {
                 foreach ($this->getBestsellersByWebsiteId($websiteId) as $magentoBestsellerProduct) {
@@ -109,9 +118,11 @@ class Upload extends BestsellerProductService
                     array_flip($productIdsToUpdateInInPostPay)
                 );
 
+                $this->storeEmulator->startEnvironmentEmulation((int)$store->getId(), Area::AREA_FRONTEND, true);
                 $this->deleteProductIdsFromInPostPay($productIdsToDeleteFromInPostPay, $storeId);
                 $createSuccess = $this->postInPostBestsellerProducts($bestsellerProductsToCreate, $store);
                 $updateSuccess = $this->putInPostBestsellerProducts($bestsellerProductsToUpdate, $store);
+                $this->storeEmulator->stopEnvironmentEmulation();
 
                 if ($createSuccess && $updateSuccess) {
                     $this->logger->debug('InPost Bestseller Product successfully uploaded.');

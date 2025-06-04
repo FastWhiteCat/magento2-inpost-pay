@@ -15,6 +15,7 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInte
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -104,6 +105,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
 
         /** @var Product $product */
         $product = $this->productRepository->get($sku, false, $storeId, true);
+        $product->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount()->getValue();
 
         return $product;
     }
