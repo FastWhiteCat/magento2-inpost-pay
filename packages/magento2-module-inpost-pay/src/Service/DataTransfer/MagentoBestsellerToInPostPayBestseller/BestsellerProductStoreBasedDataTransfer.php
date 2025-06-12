@@ -18,7 +18,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
 use Magento\Store\Model\App\Emulation as StoreEmulator;
 
-class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsellerDataTransferInterface
+class BestsellerProductStoreBasedDataTransfer implements MagentoBestsellerToInPostPayBestsellerDataTransferInterface
 {
     /**
      * @param ProductRepositoryInterface $productRepository
@@ -60,6 +60,7 @@ class BestsellerPriceDataTransfer implements MagentoBestsellerToInPostPayBestsel
 
         $bestsellerProduct->setPrice($price);
         $bestsellerProduct->setCurrency($this->getWebsiteCurrencyCode($magentoBestsellerProduct->getWebsiteId()));
+        $bestsellerProduct->setProductLink($product->getProductUrl());
         $this->storeEmulator->stopEnvironmentEmulation();
     }
 
