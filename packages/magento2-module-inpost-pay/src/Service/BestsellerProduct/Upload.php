@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\BestsellerProduct;
 
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
+use InPost\InPostPay\Exception\BestsellerProductsLimitReachedException;
 use InPost\InPostPay\Exception\CouldNotDeleteInPostPayBestsellerProductException;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
 use InPost\InPostPay\Provider\Config\BestsellersCronConfigProvider;

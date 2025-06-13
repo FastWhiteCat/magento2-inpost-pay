@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\ApiConnector;
 
 use InPost\InPostPay\Api\ApiConnector\ConnectorInterface;
+use InPost\InPostPay\Exception\BestsellerProductsLimitReachedException;
 use InPost\InPostPay\Model\IziApi\Request\PostBestsellersRequest;
 use InPost\InPostPay\Model\IziApi\Request\PostBestsellersRequestFactory;
 use InPost\InPostPay\Service\Converter\InPostBestsellerProductToArrayConverter;
@@ -13,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class PostBestsellers
 {
+    private const INPOST_PAY_BESTSELLERS_LIMIT_REACHED_ERROR_CODE = 'MAX_LIMIT_PRODUCTS';
+
     /**
      * @param ConnectorInterface $connector
      * @param PostBestsellersRequestFactory $postBestsellersRequestFactory
@@ -59,6 +62,17 @@ class PostBestsellers
         } catch (LocalizedException $e) {
             $errorMsg = __('There was a problem with uploading bestsellers. Details: %1', $e->getMessage());
             $this->logger->critical($errorMsg->render());
+
+            if ($e->getCode() === 409
+                && str_contains($e->getMessage(), self::INPOST_PAY_BESTSELLERS_LIMIT_REACHED_ERROR_CODE)
+            ) {
+                throw new BestsellerProductsLimitReachedException(
+                    __(
+                        'Limit for InPost Pay Bestsellers has been reached.'
+                        . ' Try sending less products or contact InPost Pay support.'
+                    )
+                );
+            }
 
             throw new LocalizedException($errorMsg);
         }
