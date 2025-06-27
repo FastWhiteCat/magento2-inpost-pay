@@ -264,3 +264,4 @@
 "A maximum of 10 overriding consents will be transferred to the application","Maksymalnie do aplikacji przekazane zostanie 10 nadrzędnych zgód",module,InPost_InPostPay
 "Enable Logs Anonymisation","Włącz Anonimizację Logów",module,InPost_InPostPay
 "Define payment methods in the InPost Pay Application other than those in the contract.","Zdefiniuj metody płatności w Aplikacji InPost Pay inne niż w umowie.",module,InPost_InPostPay
+"Limit for InPost Pay Bestsellers has been reached. Try sending less products or contact InPost Pay support.","Osiągnięto limit Produktów Bestsellerowych InPost Pay. Spróbuj wysłać mniejszą ilość produktów lub skontaktuj się z Działem Wsparcia InPost Pay.",module,InPost_InPostPay
