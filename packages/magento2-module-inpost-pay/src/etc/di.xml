@@ -317,7 +317,7 @@
         <arguments>
             <argument name="dataTransfer" xsi:type="array">
                 <item name="core_bestseller_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\CoreProductDataTransferInPostPay</item>
-                <item name="bestseller_price" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerPriceDataTransfer</item>
+                <item name="bestseller_store_based_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerProductStoreBasedDataTransfer</item>
             </argument>
         </arguments>
     </type>
