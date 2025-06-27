@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_entity_attribute_delete_after">
+        <observer name="InPost_InPostPay::updateBestsellerProductAfterAttributeCommitObserver"
+                  instance="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver" />
+    </event>
+    <event name="catalog_entity_attribute_save_after">
+        <observer name="InPost_InPostPay::updateBestsellerProductAfterAttributeCommitObserver"
+                  instance="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver" />
+    </event>
+</config>
