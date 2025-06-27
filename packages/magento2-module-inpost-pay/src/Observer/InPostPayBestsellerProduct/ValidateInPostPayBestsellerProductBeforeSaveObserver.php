@@ -46,18 +46,6 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
             $this->validateSku($bestsellerProduct);
             $this->validateSkuAndWebsiteConflict($bestsellerProduct);
             $this->validateAvailableFromToDates($bestsellerProduct);
-
-            if ($bestsellerProduct->getBestsellerProductId()) {
-                $this->validateLimitOfBestsellersPerWebsite(
-                    $bestsellerProduct->getWebsiteId(),
-                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE
-                );
-            } else {
-                $this->validateLimitOfBestsellersPerWebsite(
-                    $bestsellerProduct->getWebsiteId(),
-                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE - 1
-                );
-            }
         }
     }
 
@@ -135,26 +123,6 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
         if ($availableFrom && $availableTo && $availableFrom >= $availableTo) {
             throw new InvalidBestsellerProductDataException(
                 __('Bad availability date range. Available end date must be greater than available start date.')
-            );
-        }
-    }
-
-    /**
-     * @param int $websiteId
-     * @param int $limit
-     * @return void
-     * @throws InvalidBestsellerProductDataException
-     */
-    private function validateLimitOfBestsellersPerWebsite(int $websiteId, int $limit): void
-    {
-        $existingBestsellersCount = count($this->getBestsellersByWebsiteId($websiteId));
-
-        if ($existingBestsellersCount > $limit) {
-            throw new InvalidBestsellerProductDataException(
-                __(
-                    'Limit of %1 bestsellers per website has been reached.',
-                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE
-                )
             );
         }
     }
