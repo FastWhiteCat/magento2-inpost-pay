@@ -18,9 +18,19 @@
             <config_path>payment/inpost_pay/basket_lifetime</config_path>
             <comment>InPost basket lifetime in seconds.</comment>
         </field>
+        <field id="use_defined_payment_methods" translate="label comment" type="select" sortOrder="44"
+               showInDefault="1" canRestore="1">
+            <label>Define Payment Methods</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/use_defined_payment_methods</config_path>
+            <comment>Define payment methods in the InPost Pay Application other than those in the contract.</comment>
+        </field>
         <field id="button" translate="label comment" type="button" sortOrder="45"
                showInDefault="1" showInWebsite="1" showInStore="1">
             <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\SynchronizePaymentMethodsButton</frontend_model>
+            <depends>
+                <field id="use_defined_payment_methods">1</field>
+            </depends>
         </field>
         <field id="accepted_payment_types" translate="label comment" type="multiselect" sortOrder="50" showInDefault="1"
                canRestore="1">
@@ -29,6 +39,9 @@
             <can_be_empty>1</can_be_empty>
             <comment>Empty selection will allow all payment types in mobile application.</comment>
             <config_path>payment/inpost_pay/accepted_payment_types</config_path>
+            <depends>
+                <field id="use_defined_payment_methods">1</field>
+            </depends>
         </field>
         <field id="async_basket_export" translate="label comment" type="select" sortOrder="60"
                showInDefault="1" canRestore="1">
