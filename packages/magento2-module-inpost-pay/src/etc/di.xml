@@ -133,6 +133,8 @@
                 type="InPost\InPostPay\Model\InPostPayBestsellerProduct"/>
     <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayBestsellerProductRepository"/>
+    <preference for="InPost\InPostPay\Api\Provider\PolishRegionProviderInterface"
+                type="InPost\InPostPay\Provider\PolishRegionProvider"/>
 
     <!-- Grid data source and collections -->
     <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection"
