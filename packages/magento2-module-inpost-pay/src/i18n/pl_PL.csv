@@ -10,6 +10,8 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
+"EAN product attribute is not configured!","Atrybut produktowy EAN nie został wskazany w konfiguracji!",module,InPost_InPostPay
+"Product [SKU:%1] has empty EAN attribute and cannot be used as InPost Pay Bestseller.","Produkt [SKU:%1] nie posiada wartości atrybutu EAN i nie może być wykorzystywany jako Produkt Bestsellerowy InPost Pay.",module,InPost_InPostPay
 "Network problem","Problem z siecią",module,InPost_InPostPay
 "Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
 "Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
