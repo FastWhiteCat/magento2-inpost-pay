@@ -49,6 +49,7 @@
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
                 <assign_quote_to_customer_by_email>1</assign_quote_to_customer_by_email>
                 <synchronize_bestsellers_enabled>0</synchronize_bestsellers_enabled>
+                <ean_product_attribute>sku</ean_product_attribute>
                 <bestsellers_synchronize_cron_enabled>0</bestsellers_synchronize_cron_enabled>
                 <bestsellers_synchronize_mode>upload</bestsellers_synchronize_mode>
                 <bestsellers_synchronize_cron_schedule>30 6 * * *</bestsellers_synchronize_cron_schedule>

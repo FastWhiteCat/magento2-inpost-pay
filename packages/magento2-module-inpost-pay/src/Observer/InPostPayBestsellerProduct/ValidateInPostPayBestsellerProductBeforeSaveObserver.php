@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Observer\InPostPayBestsellerProduct;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Exception\InvalidBestsellerProductDataException;
 use InPost\InPostPay\Model\InPostPayBestsellerProductRepository;
+use InPost\InPostPay\Validator\Bestseller\EanValidator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
@@ -24,12 +25,14 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
      * @param StoreManagerInterface $storeManager
      * @param InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository
      * @param BestsellersCollectionFactory $bestsellersCollectionFactory
+     * @param EanValidator $eanValidator
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly StoreManagerInterface $storeManager,
         private readonly InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository,
-        private readonly BestsellersCollectionFactory $bestsellersCollectionFactory
+        private readonly BestsellersCollectionFactory $bestsellersCollectionFactory,
+        private readonly EanValidator $eanValidator
     ) {
     }
 
@@ -94,6 +97,8 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
                 )
             );
         }
+
+        $this->eanValidator->validate($product);
     }
 
     /**

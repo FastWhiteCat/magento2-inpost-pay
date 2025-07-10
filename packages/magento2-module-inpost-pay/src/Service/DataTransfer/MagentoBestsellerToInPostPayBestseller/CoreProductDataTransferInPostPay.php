@@ -8,6 +8,8 @@ use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\DataTransfer\MagentoBestsellerToInPostPayBestsellerDataTransferInterface;
+use InPost\InPostPay\Exception\InvalidBestsellerProductDataException;
+use InPost\InPostPay\Provider\Product\BestsellerProductEanProvider;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface as InPostProduct;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory as InPostProductFactory;
@@ -32,13 +34,15 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
      * @param ProductToInPostProductDataTransfer $productToInPostProductDataTransfer
      * @param InPostProductFactory $inPostProductFactory
      * @param ProductAvailabilityInterfaceFactory $productAvailabilityFactory
+     * @param BestsellerProductEanProvider $bestsellerProductEanProvider
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly StoreManagerInterface $storeManager,
         private readonly ProductToInPostProductDataTransfer $productToInPostProductDataTransfer,
         private readonly InPostProductFactory $inPostProductFactory,
-        private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory
+        private readonly ProductAvailabilityInterfaceFactory $productAvailabilityFactory,
+        private readonly BestsellerProductEanProvider $bestsellerProductEanProvider
     ) {
     }
 
@@ -47,6 +51,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
      * @param BestsellerProductInterface $bestsellerProduct
      * @return void
      * @throws NoSuchEntityException
+     * @throws InvalidBestsellerProductDataException
      */
     public function transfer(
         InPostPayBestsellerProductInterface $magentoBestsellerProduct,
@@ -62,7 +67,7 @@ class CoreProductDataTransferInPostPay implements MagentoBestsellerToInPostPayBe
         );
 
         $bestsellerProduct->setProductId($inPostProduct->getProductId());
-        $bestsellerProduct->setEan($inPostProduct->getEan());
+        $bestsellerProduct->setEan($this->bestsellerProductEanProvider->get($product));
         $bestsellerProduct->setProductName($inPostProduct->getProductName());
         $bestsellerProduct->setProductDescription($inPostProduct->getProductDescription());
         $bestsellerProduct->setProductAttributes($inPostProduct->getProductAttributes());
