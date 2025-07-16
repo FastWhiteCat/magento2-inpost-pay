@@ -81,9 +81,9 @@ interface OrderDetailsInterface
     public function setOrderComments(string $orderComments): void;
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null
      */
-    public function getBasketPrice(): PriceInterface;
+    public function getBasketPrice(): ?PriceInterface;
 
     /**
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $basketPrice

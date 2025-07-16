@@ -23,6 +23,7 @@ interface BestsellerProductInterface
     public const PRICE = 'price';
     public const CURRENCY = 'currency';
     public const QUANTITY = 'quantity';
+    public const PRODUCT_LINK = 'product_link';
     public const PRODUCT_ATTRIBUTES = 'product_attributes';
     public const DEFAULT_CURRENCY = 'PLN';
 
@@ -179,4 +180,15 @@ interface BestsellerProductInterface
      * @return void
      */
     public function setProductAttributes(array $productAttributes): void;
+
+    /**
+     * @return string
+     */
+    public function getProductLink(): string;
+
+    /**
+     * @param string $productLink
+     * @return void
+     */
+    public function setProductLink(string $productLink): void;
 }

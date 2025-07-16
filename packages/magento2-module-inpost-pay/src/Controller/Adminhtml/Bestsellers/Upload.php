@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Controller\Adminhtml\Bestsellers;
 
 use Exception;
+use InPost\InPostPay\Exception\BestsellerProductsLimitReachedException;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
 use InPost\InPostPay\Service\BestsellerProduct\Upload as UploadService;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -52,6 +53,8 @@ class Upload extends BestsellersController implements HttpGetActionInterface
             );
         } catch (NotFullySuccessfulBestsellerProductUploadException $e) {
             $this->messageManager->addWarningMessage(__($e->getMessage())->render());
+        } catch (BestsellerProductsLimitReachedException $e) {
+            $this->messageManager->addErrorMessage(__($e->getMessage())->render());
         } catch (Exception $e) {
             $this->messageManager->addErrorMessage(
                 __(

@@ -20,7 +20,6 @@ interface InPostPayBestsellerProductInterface
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
     public const SKIP_UPDATE_FLAG = 'skip_update_flag';
-    public const BESTSELLERS_LIMIT_PER_WEBSITE = 5;
 
     /**
      * @return int|null

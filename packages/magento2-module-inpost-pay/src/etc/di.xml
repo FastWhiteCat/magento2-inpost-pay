@@ -133,6 +133,8 @@
                 type="InPost\InPostPay\Model\InPostPayBestsellerProduct"/>
     <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayBestsellerProductRepository"/>
+    <preference for="InPost\InPostPay\Api\Provider\PolishRegionProviderInterface"
+                type="InPost\InPostPay\Provider\PolishRegionProvider"/>
 
     <!-- Grid data source and collections -->
     <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection"
@@ -229,7 +231,7 @@
         <plugin name="InPost_InPostPay::limitProductAttributeNameAndValueCharactersPlugin"
                 type="InPost\InPostPay\Plugin\Model\Data\Basket\Product\LimitProductAttributeNameAndValueCharactersPlugin" />
     </type>
-    <type name="\InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface">
+    <type name="InPost\InPostPay\Model\Request">
         <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
                 type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
     </type>
@@ -317,7 +319,7 @@
         <arguments>
             <argument name="dataTransfer" xsi:type="array">
                 <item name="core_bestseller_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\CoreProductDataTransferInPostPay</item>
-                <item name="bestseller_price" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerPriceDataTransfer</item>
+                <item name="bestseller_store_based_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerProductStoreBasedDataTransfer</item>
             </argument>
         </arguments>
     </type>

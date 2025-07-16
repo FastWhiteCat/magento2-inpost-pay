@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2025-06-27
+
+### Added
+
+- InPost Pay Bestseller Product objects that are synchronized with InPost Pay API will now contain also Product URL
+- InPost Pay Bestseller Products will now be synchronized when an attribute is saved in Admin Panel
+- In the case of configuration requiring Region for Poland, InPost Pay Module will now resolve Voivodeship based on post-code first two digits provided by InPost Pay due to lack of information about a region from the incoming request. 
+
+### Updated
+
+- Available Payment Methods will now work the opposite way. Instead of forcing Merchant to configure his list of available payment methods, it is allowed to configure which are not available.
+- Limit for InPost Pay Bestseller Products that can be synchronized with InPost Pay is no longer limited to 5. Limit only exists in InPost Pay API.
+
+### Fixed
+
+- Fixed sending a header with module version to InPost Pay API on each request.
+
 ## [2.2.0] - 2025-06-04
 
 ### Added

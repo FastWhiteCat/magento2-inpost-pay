@@ -10,6 +10,11 @@
             <config_path>payment/inpost_pay/synchronize_bestsellers_enabled</config_path>
             <comment>Important! This setting should only be enabled on the configuration scope where InPost Pay is enabled and has own credentials! When enabled any save of selected bestseller product or inventory will trigger update of Bestseller Product. Also, any reservation append will check if configured Bestseller Product is still saleable, if not update will be performed.</comment>
         </field>
+        <field id="ean_product_attribute" translate="label" type="select" sortOrder="5" showInDefault="1">
+            <label>EAN Product Attribute</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ProductAttributes</source_model>
+            <config_path>payment/inpost_pay/ean_product_attribute</config_path>
+        </field>
         <field id="bestsellers_synchronize_cron_enabled" translate="label" type="select" sortOrder="10"
                showInDefault="1" canRestore="1">
             <label>Enabled Bestsellers Synchronize CRON</label>
