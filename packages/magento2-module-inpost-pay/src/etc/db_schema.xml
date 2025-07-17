@@ -18,8 +18,10 @@
         <column xsi:type="text" name="serialized_analytics_data" nullable="true"/>
         <column xsi:type="timestamp" name="analytics_sent_at" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
-        <column xsi:type="varchar" length="500" name="accepted_consents" nullable="true"/>
+        <column xsi:type="text" name="accepted_consents" nullable="true"/>
         <column xsi:type="varchar" length="255" name="inpost_pay_account_email" nullable="true"/>
+        <column xsi:type="tinyint" name="order_with_invoice" nullable="false" default="1"/>
+        <column xsi:type="varchar" length="255" name="inpost_pay_invoice_email" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_email" nullable="true"/>
         <column xsi:type="varchar" length="255" name="digital_delivery_email" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
@@ -126,7 +128,7 @@
         <column xsi:type="text" name="qr_code" nullable="true"/>
         <column xsi:type="varchar" name="deep_link" length="512" nullable="false"/>
         <column xsi:type="varchar" name="inpost_pay_status" length="255" nullable="false"/>
-        <column xsi:type="varchar" name="error" length="512" nullable="false"/>
+        <column xsi:type="varchar" name="error" length="1024" nullable="false"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

@@ -305,4 +305,23 @@ class BestsellerProduct extends DataObject implements BestsellerProductInterface
     {
         $this->setData(self::PRODUCT_ATTRIBUTES, $productAttributes);
     }
+
+    /**
+     * @return string
+     */
+    public function getProductLink(): string
+    {
+        $productLink = $this->getData(self::PRODUCT_LINK);
+
+        return is_scalar($productLink) ? (string)$productLink : '';
+    }
+
+    /**
+     * @param string $productLink
+     * @return void
+     */
+    public function setProductLink(string $productLink): void
+    {
+        $this->setData(self::PRODUCT_LINK, $productLink);
+    }
 }

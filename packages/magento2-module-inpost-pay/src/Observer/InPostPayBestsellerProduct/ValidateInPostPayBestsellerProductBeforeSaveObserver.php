@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Observer\InPostPayBestsellerProduct;
 use InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface;
 use InPost\InPostPay\Exception\InvalidBestsellerProductDataException;
 use InPost\InPostPay\Model\InPostPayBestsellerProductRepository;
+use InPost\InPostPay\Validator\Bestseller\EanValidator;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
@@ -24,12 +25,14 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
      * @param StoreManagerInterface $storeManager
      * @param InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository
      * @param BestsellersCollectionFactory $bestsellersCollectionFactory
+     * @param EanValidator $eanValidator
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly StoreManagerInterface $storeManager,
         private readonly InPostPayBestsellerProductRepository $inPostPayBestsellerProductRepository,
-        private readonly BestsellersCollectionFactory $bestsellersCollectionFactory
+        private readonly BestsellersCollectionFactory $bestsellersCollectionFactory,
+        private readonly EanValidator $eanValidator
     ) {
     }
 
@@ -46,18 +49,6 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
             $this->validateSku($bestsellerProduct);
             $this->validateSkuAndWebsiteConflict($bestsellerProduct);
             $this->validateAvailableFromToDates($bestsellerProduct);
-
-            if ($bestsellerProduct->getBestsellerProductId()) {
-                $this->validateLimitOfBestsellersPerWebsite(
-                    $bestsellerProduct->getWebsiteId(),
-                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE
-                );
-            } else {
-                $this->validateLimitOfBestsellersPerWebsite(
-                    $bestsellerProduct->getWebsiteId(),
-                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE - 1
-                );
-            }
         }
     }
 
@@ -94,6 +85,8 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
                 )
             );
         }
+
+        $this->eanValidator->validate($product);
     }
 
     /**
@@ -135,26 +128,6 @@ class ValidateInPostPayBestsellerProductBeforeSaveObserver implements ObserverIn
         if ($availableFrom && $availableTo && $availableFrom >= $availableTo) {
             throw new InvalidBestsellerProductDataException(
                 __('Bad availability date range. Available end date must be greater than available start date.')
-            );
-        }
-    }
-
-    /**
-     * @param int $websiteId
-     * @param int $limit
-     * @return void
-     * @throws InvalidBestsellerProductDataException
-     */
-    private function validateLimitOfBestsellersPerWebsite(int $websiteId, int $limit): void
-    {
-        $existingBestsellersCount = count($this->getBestsellersByWebsiteId($websiteId));
-
-        if ($existingBestsellersCount > $limit) {
-            throw new InvalidBestsellerProductDataException(
-                __(
-                    'Limit of %1 bestsellers per website has been reached.',
-                    InPostPayBestsellerProductInterface::BESTSELLERS_LIMIT_PER_WEBSITE
-                )
             );
         }
     }

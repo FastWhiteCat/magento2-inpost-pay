@@ -122,9 +122,9 @@ class OrderDetails extends DataObject implements OrderDetailsInterface, Extensib
     }
 
     /**
-     * @return PriceInterface
+     * @return PriceInterface|null
      */
-    public function getBasketPrice(): PriceInterface
+    public function getBasketPrice(): ?PriceInterface
     {
         $basketPrice = $this->getData(self::BASKET_PRICE);
 
@@ -132,7 +132,7 @@ class OrderDetails extends DataObject implements OrderDetailsInterface, Extensib
             return $basketPrice;
         }
 
-        return $this->priceFactory->create();
+        return null;
     }
 
     /**

@@ -44,6 +44,12 @@ class InitInPostPayOrderStep extends OrderProcessingStep implements OrderPostPro
         $inPostPayOrder->setBasketId($inPostOrder->getOrderDetails()->getBasketId());
         $inPostPayOrder->setBasketBindingApiKey($this->extractBasketBindingApiKeyByQuoteId((int)$order->getQuoteId()));
         $inPostPayOrder->setInPostPayAccountEmail($inPostOrder->getAccountInfo()->getMail());
+        $inPostPayOrder->setOrderWithInvoice(false);
+
+        if ($inPostOrder->getInvoiceDetails() !== null) {
+            $inPostPayOrder->setOrderWithInvoice(true);
+            $inPostPayOrder->setInPostPayInvoiceEmail($inPostOrder->getInvoiceDetails()->getMail());
+        }
 
         if ($inPostOrder->getDelivery()->getDigitalDeliveryEmail()) {
             $inPostPayOrder->setDigitalDeliveryEmail($inPostOrder->getDelivery()->getDigitalDeliveryEmail());

@@ -25,7 +25,7 @@ class DeleteInPostPayBestsellerProductAfterSaveObserver extends ParentObserver i
             return;
         }
 
-        if (!$this->bestsellerChecker->isSynchronizationEnabled()
+        if (!$this->bestsellerChecker->isSynchronizationEnabled((int)$product->getStoreId())
             || !$this->bestsellerChecker->isBestsellerProductBySku($product->getSku())
         ) {
             return;

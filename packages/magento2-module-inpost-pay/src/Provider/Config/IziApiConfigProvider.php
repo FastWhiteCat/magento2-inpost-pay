@@ -12,8 +12,10 @@ use Magento\Store\Model\ScopeInterface;
 class IziApiConfigProvider
 {
     private const XML_PATH_IZI_API_URL = 'payment/inpost_pay/%sizi_api_url';
+    private const XML_PATH_WIDGET_URL = 'payment/inpost_pay/%swidget_script_url';
     private const XML_PATH_BASKET_LIFETIME = 'payment/inpost_pay/basket_lifetime';
     private const XML_PATH_ACCEPTED_PAYMENT_TYPES = 'payment/inpost_pay/accepted_payment_types';
+    private const XML_PATH_USE_DEFINED_PAYMENT_METHODS = 'payment/inpost_pay/use_defined_payment_methods';
     private const XML_PATH_ASYNC_BASKET_EXPORT = 'payment/inpost_pay/async_basket_export';
     private const XML_PATH_PROD_ATTR_CLEANING = 'payment/inpost_pay/remove_html_and_special_chars_from_attributes';
 
@@ -54,6 +56,28 @@ class IziApiConfigProvider
         return (string)$iziApiUrl;
     }
 
+    /**
+     * Returns production or sandbox Widget URL
+     *
+     * @return string
+     * @throws InPostPayInternalException
+     */
+    public function getWidgetUrl(): string
+    {
+        $widgetUrl = $this->scopeConfig->getValue(
+            sprintf(
+                self::XML_PATH_WIDGET_URL,
+                $this->sandboxConfigProvider->isSandboxEnabled() ? SandboxConfigProvider::SANDBOX_PREFIX : ''
+            )
+        );
+
+        if (empty($widgetUrl) || !is_scalar($widgetUrl)) {
+            throw new InPostPayInternalException(__('Empty Widget URL'));
+        }
+
+        return (string)$widgetUrl;
+    }
+
     public function getBasketLifetime(): ?int
     {
         $basketLifetime = $this->scopeConfig->getValue(self::XML_PATH_BASKET_LIFETIME);
@@ -65,8 +89,20 @@ class IziApiConfigProvider
         return null;
     }
 
+    /**
+     * @return bool
+     */
+    public function isUsingDefinedMethodsEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_USE_DEFINED_PAYMENT_METHODS);
+    }
+
     public function getAcceptedPaymentTypes(): array
     {
+        if (!$this->isUsingDefinedMethodsEnabled()) {
+            return [];
+        }
+
         $acceptedPaymentTypes = $this->scopeConfig->getValue(self::XML_PATH_ACCEPTED_PAYMENT_TYPES);
 
         if (!empty($acceptedPaymentTypes) && is_scalar($acceptedPaymentTypes)) {

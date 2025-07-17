@@ -32,6 +32,8 @@ interface InPostPayOrderInterface
     public const DELIVERY_OPTIONS = 'delivery_options';
     public const ACCEPTED_CONSENTS = 'accepted_consents';
     public const INPOST_PAY_ACCOUNT_EMAIL = 'inpost_pay_account_email';
+    public const ORDER_WITH_INVOICE = 'order_with_invoice';
+    public const INPOST_PAY_INVOICE_EMAIL = 'inpost_pay_invoice_email';
     public const DELIVERY_EMAIL = 'delivery_email';
     public const DIGITAL_DELIVERY_EMAIL = 'digital_delivery_email';
     public const CREATED_AT = 'created_at';
@@ -97,6 +99,28 @@ interface InPostPayOrderInterface
      * @return InPostPayOrderInterface
      */
     public function setAcceptedConsents(array $acceptedConsents): InPostPayOrderInterface;
+
+    /**
+     * @return bool
+     */
+    public function isOrderWithInvoice(): bool;
+
+    /**
+     * @param bool $orderWithInvoice
+     * @return InPostPayOrderInterface
+     */
+    public function setOrderWithInvoice(bool $orderWithInvoice): InPostPayOrderInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getInPostPayInvoiceEmail(): ?string;
+
+    /**
+     * @param string|null $inPostPayInvoiceEmail
+     * @return InPostPayOrderInterface
+     */
+    public function setInPostPayInvoiceEmail(?string $inPostPayInvoiceEmail): InPostPayOrderInterface;
 
     /**
      * @return string
