@@ -41,13 +41,13 @@ class Handler extends Base
 
     public function handle($record): bool
     {
-        if (is_array($record)) {
-            $recordMessage = (string)$record['message'];
-            $record['message'] = sprintf('[%s] %s', $this->getLogId(), $recordMessage);
-        } elseif ($record instanceof LogRecord && method_exists($record, 'with')) {
+        if ($record instanceof LogRecord && method_exists($record, 'with')) { //@phpstan-ignore-line
             $recordData = $record->toArray();
             $recordMessage = (string)$recordData['message'];
             $record->with(message: sprintf('[%s] %s', $this->getLogId(), $recordMessage));
+        } elseif (is_array($record)) { //@phpstan-ignore-line
+            $recordMessage = (string)$record['message'];
+            $record['message'] = sprintf('[%s] %s', $this->getLogId(), $recordMessage);
         }
 
         return parent::handle($record);
