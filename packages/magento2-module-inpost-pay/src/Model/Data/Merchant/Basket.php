@@ -30,25 +30,6 @@ class Basket extends DataObject implements BasketInterface, ExtensibleDataInterf
     /**
      * @return string|null
      */
-    public function getBrowserId(): ?string
-    {
-        $browserId = $this->getData(self::BROWSER_ID);
-
-        return is_scalar($browserId) ? (string)$browserId : null;
-    }
-
-    /**
-     * @param string|null $browserId
-     * @return void
-     */
-    public function setBrowserId(?string $browserId): void
-    {
-        $this->setData(self::BROWSER_ID, $browserId);
-    }
-
-    /**
-     * @return string|null
-     */
     public function getBasketId(): ?string
     {
         $basketId = $this->getData(self::BASKET_ID);

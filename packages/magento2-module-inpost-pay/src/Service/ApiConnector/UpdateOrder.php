@@ -57,7 +57,7 @@ class UpdateOrder
         $storeId = is_scalar($order->getStoreId()) ? (int)$order->getStoreId() : 0;
         $request->setStoreId($storeId);
         $request->setParams([
-            'order_id' => $order->getIncrementId(),
+            'order_id' => (string)$order->getId(), //@phpstan-ignore-line
             'event_id' => uniqid(),
             'event_data_time' => $this->localeDate->date()->format(self::DEFAULT_DATE_FORMAT),
             'phone_number' => [

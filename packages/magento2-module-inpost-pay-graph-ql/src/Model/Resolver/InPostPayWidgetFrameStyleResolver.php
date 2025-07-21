@@ -12,8 +12,6 @@ use Magento\Store\Api\Data\StoreInterface;
 
 class InPostPayWidgetFrameStyleResolver implements ResolverInterface
 {
-    private const CLASSIC_FRAME_STYLE = 'classic';
-
     /**
      * @param LayoutConfigProvider $layoutConfigProvider
      */
@@ -32,8 +30,7 @@ class InPostPayWidgetFrameStyleResolver implements ResolverInterface
         if ($store instanceof StoreInterface) {
             $websiteId = (int)$store->getWebsiteId();
         }
-        $frameStyle = $this->layoutConfigProvider->getFrameStyle($websiteId);
 
-        return !empty($frameStyle) ? $frameStyle : self::CLASSIC_FRAME_STYLE;
+        return $this->layoutConfigProvider->getWidgetStyles($websiteId);
     }
 }

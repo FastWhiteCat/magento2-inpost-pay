@@ -63,6 +63,22 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return $this->setData(self::BASKET_ID, $basketId);
     }
 
+    public function getBasketBindingApiKey(): ?string
+    {
+        if ($this->hasData(self::BASKET_BINDING_API_KEY)) {
+            $basketBindingApiKey = $this->getData(self::BASKET_BINDING_API_KEY);
+
+            $basketBindingApiKey = is_scalar($basketBindingApiKey) ? (string)$basketBindingApiKey : null;
+        };
+
+        return $basketBindingApiKey ?? null;
+    }
+
+    public function setBasketBindingApiKey(?string $basketBindingApiKey): InPostPayQuoteInterface
+    {
+        return $this->setData(self::BASKET_BINDING_API_KEY, $basketBindingApiKey);
+    }
+
     public function getInpostBasketId(): ?string
     {
         $id = ($this->hasData(self::INPOST_BASKET_ID)) ? $this->getData(self::INPOST_BASKET_ID) : null;

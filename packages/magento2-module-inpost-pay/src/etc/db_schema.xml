@@ -5,6 +5,7 @@
         <column xsi:type="int" name="inpost_pay_order_id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="false" identity="false"/>
         <column xsi:type="varchar" name="basket_id" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="basket_binding_api_key" length="1024" nullable="false"/>
         <column xsi:type="varchar" name="payment_type" length="255" nullable="true"/>
         <column xsi:type="varchar" length="255" name="locker_id" nullable="true"/>
         <column xsi:type="varchar" name="order_status" length="255" nullable="true"/>
@@ -38,6 +39,7 @@
         <column name="inpost_pay_quote_id" xsi:type="int" unsigned="true" nullable="false" identity="true" comment="Entity id"/>
         <column xsi:type="int" name="quote_id" unsigned="true" nullable="false" identity="false"/>
         <column xsi:type="varchar" name="basket_id" length="255" nullable="false"/>
+        <column xsi:type="varchar" name="basket_binding_api_key" length="1024" nullable="false"/>
         <column xsi:type="varchar" name="inpost_basket_id" length="255" nullable="true"/>
         <column xsi:type="varchar" name="status" length="32" nullable="false" default="PENDING"/>
         <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
