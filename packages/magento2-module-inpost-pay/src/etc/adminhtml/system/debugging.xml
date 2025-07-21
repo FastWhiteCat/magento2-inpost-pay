@@ -10,5 +10,12 @@
             <source_model>InPost\InPostPay\Model\Config\Source\LogLevel</source_model>
             <config_path>payment/inpost_pay/min_log_level</config_path>
         </field>
+        <field id="anonymise_objects_enabled" translate="label" type="select" sortOrder="20" showInDefault="1"
+               canRestore="1">
+            <label>Enable Logs Anonymisation</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/anonymise_objects_enabled</config_path>
+            <comment>When enabled objects and data logged in files will have every personal information anonymised.</comment>
+        </field>
     </group>
 </include>

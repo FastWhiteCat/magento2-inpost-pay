@@ -44,14 +44,14 @@ class BasketPriceValidator implements OrderValidatorInterface
     /**
      * @param Address $address
      * @param ShippingMethodInterface $shippingMethod
-     * @param PriceInterface $basketPrice
+     * @param PriceInterface|null $basketPrice
      * @return void
      * @throws LocalizedException
      */
     private function validateGrossPrice(
         Address $address,
         ShippingMethodInterface $shippingMethod,
-        PriceInterface $basketPrice
+        ?PriceInterface $basketPrice
     ): void {
         $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
         $priceInclTaxWithShipping = DecimalCalculator::add(
@@ -61,6 +61,10 @@ class BasketPriceValidator implements OrderValidatorInterface
         $finalPriceInclTax = DecimalCalculator::round(
             DecimalCalculator::add($priceInclTaxWithShipping, $discountInclTax)
         );
+
+        if ($basketPrice === null) {
+            throw new LocalizedException(__('Order final Gross value was not provided.'));
+        }
 
         if ($basketPrice->getGross() !== $finalPriceInclTax) {
             throw new LocalizedException(
@@ -125,7 +129,7 @@ class BasketPriceValidator implements OrderValidatorInterface
 
         throw new LocalizedException(
             __(
-                'Selected shipping method is not available [%s %s].',
+                'Selected shipping method is not available [%1 %2].',
                 $deliveryType,
                 $deliveryOption
             )

@@ -9,6 +9,7 @@ use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Provider\Config\OmnibusConfigProvider;
 use InPost\InPostPay\Provider\Product\CustomProductPromoPriceProvider;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer;
+use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote;
 
@@ -38,10 +39,11 @@ class ApplyCustomPromoPriceForCustomerGroupPlugin
         Quote $quote,
         BasketInterface $basket
     ): void {
+        $storeId = $quote->getStoreId();
         $customPromoPriceAttribute = $this->configProvider->getCustomProductPromoPriceAttributeCode();
-        $customerGroups = $this->configProvider->getCustomProductPromoPriceCustomerGroups();
+        $customerGroups = $this->configProvider->getCustomProductPromoPriceCustomerGroups($storeId);
 
-        if (!$this->configProvider->isCustomPromoPriceForSpecificCustomerGroupEnabled()
+        if (!$this->configProvider->isCustomPromoPriceForSpecificCustomerGroupEnabled($storeId)
             || $customPromoPriceAttribute === null
             || !in_array($quote->getCustomerGroupId(), $customerGroups)
         ) {
@@ -49,9 +51,15 @@ class ApplyCustomPromoPriceForCustomerGroupPlugin
         }
 
         foreach ($basket->getProducts() as $inPostPayProduct) {
+            $product = $this->extractProductFromQuoteById((int)$inPostPayProduct->getProductId(), $quote);
+
+            if ($product === null) {
+                continue;
+            }
+
             try {
                 $customPromoPrice = $this->customProductPromoPriceProvider->getCustomPromoPrice(
-                    $inPostPayProduct->getEan(),
+                    $product,
                     $customPromoPriceAttribute
                 );
             } catch (NoSuchEntityException $e) {
@@ -62,5 +70,26 @@ class ApplyCustomPromoPriceForCustomerGroupPlugin
                 $inPostPayProduct->setPromoPrice($customPromoPrice);
             }
         }
+    }
+
+    /**
+     * @param int $productId
+     * @param Quote $quote
+     * @return Product|null
+     */
+    private function extractProductFromQuoteById(int $productId, Quote $quote): ?Product
+    {
+        $product = null;
+
+        foreach ($quote->getAllVisibleItems() as $quoteItem) {
+            $quoteProductId = (int)$quoteItem->getProduct()->getId();
+
+            if ($quoteProductId === $productId) {
+                $product = $quoteItem->getProduct();
+                break;
+            }
+        }
+
+        return $product;
     }
 }

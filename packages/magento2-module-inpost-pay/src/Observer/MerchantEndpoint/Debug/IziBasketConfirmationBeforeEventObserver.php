@@ -24,8 +24,10 @@ class IziBasketConfirmationBeforeEventObserver extends MerchantEndpointEventObse
             $status = $event->getData(InPostPayQuoteInterface::STATUS);
             $inPostBasketId = $event->getData(InPostPayQuoteInterface::INPOST_BASKET_ID);
             $maskedPhoneNumber = $event->getData(InPostPayQuoteInterface::MASKED_PHONE_NUMBER);
-            $name = $event->getData(InPostPayQuoteInterface::NAME);
+            $name = $event->getData(sprintf('param_%s', InPostPayQuoteInterface::NAME));
+            $name = is_scalar($name) ? (string)$name : '';
             $surname = $event->getData(InPostPayQuoteInterface::SURNAME);
+            $surname = is_scalar($surname) ? (string)$surname : '';
 
             $phoneNumberData = [];
             $phoneNumber = $event->getData(InPostPayQuoteInterface::PHONE_NUMBER);
@@ -50,7 +52,11 @@ class IziBasketConfirmationBeforeEventObserver extends MerchantEndpointEventObse
                 InPostPayQuoteInterface::SURNAME => $surname,
             ];
 
-            $this->createEventDataLog($requestParams);
+            if ($this->debugConfigProvider->isAnonymisingEnabled()) {
+                $this->createEventDataLog($this->anonymizeArray($requestParams));
+            } else {
+                $this->createEventDataLog($requestParams);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Model\Data\Merchant\Order;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
+use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetails\AdditionalOrderParametersInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface;
 use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
@@ -121,9 +122,9 @@ class OrderDetails extends DataObject implements OrderDetailsInterface, Extensib
     }
 
     /**
-     * @return PriceInterface
+     * @return PriceInterface|null
      */
-    public function getBasketPrice(): PriceInterface
+    public function getBasketPrice(): ?PriceInterface
     {
         $basketPrice = $this->getData(self::BASKET_PRICE);
 
@@ -131,7 +132,7 @@ class OrderDetails extends DataObject implements OrderDetailsInterface, Extensib
             return $basketPrice;
         }
 
-        return $this->priceFactory->create();
+        return null;
     }
 
     /**
@@ -301,5 +302,24 @@ class OrderDetails extends DataObject implements OrderDetailsInterface, Extensib
     public function setDeliveryReferencesList(array $deliveryReferencesList): void
     {
         $this->setData(self::DELIVERY_REFERENCE_LIST, $deliveryReferencesList);
+    }
+
+    /**
+     * @return AdditionalOrderParametersInterface[]
+     */
+    public function getOrderAdditionalParameters(): array
+    {
+        $params = $this->getData(self::ORDER_ADDITIONAL_PARAMETERS);
+
+        return (is_array($params)) ? $params : [];
+    }
+
+    /**
+     * @param AdditionalOrderParametersInterface[] $params
+     * @return void
+     */
+    public function setOrderAdditionalParameters(array $params): void
+    {
+        $this->setData(self::ORDER_ADDITIONAL_PARAMETERS, $params);
     }
 }

@@ -4,19 +4,27 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\Order\Creator;
 
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\OrderProcessorInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Exception\QuoteChangedDuringOrderProcessingException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartManagementInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OrderProcessor implements OrderProcessorInterface
 {
     /**
@@ -33,6 +41,8 @@ class OrderProcessor implements OrderProcessorInterface
         private readonly CartManagementInterface $cartManagement,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly PaymentMethodManagementInterface $paymentMethodManagement,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger,
         array $orderProcessingSteps,
         array $orderPostProcessingSteps
@@ -43,11 +53,15 @@ class OrderProcessor implements OrderProcessorInterface
 
     /**
      * @param Quote $quote
+     * @param InPostPayQuoteInterface $inPostPayQuote
      * @param OrderInterface $inPostOrder
      * @return Order
+     * @throws CouldNotSaveException
      * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @throws QuoteChangedDuringOrderProcessingException
      */
-    public function execute(Quote $quote, OrderInterface $inPostOrder): Order
+    public function execute(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): Order
     {
         try {
             foreach ($this->orderProcessingSteps as $orderProcessingStep) {
@@ -60,6 +74,15 @@ class OrderProcessor implements OrderProcessorInterface
                 $orderPostProcessingStep->process($order, $inPostOrder);
             }
 
+            $this->eventManager->dispatch(
+                'inpost_pay_order_post_processing_steps_after',
+                [
+                    'order' => $order,
+                    'quote' => $quote,
+                    'inpost_pay_quote' => $inPostPayQuote,
+                ]
+            );
+
             $this->logger->info(
                 sprintf(
                     'Successfully created InPost Pay Order #%s from Quote ID: %s',
@@ -69,6 +92,12 @@ class OrderProcessor implements OrderProcessorInterface
             );
 
             return $order;
+        } catch (NoSuchEntityException $e) {
+            if ($this->isCouponCanceled($quote)) {
+                throw new QuoteChangedDuringOrderProcessingException();
+            }
+
+            throw $e;
         } catch (LocalizedException $e) {
             $this->logger->error($e->getMessage());
 
@@ -132,5 +161,18 @@ class OrderProcessor implements OrderProcessorInterface
         if (empty($this->orderPostProcessingSteps)) {
             throw new LocalizedException(__('InPost Pay order post processing steps are undefined.'));
         }
+    }
+
+    private function isCouponCanceled(Quote $quote): bool
+    {
+        $cartId = is_scalar($quote->getId()) ? (int)$quote->getId() : 0;
+        try {
+            $reloadedQuote = $this->cartRepository->get($cartId);
+        } catch (NoSuchEntityException $e) {
+            return false;
+        }
+
+        // @phpstan-ignore-next-line
+        return $reloadedQuote->getCouponCode() !== $quote->getCouponCode();
     }
 }

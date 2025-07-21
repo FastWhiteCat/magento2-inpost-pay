@@ -21,15 +21,15 @@ class PrepareQuoteProductsQuantity
         foreach ($quote->getAllVisibleItems() as $quoteItem) {
             if ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
                 foreach ($quoteItem->getChildren() as $child) {
-                    $qty = $child->getQty() * $quoteItem->getQty();
+                    $qty = (float)$child->getQty() * (float)$quoteItem->getQty();
                     $this->setQuoteItemQuantity((int)$child->getProduct()->getId(), $qty, $quoteItemsQuantity);
                 }
             } elseif ($quoteItem->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
-                $qty = $quoteItem->getQty();
+                $qty = (float)$quoteItem->getQty();
                 $product = $this->quoteItemProductExtractor->extractProductFromQuoteItem($quoteItem);
                 $this->setQuoteItemQuantity((int)$product->getId(), $qty, $quoteItemsQuantity);
             } else {
-                $qty = $quoteItem->getQty();
+                $qty = (float)$quoteItem->getQty();
                 $this->setQuoteItemQuantity((int)$quoteItem->getProduct()->getId(), $qty, $quoteItemsQuantity);
             }
         }
