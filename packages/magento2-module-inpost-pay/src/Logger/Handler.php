@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Logger;
 use InPost\InPostPay\Provider\Config\DebugConfigProvider;
 use Magento\Framework\Filesystem\DriverInterface;
 use Magento\Framework\Logger\Handler\Base;
+use Monolog\LogRecord;
 
 class Handler extends Base
 {
@@ -31,17 +32,23 @@ class Handler extends Base
         $this->bubble = false;
     }
 
-    public function isHandling(array $record): bool
+    public function isHandling($record): bool
     {
         $minLogLevel = ($this->debugConfigProvider) ? $this->debugConfigProvider->getMinLogLevel() : $this->level;
 
         return (int)$record['level'] >= $minLogLevel;
     }
 
-    public function handle(array $record): bool
+    public function handle($record): bool
     {
-        $recordMessage = (string)$record['message'];
-        $record['message'] = sprintf('[%s] %s', $this->getLogId(), $recordMessage);
+        if (is_array($record)) {
+            $recordMessage = (string)$record['message'];
+            $record['message'] = sprintf('[%s] %s', $this->getLogId(), $recordMessage);
+        } elseif ($record instanceof LogRecord && method_exists($record, 'with')) {
+            $recordData = $record->toArray();
+            $recordMessage = (string)$recordData['message'];
+            $record->with(message: sprintf('[%s] %s', $this->getLogId(), $recordMessage));
+        }
 
         return parent::handle($record);
     }
