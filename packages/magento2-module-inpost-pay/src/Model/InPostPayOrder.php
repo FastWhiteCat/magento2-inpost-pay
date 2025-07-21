@@ -86,22 +86,6 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::BASKET_ID, $basketId);
     }
 
-    public function getBasketBindingApiKey(): ?string
-    {
-        if ($this->hasData(self::BASKET_BINDING_API_KEY)) {
-            $basketBindingApiKey = $this->getData(self::BASKET_BINDING_API_KEY);
-
-            $basketBindingApiKey = is_scalar($basketBindingApiKey) ? (string)$basketBindingApiKey : null;
-        };
-
-        return $basketBindingApiKey ?? null;
-    }
-
-    public function setBasketBindingApiKey(?string $basketBindingApiKey): InPostPayOrderInterface
-    {
-        return $this->setData(self::BASKET_BINDING_API_KEY, $basketBindingApiKey);
-    }
-
     public function getPaymentType(): ?string
     {
         $paymentType = $this->getData(self::PAYMENT_TYPE);

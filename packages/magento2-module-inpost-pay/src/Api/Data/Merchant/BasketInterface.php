@@ -11,6 +11,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 interface BasketInterface
 {
     public const BASKET_ID = 'basket_id';
+    public const BROWSER_ID = 'browser_id';
     public const SUMMARY = 'summary';
     public const DELIVERY = 'delivery';
     public const PROMO_CODES = 'promo_codes';
@@ -20,6 +21,17 @@ interface BasketInterface
     public const PROMOTIONS_AVAILABLE = 'promotions_available';
     public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
     public const STATUS = 'status';
+
+    /**
+     * @return string|null
+     */
+    public function getBrowserId(): ?string;
+
+    /**
+     * @param string|null $browserId
+     * @return void
+     */
+    public function setBrowserId(string|null $browserId): void;
 
     /**
      * @return string|null

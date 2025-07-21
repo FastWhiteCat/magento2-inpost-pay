@@ -11,7 +11,6 @@ interface RequestInterface
 {
     public const CONTENT_TYPE = 'Content-Type';
     public const AUTHORIZATION = 'Authorization';
-    public const PLUGIN_VERSION = 'inpay-plugin-version';
     public const BEARER_PATTERN = ' Bearer %s';
 
     public function getUri(bool $keepParamsIntact = false): string;

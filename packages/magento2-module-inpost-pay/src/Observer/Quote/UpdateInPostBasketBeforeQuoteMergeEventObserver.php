@@ -6,8 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
-use InPost\InPostPay\Enum\InPostBasketStatus;
-use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -19,12 +18,12 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
 {
     /**
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
-     * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
+     * @param BasketBindingDelete $basketBindingDelete
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
+        private readonly BasketBindingDelete $basketBindingDelete,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -63,13 +62,17 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         $customerBasket = $this->getInPostPayQuoteByQuoteId($customerQuoteId);
         $guestBasket = $this->getInPostPayQuoteByQuoteId($guestQuoteId);
 
-        if ($guestBasket && $customerQuoteId && $this->isBasketBound($guestBasket)) {
+        if ($customerBasket !== null && $guestBasket !== null) {
+            $this->basketBindingDelete->execute($customerBasket->getBasketId());
             $guestBasket->setQuoteId($customerQuoteId);
             $finalBasket = $guestBasket;
             $deprecatedBasket = $customerBasket;
-        } elseif ($this->isBasketBound($customerBasket)) {
+        } elseif ($customerBasket === null && $guestBasket !== null) {
+            $guestBasket->setQuoteId($customerQuoteId);
+            $finalBasket = $guestBasket;
+            $deprecatedBasket = $customerBasket;
+        } elseif ($customerBasket !== null && $guestBasket === null) {
             $finalBasket = $customerBasket;
-            $deprecatedBasket = $guestBasket;
         } else {
             throw new NoSuchEntityException(__('Non of the quotes are InPost Pay bound baskets.'));
         }
@@ -79,13 +82,8 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
             $this->inPostPayQuoteRepository->delete($deprecatedBasket);
         }
 
-        if ($finalBasket) {
-            $finalBasket->setCartVersion(uniqid());
-            $this->inPostPayQuoteRepository->save($finalBasket);
-            $this->basketBindingApiKeyCookieService->createOrUpdateBasketBindingCookie(
-                (string)$finalBasket->getBasketBindingApiKey()
-            );
-        }
+        $finalBasket->setCartVersion(uniqid());
+        $this->inPostPayQuoteRepository->save($finalBasket);
     }
 
     /**
@@ -101,14 +99,5 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         }
 
         return $inPostPayQuote;
-    }
-
-    private function isBasketBound(?InPostPayQuoteInterface $basket = null): bool
-    {
-        if (!$basket instanceof InPostPayQuoteInterface) {
-            return false;
-        }
-
-        return $basket->getStatus() === InPostBasketStatus::SUCCESS->value;
     }
 }

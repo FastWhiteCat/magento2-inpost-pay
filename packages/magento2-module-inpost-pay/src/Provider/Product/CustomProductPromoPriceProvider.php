@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Fast White Cat S.A. All rights reserved.
+ * See LICENSE_FASTWHITECAT for license details.
+ */
 
 declare(strict_types=1);
 

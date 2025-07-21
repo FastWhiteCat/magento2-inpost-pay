@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="minicart.addons">
+        <referenceBlock name="minicart.addons">
             <block name="inpost.init.widget.minicart"
                    template="InPost_InPostPay::initialize-widget-minicart.phtml" after="-"
                    ifconfig="payment/inpost_pay/show_in_minicart">
@@ -13,6 +13,6 @@
                     <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
                 </arguments>
             </block>
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_polling" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1">
+        <label>Polling Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="polling_enabled_for_inactive" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable long polling for inactive browser tab</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/polling_enabled_for_inactive</config_path>
+        </field>
+        <field id="polling_time_for_inactive" translate="label" type="text" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Long polling time for inactive tab (in milliseconds)</label>
+            <config_path>payment/inpost_pay/polling_time_for_inactive</config_path>
+        </field>
+    </group>
+</include>

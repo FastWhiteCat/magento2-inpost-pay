@@ -75,22 +75,6 @@ class InPostPayQuoteRepository implements InPostPayQuoteRepositoryInterface
         return $inPostPayQuote;
     }
 
-    public function getByBasketBindingApiKey(string $basketBindingApiKey): InPostPayQuoteInterface
-    {
-        $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();
-        // @phpstan-ignore-next-line
-        $this->resource->load($inPostPayQuote, $basketBindingApiKey, InPostPayQuoteInterface::BASKET_BINDING_API_KEY);
-        try {
-            $inPostPayQuote->getQuoteId();
-        } catch (LocalizedException $e) {
-            throw new NoSuchEntityException(
-                __('InPost Pay Quote with Basket Binding API Key "%1" does not exist.', $basketBindingApiKey)
-            );
-        }
-
-        return $inPostPayQuote;
-    }
-
     public function getByBasketId(string $basketId): InPostPayQuoteInterface
     {
         $inPostPayQuote = $this->inPostPayQuoteInterfaceFactory->create();

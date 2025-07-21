@@ -19,7 +19,7 @@ class BasketRequest extends Request implements RequestInterface
     protected string $method = HttpRequest::METHOD_PUT;
     protected ?string $contentType = JsonConverter::CONTENT_MEDIA_TYPE;
 
-    protected string $uri = '/v2/izi/basket/{basket_id}';
+    protected string $uri = '/v1/izi/basket/{basket_id}';
 
     private ?int $storeId = null;
 
