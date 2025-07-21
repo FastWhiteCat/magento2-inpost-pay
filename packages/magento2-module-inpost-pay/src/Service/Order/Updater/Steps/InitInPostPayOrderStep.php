@@ -7,10 +7,12 @@ namespace InPost\InPostPay\Service\Order\Updater\Steps;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\Data\InPostPayOrderInterfaceFactory;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Api\OrderPostProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface as InPostOrderInterface;
 use InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
@@ -19,6 +21,7 @@ class InitInPostPayOrderStep extends OrderProcessingStep implements OrderPostPro
     public function __construct(
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly InPostPayOrderInterfaceFactory $inPostPayOrderFactory,
+        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -39,10 +42,34 @@ class InitInPostPayOrderStep extends OrderProcessingStep implements OrderPostPro
         $inPostPayOrder->setOrderId($orderId);
         $inPostPayOrder->setPaymentType($inPostOrder->getOrderDetails()->getPaymentType());
         $inPostPayOrder->setBasketId($inPostOrder->getOrderDetails()->getBasketId());
+        $inPostPayOrder->setBasketBindingApiKey($this->extractBasketBindingApiKeyByQuoteId((int)$order->getQuoteId()));
+        $inPostPayOrder->setInPostPayAccountEmail($inPostOrder->getAccountInfo()->getMail());
+        $inPostPayOrder->setOrderWithInvoice(false);
+
+        if ($inPostOrder->getInvoiceDetails() !== null) {
+            $inPostPayOrder->setOrderWithInvoice(true);
+            $inPostPayOrder->setInPostPayInvoiceEmail($inPostOrder->getInvoiceDetails()->getMail());
+        }
+
         $this->inPostPayOrderRepository->save($inPostPayOrder);
 
         $this->createLog(
             sprintf('InPost Pay Order entity has been initialized for order #%s', (string)$order->getIncrementId())
         );
+    }
+
+    /**
+     * @param int $quoteId
+     * @return string|null
+     */
+    private function extractBasketBindingApiKeyByQuoteId(int $quoteId): ?string
+    {
+        try {
+            $inPostPayQuote = $this->inPostPayQuoteRepository->getByQuoteId($quoteId);
+
+            return $inPostPayQuote->getBasketBindingApiKey();
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
     }
 }

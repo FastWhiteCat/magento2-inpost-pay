@@ -3,19 +3,26 @@
         "column": {
             "inpost_pay_order_id": true,
             "order_id": true,
-            "locker_id": true,
-            "created_at": true,
-            "updated_at": true,
-            "order_status": true,
-            "prefix": true,
-            "phone_number": true,
             "basket_id": true,
+            "basket_binding_api_key": true,
             "payment_type": true,
+            "locker_id": true,
+            "order_status": true,
             "country_prefix": true,
             "phone": true,
             "courier_note": true,
+            "ga_client_id": true,
+            "fbclid": true,
+            "gclid": true,
+            "serialized_analytics_data": true,
+            "analytics_sent_at": true,
             "delivery_options": true,
-            "accepted_consents": true
+            "accepted_consents": true,
+            "created_at": true,
+            "updated_at": true,
+            "inpost_pay_account_email": true,
+            "order_with_invoice": true,
+            "inpost_pay_invoice_email": true
         },
         "constraint": {
             "PRIMARY": true,
@@ -28,28 +35,31 @@
             "inpost_pay_quote_id": true,
             "quote_id": true,
             "basket_id": true,
+            "basket_binding_api_key": true,
             "inpost_basket_id": true,
             "status": true,
-            "phone_number": true,
+            "phone": true,
+            "country_prefix": true,
             "masked_phone_number": true,
             "browser_trusted": true,
             "browser_id": true,
             "name": true,
             "surname": true,
+            "cart_version": true,
+            "ga_client_id": true,
+            "fbclid": true,
+            "gclid": true,
             "created_at": true,
-            "updated_at": true,
-            "phone": true,
-            "country_prefix": true,
-            "cart_version": true
+            "updated_at": true
+        },
+        "index": {
+            "INPOST_PAY_QUOTE_INPOST_BASKET_ID": true,
+            "INPOST_PAY_QUOTE_BASKET_ID": true
         },
         "constraint": {
             "PRIMARY": true,
             "INPOST_PAY_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
             "INPOST_PAY_QUOTE_QUOTE_ID": true
-        },
-        "index": {
-            "INPOST_PAY_QUOTE_INPOST_BASKET_ID": true,
-            "INPOST_PAY_QUOTE_BASKET_ID": true
         }
     },
     "inpost_pay_checkout_agreement_version": {
@@ -90,6 +100,26 @@
         },
         "constraint": {
             "INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID": true
+        }
+    },
+    "inpost_pay_bestseller_product": {
+        "column": {
+            "bestseller_product_id": true,
+            "sku": true,
+            "website_id": true,
+            "available_start_date": true,
+            "available_end_date": true,
+            "synchronized_at": true,
+            "qr_code": true,
+            "deep_link": true,
+            "inpost_pay_status": true,
+            "error": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID": true
         }
     }
 }

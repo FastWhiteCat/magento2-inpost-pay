@@ -13,7 +13,7 @@ use Magento\Framework\DataObject;
 
 class Summary extends DataObject implements SummaryInterface, ExtensibleDataInterface
 {
-    private const DEFAULT_COUNTRY_CODE = 'PL';
+    private const DEFAULT_CURRENCY = 'PLN';
 
     /**
      * @param PriceInterfaceFactory $priceFactory
@@ -125,7 +125,7 @@ class Summary extends DataObject implements SummaryInterface, ExtensibleDataInte
     {
         $currency = $this->getData(self::CURRENCY);
 
-        return is_scalar($currency) ? (string)$currency : self::DEFAULT_COUNTRY_CODE;
+        return is_scalar($currency) ? (string)$currency : self::DEFAULT_CURRENCY;
     }
 
     /**

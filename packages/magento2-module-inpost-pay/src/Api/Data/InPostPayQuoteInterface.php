@@ -21,6 +21,9 @@ interface InPostPayQuoteInterface
     public const NAME = 'name';
     public const SURNAME = 'surname';
     public const CART_VERSION = 'cart_version';
+    public const GA_CLIENT_ID = 'ga_client_id';
+    public const FBCLID = 'fbclid';
+    public const GCLID = 'gclid';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -62,6 +65,15 @@ interface InPostPayQuoteInterface
 
     public function getCartVersion(): string;
     public function setCartVersion(string $cartVersion): InPostPayQuoteInterface;
+
+    public function getGaClientId(): ?string;
+    public function setGaClientId(?string $gaClientId): InPostPayQuoteInterface;
+
+    public function getFbclid(): ?string;
+    public function setFbclid(?string $fbclid): InPostPayQuoteInterface;
+
+    public function getGclid(): ?string;
+    public function setGclid(?string $gclid): InPostPayQuoteInterface;
 
     public function getCreatedAt(): string;
     public function getUpdatedAt(): string;

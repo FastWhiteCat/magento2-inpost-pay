@@ -42,6 +42,7 @@ class CreateOrUpdateBasket
     {
         /** @var BasketRequest $request */
         $request = $this->basketRequestFactory->create();
+        $request->setStoreId($quote->getStoreId());
 
         /** @var BasketInterface $basket */
         $basket = $this->basketFactory->create();

@@ -12,12 +12,12 @@ if (!$widgetViewModel->isEnabled()
     return;
 }
 $widgetWrapperClass = "inpay-widget-wrapper";
-$sandboxMode = $widgetViewModel->isSandboxEnabled();
-$scriptUrl = $sandboxMode ? "https://izi-sandbox.inpost.pl/inpostizi.js" : "https://izi.inpost.pl/inpostizi.js";
+$bindingPlace = $block->getBindingPlace();
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 ?>
 
 <script src="<?= $escaper->escapeUrl($scriptUrl) ?>"></script>
 
-<div class="<?= /* @noEscape */ $widgetWrapperClass ?>">
+<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
     <inpost-thank-you/>
 </div>

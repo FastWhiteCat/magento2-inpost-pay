@@ -8,4 +8,9 @@
         <plugin name="InPost_InPostPay::renderInPostPayOrderViewInfoPlugin"
                 type="InPost\InPostPay\Plugin\Adminhtml\Order\View\RenderInPostPayOrderViewInfoPlugin" />
     </type>
+    <type name="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>

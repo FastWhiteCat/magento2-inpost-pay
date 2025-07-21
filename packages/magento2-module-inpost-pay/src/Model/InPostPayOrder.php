@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
+use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterfaceFactory;
@@ -17,6 +18,9 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
     private const SEPARATOR = ',';
@@ -168,6 +172,44 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::ACCEPTED_CONSENTS, $this->serializer->serialize($acceptedConsentsData));
     }
 
+    /**
+     * @return bool
+     */
+    public function isOrderWithInvoice(): bool
+    {
+        $orderWithInvoice = $this->getData(self::ORDER_WITH_INVOICE);
+
+        return is_scalar($orderWithInvoice) && (bool)$orderWithInvoice;
+    }
+
+    /**
+     * @param bool $orderWithInvoice
+     * @return InPostPayOrderInterface
+     */
+    public function setOrderWithInvoice(bool $orderWithInvoice): InPostPayOrderInterface
+    {
+        return $this->setData(self::ORDER_WITH_INVOICE, $orderWithInvoice);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInPostPayInvoiceEmail(): ?string
+    {
+        $inPostPayInvoiceEmail = $this->getData(self::INPOST_PAY_INVOICE_EMAIL);
+
+        return is_scalar($inPostPayInvoiceEmail) ? (string)$inPostPayInvoiceEmail : null;
+    }
+
+    /**
+     * @param string|null $inPostPayInvoiceEmail
+     * @return InPostPayOrderInterface
+     */
+    public function setInPostPayInvoiceEmail(?string $inPostPayInvoiceEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::INPOST_PAY_INVOICE_EMAIL, $inPostPayInvoiceEmail);
+    }
+
     public function getOrderStatus(): ?string
     {
         $orderStatus = ($this->hasData(self::ORDER_STATUS)) ? $this->getData(self::ORDER_STATUS) : null;
@@ -202,6 +244,79 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     public function setCourierNote(?string $courierNote): InPostPayOrderInterface
     {
         return $this->setData(self::COURIER_NOTE, $courierNote);
+    }
+
+    public function getGaClientId(): ?string
+    {
+        $gaClientId = $this->getData(self::GA_CLIENT_ID);
+
+        return (is_scalar($gaClientId) && !empty($gaClientId)) ? (string)$gaClientId : null;
+    }
+
+    public function setGaClientId(?string $gaClientId): InPostPayOrderInterface
+    {
+        return $this->setData(self::GA_CLIENT_ID, $gaClientId);
+    }
+
+    public function getFbclid(): ?string
+    {
+        $fbclid = $this->getData(self::FBCLID);
+
+        return (is_scalar($fbclid) && !empty($fbclid)) ? (string)$fbclid : null;
+    }
+
+    public function setFbclid(?string $fbclid): InPostPayOrderInterface
+    {
+        return $this->setData(self::FBCLID, $fbclid);
+    }
+
+    public function getGclid(): ?string
+    {
+        $gclid = $this->getData(self::GCLID);
+
+        return (is_scalar($gclid) && !empty($gclid)) ? (string)$gclid : null;
+    }
+
+    public function setGclid(?string $gclid): InPostPayOrderInterface
+    {
+        return $this->setData(self::GCLID, $gclid);
+    }
+
+    public function getSerializedAnalyticsData(): ?string
+    {
+        $serializedData = $this->getData(self::SERIALIZED_ANALYTICS_DATA);
+
+        return (is_scalar($serializedData) && !empty($serializedData)) ? (string)$serializedData : null;
+    }
+
+    public function setSerializedAnalyticsData(?string $serializedAnalyticsData): InPostPayOrderInterface
+    {
+        return $this->setData(self::SERIALIZED_ANALYTICS_DATA, $serializedAnalyticsData);
+    }
+
+    public function getAnalyticsSentAt(): ?string
+    {
+        $sentAt = $this->getData(self::ANALYTICS_SENT_AT);
+
+        return (is_scalar($sentAt) && !empty($sentAt)) ? (string)$sentAt : null;
+    }
+
+    public function setAnalyticsSentAt(?string $analyticsSentAt): InPostPayOrderInterface
+    {
+        return $this->setData(self::ANALYTICS_SENT_AT, $analyticsSentAt);
+    }
+
+    public function getInPostPayAccountEmail(): ?string
+    {
+        $hasInPostPayAccountEmail = $this->hasData(self::INPOST_PAY_ACCOUNT_EMAIL);
+        $inPostPayAccountEmail = $hasInPostPayAccountEmail ? $this->getData(self::INPOST_PAY_ACCOUNT_EMAIL) : null;
+
+        return ($inPostPayAccountEmail && is_scalar($inPostPayAccountEmail)) ? (string)$inPostPayAccountEmail : null;
+    }
+
+    public function setInPostPayAccountEmail(?string $inPostPayAccountEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::INPOST_PAY_ACCOUNT_EMAIL, $inPostPayAccountEmail);
     }
 
     public function getCountryPrefix(): ?string

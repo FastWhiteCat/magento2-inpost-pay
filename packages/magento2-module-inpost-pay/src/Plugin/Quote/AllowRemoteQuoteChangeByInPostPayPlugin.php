@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Plugin\Quote;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Service\Cart\CartService;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -46,6 +47,6 @@ class AllowRemoteQuoteChangeByInPostPayPlugin
 
         $allowRemoteAccess = $quote->getData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS);
 
-        return $allowRemoteAccess && $inPostPayQuote->getBrowserTrusted();
+        return $allowRemoteAccess && $inPostPayQuote->getStatus() === InPostBasketStatus::SUCCESS->value;
     }
 }

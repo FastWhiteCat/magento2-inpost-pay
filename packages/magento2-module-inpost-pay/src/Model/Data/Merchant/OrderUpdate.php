@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Model\Data\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\DataObject;
 
-class OrderUpdate extends DataObject implements OrderUpdateInterface
+class OrderUpdate extends DataObject implements OrderUpdateInterface, ExtensibleDataInterface
 {
     public function getOrderStatus(): ?string
     {

@@ -4,6 +4,10 @@
     <group id="inpost_pay_general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1">
         <label>General Settings</label>
         <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="module_version" translate="label" type="label" sortOrder="1" showInDefault="1">
+            <label>Module Version</label>
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\Form\ModuleVersion</frontend_model>
+        </field>
         <field id="active" translate="label" type="select" sortOrder="10"
                showInDefault="1" showInWebsite="1" canRestore="1">
             <label>Enable InPost Pay</label>
@@ -55,6 +59,25 @@
             <label>Image role sended to InPost Pay</label>
             <source_model>InPost\InPostPay\Model\Config\Source\ImageType</source_model>
             <config_path>payment/inpost_pay/image_role</config_path>
+        </field>
+        <field id="additional_images_enabled" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Send additional images to InPost Pay</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/additional_images_enabled</config_path>
+        </field>
+        <field id="prepare_resized_additional_images" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Prepare resized additional images</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/prepare_resized_additional_images</config_path>
+        </field>
+        <field id="assign_quote_to_customer_by_email" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Assign Quote to Customer by Email</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/assign_quote_to_customer_by_email</config_path>
+            <comment>If set to YES, cart initiated by guest user, bound to InPost Pay Mobile Aap on order processing will be assigned to an existing Magento account if found by InPost Pay account email address.</comment>
         </field>
     </group>
 </include>
