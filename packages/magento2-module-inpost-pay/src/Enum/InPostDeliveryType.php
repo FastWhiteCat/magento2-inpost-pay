@@ -10,6 +10,9 @@ namespace InPost\InPostPay\Enum;
  */
 enum InPostDeliveryType: string
 {
+    public const APM_VALUE = 'APM';
+    public const COURIER_VALUE = 'COURIER';
+
     case APM = 'APM';
     case COURIER = 'COURIER';
 }
