@@ -24,7 +24,11 @@ class IziOrderCreateAfterEventObserver extends MerchantEndpointEventObserver imp
                 $orderData = $this->objectConverter->toNestedArray($order, [], OrderInterface::class);
             }
 
-            $this->createEventDataLog($orderData);
+            if ($this->debugConfigProvider->isAnonymisingEnabled()) {
+                $this->createEventDataLog($this->anonymizeArray($orderData));
+            } else {
+                $this->createEventDataLog($orderData);
+            }
         }
     }
 }

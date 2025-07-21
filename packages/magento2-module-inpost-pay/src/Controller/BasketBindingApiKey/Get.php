@@ -6,10 +6,11 @@ namespace InPost\InPostPay\Controller\BasketBindingApiKey;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Controller\WidgetController;
+use InPost\InPostPay\Provider\Config\AnalyticsConfigProvider;
 use InPost\InPostPay\Service\InitBasketProcessor;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
@@ -24,8 +25,10 @@ use Psr\Log\LoggerInterface;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class Get extends WidgetController implements HttpGetActionInterface
+class Get extends WidgetController implements HttpPostActionInterface
 {
+    private const ANALYTICS_PARAM_MAX_LENGTH = 255;
+
     /**
      * @param Context $context
      * @param CheckoutSession $checkoutSession
@@ -35,6 +38,7 @@ class Get extends WidgetController implements HttpGetActionInterface
      * @param CartRepositoryInterface $quoteRepository
      * @param InitBasketProcessor $initBasketProcessor
      * @param QuoteManagement $quoteManagement
+     * @param AnalyticsConfigProvider $analyticsConfigProvider
      */
     public function __construct(
         Context $context,
@@ -44,7 +48,8 @@ class Get extends WidgetController implements HttpGetActionInterface
         LoggerInterface $logger,
         private readonly CartRepositoryInterface $quoteRepository,
         private readonly InitBasketProcessor $initBasketProcessor,
-        private readonly QuoteManagement $quoteManagement
+        private readonly QuoteManagement $quoteManagement,
+        private readonly AnalyticsConfigProvider $analyticsConfigProvider
     ) {
         parent::__construct($context, $checkoutSession, $formKeyValidator, $jsonFactory, $logger);
     }
@@ -57,11 +62,26 @@ class Get extends WidgetController implements HttpGetActionInterface
 
         $result = [];
         try {
+            $gaClientId = null;
+            $fbclid = null;
+            $gclid = null;
+
+            if ($this->analyticsConfigProvider->isAnalyticsEnabled()) {
+                $gaClientId = $this->getGaClientIdFromRequestParams();
+                $fbclid = $this->getFbclidFromRequestParams();
+                $gclid = $this->getGclidFromRequestParams();
+            }
+
             $quote = $this->getQuote();
             if ($quote->getId()) {
                 $quoteId = (int)$quote->getId();
                 $this->quoteRepository->getActive($quoteId);
-                $inPostPayQuote = $this->initBasketProcessor->process($quoteId);
+                $inPostPayQuote = $this->initBasketProcessor->process(
+                    $quoteId,
+                    $gaClientId,
+                    $fbclid,
+                    $gclid
+                );
 
                 $result = [
                     self::SUCCESS_RESULT_KEY  => true,
@@ -97,5 +117,70 @@ class Get extends WidgetController implements HttpGetActionInterface
         }
 
         return $quote;
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     */
+    private function getGaClientIdFromRequestParams(): ?string
+    {
+        $gaClientId = $this->request->getParam(InPostPayQuoteInterface::GA_CLIENT_ID);
+        $gaClientId = is_scalar($gaClientId) ? (string)$gaClientId : null;
+
+        if ($gaClientId !== null) {
+            $this->validateAnalyticsParam(InPostPayQuoteInterface::GA_CLIENT_ID, $gaClientId);
+        }
+
+        return $gaClientId;
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     */
+    private function getFbclidFromRequestParams(): ?string
+    {
+        $fbclid = $this->request->getParam(InPostPayQuoteInterface::FBCLID);
+        $fbclid = is_scalar($fbclid) ? (string)$fbclid : null;
+
+        if ($fbclid !== null) {
+            $this->validateAnalyticsParam(InPostPayQuoteInterface::FBCLID, $fbclid);
+        }
+
+        return $fbclid;
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     */
+    private function getGclidFromRequestParams(): ?string
+    {
+        $gclid = $this->request->getParam(InPostPayQuoteInterface::GCLID);
+        $gclid = is_scalar($gclid) ? (string)$gclid : null;
+
+        if ($gclid !== null) {
+            $this->validateAnalyticsParam(InPostPayQuoteInterface::GCLID, $gclid);
+        }
+
+        return $gclid;
+    }
+
+    /**
+     * @param string $analyticsParamKey
+     * @param string $analyticsParamValue
+     * @return void
+     * @throws LocalizedException
+     */
+    private function validateAnalyticsParam(string $analyticsParamKey, string $analyticsParamValue): void
+    {
+        if (strlen($analyticsParamValue) > self::ANALYTICS_PARAM_MAX_LENGTH) {
+            throw new LocalizedException(__('Analytics param %1 is too long.', $analyticsParamKey));
+        }
+
+        if (preg_match('/^[A-Za-z0-9._-]+$/', $analyticsParamValue) !== 1) {
+            throw new LocalizedException(__('Analytics param %1 is not valid.', $analyticsParamKey));
+        }
     }
 }

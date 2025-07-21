@@ -8,8 +8,10 @@ use InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
+use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
 use InPost\InPostPay\Exception\InPostPayException;
 use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Model\Order;
 
@@ -17,9 +19,11 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
 {
     /**
      * @param GeneralConfigProvider $generalConfigProvider
+     * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      */
     public function __construct(
-        private readonly GeneralConfigProvider $generalConfigProvider
+        private readonly GeneralConfigProvider $generalConfigProvider,
+        private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository
     ) {
     }
 
@@ -36,6 +40,12 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
             $this->transferPhoneNumber($billingAddress, $accountInfo);
             $this->transferClientAddress($billingAddress, $accountInfo);
         }
+
+        $inPostPayAccountEmail = $this->getInPostPayAccountEmailByOrder($order);
+        if ($inPostPayAccountEmail) {
+            $accountInfo->setMail($inPostPayAccountEmail);
+        }
+
         $inPostOrder->setAccountInfo($accountInfo);
     }
 
@@ -145,5 +155,19 @@ class OrderToInPostOrderAccountInfoDataTransfer implements OrderToInPostOrderDat
         }
 
         return $lastname;
+    }
+
+    private function getInPostPayAccountEmailByOrder(Order $order): ?string
+    {
+        $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
+
+        try {
+            $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
+            $inPostPayAccountEmail = $inPostPayOrder->getInPostPayAccountEmail();
+        } catch (NoSuchEntityException $e) {
+            $inPostPayAccountEmail = null;
+        }
+
+        return $inPostPayAccountEmail;
     }
 }

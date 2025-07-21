@@ -12,6 +12,8 @@
                 <order_status>pending</order_status>
                 <allowspecific>0</allowspecific>
                 <image_role>small_image</image_role>
+                <additional_images_enabled>0</additional_images_enabled>
+                <prepare_resized_additional_images>0</prepare_resized_additional_images>
                 <sort_order>5</sort_order>
                 <min_order_total>0</min_order_total>
                 <max_order_total>99999</max_order_total>
@@ -27,7 +29,8 @@
                 <widget_size>size-md</widget_size>
                 <widget_frame_style>primary</widget_frame_style>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
-                <accepted_payment_types>CARD,CARD_TOKEN,GOOGLE_PAY,APPLE_PAY,BLIK_CODE,BLIK_TOKEN,PAY_BY_LINK,CASH_ON_DELIVERY</accepted_payment_types>
+                <widget_script_url>https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</widget_script_url>
+                <use_defined_payment_methods>0</use_defined_payment_methods>
                 <async_basket_export>0</async_basket_export>
                 <remove_html_and_special_chars_from_attributes>1</remove_html_and_special_chars_from_attributes>
                 <sandbox_enabled>0</sandbox_enabled>
@@ -35,13 +38,29 @@
                 <sandbox_client_secret></sandbox_client_secret>
                 <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
                 <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
+                <sandbox_widget_script_url>https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</sandbox_widget_script_url>
                 <min_log_level>100</min_log_level>
+                <anonymise_objects_enabled>1</anonymise_objects_enabled>
                 <can_capture>1</can_capture>
                 <can_refund>1</can_refund>
                 <is_offline>1</is_offline>
                 <use_address_as_firstname_source>0</use_address_as_firstname_source>
                 <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
+                <assign_quote_to_customer_by_email>1</assign_quote_to_customer_by_email>
+                <synchronize_bestsellers_enabled>0</synchronize_bestsellers_enabled>
+                <ean_product_attribute>sku</ean_product_attribute>
+                <bestsellers_synchronize_cron_enabled>0</bestsellers_synchronize_cron_enabled>
+                <bestsellers_synchronize_mode>upload</bestsellers_synchronize_mode>
+                <bestsellers_synchronize_cron_schedule>30 6 * * *</bestsellers_synchronize_cron_schedule>
+                <promotions_enabled>0</promotions_enabled>
+                <analytics_enabled>0</analytics_enabled>
+                <ga_api_url>https://www.google-analytics.com/mp/collect</ga_api_url>
+                <analytics_async_sending_enabled>0</analytics_async_sending_enabled>
+                <analytics_async_sending_enabled>0</analytics_async_sending_enabled>
+                <analytics_async_sending_cron_schedule>*/5 * * * *</analytics_async_sending_cron_schedule>
+                <sending_fbclid_enabled>0</sending_fbclid_enabled>
+                <sending_gclid_enabled>0</sending_gclid_enabled>
             </inpost_pay>
         </payment>
     </default>

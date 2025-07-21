@@ -8,9 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Provider\Config\OmnibusConfigProvider;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Tax\Model\Calculation as TaxCalculation;
 use Magento\Tax\Model\Config as TaxConfig;
@@ -25,7 +23,6 @@ class OmnibusProductLowestPriceProvider
     private ?string $omnibusLowestPriceAttributeCode = null;
 
     /**
-     * @param ProductRepositoryInterface $productRepository
      * @param OmnibusConfigProvider $omnibusConfigProvider
      * @param TaxConfig $taxConfig
      * @param TaxCalculation $taxCalculation
@@ -34,7 +31,6 @@ class OmnibusProductLowestPriceProvider
      * @param LoggerInterface $logger
      */
     public function __construct(
-        protected readonly ProductRepositoryInterface $productRepository,
         protected readonly OmnibusConfigProvider $omnibusConfigProvider,
         protected readonly TaxConfig $taxConfig,
         protected readonly TaxCalculation $taxCalculation,
@@ -78,17 +74,10 @@ class OmnibusProductLowestPriceProvider
      */
     public function getLowestPrice(Product $product): ?PriceInterface
     {
-        $lowestPriceAttributeCode = $this->getOmnibusLowestPriceProductAttributeCode();
+        $lowestPriceAttributeCode = $this->getOmnibusLowestPriceProductAttributeCode($product->getStoreId());
 
         if ($lowestPriceAttributeCode === null) {
             return null;
-        }
-
-        try {
-            /** @var Product $product */
-            $product = $this->productRepository->get($product->getSku());
-        } catch (NoSuchEntityException $e) {
-            $this->logger->error($e->getMessage());
         }
 
         $lowestPriceAttribute = $product->getCustomAttribute($lowestPriceAttributeCode);
@@ -152,12 +141,15 @@ class OmnibusProductLowestPriceProvider
     }
 
     /**
+     * @param int $storeId
      * @return string|null
      */
-    private function getOmnibusLowestPriceProductAttributeCode(): ?string
+    private function getOmnibusLowestPriceProductAttributeCode(int $storeId): ?string
     {
         if ($this->omnibusLowestPriceAttributeCode === null) {
-            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode();
+            $lowestPriceAttributeCode = $this->omnibusConfigProvider->getOmnibusProductLowestPriceAttributeCode(
+                $storeId
+            );
 
             if ($lowestPriceAttributeCode) {
                 $this->omnibusLowestPriceAttributeCode = $lowestPriceAttributeCode;

@@ -60,15 +60,18 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             if ($quoteItem->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
                 $option = $quoteItem->getOptionByCode('simple_product');
                 if ($option instanceof Option) {
-                    $product->setData('simple_product_id', (string)$option->getProduct()->getId());
-
+                    $quoteItem->getProduct()->setData(
+                        ProductToInPostProductDataTransfer::CONFIGURABLE_CHILD_PRODUCT,
+                        $option->getProduct()
+                    );
                 }
                 // @phpstan-ignore-next-line
-                $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo($product);
+                $options = $quoteItem->getProduct()->getTypeInstance()->getSelectedAttributesInfo(
+                    $quoteItem->getProduct()
+                );
             } elseif ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
                 $children = $quoteItem->getChildren();
-                $product->setData('children', $children);
-
+                $product->setData(ProductToInPostProductDataTransfer::BUNDLE_CHILD_PRODUCTS, $children);
                 $selectedOptions = $quoteItem->getProduct()
                     ->getTypeInstance()->getOrderOptions($quoteItem->getProduct());
                 if ($selectedOptions && $selectedOptions['bundle_options']) {
@@ -89,7 +92,6 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                     'Product "%1" is not available for InPost Pay.',
                     mb_substr((string)$product->getName(), 0, 50)
                 );
-
                 $this->addBasketNotice(
                     (string)$basket->getBasketId(),
                     $noticePhrase->render()
@@ -107,7 +109,6 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
 
             if ($this->omnibusProductLowestPriceProvider->canSendLowestPrice($quoteItem)) {
                 $lowestPrice = $this->omnibusProductLowestPriceProvider->getLowestPrice($product);
-
                 if ($lowestPrice) {
                     $inPostProduct->setLowestPrice($lowestPrice);
                 }
@@ -118,7 +119,6 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
                 $basePriceExclTax = DecimalCalculator::round((float)$quoteItem->getBasePrice());
                 $basePriceInclTax = DecimalCalculator::round((float)$quoteItem->getBasePriceInclTax());
                 $baseTaxValue = DecimalCalculator::sub($basePriceInclTax, $basePriceExclTax);
-
                 /** @var PriceInterface $basePrice */
                 $basePrice = $this->priceFactory->create();
                 $basePrice->setNet($basePriceExclTax);

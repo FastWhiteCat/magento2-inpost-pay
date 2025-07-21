@@ -8,4 +8,12 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Quote\Model\Quote\Config">
+        <plugin name="InPost_InPostPay::addAdditionalQuoteProductAttributesPlugin"
+                type="InPost\InPostPay\Plugin\Quote\AddAdditionalQuoteProductAttributesPlugin" />
+    </type>
+    <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
+        <plugin name="InPost_InPostPay::registerSaveAddressActionPlugin"
+                type="InPost\InPostPay\Plugin\Quote\RegisterSaveAddressActionPlugin" />
+    </type>
 </config>

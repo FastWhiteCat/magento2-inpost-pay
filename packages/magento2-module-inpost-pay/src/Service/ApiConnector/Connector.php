@@ -58,12 +58,13 @@ class Connector implements ConnectorInterface
                 $e->getMessage()
             );
             $this->logger->critical($errorMsg);
+            $errorCode = (int)$e->getCode();
 
-            if ((int)$e->getCode() === 404) {
-                throw new NotFoundException(__($errorMsg));
+            if ($errorCode === 404) {
+                throw new NotFoundException(__($errorMsg), null, $errorCode);
             }
 
-            throw new LocalizedException(__($errorMsg));
+            throw new LocalizedException(__($errorMsg), null, $errorCode);
         }
 
         $response = $this->handleResponse($response, $url);

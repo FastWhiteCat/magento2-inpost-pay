@@ -24,33 +24,51 @@ type InPostPayPlacedOrderData {
     success: Boolean! @doc(description: "Success.")
     redirect: String! @doc(description: "Success Page redirect URL.")
     increment_id: String @doc(description: "Order Increment ID of placed order in InPost Pay Mobile App.")
+    postcode: String @doc(description: "Order billing address postcode of placed order in InPost Pay Mobile App.")
+    email: String @doc(description: "Order billing address email of placed order in InPost Pay Mobile App.")
+    cart: Cart @doc(description: "Cart object that was converted into order placed in InPost Pay Mobile App.")
     error: String @doc(description: "Error details.")
 }
 
 type StoreConfig {
-    inpost_pay_widget_enabled : String
-    @doc(description: "Indicates whether widget should be displayed or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_merchant_client_id : String
+    @doc(description: "Merchant Client ID used be frontend Widget.")
 
-    inpost_pay_show_on_product_cart : String
-    @doc(description: "Indicates whether widget should be displayed on product page or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_sandbox_merchant_client_id : String
+    @doc(description: "Sandbox Merchant Client ID used be frontend Widget.")
 
-    inpost_pay_show_on_cart : String
-    @doc(description: "Indicates whether widget should be displayed on cart page or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_is_sandbox : Boolean
+    @doc(description: "Determines if sandbox mode is configured or not.")
 
-    inpost_pay_show_in_minicart : String
-    @doc(description: "Indicates whether widget should be displayed on minicart or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_widget_script_url : String
+    @doc(description: "URL used to load widget JS. Needs to be combined with Merchant Client ID.")
 
-    inpost_pay_show_on_success_page : String
-    @doc(description: "Indicates whether widget should be displayed on success page or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_sandbox_widget_script_url : String
+    @doc(description: "URL used to load sandbox widget JS. Needs to be combined with Sandbox Merchant Client ID.")
 
-    inpost_pay_show_on_register_page : String
-    @doc(description: "Indicates whether widget should be displayed on register page or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_widget_enabled : Boolean
+    @doc(description: "Indicates whether widget should be displayed or not.")
 
-    inpost_pay_show_on_login_page : String
-    @doc(description: "Indicates whether widget should be displayed on login page or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_show_on_product_cart : Boolean
+    @doc(description: "Indicates whether widget should be displayed on product page or not.")
 
-    inpost_pay_show_on_checkout_page : String
-    @doc(description: "Indicates whether widget should be displayed on checkout page or not. Possible values: 1 (Yes) and 0 (No).")
+    inpost_pay_show_on_cart : Boolean
+    @doc(description: "Indicates whether widget should be displayed on cart page or not.")
+
+    inpost_pay_show_in_minicart : Boolean
+    @doc(description: "Indicates whether widget should be displayed on minicart or not.")
+
+    inpost_pay_show_on_success_page : Boolean
+    @doc(description: "Indicates whether widget should be displayed on success page or not.")
+
+    inpost_pay_show_on_register_page : Boolean
+    @doc(description: "Indicates whether widget should be displayed on register page or not.")
+
+    inpost_pay_show_on_login_page : Boolean
+    @doc(description: "Indicates whether widget should be displayed on login page or not.")
+
+    inpost_pay_show_on_checkout_page : Boolean
+    @doc(description: "Indicates whether widget should be displayed on checkout page or not.")
 
     inpost_pay_widget_styles : String
     @doc(description: "InPost Pay widget frame corner style.")

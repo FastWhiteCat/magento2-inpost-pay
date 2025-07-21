@@ -20,6 +20,7 @@ class OAuthTokenRequest extends Request implements RequestInterface
     protected string $method = HttpRequest::METHOD_POST;
     protected string $uri = '/auth/realms/external/protocol/openid-connect/token';
     protected ?string $contentType = Client::ENC_URLENCODED;
+    private ?int $storeId = null;
 
     public function __construct(
         private readonly AuthConfigProvider $authConfigProvider
@@ -28,6 +29,16 @@ class OAuthTokenRequest extends Request implements RequestInterface
 
     public function getApiUrl(): string
     {
-        return $this->authConfigProvider->getAuthTokenUrl();
+        return $this->authConfigProvider->getAuthTokenUrl($this->getStoreId());
+    }
+
+    public function setStoreId(?int $storeId = null): void
+    {
+        $this->storeId = $storeId;
+    }
+
+    public function getStoreId(): ?int
+    {
+        return $this->storeId;
     }
 }

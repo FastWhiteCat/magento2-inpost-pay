@@ -5,25 +5,36 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
-use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Api\Provider\PolishRegionProviderInterface;
 use InPost\InPostPay\Enum\InPostInvoiceLegalForm;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
+use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Quote\Api\BillingAddressManagementInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BillingAddressStep extends OrderProcessingStep implements OrderProcessingStepInterface
 {
+    /**
+     * Polish country code
+     */
+    private const POLAND_COUNTRY_CODE = 'PL';
+
     public function __construct(
         private readonly AddressInterfaceFactory $addressFactory,
         private readonly BillingAddressManagementInterface $billingAddressManagement,
+        private readonly PolishRegionProviderInterface $polishRegionProvider,
+        private readonly DirectoryHelper $directoryHelper,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -52,6 +63,11 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setCountryId($invoiceDetails->getCountryCode());
             $billingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getAccountInfo()->getPhoneNumber()));
             $billingAddress->setVatId($this->combineVatId($invoiceDetails));
+            $this->setRegionIdIfRequired(
+                $billingAddress,
+                $invoiceDetails->getPostalCode(),
+                $invoiceDetails->getCountryCode()
+            );
         } else {
             $billingAddress->setFirstname($inPostOrder->getAccountInfo()->getName());
             $billingAddress->setLastname($inPostOrder->getAccountInfo()->getSurname());
@@ -60,13 +76,58 @@ class BillingAddressStep extends OrderProcessingStep implements OrderProcessingS
             $billingAddress->setPostcode($accountAddress->getPostalCode());
             $billingAddress->setCountryId($accountAddress->getCountryCode());
             $billingAddress->setTelephone($this->combinePhoneNumber($inPostOrder->getAccountInfo()->getPhoneNumber()));
+            $this->setRegionIdIfRequired(
+                $billingAddress,
+                $accountAddress->getPostalCode(),
+                $accountAddress->getCountryCode()
+            );
         }
+
+        if ($quote->getCustomerId() && $billingAddress->getCustomerId() === null) {
+            $billingAddress->setCustomerId((int)$quote->getCustomerId());
+        }
+
         $quote->setBillingAddress($billingAddress);
         $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
         $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
         $this->billingAddressManagement->assign($quoteId, $billingAddress);
 
         $this->createLog(sprintf('Billing address has been applied to quote ID: %s', $quoteId));
+    }
+
+    /**
+     * @param AddressInterface $address
+     * @param string $postcode
+     * @param string $countryCode
+     * @return void
+     */
+    private function setRegionIdIfRequired(AddressInterface $address, string $postcode, string $countryCode): void
+    {
+        if ($countryCode === PolishRegionProviderInterface::POLAND_COUNTRY_CODE
+            && $this->isRegionRequired($countryCode)
+        ) {
+            $regionName = $this->polishRegionProvider->getRegionNameByPostcode($postcode);
+
+            if ($regionName) {
+                $regionId = $this->polishRegionProvider->getRegionIdByName($regionName);
+
+                if ($regionId) {
+                    $address->setRegionId($regionId);
+                    $address->setRegion($regionName);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $countryCode
+     * @return bool
+     */
+    private function isRegionRequired(string $countryCode): bool
+    {
+        $countriesWithRequiredRegions = $this->directoryHelper->getCountriesWithStatesRequired();
+
+        return in_array($countryCode, is_array($countriesWithRequiredRegions) ? $countriesWithRequiredRegions : []);
     }
 
     private function combineBillingAddressArray(ClientAddressInterface $clientAddress): array

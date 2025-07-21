@@ -62,7 +62,7 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
                     $options = $productOptions['attributes_info'];
                 }
             } elseif ($product->getTypeId() === Type::TYPE_BUNDLE) {
-                $product->setData('children', []);
+                $product->setData(ProductToInPostProductDataTransfer::BUNDLE_CHILD_PRODUCTS, []);
 
                 $productOptions = $orderItem->getProductOptions();
                 if ($productOptions && $productOptions['bundle_options']) {

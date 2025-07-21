@@ -10,6 +10,8 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
+"EAN product attribute is not configured!","Atrybut produktowy EAN nie został wskazany w konfiguracji!",module,InPost_InPostPay
+"Product [SKU:%1] has empty EAN attribute and cannot be used as InPost Pay Bestseller.","Produkt [SKU:%1] nie posiada wartości atrybutu EAN i nie może być wykorzystywany jako Produkt Bestsellerowy InPost Pay.",module,InPost_InPostPay
 "Network problem","Problem z siecią",module,InPost_InPostPay
 "Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
 "Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
@@ -21,6 +23,7 @@
 "Enable InPost Pay Sandbox","Przełącz InPost Pay w Tryb Sandbox",module,InPost_InPostPay
 "Mapping for InPost Courier delivery method","Mapowanie Kuriera InPost do metody dostawy",module,InPost_InPostPay
 "Mapping for InPost Paczkomat 24/7 delivery method","Mapowanie metody dostawy InPost Paczkomat 24/7",module,InPost_InPostPay
+"Shipping method ""%1"" is already used in ""%2"" configuration. Each method can only be used once.","Metoda dostawy ""%1"" jest już wykorzystawa w konfiguracji ""%2"". Każda metoda może być przypisana tylko raz.",module,InPost_InPostPay
 "Could not obtain public key.","Nie udało się uzyskać klucza publicznego.",module,InPost_InPostPay
 "Empty IZI API URL","Wartość IZI API URL jest pusta",module,InPost_InPostPay
 "InPost API endpoint ""%1"" responded with an error: %2","Procesowane zapytania API InPost ""%1"" zwróciło błąd: %2",module,InPost_InPostPay
@@ -91,6 +94,21 @@
 "Browser binding was not complete. Browser is not trusted.","Proces powiązania przeglądarki nie został pomyślnie ukończony. Przeglądarka nie jest zaufana.",module,InPost_InPostPay
 "Browser ID does not match value saved in merchant quote ID: %1.","ID powiązanej przeglądarki różni się od tej zapisanej w koszyku sklepu ID: %1.",module,InPost_InPostPay
 "Cannot confirm basket. Reason: %1","Nie udało się potwierdzić koszyka. Powód: %1",module,InPost_InPostPay
+"Selected shipping method is not available [%1 %2].","Wybrana metoda dostawy jest niedostępna [%1 %2].",module,InPost_InPostPay
+"Analytics param %1 is too long.","Parametr Analityczny %1 jest zbyt długi.",module,InPost_InPostPay
+"Analytics param %1 is not valid.","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API endpoint URL is invalid: %1","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API request headers are invalid!","Nagłówki w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request params are invalid!","Parametry w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request method are invalid: %1","Metoda: %1 w żądaniu API Google Analytics jest niepoprawna!",module,InPost_InPostPay
+"Google Analytics API endpoint ""%1"" responded with %2 code.","Żądanie API ""%1"" Google Analytics zwróciło kod: %2.",module,InPost_InPostPay
+"Analytics Settings","Ustawienia Analityki",module,InPost_InPostPay
+"Enable Analytics","Włącz Analitykę",module,InPost_InPostPay
+"Enable Analytics Data Asynchronous Sending by CRON","Włącz Asynchroniczne Wysyłanie danych Analitycznych przez CRON",module,InPost_InPostPay
+"Analytics Data Sending CRON CRON Schedule","Harmonogram CRON Wysyłki Danych Analitycznych",module,InPost_InPostPay
+"*/5 * * * * for example causes this CRON to run every 5 minutes","*/5 * * * * przykładowo oznacza wysyłkę przez CRON co 5 minut.",module,InPost_InPostPay
+"Enable Sending fbclid Param","Włącz Przekazywanie Parametru fbclid",module,InPost_InPostPay
+"Enable Sending gclid Param","Włącz Przekazywanie Parametru gclid",module,InPost_InPostPay
 "If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.","Jeśli włączono dane koszyka będą eksportowane z wykorzystaniem wbudowanego systemu kolejkowania wiadomości. Wymagane jest po stronie infrastruktury serwerowej utrzymywanie uruchomionego procesu przetwarzającego kolejkę inpost_pay.basket.create_or_update",module,InPost_InPostPay
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
@@ -152,6 +170,7 @@
 "InPost Pay API returned transaction refund status: failed. External Refund ID: %1 Description: %2","Otrzymani z API InPost Pay status zwrotu środków to: nieudany: %1. Zwenętrzny ID Zwrotu: %1 Opis: %2",module,InPost_InPostPay
 "Enable removing special characters and HTML code from product attributes sent to InPost Pay Mobile App.","Włącz usuwanie znaków specjalnych i kodu HTML z atrybutów produktowych wysyłanych do Aplikacji Mobilnej InPost Pay",module,InPost_InPostPay
 "No transactions found to be refunded for Order #%1.","Nie znaleziono transakcji do zwrotu dla Zamówienia #%1.",module,InPost_InPostPay
+"InPost Pay order offline refund has been initialised.","Zwrot offline do zamówienia InPost Pay został zainicjowany.",module,InPost_InPostPay
 "Use order address firstname and lastname instead of customer firstname and lastname","Użyj imienia i nazwiska z adresu zamiast imienia i nazwiska klienta",module,InPost_InPostPay
 "Image role sended to InPost Pay","Rola obrazu wysyłana do InPost Pay",module,InPost_InPostPay
 "Synchronize payment methods","Zsynchronizuj dostępne metody płatności",module,InPost_InPostPay
@@ -172,3 +191,79 @@
 "Google Pay (InPost Pay)","Google Pay (InPost Pay)"
 "Cash on delivery (InPost Pay)","Za pobraniem (InPost Pay)"
 "Payment Type","Rodzaj płatności"
+"Basket has been changed during order processing. Please try again.","Koszyk uległ zmianie podczas procesu składania zamówienia. Prosimy ponowić próbę.",module,InPost_InPostPay
+"Assign Quote to Customer by Email","Przypisz Koszyk do Klient po Adresie Email",module,InPost_InPostPay
+"If set to YES, cart initiated by guest user, bound to InPost Pay Mobile Aap on order processing will be assigned to an existing Magento account if found by InPost Pay account email address.","Jeśli wybrano opcję TAK, koszyk zainicjowany przez użytkownika niezalogowanego, powiązany z Aplikacją Mobilną InPost Pay podczas procesowania zamówienia zostanie przypisany do konta Magento jeśli takie zostanie znalezione po adresie email konta InPost Pay.",module,InPost_InPostPay
+"Delete Bestseller Product","Usuń Produkt Bestsellerowy",module,InPost_InPostPay
+"Important! This setting should only be enabled on the configuration scope where InPost Pay is enabled and has own credentials! When enabled any save of selected bestseller product or inventory will trigger update of Bestseller Product. Also, any reservation append will check if configured Bestseller Product is still saleable, if not update will be performed.","Uwaga! To ustawienie powinno być włączone wyłącznie na poziomie konfiguracji na którym InPost Pay jest uruchomione oraz posiada własne dane autoryzacyjne! Po włączeniu tej opcji każdy zapis stanu magazynowego i produktu będącego Bestsellerem InPost Pay uruchomi aktualizację danych produktowych. Ponadto każda rezerwacja, skutkująca wyłączeniem produktu ze sprzedaży również uruchomi aktualizację danych Produktu Bestsellerowego.",module,InPost_InPostPay
+"Are you sure?","Czy jesteś pewny?",module,InPost_InPostPay
+"Back","Powrót",module,InPost_InPostPay
+"New","Nowy",module,InPost_InPostPay
+"Edit","Edytuj",module,InPost_InPostPay
+"Delete","Usuń",module,InPost_InPostPay
+"Select","Wybierz",module,InPost_InPostPay
+"Save Bestseller Product","Zapisz Produkt Bestsellerowy",module,InPost_InPostPay
+"InPost Pay Bestseller Products","Produkty Bestsellerowe InPost Pay",module,InPost_InPostPay
+"InPost Bestsellers currently cannot handle bundle, configurable or grouped product types.","Bestsellery w Aplikacji InPost Pay aktualnie nie obsługują produktów typu zestawy, grupowych ani konfigurowalnych.",module,InPost_InPostPay
+"You are not allowed to view this page. Please contact Administrators.","Nie masz uprawnień do podglądu tej strony. Prosimy o kontakt z Administratorami.",module,InPost_InPostPay
+"You have deleted InPost Pay Bestseller Product with ID %1.","Bestseller InPost Pay o ID %1 został usunięty.",module,InPost_InPostPay
+"Bestseller Products configured in InPost Pay have been downloaded into Magento.","Bestsellery skonfigurowane po stronie InPost Pay zostały pobrane do Magento.",module,InPost_InPostPay
+"There was a problem with downloading bestseller products from InPost Pay to Magento. Reason: %1","Wystąpił problem podczas pobierania bestsellerów z InPost Pay do Magento. Powód: %1",module,InPost_InPostPay
+"InPost Pay Bestseller Product","Produkt Bestsellerowy InPost Pay",module,InPost_InPostPay
+"Edit InPost Pay Bestseller Product %1","Edytuj Produkt Bestsellerowy InPost Pay %1",module,InPost_InPostPay
+"New InPost Pay Bestseller Product","Nowy Produkt Bestsellerowy InPost Pay",module,InPost_InPostPay
+"InPost Pay Bestseller Products List","Lista Produktów Bestsellerowych InPost Pay",module,InPost_InPostPay
+"You have saved the InPost Pay Bestseller Product [ID:%1].","Produkt Bestsellerowy InPost Pay [ID:%1] został zapisany.",module,InPost_InPostPay
+"Something went wrong while saving InPost Pay Bestseller Product.","Wystąpił błąd podczas zapisu Produktu Bestsellerowego InPost Pay.",module,InPost_InPostPay
+"Bestseller Products configured in Magento have been uploaded into InPost Pay.","Produkty Bestsellerowe skonfigurowane w Magento zostały wysłane do InPost Pay.",module,InPost_InPostPay
+"There was a problem with uploading bestseller products from Magento to InPost Pay. Reason: %1","Wystąpił problem z wysyłaniem produktów bestsellerowych z Magento do InPost Pay. Powód: %1",module,InPost_InPostPay
+"Could not save InPost Pay Bestseller Product: %1","Nie udało się zapisać Produktu Bestsellerowego InPost Pay: %1",module,InPost_InPostPay
+"Saving InPost Pay Bestseller Product failed.","Zapis Produktu Bestsellerowego InPost Pay nie powiódł się.",module,InPost_InPostPay
+"InPost Pay Bestseller Product with ID ""%1"" does not exist.","Produkt Bestsellerowy InPost Pay o ID ""%1"" nie istnieje.",module,InPost_InPostPay
+"InPost Pay Bestseller Product with SKU ""%1"" for Website ID:%2 does not exist.","Produkt Bestsellerowy InPost Pay o SKU ""%1"" dla Webstite o ID:%2 nie istnieje.",module,InPost_InPostPay
+"Could not delete InPost Pay Bestseller Product: %1","Nie udało się usunąć Produktu Bestsellerowego InPost Pay: %1",module,InPost_InPostPay
+"Product with SKU:%1 does not exist.","Produkt o SKU:%1 nie istnieje.",module,InPost_InPostPay
+"Product ""%1"" is currently not available for sale.","Produkt ""%1"" nie jest obecnie dostępny w sprzedaży.",module,InPost_InPostPay
+"Could not delete Bestseller [Product ID:%1] from InPost Pay API. Reason: %2.","Nie udało się usunąć Produktu Bestsellerowego [ID Produktu:%1] z API InPost Pay. Powód: %2",module,InPost_InPostPay
+"Please log in to InPost Pay Panel and delete this Bestseller Product manually.","Prosimy o zalogowanie się do Panelu InPost Pay i usunięcie Produktu Bestsellerowego manualnie.",module,InPost_InPostPay
+"There was a problem with downloading bestsellers. Details: %1","Wystąpił problem z pobieraniem bestsellerów. Szczegóły: %1",module,InPost_InPostPay
+"Quote with ID %1 is invalid.","Koszyk o ID %1 jest nieprawidłowy.",module,InPost_InPostPay
+"There was a problem with uploading bestsellers. Details: %1","Wystąpił problem z wysyłaniem bestsellerów. Szczegóły: %1",module,InPost_InPostPay
+"Uploading Bestsellers to InPost Pay was completed but some products have errors.","Proces wysyłania Produktów Bestsellerowych do InPost Pay zakończył się, lecz niektóre produkty zawierają błędy.",module,InPost_InPostPay
+"Deleting Bestseller Product ""%1"","Usuwanie Produktu Bestsellerowego ""%1""",module,InPost_InPostPay
+"Are you sure you want to delete ""%1"" bestseller?","Czy jesteś pewien, że chcesz usunąć produkt bestsellerowy ""%1""?",module,InPost_InPostPay
+"Synchronise With InPost Pay","Zsynchronizuj z InPost Pay",module,InPost_InPostPay
+"Bestseller with SKU:%1 for Website ID:%2 already exists. Remove or edit that record.","Bestseller o SKU:%1 Dla Website o ID:%2 już istnieje. Usuń bądź edytuj tamten rekord.",module,InPost_InPostPay
+"Limit of %1 bestsellers per website has been reached.","Limit %1 bestsellerów został osiągnięty.",module,InPost_InPostPay
+"Add New Bestseller Product","Dodaj Nowy Produkt Bestsellerowy",module,InPost_InPostPay
+"InPost Pay Bestsellers Settings","Ustawienia Bestsellerów InPost Pay",module,InPost_InPostPay
+"Enabled Bestsellers Synchronize CRON","Włącz Synchronizacje Bestsellerów w CRON",module,InPost_InPostPay
+"Synchronization Mode","Tryb Synchronizacji",module,InPost_InPostPay
+"Synchronize Bestsellers Cron Schedule","Harmonogram CRON Synchronizacji Bestsellerów",module,InPost_InPostPay
+"Download and replace Magento Bestsellers with InPost Pay Configured Bestsellers.","Pobieraj i podmieniaj Produkty Bestsellerowe skonfigurowane w InPost Pay do Magento.",module,InPost_InPostPay
+"Upload Magento Bestsellers into InPost Pay API.","Wysyłaj Produkty Bestsellerowe z Magento do InPost Pay API",module,InPost_InPostPay
+"Product Name","Nazwa Produktu",module,InPost_InPostPay
+"Available Start Date","Dostępny Od",module,InPost_InPostPay
+"Bad availability date range. Available end date must be greater than available start date.","Błędny zakres dat dostępności. Data do musi być późniejsza niż data do.",module,InPost_InPostPay
+"Available End Date","Dostępny Do",module,InPost_InPostPay
+"Synchronized At","Data Synchronizacji",module,InPost_InPostPay
+"Created At","Data Utworzenia",module,InPost_InPostPay
+"General Information","Ogólne Informacje",module,InPost_InPostPay
+"General Configuration","Ogólna Konfiguracja",module,InPost_InPostPay
+"Synchronization Error","Błąd Synchronizacji",module,InPost_InPostPay
+"QR Code","Kod QR",module,InPost_InPostPay
+"InPost Pay Status","Status InPost Pay",module,InPost_InPostPay
+"Active [Approved by InPost]","Aktywny [Potwierdzony przez InPost]"
+"Inactive [InPost Approval Required]","Nieaktywny [Wymaga akceptacji przez InPost]"
+"Unknown [Synchronization Required]","Nieznany [Wymaga synchronizacji]"
+"Magento cart rule with coupon","Reguła koszykowa Magento z kodem",module,InPost_InPostPay
+"Available In-app Promotions","Dostępne promocje w aplikacji",module,InPost_InPostPay
+"Add another promotion","Dodaj kolejną promocję",module,InPost_InPostPay
+"Promotions limit reached. Please remove one before adding another","Osiągnięto limit promocji. Prosimy o usunięcie poprzedniej, aby dodać nową.",module,InPost_InPostPay
+"Enable In-app Promotions","Włącz promocje w aplikacji",module,InPost_InPostPay
+"Promotion description url","Url opisu promocji",module,InPost_InPostPay
+"Coupon code ""%1"" expired or that promotion is not applicable to this cart.","Kod rabatowy ""%1"" wygasł lub koszyk nie spełnia warunków tej promocji",module,InPost_InPostPay
+"A maximum of 10 overriding consents will be transferred to the application","Maksymalnie do aplikacji przekazane zostanie 10 nadrzędnych zgód",module,InPost_InPostPay
+"Enable Logs Anonymisation","Włącz Anonimizację Logów",module,InPost_InPostPay
+"Define payment methods in the InPost Pay Application other than those in the contract.","Zdefiniuj metody płatności w Aplikacji InPost Pay inne niż w umowie.",module,InPost_InPostPay
+"Limit for InPost Pay Bestsellers has been reached. Try sending less products or contact InPost Pay support.","Osiągnięto limit Produktów Bestsellerowych InPost Pay. Spróbuj wysłać mniejszą ilość produktów lub skontaktuj się z Działem Wsparcia InPost Pay.",module,InPost_InPostPay

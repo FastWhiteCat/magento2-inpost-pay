@@ -40,10 +40,15 @@ class TransactionList
         ?string $dateFrom = null,
         ?string $dateTo = null,
         array $paymentMethod = [],
-        array $status = []
+        array $status = [],
+        ?int $storeId = null
     ): TransactionListResponse {
         /** @var TransactionListRequest $request */
         $request = $this->transactionListRequestFactory->create();
+
+        if ($storeId) {
+            $request->setStoreId($storeId);
+        }
 
         $params = [
             'page' => 0,

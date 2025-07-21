@@ -12,8 +12,16 @@
         <column xsi:type="varchar" name="country_prefix" length="4" nullable="true"/>
         <column xsi:type="varchar" name="phone" length="12" nullable="true"/>
         <column xsi:type="varchar" name="courier_note" length="255" nullable="true"/>
+        <column xsi:type="varchar" name="ga_client_id" length="255" nullable="true" />
+        <column xsi:type="varchar" name="fbclid" length="255" nullable="true" />
+        <column xsi:type="varchar" name="gclid" length="255" nullable="true" />
+        <column xsi:type="text" name="serialized_analytics_data" nullable="true"/>
+        <column xsi:type="timestamp" name="analytics_sent_at" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
-        <column xsi:type="varchar" length="500" name="accepted_consents" nullable="true"/>
+        <column xsi:type="text" name="accepted_consents" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="inpost_pay_account_email" nullable="true"/>
+        <column xsi:type="tinyint" name="order_with_invoice" nullable="false" default="1"/>
+        <column xsi:type="varchar" length="255" name="inpost_pay_invoice_email" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -42,6 +50,9 @@
         <column xsi:type="varchar" name="name" length="255" nullable="true"/>
         <column xsi:type="varchar" name="surname" length="255" nullable="true"/>
         <column xsi:type="varchar" name="cart_version" length="255" nullable="true" />
+        <column xsi:type="varchar" name="ga_client_id" length="255" nullable="true" />
+        <column xsi:type="varchar" name="fbclid" length="255" nullable="true" />
+        <column xsi:type="varchar" name="gclid" length="255" nullable="true" />
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -103,6 +114,27 @@
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_AVAILABLE_PAYMENT_METHOD_PAYMENT_METHOD_ID">
             <column name="payment_method_id"/>
+        </constraint>
+    </table>
+    <table name="inpost_pay_bestseller_product" resource="default" engine="innodb">
+        <column xsi:type="int" name="bestseller_product_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="sku" length="255" nullable="false"/>
+        <column xsi:type="smallint" name="website_id" nullable="false" unsigned="true" identity="false" default="0"/>
+        <column xsi:type="timestamp" name="available_start_date" nullable="true"/>
+        <column xsi:type="timestamp" name="available_end_date" nullable="true"/>
+        <column xsi:type="timestamp" name="synchronized_at" nullable="true"/>
+        <column xsi:type="text" name="qr_code" nullable="true"/>
+        <column xsi:type="varchar" name="deep_link" length="512" nullable="false"/>
+        <column xsi:type="varchar" name="inpost_pay_status" length="255" nullable="false"/>
+        <column xsi:type="varchar" name="error" length="1024" nullable="false"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="bestseller_product_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOST_PAY_BESTSELLER_PRODUCT_SKU_WEBSITE_ID">
+            <column name="sku"/>
+            <column name="website_id"/>
         </constraint>
     </table>
 </schema>

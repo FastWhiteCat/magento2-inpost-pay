@@ -24,9 +24,9 @@ class SalesRules implements OptionSourceInterface
     /**
      * @return array[]
      */
-    public function toOptionArray(): array
+    public function toOptionArray(bool $onlySpecificCoupon = false): array
     {
-        $salesRules = $this->getSalesRules();
+        $salesRules = $this->getSalesRules($onlySpecificCoupon);
         $salesRulesOptions = [];
 
         foreach ($salesRules as $salesRule) {
@@ -44,14 +44,22 @@ class SalesRules implements OptionSourceInterface
     /**
      * @return array
      */
-    private function getSalesRules(): array
+    private function getSalesRules(bool $onlySpecificCoupon = false): array
     {
         /** @var SalesRuleCollection $salesRuleCollection */
         $salesRuleCollection = $this->salesRuleCollectionFactory->create();
-        $salesRuleCollection->addFieldToFilter(
-            Rule::KEY_COUPON_TYPE,
-            ['neq' => RuleModel::COUPON_TYPE_NO_COUPON]
-        );
+        if ($onlySpecificCoupon) {
+            $salesRuleCollection->addFieldToFilter(
+                Rule::KEY_COUPON_TYPE,
+                ['eq' => RuleModel::COUPON_TYPE_SPECIFIC]
+            );
+        } else {
+            $salesRuleCollection->addFieldToFilter(
+                Rule::KEY_COUPON_TYPE,
+                ['neq' => RuleModel::COUPON_TYPE_NO_COUPON]
+            );
+        }
+
         $salesRuleCollection->addOrder(Rule::KEY_RULE_ID, Collection::SORT_ORDER_ASC);
         $salesRules = [];
 
