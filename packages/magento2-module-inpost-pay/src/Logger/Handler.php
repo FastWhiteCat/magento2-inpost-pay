@@ -44,7 +44,7 @@ class Handler extends Base
         if ($record instanceof LogRecord && method_exists($record, 'with')) { //@phpstan-ignore-line
             $recordData = $record->toArray();
             $recordMessage = (string)$recordData['message'];
-            $record->with(message: sprintf('[%s] %s', $this->getLogId(), $recordMessage));
+            $record = $record->with(message: sprintf('[%s] %s', $this->getLogId(), $recordMessage));
         } elseif (is_array($record)) { //@phpstan-ignore-line
             $recordMessage = (string)$record['message'];
             $record['message'] = sprintf('[%s] %s', $this->getLogId(), $recordMessage);
