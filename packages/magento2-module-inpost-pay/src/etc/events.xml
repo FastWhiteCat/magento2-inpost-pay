@@ -119,6 +119,10 @@
         <observer name="InPost_InPostPay::cleanPromotionsCacheAfterRuleSave" instance="InPost\InPostPay\Observer\SalesRule\SalesRuleSaveEventObserver" />
     </event>
 
+    <event name="salesrule_rule_condition_combine">
+        <observer name="InPost_InPostPay::addInPostPayOrderCondition" instance="InPost\InPostPay\Observer\AddInPostPayOrderCondition" />
+    </event>
+
     <!-- Email Events:: observer set InPost Pay Order in process registry so that email copy can be also sent to InPost Pay Account email address -->
     <event name="email_order_comment_set_template_vars_before">
         <observer name="InPost_InPostPay::inPostPayOrderCommentEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
