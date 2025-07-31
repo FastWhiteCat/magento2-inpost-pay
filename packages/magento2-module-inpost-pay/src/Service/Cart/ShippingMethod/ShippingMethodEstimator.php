@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 
 class ShippingMethodEstimator
 {
-    private const DEFAULT_COUNTRY_ID = 'PL';
+    public const DEFAULT_COUNTRY_ID = 'PL';
 
     public function __construct(
         private readonly AddressRepositoryInterface $addressRepository,
