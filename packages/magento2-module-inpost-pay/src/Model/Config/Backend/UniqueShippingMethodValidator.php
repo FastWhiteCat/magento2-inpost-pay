@@ -22,14 +22,14 @@ class UniqueShippingMethodValidator extends Value
     private const REGISTRY_KEY_PREFIX = 'inpost_pay_shipping_method_';
     private const INPOST_PAY_SHIPPING_METHOD_MAPPING_CONFIG_PATH_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
     private const INPOST_PAY_SHIPPING_METHOD_TYPES = [
-        InPostDeliveryType::APM->name,
-        InPostDeliveryType::COURIER->name
+        InPostDeliveryType::APM_VALUE,
+        InPostDeliveryType::COURIER_VALUE
     ];
 
     private const INPOST_PAY_SHIPPING_METHOD_OPTIONS = [
-        InPostDeliveryOption::PWW->name,
-        InPostDeliveryOption::COD->name,
-        InPostDeliveryOption::CODPWW->name
+        InPostDeliveryOption::PWW_VALUE,
+        InPostDeliveryOption::COD_VALUE,
+        InPostDeliveryOption::CODPWW_VALUE
     ];
 
     /**
