@@ -12,6 +12,7 @@ use Magento\Framework\Model\AbstractModel;
 use Magento\Quote\Model\Quote;
 use Magento\Rule\Model\Condition\AbstractCondition;
 use Magento\Rule\Model\Condition\Context;
+use Magento\SalesRule\Model\Rule;
 
 class IsInPostPayOrder extends AbstractCondition
 {
@@ -78,6 +79,7 @@ class IsInPostPayOrder extends AbstractCondition
      * @param AbstractModel $model
      * @return bool
      * @throws OnlyInAppException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function validate(AbstractModel $model)
     {
@@ -92,7 +94,7 @@ class IsInPostPayOrder extends AbstractCondition
             $quoteId = (int)$model->getQuoteId();
         }
 
-        if (!$quoteId) {
+        if (!$quoteId || !$this->validateCouponType()) {
             return false;
         }
 
@@ -115,5 +117,20 @@ class IsInPostPayOrder extends AbstractCondition
         } catch (NoSuchEntityException $e) {
             return false;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    private function validateCouponType(): bool
+    {
+        $couponType = null;
+        $rule = $this->getData('rule');
+
+        if ($rule instanceof Rule) {
+            $couponType = (int)$rule->getCouponType();
+        }
+
+        return $couponType !== Rule::COUPON_TYPE_NO_COUPON;
     }
 }
