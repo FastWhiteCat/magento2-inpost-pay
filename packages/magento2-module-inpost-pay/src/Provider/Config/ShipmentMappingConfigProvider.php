@@ -17,6 +17,7 @@ class ShipmentMappingConfigProvider
     public const OPTION_STANDARD = 'STANDARD';
     private const XML_PATH_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
     private const XML_PATH_DELIVERY_DEADLINE_IN_DAYS = 'payment/inpost_pay/delivery_deadline_in_days';
+    private const XML_PATH_USE_COLLECT_ADDRESS_TOTALS = 'payment/inpost_pay/estimate_with_collect_address_totals';
     private const XML_PATH_FREE_SHIPPING_ENABLED_PATTERN = 'carriers/%s/free_shipping_enable';
     private const XML_PATH_FREE_SHIPPING_SUBTOTAL_PATTERN = 'carriers/%s/free_shipping_subtotal';
 
@@ -115,5 +116,10 @@ class ShipmentMappingConfigProvider
         $deadlineInDays = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_DEADLINE_IN_DAYS);
 
         return is_scalar($deadlineInDays) ? (int)$deadlineInDays : self::DEFAULT_DELIVERY_DEADLINE;
+    }
+
+    public function isUsingCollectAddressTotalsForShippingEstimationEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_USE_COLLECT_ADDRESS_TOTALS);
     }
 }
