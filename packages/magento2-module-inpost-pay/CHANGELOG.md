@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.3] - 2025-08-25
+
+### Fixed
+
+- Fixed deleting no longer valid InPost Pay Basket after an order has been placed in Magento Checkout from a cart bound with InPost Pay.
+- Fixed a scope error in InPost Pay Admin Panel configuration validator of Shipping Methods Mapping.
+
 ## [2.2.2] - 2025-08-05
 
 ### Fixed
