@@ -100,9 +100,8 @@ class UniqueShippingMethodValidator extends Value
 
             $configValue = $this->scopeConfig->getValue(
                 $path,
-                $scope === ScopeConfigInterface::SCOPE_TYPE_DEFAULT
-                    ? ScopeConfigInterface::SCOPE_TYPE_DEFAULT : ScopeInterface::SCOPE_STORE,
-                $scopeId
+                $scope,
+                (int)$scopeId
             );
 
             if (!empty($configValue)) {
