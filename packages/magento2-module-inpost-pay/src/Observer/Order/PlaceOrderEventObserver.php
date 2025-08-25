@@ -6,12 +6,14 @@ namespace InPost\InPostPay\Observer\Order;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
+use InPost\InPostPay\Registry\Order\Creation\InPostPayOrderCreationRegistry;
 use Psr\Log\LoggerInterface;
 
 class PlaceOrderEventObserver implements ObserverInterface
@@ -19,8 +21,10 @@ class PlaceOrderEventObserver implements ObserverInterface
     private ?InPostPayQuoteInterface $inPostPayQuote = null;
 
     public function __construct(
+        private readonly BasketBindingDelete $basketBindingDelete,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
+        private readonly InPostPayOrderCreationRegistry $orderCreationRegistry,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -45,6 +49,7 @@ class PlaceOrderEventObserver implements ObserverInterface
                     && $inPostPayQuote->getBasketId()
                     && $inPostPayQuoteId = $inPostPayQuote->getInPostPayQuoteId()
                 ) {
+                    $this->deleteBasketFromInPostPayApi($inPostPayQuote);
                     $this->inPostPayQuoteRepository->deleteById($inPostPayQuoteId);
                     $this->basketBindingApiKeyCookieService->deleteBasketBindingKeyCookie();
                 }
@@ -80,5 +85,30 @@ class PlaceOrderEventObserver implements ObserverInterface
         }
 
         return $this->inPostPayQuote;
+    }
+
+    private function deleteBasketFromInPostPayApi(InPostPayQuoteInterface $inPostPayQuote): void
+    {
+        $registeredBasketId = $this->orderCreationRegistry->registry();
+        if ($registeredBasketId && $registeredBasketId === $inPostPayQuote->getBasketId()) {
+            $this->logger->debug(
+                sprintf(
+                    'Skipping BasketBindingDelete for Basket ID:%s InPost Pay triggered order creation.',
+                    $registeredBasketId
+                )
+            );
+        } else {
+            try {
+                $this->basketBindingDelete->execute($inPostPayQuote->getBasketId(), true);
+            } catch (LocalizedException $e) {
+                $this->logger->error(
+                    sprintf(
+                        'Could not delete Basket ID:%s from InPost Pay API. Reason: %s.',
+                        $registeredBasketId,
+                        $e->getMessage()
+                    )
+                );
+            }
+        }
     }
 }
