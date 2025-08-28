@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Provider;
 
 use InPost\InPostPay\Api\InPostPayLockerIdProviderInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Service\GetOrderByIncrementId;
@@ -26,7 +27,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     ) {
     }
 
-    public function getFromOrderById(int $orderId): string
+    public function getFromOrderById(int $orderId): ?string
     {
         try {
             return $this->getFromOrder($this->orderRepository->get($orderId));
@@ -43,7 +44,7 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
         }
     }
 
-    public function getFromOrderByIncrementId(string $orderIncrementId): string
+    public function getFromOrderByIncrementId(string $orderIncrementId): ?string
     {
         try {
             return $this->getFromOrder($this->getOrderByIncrementId->get($orderIncrementId));
@@ -62,19 +63,14 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
 
     /**
      * @param OrderInterface $order
-     * @return string
+     * @return string|null
      * @throws LocalizedException
      */
-    private function getFromOrder(OrderInterface $order): string
+    private function getFromOrder(OrderInterface $order): ?string
     {
         // @phpstan-ignore-next-line
         if (!$this->isInPostPickupDeliveryMethod((string)$order->getShippingMethod())) {
-            throw new LocalizedException(
-                __(
-                    'Delivery method selected for this order #%1 is not InPost Paczkomat 24/7',
-                    (string)$order->getIncrementId()
-                )
-            );
+            return null;
         }
 
         $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId((int)$order->getEntityId());
@@ -97,6 +93,10 @@ class InPostPayLockerIdProvider implements InPostPayLockerIdProviderInterface
     {
         $inPostPickupCarrierCodes = [];
         foreach ($this->shipmentMappingConfigProvider->getAllDeliveryTypes() as $deliveryType) {
+            if ($deliveryType !== InPostDeliveryType::APM->name) {
+                continue;
+            }
+
             try {
                 $inPostPickupCarrierCodes[] = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
                     $deliveryType,
