@@ -32,8 +32,10 @@
     <event name="sales_order_shipment_track_delete_after">
         <observer name="InPost_InPostPay::updateInPostOrderShipmentTrackEventObserver" instance="InPost\InPostPay\Observer\Order\Shipment\UpdateInPostOrderShipmentTrackEventObserver" />
     </event>
-    <event name="checkout_onepage_controller_success_action">
-        <observer name="InPost_InPostPay::deleteBindingAfterPlaceOrderObserver" instance="InPost\InPostPay\Observer\Order\PlaceOrderEventObserver" />
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="InPost_InPostPay::deleteBindingAfterCheckoutPlacedOrderObserver" instance="InPost\InPostPay\Observer\Order\DeleteBindingAfterCheckoutPlacedOrderObserver" />
+    </event>
+    <event name="inpost_pay_order_success_action">
         <observer name="InPost_InPostPay::forceStatusUpdateObserver" instance="InPost\InPostPay\Observer\Order\ForceStatusUpdateObserver" />
     </event>
     <event name="inpost_pay_bestseller_product_save_before">
@@ -67,6 +69,7 @@
         <observer name="InPost_InPostPay::registerInPostPayOrderAccountEmailObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\RegisterInPostPayOrderAccountEmailObserver" />
     </event>
     <event name="inpost_pay_order_post_processing_steps_after">
+        <observer name="InPost_InPostPay::deleteBindingAfterPlaceOrderObserver" instance="InPost\InPostPay\Observer\Order\DeleteBindingAfterPlaceOrderObserver" />
         <observer name="InPost_InPostPay::copyAnalyticsDataFromInPostPayQuoteToOrderEventObserver" instance="InPost\InPostPay\Observer\Order\CopyAnalyticsDataFromInPostPayQuoteToOrderEventObserver" />
     </event>
     <event name="izi_order_create_after">
