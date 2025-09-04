@@ -592,6 +592,8 @@
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
+        <plugin name="InPost_InPostPay::registerBasketIdBeforeOrderCreatePlugin"
+                type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\RegisterBasketIdBeforeOrderCreatePlugin"/>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet">
         <arguments>
@@ -784,6 +786,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

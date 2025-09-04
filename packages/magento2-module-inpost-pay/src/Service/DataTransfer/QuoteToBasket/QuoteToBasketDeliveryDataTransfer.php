@@ -19,15 +19,11 @@ use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Registry\Quote\DigitalQuoteAllowRegistry;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator;
 use InPost\InPostPay\Service\CreateBasketNotice;
-use Magento\Customer\Api\AddressRepositoryInterface;
 use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
-use Magento\Quote\Model\Cart\ShippingMethodConverter;
 use Magento\Quote\Model\Quote;
-use Magento\Quote\Model\Quote\Address;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -35,30 +31,26 @@ use Psr\Log\LoggerInterface;
  */
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
-    private const DEFAULT_COUNTRY_ID = 'PL';
 
     /**
      * @param DeliveryInterfaceFactory $deliveryFactory
      * @param DeliveryOptionInterfaceFactory $deliveryOptionFactory
      * @param DeliveryDateProvider $deliveryDateProvider
      * @param ShipmentMappingConfigProvider $shipmentMappingConfigProvider
-     * @param AddressRepositoryInterface $addressRepository
      * @param CreateBasketNotice $createBasketNotice
      * @param QuoteRestrictionsValidator $quoteRestrictionsValidator
-     * @param ShippingMethodConverter $shippingMethodConverter
+     * @param ShippingMethodEstimator $shippingMethodEstimator
      * @param DigitalQuoteAllowRegistry $digitalQuoteAllowRegistry
      * @param LoggerInterface $logger
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         private readonly DeliveryInterfaceFactory $deliveryFactory,
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
-        private readonly AddressRepositoryInterface $addressRepository,
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
-        private readonly ShippingMethodConverter $shippingMethodConverter,
+        private readonly ShippingMethodEstimator $shippingMethodEstimator,
         private readonly DigitalQuoteAllowRegistry $digitalQuoteAllowRegistry,
         private readonly LoggerInterface $logger
     ) {
@@ -91,7 +83,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         if (!$quote->isVirtual()) {
-            $shippingMethods = $this->getShippingMethodsForQuote($quote);
+            $shippingMethods = $this->shippingMethodEstimator->estimate($quote);
             $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
 
             if ($quote->hasVirtualItems()) {
@@ -110,28 +102,6 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $basket->setDelivery($deliveries);
-    }
-
-    /**
-     * @param Quote $quote
-     * @return ShippingMethodInterface[]
-     */
-    private function getShippingMethodsForQuote(Quote $quote): array
-    {
-        $output = [];
-        /** @var Address $shippingAddress */
-        $shippingAddress = $this->getShippingAddress($quote);
-        $shippingAddress->setCollectShippingRates(true);
-        $shippingAddress->collectShippingRates();
-        $shippingRates = $shippingAddress->getGroupedAllShippingRates();
-
-        foreach ($shippingRates as $carrierRates) {
-            foreach ($carrierRates as $rate) {
-                $output[] = $this->shippingMethodConverter->modelToDataObject($rate, $quote->getQuoteCurrencyCode());
-            }
-        }
-
-        return $output;
     }
 
     /**
@@ -282,33 +252,5 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         return $limit;
-    }
-
-    private function getShippingAddress(Quote $quote): AddressInterface
-    {
-        $shippingAddress = $quote->getShippingAddress();
-        // @phpstan-ignore-next-line
-        if ((empty($shippingAddress->getCountryId()) || !$shippingAddress->getPostcode())
-            // @phpstan-ignore-next-line
-            && $quote->getCustomer()->getId()
-        ) {
-            try {
-                $customerShippingAddress =
-                    // @phpstan-ignore-next-line
-                    $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
-                $customerShippingAddress->getCountryId();
-                if ($customerShippingAddress->getCountryId()) {
-                    $shippingAddress->setCountryId($customerShippingAddress->getCountryId());
-                }
-            } catch (LocalizedException $e) {
-                $this->logger->error($e->getMessage());
-            }
-        }
-
-        if (empty($shippingAddress->getCountryId())) {
-            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
-        }
-
-        return $shippingAddress;
     }
 }

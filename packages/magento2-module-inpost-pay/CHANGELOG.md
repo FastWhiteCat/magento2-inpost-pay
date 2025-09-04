@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.3] - 2025-08-25
+
+### Fixed
+
+- Fixed deleting no longer valid InPost Pay Basket after an order has been placed in Magento Checkout from a cart bound with InPost Pay.
+- Fixed a scope error in InPost Pay Admin Panel configuration validator of Shipping Methods Mapping.
+
+## [2.2.2] - 2025-08-05
+
+### Fixed
+
+- Fixed the handling of free delivery set by Cart Rule with one of the conditions depending on the shipping country equals Poland.
+- Fixed compatibility with newer Magento 2 Open Source v2.4.8-p1 on PHP 8.3
+- Fixed compatibility with older Magento 2 Open Source v2.4.6 on PHP 8.1
+
 ## [2.2.1] - 2025-06-27
 
 ### Added
