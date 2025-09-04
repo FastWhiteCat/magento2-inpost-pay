@@ -17,6 +17,7 @@
             <frontend_model>InPost\InPostPay\Block\Adminhtml\Form\Field\TermsAndConditionsField</frontend_model>
             <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
             <config_path>payment/inpost_pay/terms_and_conditions_new_mapping</config_path>
+            <comment>A maximum of 10 overriding consents will be transferred to the application</comment>
         </field>
     </group>
 </include>

@@ -70,7 +70,11 @@ class IziOrderCreateBeforeEventObserver extends MerchantEndpointEventObserver im
                 OrderInterface::INVOICE_DETAILS => $invoiceDetailsData
             ];
 
-            $this->createEventDataLog($requestParams);
+            if ($this->debugConfigProvider->isAnonymisingEnabled()) {
+                $this->createEventDataLog($this->anonymizeArray($requestParams));
+            } else {
+                $this->createEventDataLog($requestParams);
+            }
         }
     }
 

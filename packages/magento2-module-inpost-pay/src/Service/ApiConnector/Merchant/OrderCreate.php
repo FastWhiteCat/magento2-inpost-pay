@@ -101,12 +101,14 @@ class OrderCreate implements OrderCreateInterface
                 );
 
                 $this->orderValidator->validate($quote, $inPostPayQuote, $inPostOrder);
-                $order = $this->orderProcessor->execute($quote, $inPostOrder);
+                $order = $this->orderProcessor->execute($quote, $inPostPayQuote, $inPostOrder);
                 $inPostOrder = $this->prepareInPostOrderFromMagentoOrder($order);
 
                 $this->eventManager->dispatch(
                     'izi_order_create_after',
-                    [OrderCreateInterface::INPOST_ORDER => $inPostOrder]
+                    [
+                        OrderCreateInterface::INPOST_ORDER => $inPostOrder
+                    ]
                 );
 
                 return  $inPostOrder;

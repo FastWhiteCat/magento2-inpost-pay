@@ -10,7 +10,7 @@
         <observer name="InPost_InPostPay::insertInPostPayCheckoutAgreementAssignedStoresEventObserver" instance="InPost\InPostPay\Observer\CheckoutAgreement\InsertInPostPayCheckoutAgreementAssignedStoresEventObserver" />
         <observer name="InPost_InPostPay::clearCacheAfterInPostPayCheckoutAgreementSaveEventObserver" instance="InPost\InPostPay\Observer\CheckoutAgreement\ClearCacheAfterInPostPayCheckoutAgreementSaveEventObserver" />
     </event>
-    <event name="sales_quote_save_after">
+    <event name="sales_quote_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostBasketEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver" />
     </event>
     <event name="checkout_cart_save_after">
@@ -19,8 +19,14 @@
     <event name="sales_quote_merge_before">
         <observer name="InPost_InPostPay::updateInPostBasketBeforeQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketBeforeQuoteMergeEventObserver" />
     </event>
+    <event name="sales_quote_address_collect_totals_before">
+        <observer name="InPost_InPostPay::setDefaultCountryBeforeAddressCollectTotalsEventObserver" instance="InPost\InPostPay\Observer\Quote\SetDefaultCountryBeforeAddressCollectTotalsEventObserver" />
+    </event>
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
+    </event>
+    <event name="sales_quote_item_collection_products_after_load">
+        <observer name="InPost_InPostPay::addImageGalleryToProductsCollectionEventObserver" instance="InPost\InPostPay\Observer\Quote\AddImageGalleryToProductsCollectionEventObserver"/>
     </event>
     <event name="customer_logout">
         <observer name="InPost_InPostPay::deleteBasketBidingApiCookieAfterCustomerLogout" instance="InPost\InPostPay\Observer\Customer\DeleteBasketBidingApiCookieAfterCustomerLogout" />
@@ -28,7 +34,7 @@
     <event name="customer_login">
         <observer name="InPost_InPostPay::createOrUpdateBasketBidingApiCookieAfterCustomerLogin" instance="InPost\InPostPay\Observer\Customer\CreateOrUpdateBasketBidingApiCookieAfterCustomerLogin" />
     </event>
-    <event name="sales_order_save_after">
+    <event name="sales_order_save_commit_after">
         <observer name="InPost_InPostPay::updateInPostOrderEventObserver" instance="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver" />
     </event>
     <event name="sales_order_shipment_track_save_after">
@@ -40,6 +46,12 @@
     <event name="checkout_onepage_controller_success_action">
         <observer name="InPost_InPostPay::deleteBindingAfterPlaceOrderObserver" instance="InPost\InPostPay\Observer\Order\PlaceOrderEventObserver" />
         <observer name="InPost_InPostPay::forceStatusUpdateObserver" instance="InPost\InPostPay\Observer\Order\ForceStatusUpdateObserver" />
+    </event>
+    <event name="inpost_pay_bestseller_product_save_before">
+        <observer name="InPost_InPostPay::validateInPostPayBestsellerProductBeforeSaveObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\ValidateInPostPayBestsellerProductBeforeSaveObserver" />
+    </event>
+    <event name="inpost_pay_bestseller_product_delete_after">
+        <observer name="InPost_InPostPay::inPostPayBestsellerProductAfterDeleteObserver" instance="InPost\InPostPay\Observer\InPostPayBestsellerProduct\InPostPayBestsellerProductAfterDeleteObserver" />
     </event>
     <!-- Events triggered when sending requests to IZI API Endpoints -->
     <event name="izi_api_send_request_before">
@@ -63,8 +75,13 @@
     </event>
     <event name="izi_order_create_before">
         <observer name="InPost_InPostPay::iziOrderCreateBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderCreateBeforeEventObserver" />
+        <observer name="InPost_InPostPay::registerInPostPayOrderAccountEmailObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\RegisterInPostPayOrderAccountEmailObserver" />
+    </event>
+    <event name="inpost_pay_order_post_processing_steps_after">
+        <observer name="InPost_InPostPay::copyAnalyticsDataFromInPostPayQuoteToOrderEventObserver" instance="InPost\InPostPay\Observer\Order\CopyAnalyticsDataFromInPostPayQuoteToOrderEventObserver" />
     </event>
     <event name="izi_order_create_after">
+        <observer name="InPost_InPostPay::sendAnalyticsPurchaseAfterOrderCreateEventObserver" instance="InPost\InPostPay\Observer\Order\Analytics\SendAnalyticsPurchaseAfterOrderCreateEventObserver" />
         <observer name="InPost_InPostPay::iziOrderCreateAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziOrderCreateAfterEventObserver" />
     </event>
     <event name="izi_basket_update_before">
@@ -90,5 +107,55 @@
     </event>
     <event name="izi_basket_confirmation_after">
         <observer name="InPost_InPostPay::iziBasketConfirmationAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBasketConfirmationAfterEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_before">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetBeforeEventObserver" />
+    </event>
+    <event name="izi_bestseller_products_get_after">
+        <observer name="InPost_InPostPay::iziBestsellerProductsGetAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziBestsellerProductsGetAfterEventObserver" />
+    </event>
+    <event name="catalog_product_save_commit_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="cataloginventory_stock_item_save_commit_after">
+        <observer name="InPost_InPostPay::updateInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterStockItemSaveObserver" />
+    </event>
+    <event name="catalog_product_delete_before">
+        <observer name="InPost_InPostPay::deleteInPostPayBestsellerProductAfterSaveObserver" instance="InPost\InPostPay\Observer\Product\DeleteInPostPayBestsellerProductAfterSaveObserver" />
+    </event>
+    <event name="izi_init_basket_before">
+        <observer name="InPost_InPostPay::iziInitBasketBeforeEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketBeforeEventObserver" />
+    </event>
+    <event name="izi_init_basket_after">
+        <observer name="InPost_InPostPay::iziInitBasketAfterEventObserver" instance="InPost\InPostPay\Observer\MerchantEndpoint\Debug\IziInitBasketAfterEventObserver" />
+    </event>
+    <event name="salesrule_rule_save_after">
+        <observer name="InPost_InPostPay::cleanPromotionsCacheAfterRuleSave" instance="InPost\InPostPay\Observer\SalesRule\SalesRuleSaveEventObserver" />
+    </event>
+
+    <!-- Email Events:: observer set InPost Pay Order in process registry so that email copy can be also sent to InPost Pay Account email address -->
+    <event name="email_order_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderCommentEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_order_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayOrderEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_shipment_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayShipmentCommentEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_shipment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayShipmentEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_invoice_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayInvoiceCommentEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_invoice_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayInvoiceEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_creditmemo_comment_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayCreditmemoCommentEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
+    </event>
+    <event name="email_creditmemo_set_template_vars_before">
+        <observer name="InPost_InPostPay::inPostPayCreditmemoEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
     </event>
 </config>
