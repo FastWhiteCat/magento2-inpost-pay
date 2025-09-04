@@ -17,6 +17,7 @@ class ShipmentMappingConfigProvider
     public const OPTION_STANDARD = 'STANDARD';
     private const XML_PATH_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
     private const XML_PATH_DELIVERY_DEADLINE_IN_DAYS = 'payment/inpost_pay/delivery_deadline_in_days';
+    private const XML_PATH_USE_COLLECT_ADDRESS_TOTALS = 'payment/inpost_pay/estimate_with_collect_address_totals';
     private const XML_PATH_FREE_SHIPPING_ENABLED_PATTERN = 'carriers/%s/free_shipping_enable';
     private const XML_PATH_FREE_SHIPPING_SUBTOTAL_PATTERN = 'carriers/%s/free_shipping_subtotal';
 
@@ -31,14 +32,15 @@ class ShipmentMappingConfigProvider
     /**
      * @param string $deliveryType
      * @param string $option
+     * @param int|null $storeId
      * @return string
      * @throws InPostPayInternalException
      */
-    public function getCarrierMethodCodeForOptions(string $deliveryType, string $option): string
+    public function getCarrierMethodCodeForOptions(string $deliveryType, string $option, ?int $storeId = null): string
     {
         $carrierConfigPattern = self::XML_PATH_DELIVERY_MAPPING_PATTERN;
         $carrierConfigPath = sprintf($carrierConfigPattern, strtolower($deliveryType), strtolower($option));
-        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_WEBSITE);
+        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_STORE, $storeId);
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInternalException(
@@ -75,7 +77,7 @@ class ShipmentMappingConfigProvider
         return $nonStandardOptions;
     }
 
-    public function isFreeShippingEnabledForCarrier(string $code, string $method = ''): bool
+    public function isFreeShippingEnabledForCarrier(string $code, string $method = '', ?int $storeId = null): bool
     {
         $configPattern = self::XML_PATH_FREE_SHIPPING_ENABLED_PATTERN;
         if (!empty($method)) {
@@ -84,10 +86,14 @@ class ShipmentMappingConfigProvider
             $methodCode = sprintf('%s', $code);
         }
 
-        return $this->scopeConfig->isSetFlag(sprintf($configPattern, $methodCode));
+        return $this->scopeConfig->isSetFlag(
+            sprintf($configPattern, $methodCode),
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
 
-    public function getFreeShippingSubtotalForCarrier(string $code, string $method = ''): ?float
+    public function getFreeShippingSubtotalForCarrier(string $code, string $method = '', ?int $storeId = null): ?float
     {
         $configPattern = self::XML_PATH_FREE_SHIPPING_SUBTOTAL_PATTERN;
         if (!empty($method)) {
@@ -98,7 +104,8 @@ class ShipmentMappingConfigProvider
 
         $subtotalValue = $this->scopeConfig->getValue(
             sprintf($configPattern, $methodCode),
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
 
         return is_scalar($subtotalValue) ? round((float)$subtotalValue, 2) : null;
@@ -109,5 +116,10 @@ class ShipmentMappingConfigProvider
         $deadlineInDays = $this->scopeConfig->getValue(self::XML_PATH_DELIVERY_DEADLINE_IN_DAYS);
 
         return is_scalar($deadlineInDays) ? (int)$deadlineInDays : self::DEFAULT_DELIVERY_DEADLINE;
+    }
+
+    public function isUsingCollectAddressTotalsForShippingEstimationEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_USE_COLLECT_ADDRESS_TOTALS);
     }
 }

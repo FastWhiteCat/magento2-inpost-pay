@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
@@ -20,12 +21,14 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
 {
     /**
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
+     * @param BasketBindingDelete $basketBindingDelete
      * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
      * @param CartSessionCookieProvider $cartSessionCookieProvider
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly BasketBindingDelete $basketBindingDelete,
         private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
         private readonly CartSessionCookieProvider $cartSessionCookieProvider,
         private readonly LoggerInterface $logger
@@ -78,6 +81,7 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         }
 
         if (isset($deprecatedBasket)) {
+            $this->basketBindingDelete->execute($deprecatedBasket->getBasketId());
             $guestQuote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
             $this->inPostPayQuoteRepository->delete($deprecatedBasket);
         }

@@ -13,16 +13,23 @@ use Magento\Framework\EntityManager\EntityManager as OperationRepository;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Framework\App\AreaInterface;
+use InPost\InPostPay\Model\Consumer\Quote\ConsumerQuoteRepository;
+use Magento\Store\Model\App\Emulation;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BasketCreateOrUpdateConsumer
 {
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly OperationRepository $operationRepository,
-        private readonly CartRepositoryInterface $cartRepository,
+        private readonly ConsumerQuoteRepository $consumerQuoteRepository,
+        private readonly Emulation $emulation,
+        private readonly AreaInterface $area,
         private readonly CreateOrUpdateBasket $createOrUpdateBasket,
         private readonly JsonSerializer $jsonSerializer,
         private readonly LoggerInterface $logger
@@ -41,10 +48,13 @@ class BasketCreateOrUpdateConsumer
         }
 
         try {
+            $this->consumerQuoteRepository->cleanCachedQuotes();
             $this->processBasketExport($basketId);
             $this->handleResult($basketId, $operation);
         } catch (LocalizedException $e) {
             $this->handleResult($basketId, $operation, $e);
+        } finally {
+            $this->consumerQuoteRepository->cleanCachedQuotes();
         }
     }
 
@@ -57,11 +67,20 @@ class BasketCreateOrUpdateConsumer
         $quote = null;
         $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
         if (is_scalar($inPostPayQuote->getQuoteId())) {
-            $quote = $this->cartRepository->get((int)$inPostPayQuote->getQuoteId());
+            $quote = $this->consumerQuoteRepository->get((int)$inPostPayQuote->getQuoteId());
         }
 
         if ($quote instanceof Quote && $inPostPayQuote->getBrowserId()) {
-            $this->createOrUpdateBasket->execute($quote, $basketId);
+            try {
+                $this->area->load(AreaInterface::PART_TRANSLATE);
+                $this->emulation->startEnvironmentEmulation($quote->getStoreId(), 'frontend', true);
+                $this->createOrUpdateBasket->execute($quote, $basketId);
+                $this->emulation->stopEnvironmentEmulation();
+            } catch (LocalizedException $e) {
+                $this->emulation->stopEnvironmentEmulation();
+
+                throw $e;
+            }
         } else {
             throw new LocalizedException(__(sprintf('Missing basket data for Basket ID: %s.', $basketId)));
         }

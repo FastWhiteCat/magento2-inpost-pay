@@ -16,7 +16,7 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
-$apiBaseUrl = $widgetViewModel->getApiBaseUrl();
+$enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
 ?>
 
 <div class="inpay-login-wrapper">
@@ -34,7 +34,7 @@ $apiBaseUrl = $widgetViewModel->getApiBaseUrl();
                         "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
                         "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
                         "language": "<?= /* @noEscape */ $language ?>",
-                        "apiBaseUrl": "<?= /* @noEscape */ $apiBaseUrl ?>"
+                        "enabledAnalyticsParams": "<?= /* @noEscape */ $enabledAnalyticsParams ?>"
                     }
                 }
             }

@@ -17,13 +17,10 @@ use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
+use InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator;
 use InPost\InPostPay\Service\CreateBasketNotice;
-use Magento\Customer\Api\AddressRepositoryInterface;
 use InPost\InPostPay\Validator\QuoteRestrictionsValidator;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
-use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
@@ -32,24 +29,22 @@ use Psr\Log\LoggerInterface;
  */
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
-    private const DEFAULT_COUNTRY_ID = 'PL';
 
     public function __construct(
         private readonly DeliveryInterfaceFactory $deliveryFactory,
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
         private readonly DeliveryDateProvider $deliveryDateProvider,
         private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
-        private readonly ShippingMethodManagementInterface $shippingManager,
-        private readonly AddressRepositoryInterface $addressRepository,
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
+        private readonly ShippingMethodEstimator $shippingMethodEstimator,
         private readonly LoggerInterface $logger
     ) {
     }
 
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
-        $shippingAddress = $this->getShippingAddress($quote);
+        $storeId = $quote->getStoreId();
 
         if ($quote->isVirtual()) {
             $this->logger->error('Quote is virtual. Setting empty delivery.');
@@ -81,9 +76,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             }
         }
 
-        // @phpstan-ignore-next-line
-        $shippingMethods = $this->shippingManager->estimateByExtendedAddress((int)$quote->getId(), $shippingAddress);
-        $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods);
+        $shippingMethods = $this->shippingMethodEstimator->estimate($quote);
+        $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
 
         if (empty($deliveries)) {
             $this->createBasketNotice->execute(
@@ -97,17 +91,19 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     }
 
     /**
-     * @param DeliveryInterface[] $quoteAvailableShippingMethods
+     * @param ShippingMethodInterface[] $quoteAvailableShippingMethods
+     * @param int $storeId
      * @return array
      */
-    private function prepareMappedShippingMethodsData(array $quoteAvailableShippingMethods): array
+    private function prepareMappedShippingMethodsData(array $quoteAvailableShippingMethods, int $storeId): array
     {
         $deliveryData = [];
         foreach ($this->shipmentMappingConfigProvider->getAllDeliveryTypes() as $deliveryType) {
             $shippingMethod = $this->getDeliveryByTypeAndOption(
                 $quoteAvailableShippingMethods,
                 $deliveryType,
-                ShipmentMappingConfigProvider::OPTION_STANDARD
+                ShipmentMappingConfigProvider::OPTION_STANDARD,
+                $storeId
             );
             if ($shippingMethod === null) {
                 continue;
@@ -123,7 +119,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             $deliverPrice->setVat(DecimalCalculator::sub($deliverPrice->getGross(), $deliverPrice->getNet()));
             $delivery->setDeliveryPrice($deliverPrice);
 
-            $freeShippingLimit = $this->getFreeShippingLimit($shippingMethod);
+            $freeShippingLimit = $this->getFreeShippingLimit($shippingMethod, $storeId);
             if ($freeShippingLimit) {
                 $delivery->setFreeDeliveryMinimumGrossPrice($freeShippingLimit);
             }
@@ -133,7 +129,8 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
                 $optionShippingMethod = $this->getDeliveryByTypeAndOption(
                     $quoteAvailableShippingMethods,
                     $deliveryType,
-                    $optionCode
+                    $optionCode,
+                    $storeId
                 );
 
                 if ($optionShippingMethod === null) {
@@ -182,12 +179,14 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     private function getDeliveryByTypeAndOption(
         array $quoteAvailableShippingMethods,
         string $deliveryType,
-        string $option
+        string $option,
+        int $storeId
     ): ?ShippingMethodInterface {
         try {
             $mappedMethodCode = $this->shipmentMappingConfigProvider->getCarrierMethodCodeForOptions(
                 $deliveryType,
-                $option
+                $option,
+                $storeId
             );
             foreach ($quoteAvailableShippingMethods as $shippingMethod) {
                 $allowedMethodCode = sprintf(
@@ -207,13 +206,13 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         return $mappedShippingMethod ?? null;
     }
 
-    private function getFreeShippingLimit(ShippingMethodInterface $pickupPointShippingMethod): ?float
+    private function getFreeShippingLimit(ShippingMethodInterface $pickupPointShippingMethod, int $storeId): ?float
     {
         $limit = null;
         $method = (string)$pickupPointShippingMethod->getMethodCode();
         $code = (string)$pickupPointShippingMethod->getCarrierCode();
-        if ($this->shipmentMappingConfigProvider->isFreeShippingEnabledForCarrier($code, $method)) {
-            $limit = $this->shipmentMappingConfigProvider->getFreeShippingSubtotalForCarrier($code, $method);
+        if ($this->shipmentMappingConfigProvider->isFreeShippingEnabledForCarrier($code, $method, $storeId)) {
+            $limit = $this->shipmentMappingConfigProvider->getFreeShippingSubtotalForCarrier($code, $method, $storeId);
         }
 
         return $limit;
@@ -226,33 +225,5 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             InPostPayBasketNoticeInterface::ATTENTION,
             __('Order contains products that cannot be shipped.')->render()
         );
-    }
-
-    private function getShippingAddress(Quote $quote): AddressInterface
-    {
-        $shippingAddress = $quote->getShippingAddress();
-        // @phpstan-ignore-next-line
-        if ((empty($shippingAddress->getCountryId()) || !$shippingAddress->getPostcode())
-            // @phpstan-ignore-next-line
-            && $quote->getCustomer()->getId()
-        ) {
-            try {
-                $customerShippingAddress =
-                    // @phpstan-ignore-next-line
-                    $this->addressRepository->getById($quote->getCustomer()->getDefaultShipping());
-                $customerShippingAddress->getCountryId();
-                if ($customerShippingAddress->getCountryId()) {
-                    $shippingAddress->setCountryId($customerShippingAddress->getCountryId());
-                }
-            } catch (LocalizedException $e) {
-                $this->logger->error($e->getMessage());
-            }
-        }
-
-        if (empty($shippingAddress->getCountryId())) {
-            $shippingAddress->setCountryId(self::DEFAULT_COUNTRY_ID);
-        }
-
-        return $shippingAddress;
     }
 }

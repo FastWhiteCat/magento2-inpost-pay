@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\ViewModel;
 
 use InPost\InPostPay\Exception\InPostPayInternalException;
+use InPost\InPostPay\Provider\Config\AnalyticsConfigProvider;
 use InPost\InPostPay\Provider\Config\AuthConfigProvider;
 use InPost\InPostPay\Provider\Config\IziApiConfigProvider;
 use InPost\InPostPay\Provider\TestModeProvider;
@@ -36,6 +37,7 @@ class Widget implements ArgumentInterface
      * @param SandboxConfigProvider $sandboxConfigProvider
      * @param LayoutConfigProvider $layoutConfigProvider
      * @param DisplayConfigProvider $displayConfigProvider
+     * @param AnalyticsConfigProvider $analyticsConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
      * @param GeneralConfigProvider $generalConfigProvider
@@ -53,6 +55,7 @@ class Widget implements ArgumentInterface
         private readonly SandboxConfigProvider $sandboxConfigProvider,
         private readonly LayoutConfigProvider $layoutConfigProvider,
         private readonly DisplayConfigProvider $displayConfigProvider,
+        private readonly AnalyticsConfigProvider $analyticsConfigProvider,
         private readonly ResolverInterface $localeResolver,
         private readonly CheckoutSession $checkoutSession,
         private readonly GeneralConfigProvider $generalConfigProvider,
@@ -71,7 +74,13 @@ class Widget implements ArgumentInterface
     {
         return $this->generalConfigProvider->isEnabled()
             && $this->displayConfigProvider->isWidgetEnabled()
-            && $this->isDisplayAllowed();
+            && $this->isDisplayAllowed()
+            && $this->isAuthConfigComplete();
+    }
+
+    public function isAnalyticsEnabled(): bool
+    {
+        return $this->analyticsConfigProvider->isAnalyticsEnabled();
     }
 
     /**
@@ -241,10 +250,13 @@ class Widget implements ArgumentInterface
 
     public function getScriptUrl(string $bindingPlace, array $layout = null): string
     {
-        $sandboxMode = $this->isSandboxEnabled();
-        $scriptUrl = $sandboxMode
-            ? "https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js"
-            : "https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js";
+        try {
+            $scriptUrl = $this->iziApiConfigProvider->getWidgetUrl();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+
+            return '';
+        }
 
         if (!$this->isEnabledInMiniCart() || !$layout) {
             return $scriptUrl;
@@ -259,17 +271,47 @@ class Widget implements ArgumentInterface
         return $scriptUrl;
     }
 
-    public function getApiBaseUrl(): string
-    {
-        return trim($this->iziApiConfigProvider->getIziApiUrl(), '/');
-    }
-
     /**
      * @return string
-     * @throws InPostPayInternalException
      */
     public function getClientMerchantId(): string
     {
-        return $this->authConfigProvider->getClientMerchantId();
+        try {
+            return $this->authConfigProvider->getClientMerchantId();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+
+            return '';
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function isAuthConfigComplete(): bool
+    {
+        try {
+            $merchantClientId = $this->authConfigProvider->getClientMerchantId();
+            $posId = $this->authConfigProvider->getPosId();
+            $clientId = $this->authConfigProvider->getClientId();
+            $clientSecret = $this->authConfigProvider->getClientSecret();
+            $authTokenUrl = $this->authConfigProvider->getAuthTokenUrl();
+            $iziApiUrl = $this->iziApiConfigProvider->getIziApiUrl();
+        } catch (InPostPayInternalException $e) {
+            $this->logger->error($e->getMessage());
+            $merchantClientId = '';
+            $posId = '';
+            $clientId = '';
+            $clientSecret = '';
+            $authTokenUrl = '';
+            $iziApiUrl = '';
+        }
+
+        return !empty($posId)
+            && !empty($clientId)
+            && !empty($merchantClientId)
+            && !empty($clientSecret)
+            && !empty($authTokenUrl)
+            && !empty($iziApiUrl);
     }
 }

@@ -27,13 +27,26 @@ class InitBasketProcessor
 
     /**
      * @param int $quoteId
+     * @param string|null $gaClientId
+     * @param string|null $fbclid
+     * @param string|null $gclid
      * @return InPostPayQuoteInterface
      * @throws LocalizedException
      */
-    public function process(int $quoteId): InPostPayQuoteInterface
-    {
+    public function process(
+        int $quoteId,
+        ?string $gaClientId = null,
+        ?string $fbclid = null,
+        ?string $gclid = null
+    ): InPostPayQuoteInterface {
         try {
-            $basketId = $this->getBasketId->get($quoteId, true);
+            $basketId = $this->getBasketId->get(
+                $quoteId,
+                true,
+                $gaClientId,
+                $fbclid,
+                $gclid
+            );
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
             $basketBindingApiKey = $inPostPayQuote->getBasketBindingApiKey();
             $saveRequired = false;

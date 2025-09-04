@@ -23,6 +23,7 @@ interface OrderDetailsInterface
     public const ORDER_BASE_PRICE = 'order_base_price';
     public const ORDER_FINAL_PRICE = 'order_final_price';
     public const DELIVERY_REFERENCE_LIST = 'delivery_references_list';
+    public const ORDER_ADDITIONAL_PARAMETERS = 'order_additional_parameters';
 
     /**
      * @return string
@@ -80,9 +81,9 @@ interface OrderDetailsInterface
     public function setOrderComments(string $orderComments): void;
 
     /**
-     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface|null
      */
-    public function getBasketPrice(): PriceInterface;
+    public function getBasketPrice(): ?PriceInterface;
 
     /**
      * @param \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface $basketPrice
@@ -177,4 +178,15 @@ interface OrderDetailsInterface
      * @return void
      */
     public function setDeliveryReferencesList(array $deliveryReferencesList): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Order\OrderDetails\AdditionalOrderParametersInterface[]
+     */
+    public function getOrderAdditionalParameters(): array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Order\OrderDetails\AdditionalOrderParametersInterface[] $params
+     * @return void
+     */
+    public function setOrderAdditionalParameters(array $params): void;
 }

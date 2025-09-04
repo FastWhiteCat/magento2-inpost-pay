@@ -12,4 +12,13 @@
         <plugin name="InPost_InPostPay::modifyExceptionResultPlugin"
                 type="InPost\InPostPay\Plugin\Webapi\Rest\ModifyExceptionResultPlugin"/>
     </type>
+    <type name="Magento\Quote\Model\Quote\Config">
+        <plugin name="InPost_InPostPay::addAdditionalQuoteProductAttributesPlugin"
+                type="InPost\InPostPay\Plugin\Quote\AddAdditionalQuoteProductAttributesPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>

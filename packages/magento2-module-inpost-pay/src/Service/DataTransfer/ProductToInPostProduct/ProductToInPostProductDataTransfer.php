@@ -15,13 +15,11 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
@@ -30,7 +28,6 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
-use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Store\Model\App\Emulation;
@@ -42,6 +39,9 @@ use Psr\Log\LoggerInterface;
  */
 class ProductToInPostProductDataTransfer
 {
+    public const CONFIGURABLE_PARENT_PRODUCT = 'configurable_parent_product';
+    public const CONFIGURABLE_CHILD_PRODUCT = 'configurable_child_product';
+    public const BUNDLE_CHILD_PRODUCTS = 'bundle_child_products';
     public const INT_QTY = 'INTEGER';
     public const FLOAT_QTY = 'DECIMAL';
 
@@ -51,8 +51,6 @@ class ProductToInPostProductDataTransfer
         RestrictionsRuleInterface::APPLIES_TO_COURIER => InPostDeliveryType::COURIER,
         RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM
     ];
-
-    private ?MagentoProductInterface $product = null;
 
     private WriteInterface $mediaDirectory;
 
@@ -64,13 +62,13 @@ class ProductToInPostProductDataTransfer
         private readonly ProductAttributeInterfaceFactory $productAttributeFactory,
         private readonly RestrictedProductIdsProvider $restrictedProductIdsProvider,
         private readonly StockByWebsiteIdResolverInterface $stockByWebsiteIdResolver,
-        private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
         private readonly ManageStockCondition $manageStockCondition,
         private readonly StringUtils $stringUtils,
         private readonly Escaper $escaper,
         private readonly ImageHelper $imageHelper,
+        private readonly AdditionalProductImagesDataTransfer $additionalProductImagesDataTransfer,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
         private readonly LoggerInterface $logger,
@@ -112,7 +110,6 @@ class ProductToInPostProductDataTransfer
             $maxQuantity = $canCastQtyToInt ? (int)$maxQuantity : (float)$maxQuantity;
         }
 
-        $description = $this->getDescription($product);
         $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getAmount();
         $regularPriceExclTax = DecimalCalculator::round((float)$regularPrice->getBaseAmount());
         $regularPriceInclTax = DecimalCalculator::round((float)$regularPrice->getValue());
@@ -125,9 +122,9 @@ class ProductToInPostProductDataTransfer
         );
         $inPostProduct->setEan((string)$product->getSku());
         $inPostProduct->setProductName((string)$product->getName());
-        $inPostProduct->setProductDescription($description);
-        $inPostProduct->setProductLink($product->getProductUrl());
-        $inPostProduct->setProductImage($this->getProductImageUrl($product));
+        $inPostProduct->setProductDescription($this->prepareProductDescription($product));
+        $inPostProduct->setProductLink($this->prepareProductUrl($product));
+        $inPostProduct->setProductImage($this->prepareProductImageUrl($product));
         $basePrice = $inPostProduct->getBasePrice();
         $basePrice->setNet($regularPriceExclTax);
         $basePrice->setGross($regularPriceInclTax);
@@ -143,40 +140,28 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
         $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
+        $this->additionalProductImagesDataTransfer->transfer($product, $inPostProduct);
     }
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
      */
-    private function getProductImageUrl(Product $originalProduct): string
+    private function prepareProductImageUrl(Product $product): string
     {
-        $storeId = (int)$originalProduct->getStoreId();
-
-        if ($originalProduct->getTypeId() === Type::TYPE_BUNDLE) {
-            $productId = (int)$originalProduct->getId();
-            /** @var Product $product */
-            $product = $this->productRepository->getById($productId, false, $storeId);
-        } else {
-            $originalProductSku = (string)$originalProduct->getSku();
-            /** @var Product $product */
-            $product = $this->productRepository->get($originalProductSku, false, $storeId);
-            $productId = (int)$product->getId();
-        }
-
+        $storeId = (int)$product->getStoreId();
         $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
 
-        $imageRole = $this->generalConfigProvider->getImageRole();
+        $imageRole = $this->generalConfigProvider->getImageRole($product->getStoreId());
         $productImageRole = $product->getData($imageRole);
         $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
 
         if ((empty($image) || $image === SwatchesHelper::EMPTY_IMAGE_VALUE)
-            && $product->hasData('configurable_product_id')
-            && is_scalar($product->getData('configurable_product_id'))
+            && $product->hasData(self::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(self::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
         ) {
-            $configurableProductId = (int)$product->getData('configurable_product_id');
             /** @var Product $product */
-            $product = $this->productRepository->getById($configurableProductId, false, $storeId);
+            $product = $product->getData(self::CONFIGURABLE_PARENT_PRODUCT);
             $productImageRole = $product->getData($imageRole);
             $image = is_scalar($productImageRole) ? (string)$productImageRole : '';
         }
@@ -185,22 +170,12 @@ class ProductToInPostProductDataTransfer
         $imgPath = $product->getMediaConfig()->getMediaPath($image);
 
         if (!$this->mediaDirectory->isExist($imgPath) || !$this->mediaDirectory->isFile($imgPath)) {
-            if (isset($configurableProductId)) {
-                $this->logger->debug(
-                    sprintf(
-                        'Image (%s) not found for simple product ID: %s and its parent product ID: %s',
-                        $image,
-                        $productId,
-                        $configurableProductId
-                    )
-                );
-            } else {
-                $this->logger->debug(
-                    sprintf('Image (%s) not found for simple product ID: %s', $image, (int)$product->getId())
-                );
-            }
+            $this->logger->debug(sprintf('Image (%s) not found for product ID: %s', $image, (int)$product->getId()));
 
-            return $this->imageHelper->getDefaultPlaceholderUrl('image');
+            $placeholderImageUrl = $this->imageHelper->getDefaultPlaceholderUrl('image');
+            $this->emulation->stopEnvironmentEmulation();
+
+            return $placeholderImageUrl;
         }
 
         // @phpstan-ignore-next-line
@@ -209,6 +184,22 @@ class ProductToInPostProductDataTransfer
         $this->emulation->stopEnvironmentEmulation();
 
         return $imgUrl;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+     */
+    private function prepareProductUrl(Product $product): string
+    {
+        if ($product->hasData(self::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(self::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
+        ) {
+            /** @var Product $product */
+            $product = $product->getData(self::CONFIGURABLE_PARENT_PRODUCT);
+        }
+
+        return $product->getProductUrl();
     }
 
     private function getProductAttributes(Product $product, array $selectedOptions = []): array
@@ -223,27 +214,32 @@ class ProductToInPostProductDataTransfer
             $productAttributesData[] = $inPostProductAttribute;
         }
 
-        $product = $this->getProduct($product);
-        if ($product instanceof Product) {
-            $attributes = $product->getAttributes();
-            foreach ($attributes as $attribute) {
-                if ($attribute->getIsVisibleOnFront()) {
-                    $value = $attribute->getFrontend()->getValue($product);
-                    if (is_string($value)) {
-                        $cleanValue = trim($this->stringUtils->cleanUpString($value));
-                    } else {
-                        continue;
-                    }
+        if ($product->hasData(self::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(self::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
+        ) {
+            $product = $product->getData(self::CONFIGURABLE_PARENT_PRODUCT);
+        }
 
-                    if (strlen($cleanValue)) {
-                        /** @var ProductAttributeInterface $inPostProductAttribute */
-                        $inPostProductAttribute = $this->productAttributeFactory->create();
-                        $storeLabel = $attribute->getStoreLabel((int)$product->getStoreId());
-                        $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($storeLabel));
-                        $inPostProductAttribute->setAttributeValue($cleanValue);
-                        $productAttributesData[] = $inPostProductAttribute;
-                    }
-                }
+        $attributes = $product->getAttributes();
+        foreach ($attributes as $attribute) {
+            if (!$attribute->getIsVisibleOnFront()) {
+                continue;
+            }
+
+            $value = $attribute->getFrontend()->getValue($product);
+            if (is_string($value)) {
+                $cleanValue = trim($this->stringUtils->cleanUpString($value));
+            } else {
+                continue;
+            }
+
+            if (strlen($cleanValue)) {
+                /** @var ProductAttributeInterface $inPostProductAttribute */
+                $inPostProductAttribute = $this->productAttributeFactory->create();
+                $storeLabel = $attribute->getStoreLabel((int)$product->getStoreId());
+                $inPostProductAttribute->setAttributeName($this->escaper->escapeUrl($storeLabel));
+                $inPostProductAttribute->setAttributeValue($cleanValue);
+                $productAttributesData[] = $inPostProductAttribute;
             }
         }
 
@@ -255,37 +251,21 @@ class ProductToInPostProductDataTransfer
         return number_format(round($value, 2), 2, '.', '') === number_format((int)$value, 2, '.', '');
     }
 
-    private function getDescription(Product $product): string
+    private function prepareProductDescription(Product $product): string
     {
-        $product = $this->getProduct($product);
-        $description = '';
+        $description = $product->getData('short_description') ?? $product->getData('description');
+        $description = is_scalar($description) ? (string)$description : '';
 
-        if ($product instanceof Product) {
+        if (empty($description)
+            && $product->hasData(self::CONFIGURABLE_PARENT_PRODUCT)
+            && $product->getData(self::CONFIGURABLE_PARENT_PRODUCT) instanceof Product
+        ) {
+            $product = $product->getData(self::CONFIGURABLE_PARENT_PRODUCT);
             $description = $product->getData('short_description') ?? $product->getData('description');
             $description = is_scalar($description) ? (string)$description : '';
-            $description = $this->stringUtils->cleanUpString($description);
         }
 
-        return $description;
-    }
-
-    private function getProduct(Product $product): ?MagentoProductInterface
-    {
-        if ($this->product && $this->product->getId() === $product->getId()) {
-            return $this->product;
-        }
-
-        try {
-            $this->product = $this->productRepository->getById(
-                (int)$product->getId(),
-                false,
-                (int)$product->getStoreId()
-            );
-        } catch (NoSuchEntityException $e) {
-            $this->product = null;
-        }
-
-        return $this->product;
+        return $this->stringUtils->cleanUpString($description);
     }
 
     private function getBundleQuantity(
@@ -297,7 +277,7 @@ class ProductToInPostProductDataTransfer
         $maxBundleQuantity = null;
         $bundleStockQuantity = null;
         /** @var AbstractItem[] $children */
-        $children = $product->getData('children');
+        $children = $product->getData(self::BUNDLE_CHILD_PRODUCTS);
         $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
 
         foreach ($children as $child) {
@@ -333,8 +313,10 @@ class ProductToInPostProductDataTransfer
 
     private function extractProductId(Product $product): string
     {
-        if ($product->getData('simple_product_id') && is_scalar($product->getData('simple_product_id'))) {
-            return (string)$product->getData('simple_product_id');
+        if ($product->getData(self::CONFIGURABLE_CHILD_PRODUCT)
+            && is_scalar($product->getData(self::CONFIGURABLE_CHILD_PRODUCT))
+        ) {
+            return (string)$product->getData(self::CONFIGURABLE_CHILD_PRODUCT);
         }
 
         return (string)$product->getId();

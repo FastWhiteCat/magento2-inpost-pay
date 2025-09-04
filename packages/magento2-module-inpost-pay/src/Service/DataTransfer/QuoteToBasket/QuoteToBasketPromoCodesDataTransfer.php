@@ -96,7 +96,7 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
                 PromoCodeInterface::PROMO_CODE_VALUE => !empty($row['rule_coupon']) ? (string)$row['rule_coupon'] : ''
             ];
 
-            if ($this->isOmnibusCartPriceRule((int)($row['rule_id'] ?? 0))) {
+            if ($this->isOmnibusCartPriceRule((int)($row['rule_id'] ?? 0), $storeId)) {
                 $salesRuleData[PromoCodeInterface::REGULATION_TYPE] = PromoCodeInterface::REGULATION_TYPE_OMNIBUS;
             }
 
@@ -106,9 +106,9 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
         return $salesRulesData;
     }
 
-    private function isOmnibusCartPriceRule(int $cartPriceRuleId): bool
+    private function isOmnibusCartPriceRule(int $cartPriceRuleId, int $storeId): bool
     {
-        $omnibusRuleIds = $this->omnibusConfigProvider->getOmnibusCartPriceRuleIds();
+        $omnibusRuleIds = $this->omnibusConfigProvider->getOmnibusCartPriceRuleIds($storeId);
 
         return !empty($omnibusRuleIds) && $cartPriceRuleId && in_array($cartPriceRuleId, $omnibusRuleIds);
     }

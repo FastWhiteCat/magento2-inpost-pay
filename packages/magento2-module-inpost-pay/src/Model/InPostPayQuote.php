@@ -221,6 +221,42 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
         return $this->setData(self::CART_VERSION, $cartVersion);
     }
 
+    public function getGaClientId(): ?string
+    {
+        $gaClientId = $this->getData(self::GA_CLIENT_ID);
+
+        return (is_scalar($gaClientId) && !empty($gaClientId)) ? (string)$gaClientId : null;
+    }
+
+    public function setGaClientId(?string $gaClientId): InPostPayQuoteInterface
+    {
+        return $this->setData(self::GA_CLIENT_ID, $gaClientId);
+    }
+
+    public function getFbclid(): ?string
+    {
+        $fbclid = $this->getData(self::FBCLID);
+
+        return (is_scalar($fbclid) && !empty($fbclid)) ? (string)$fbclid : null;
+    }
+
+    public function setFbclid(?string $fbclid): InPostPayQuoteInterface
+    {
+        return $this->setData(self::FBCLID, $fbclid);
+    }
+
+    public function getGclid(): ?string
+    {
+        $gclid = $this->getData(self::GCLID);
+
+        return (is_scalar($gclid) && !empty($gclid)) ? (string)$gclid : null;
+    }
+
+    public function setGclid(?string $gclid): InPostPayQuoteInterface
+    {
+        return $this->setData(self::GCLID, $gclid);
+    }
+
     public function getSessionCookie(): ?string
     {
         $sessionCookie = $this->getData(self::SESSION_COOKIE);
