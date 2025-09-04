@@ -16,16 +16,16 @@ use Magento\Sales\Model\Order;
 use InPost\InPostPay\Registry\Order\Creation\InPostPayOrderCreationRegistry;
 use Psr\Log\LoggerInterface;
 
-class PlaceOrderEventObserver implements ObserverInterface
+class DeleteBindingAfterPlaceOrderObserver implements ObserverInterface
 {
     private ?InPostPayQuoteInterface $inPostPayQuote = null;
 
     public function __construct(
-        private readonly BasketBindingDelete $basketBindingDelete,
-        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
-        private readonly InPostPayOrderCreationRegistry $orderCreationRegistry,
-        private readonly LoggerInterface $logger
+        protected readonly BasketBindingDelete $basketBindingDelete,
+        protected readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        protected readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
+        protected readonly InPostPayOrderCreationRegistry $orderCreationRegistry,
+        protected readonly LoggerInterface $logger
     ) {
     }
 
@@ -37,14 +37,15 @@ class PlaceOrderEventObserver implements ObserverInterface
     {
         $order = $observer->getEvent()->getData('order');
         if ($order instanceof Order && $this->canSync($order)) {
-            $orderId = is_scalar($order->getId()) ? (int)$order->getId() : null;
-            if ($orderId === null) {
-                $this->logger->error('Empty order ID.');
+            $quoteId = is_scalar($order->getQuoteId()) ? (int)$order->getQuoteId() : null;
+
+            if ($quoteId === null) {
+                $this->logger->error('Empty quote ID. Skipping basket binding delete procedure.');
                 return;
             }
 
             try {
-                $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($orderId);
+                $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
                 if ($inPostPayQuote
                     && $inPostPayQuote->getBasketId()
                     && $inPostPayQuoteId = $inPostPayQuote->getInPostPayQuoteId()
@@ -60,19 +61,19 @@ class PlaceOrderEventObserver implements ObserverInterface
         }
     }
 
-    private function canSync(Order $order): bool
+    protected function canSync(Order $order): bool
     {
         $quoteId = (int)(is_scalar($order->getQuoteId()) ? $order->getQuoteId() : null);
-        $inPostPayOrder = $this->getInPostPayQuoteByQuoteId($quoteId);
+        $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
 
-        if (!$inPostPayOrder) {
+        if (!$inPostPayQuote) {
             return false;
         }
 
         return true;
     }
 
-    private function getInPostPayQuoteByQuoteId(int $quoteId): ?InPostPayQuoteInterface
+    protected function getInPostPayQuoteByQuoteId(int $quoteId): ?InPostPayQuoteInterface
     {
         if ($this->inPostPayQuote === null) {
             try {
@@ -87,7 +88,7 @@ class PlaceOrderEventObserver implements ObserverInterface
         return $this->inPostPayQuote;
     }
 
-    private function deleteBasketFromInPostPayApi(InPostPayQuoteInterface $inPostPayQuote): void
+    protected function deleteBasketFromInPostPayApi(InPostPayQuoteInterface $inPostPayQuote): void
     {
         $registeredBasketId = $this->orderCreationRegistry->registry();
         if ($registeredBasketId && $registeredBasketId === $inPostPayQuote->getBasketId()) {
