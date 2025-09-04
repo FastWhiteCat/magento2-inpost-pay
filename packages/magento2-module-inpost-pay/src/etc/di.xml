@@ -589,6 +589,8 @@
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
+        <plugin name="InPost_InPostPay::registerBasketIdBeforeOrderCreatePlugin"
+                type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\RegisterBasketIdBeforeOrderCreatePlugin"/>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet">
         <arguments>
