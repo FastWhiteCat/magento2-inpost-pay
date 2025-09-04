@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_debugging_logs" translate="label" type="text" sortOrder="100" showInDefault="1" >
+        <label>InPost Pay Receont Logs</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="recent_logs" translate="label" type="label" sortOrder="1" showInDefault="1">
+            <label>Recent Logs</label>
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\Form\RecentLogs</frontend_model>
+        </field>
+    </group>
+</include>

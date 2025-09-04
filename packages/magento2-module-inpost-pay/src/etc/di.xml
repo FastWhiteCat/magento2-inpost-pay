@@ -192,6 +192,8 @@
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface">
         <plugin name="InPost_InPostPay::basketUpdateIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+        <plugin name="InPost_InPostPay::registerMobileAppBasketEventPlugin"
+                type="InPost\InPostPay\Plugin\ApiConnector\Merchant\RegisterMobileAppBasketEventPlugin" />
     </type>
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface">
         <plugin name="InPost_InPostPay::basketDeleteIsEnablePlugin"
@@ -204,6 +206,8 @@
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
         <plugin name="InPost_InPostPay::orderCreateIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+        <plugin name="InPost_InPostPay::registerMobileAppOrderPlugin"
+                type="InPost\InPostPay\Plugin\ApiConnector\Merchant\RegisterMobileAppOrderPlugin" />
     </type>
     <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer">
         <plugin name="InPost_InPostPay::addAdditionalAnalyticsOrderParamsToOrderDetailsPlugin"
@@ -604,6 +608,7 @@
     </type>
 
     <type name="InPost\InPostPay\Registry\ShippingMethodMappingRegistry" shared="true" />
+    <type name="InPost\InPostPay\Registry\InPostPayMobileAppOrderRegistry" shared="true" />
     <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
