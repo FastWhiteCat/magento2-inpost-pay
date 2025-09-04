@@ -9,8 +9,9 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\ScopeInterface;
 
-class TermsAndConditionsMappingConfigProvider
+class TermsAndConditionsConfigProvider
 {
+    private const XML_PATH_LEGACY_MAPPING_ENABLED = 'payment/inpost_pay/use_legacy_terms_and_conditions_mapping';
     private const XML_PATH_TERMS_AND_CONDITIONS_MAPPING = 'payment/inpost_pay/terms_and_conditions_new_mapping';
 
     /**
@@ -21,6 +22,14 @@ class TermsAndConditionsMappingConfigProvider
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly SerializerInterface $serializer
     ) {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLegacyMappingEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_LEGACY_MAPPING_ENABLED);
     }
 
     /**

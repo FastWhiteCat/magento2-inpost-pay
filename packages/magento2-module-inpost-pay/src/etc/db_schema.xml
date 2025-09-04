@@ -22,6 +22,7 @@
         <column xsi:type="varchar" length="255" name="inpost_pay_account_email" nullable="true"/>
         <column xsi:type="tinyint" name="order_with_invoice" nullable="false" default="1"/>
         <column xsi:type="varchar" length="255" name="inpost_pay_invoice_email" nullable="true"/>
+        <column xsi:type="varchar" length="1024" name="accepted_consents" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -136,5 +137,51 @@
             <column name="sku"/>
             <column name="website_id"/>
         </constraint>
+    </table>
+    <table name="inpost_pay_checkout_agreement" resource="default" engine="innodb" comment="InPost Pay Checkout Agreement">
+        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="varchar" name="title" length="255" nullable="false"  comment="Title"/>
+        <column xsi:type="boolean" name="is_enabled" nullable="false" default="0" comment="Is Enabled Flag"/>
+        <column xsi:type="tinyint" name="visibility" nullable="false" default="1" comment="Visibility"/>
+        <column xsi:type="varchar" name="requirement" nullable="false" length="40" default="OPTIONAL"  comment="Requirement"/>
+        <column xsi:type="varchar" name="children_ids" nullable="true" comment="Children IDs"/>
+        <column xsi:type="varchar" name="checkbox_text" nullable="false" comment="Checkbox Text"/>
+        <column xsi:type="varchar" name="agreement_url" length="500" nullable="false" comment="Agreement URL"/>
+        <column xsi:type="varchar" name="url_label" length="500" nullable="false" comment="URL Label"/>
+        <column xsi:type="varchar" name="version" length="255" nullable="false" comment="Version Hash"/>
+        <column name="created_at" xsi:type="timestamp" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column name="updated_at" xsi:type="timestamp" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="agreement_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_IP_CHKT_AGRT_VERSION">
+            <column name="version"/>
+        </constraint>
+    </table>
+    <table name="inpost_pay_checkout_agreement_store" resource="default" engine="innodb" comment="InPost Pay Checkout Agreement Store">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="true" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="agreement_id" unsigned="true" nullable="false" identity="false" comment="Agreement ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" identity="false" comment="Store ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_IP_CHKT_AGRT_STORE_AGREEMENT_ID_STORE_ID">
+            <column name="agreement_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="IP_CHKT_AGRT_STORE_AGRT_ID_IP_CHKT_AGRT_AGRT_ID"
+                    table="inpost_pay_checkout_agreement_store"
+                    column="agreement_id"
+                    referenceTable="inpost_pay_checkout_agreement"
+                    referenceColumn="agreement_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign"
+                    referenceId="IP_CHKT_AGRT_STORE_STORE_ID_STORE_STORE_ID"
+                    table="inpost_pay_checkout_agreement_store"
+                    column="store_id"
+                    referenceTable="store"
+                    referenceColumn="store_id"
+                    onDelete="CASCADE"/>
     </table>
 </schema>

@@ -40,6 +40,7 @@
                 <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
                 <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
                 <sandbox_widget_script_url>https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</sandbox_widget_script_url>
+                <use_legacy_terms_and_conditions_mapping>1</use_legacy_terms_and_conditions_mapping>
                 <min_log_level>100</min_log_level>
                 <anonymise_objects_enabled>1</anonymise_objects_enabled>
                 <can_capture>1</can_capture>
