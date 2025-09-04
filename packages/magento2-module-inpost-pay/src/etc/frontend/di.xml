@@ -16,4 +16,13 @@
         <plugin name="InPost_InPostPay::registerSaveAddressActionPlugin"
                 type="InPost\InPostPay\Plugin\Quote\RegisterSaveAddressActionPlugin" />
     </type>
+    <type name="Magento\Checkout\Block\Registration">
+        <plugin name="InPost_InPostPay::replaceOrderDeliveryEmailWithAccountEmailPlugin"
+                type="InPost\InPostPay\Plugin\Checkout\ReplaceOrderDeliveryEmailWithAccountEmailPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Plugin\Checkout\ReplaceOrderDeliveryEmailWithAccountEmailPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>

@@ -255,6 +255,14 @@
         <plugin name="InPost_InPostPay::addCopyToOrderEmailsForInPostPayAccountEmailPlugin"
                 type="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin" />
     </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <plugin name="InPost_InPostPay::registerIfDigitalQuoteIsAllowedForMagentoConfigPlugin"
+                type="InPost\InPostPay\Plugin\Service\DataTransfer\QuoteToBasketDataTransfer\RegisterIfDigitalQuoteIsAllowedForMagentoConfigPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer">
+        <plugin name="InPost_InPostPay::disableDigitalProductDeliveryIfNotAllowedPlugin"
+                type="InPost\InPostPay\Plugin\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer\DisableDigitalProductDeliveryIfNotAllowedPlugin" />
+    </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="string">inpost_pay</argument>
@@ -819,6 +827,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Service\DataTransfer\QuoteToBasketDataTransfer\RegisterIfDigitalQuoteIsAllowedForMagentoConfigPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

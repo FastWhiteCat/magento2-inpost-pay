@@ -23,6 +23,8 @@
         <column xsi:type="tinyint" name="order_with_invoice" nullable="false" default="1"/>
         <column xsi:type="varchar" length="255" name="inpost_pay_invoice_email" nullable="true"/>
         <column xsi:type="varchar" length="1024" name="accepted_consents" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="delivery_email" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="digital_delivery_email" nullable="true"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

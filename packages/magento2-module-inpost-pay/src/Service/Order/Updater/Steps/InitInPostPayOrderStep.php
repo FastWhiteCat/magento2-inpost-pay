@@ -51,6 +51,14 @@ class InitInPostPayOrderStep extends OrderProcessingStep implements OrderPostPro
             $inPostPayOrder->setInPostPayInvoiceEmail($inPostOrder->getInvoiceDetails()->getMail());
         }
 
+        if ($inPostOrder->getDelivery()->getDigitalDeliveryEmail()) {
+            $inPostPayOrder->setDigitalDeliveryEmail($inPostOrder->getDelivery()->getDigitalDeliveryEmail());
+        }
+
+        if ($inPostOrder->getDelivery()->getMail()) {
+            $inPostPayOrder->setDeliveryEmail($inPostOrder->getDelivery()->getMail());
+        }
+
         $this->inPostPayOrderRepository->save($inPostPayOrder);
 
         $this->createLog(

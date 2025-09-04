@@ -34,6 +34,8 @@ interface InPostPayOrderInterface
     public const INPOST_PAY_ACCOUNT_EMAIL = 'inpost_pay_account_email';
     public const ORDER_WITH_INVOICE = 'order_with_invoice';
     public const INPOST_PAY_INVOICE_EMAIL = 'inpost_pay_invoice_email';
+    public const DELIVERY_EMAIL = 'delivery_email';
+    public const DIGITAL_DELIVERY_EMAIL = 'digital_delivery_email';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -67,6 +69,10 @@ interface InPostPayOrderInterface
     public function setCourierNote(?string $courierNote): InPostPayOrderInterface;
     public function getInPostPayAccountEmail(): ?string;
     public function setInPostPayAccountEmail(?string $inPostPayAccountEmail): InPostPayOrderInterface;
+    public function getDeliveryEmail(): ?string;
+    public function setDeliveryEmail(?string $deliveryEmail): InPostPayOrderInterface;
+    public function getDigitalDeliveryEmail(): ?string;
+    public function setDigitalDeliveryEmail(?string $digitalDeliveryEmail): InPostPayOrderInterface;
 
     public function getGaClientId(): ?string;
     public function setGaClientId(?string $gaClientId): InPostPayOrderInterface;

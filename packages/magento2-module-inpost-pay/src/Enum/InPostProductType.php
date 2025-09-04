@@ -8,12 +8,8 @@ namespace InPost\InPostPay\Enum;
  * @phpcs:disable Generic.WhiteSpace.ScopeIndent.Incorrect
  * @phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
  */
-enum InPostDeliveryType: string
+enum InPostProductType: string
 {
-    public const APM_VALUE = 'APM';
-    public const COURIER_VALUE = 'COURIER';
-
-    case APM = 'APM';
-    case COURIER = 'COURIER';
+    case PRODUCT = 'PRODUCT';
     case DIGITAL = 'DIGITAL';
 }
