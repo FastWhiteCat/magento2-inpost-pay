@@ -325,3 +325,5 @@
 "Digital Delivery Email address is required to purchase digital products.","Adres Email Dostawy Cyfrowej jest wymagany do zamówienia produktów cyfrowych.",module,InPost_InPostPay
 "Discount You are using can only be applied to orders placed with InPost Pay Mobile App. To complete You order with this discount use InPost Pay Mobile App or edit You cart and disable that discount to complete order in browser.","Rabat, z którego korzystasz może być użyty wyłącznie poprzez zamówienia składane w Aplikacji Mobilnej InPost Pay. Aby skorzystać z tego rabatu dokończ zamówienie w Aplikacji Mobilnej lub edytuj koszyk i usuń rabat by dokończyć zamówienie w przeglądarce.",module,InPost_InPostPay
 "Only orders placed with InPost Pay Mobile App","Tylko zamówienia składane poprzez Aplikację Mobilną InPost Pay.",module,InPost_InPostPay
+"Allow Invoice Partial Refund","Zezwól Na Częściowe Zwroty Faktur",module,InPost_InPostPay
+"If set to YES, invoice refund forms will have inputs allowing to select item quantities.","Jeśli włączono, formularze zwrotów za faktury będą zawierały pole do wskazania ilości zwracanego towaru.",module,InPost_InPostPay

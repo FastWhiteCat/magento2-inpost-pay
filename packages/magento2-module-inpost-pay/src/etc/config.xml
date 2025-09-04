@@ -10,6 +10,7 @@
                 <model>InPostPayPaymentFacade</model>
                 <title>InPost Pay</title>
                 <order_status>pending</order_status>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <allowspecific>0</allowspecific>
                 <image_role>small_image</image_role>
                 <additional_images_enabled>0</additional_images_enabled>
