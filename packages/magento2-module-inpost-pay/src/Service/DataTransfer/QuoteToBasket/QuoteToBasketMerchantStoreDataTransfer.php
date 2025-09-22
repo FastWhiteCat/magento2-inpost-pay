@@ -64,7 +64,7 @@ class QuoteToBasketMerchantStoreDataTransfer implements QuoteToBasketDataTransfe
             $cookie->setKey($this->cartSessionCookieProvider->getCookieSessionName());
             $cookie->setValue($inPostPayQuote->getSessionCookie());
             $cookie->setPath($this->cartSessionCookieProvider->getCookiePath());
-            $cookie->setSameSite($this->cartSessionCookieProvider->getSameSite());
+            $cookie->setSameSite(strtoupper($this->cartSessionCookieProvider->getSameSite()));
             $cookie->setSecure($this->cartSessionCookieProvider->isSecure());
             $cookie->setHttpOnly($this->cartSessionCookieProvider->isHttpOnly());
             $cookie->setMaxAge($this->cartSessionCookieProvider->getCookieLifetime());
