@@ -52,7 +52,8 @@
             "fbclid": true,
             "gclid": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "session_cookie": true
         },
         "index": {
             "INPOST_PAY_QUOTE_INPOST_BASKET_ID": true,

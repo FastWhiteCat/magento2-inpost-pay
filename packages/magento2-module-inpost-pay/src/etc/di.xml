@@ -17,6 +17,10 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PromoCode"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\MerchantStore"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStore\CookieInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\MerchantStore\Cookie"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent\AdditionalConsent"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface"
@@ -319,6 +323,7 @@
                 <item name="related_products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer</item>
                 <item name="promotions_available" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromotionsAvailableDataTransfer</item>
+                <item name="merchant_store" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketMerchantStoreDataTransfer</item>
             </argument>
         </arguments>
     </type>

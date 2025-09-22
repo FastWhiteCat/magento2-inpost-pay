@@ -5,6 +5,7 @@ namespace InPost\InPostPay\Service;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
 use InPost\InPostPay\Service\ApiConnector\GetBasketBindingApiKey;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -19,6 +20,7 @@ class InitBasketProcessor
         private readonly GetBasketId $getBasketId,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
+        private readonly CartSessionCookieProvider $cartSessionCookieProvider,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -47,10 +49,22 @@ class InitBasketProcessor
             );
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
             $basketBindingApiKey = $inPostPayQuote->getBasketBindingApiKey();
+            $saveRequired = false;
 
             if (empty($basketBindingApiKey)) {
                 $basketBindingApiKey = $this->getBasketBindingApiKey->execute($quoteId);
                 $inPostPayQuote->setBasketBindingApiKey($basketBindingApiKey);
+                $saveRequired = true;
+            }
+
+            $cookieSession = $this->cartSessionCookieProvider->getCookieSession();
+
+            if ($cookieSession !== $inPostPayQuote->getSessionCookie()) {
+                $inPostPayQuote->setSessionCookie($cookieSession);
+                $saveRequired = true;
+            }
+
+            if ($saveRequired) {
                 $this->inPostPayQuoteRepository->save($inPostPayQuote);
             }
 
