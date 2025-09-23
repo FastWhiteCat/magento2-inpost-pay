@@ -377,6 +377,7 @@
                 <item name="save_delivery_options" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveDeliveryOptionsStep</item>
                 <item name="save_accepted_consents" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveAcceptedConsentsStep</item>
                 <item name="update_payment_title" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdatePaymentTitleStep</item>
+                <item name="update_free_order_payment" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdateFreeOrderPayment</item>
             </argument>
         </arguments>
     </type>
@@ -407,6 +408,7 @@
                 <item name="DEFERRED_PAYMENT" xsi:type="string">Deferred Payment (InPost Pay)</item>
                 <item name="GOOGLE_PAY" xsi:type="string">Google Pay (InPost Pay)</item>
                 <item name="CASH_ON_DELIVERY" xsi:type="string">Cash on delivery (InPost Pay)</item>
+                <item name="FREE_ORDER" xsi:type="string">Free Order (InPost Pay)</item>
             </argument>
         </arguments>
     </type>

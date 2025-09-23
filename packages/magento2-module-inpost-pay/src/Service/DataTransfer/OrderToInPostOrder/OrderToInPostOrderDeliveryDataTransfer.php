@@ -94,7 +94,13 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
         $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
         $orderShippingAddress = $order->getShippingAddress();
-        $shippingPriceInclTax = DecimalCalculator::round((float)$order->getShippingInclTax());
+        $shippingPriceInclTax = DecimalCalculator::round(
+            DecimalCalculator::sub(
+                (float)$order->getShippingInclTax(),
+                (float)$order->getShippingDiscountAmount()
+            )
+        );
+
         $shippingPriceTax = DecimalCalculator::round((float)$order->getShippingTaxAmount());
         $shippingPriceExclTax = DecimalCalculator::sub($shippingPriceInclTax, $shippingPriceTax);
         $delivery->setDeliveryType($deliveryType);

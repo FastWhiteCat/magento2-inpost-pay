@@ -22,6 +22,9 @@
     <event name="sales_quote_address_collect_totals_before">
         <observer name="InPost_InPostPay::setDefaultCountryBeforeAddressCollectTotalsEventObserver" instance="InPost\InPostPay\Observer\Quote\SetDefaultCountryBeforeAddressCollectTotalsEventObserver" />
     </event>
+    <event name="sales_quote_payment_import_data_before">
+        <observer name="InPost_InPostPay::removeZeroTotalCheckFromInPostPayPaymentEventObserver" instance="InPost\InPostPay\Observer\Quote\Payment\RemoveZeroTotalCheckFromInPostPayPaymentEventObserver" />
+    </event>
     <event name="sales_quote_merge_after">
         <observer name="InPost_InPostPay::updateInPostBasketAfterQuoteMergeEventObserver" instance="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver" />
     </event>

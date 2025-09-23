@@ -193,4 +193,24 @@ class Summary extends DataObject implements SummaryInterface, ExtensibleDataInte
     {
         $this->setData(self::BASKET_EXPIRATION_DATE, $basketExpirationDate);
     }
+
+    /**
+     * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getFreeBasket(): bool
+    {
+        $freeBasket = $this->getData(self::FREE_BASKET);
+
+        return is_bool($freeBasket) && (bool)$freeBasket;
+    }
+
+    /**
+     * @param bool $freeBasket
+     * @return void
+     */
+    public function setFreeBasket(bool $freeBasket): void
+    {
+        $this->setData(self::FREE_BASKET, $freeBasket);
+    }
 }

@@ -35,6 +35,12 @@ class QuoteToBasketSummaryDataTransfer implements QuoteToBasketDataTransferInter
             $summary->setBasketExpirationDate($basketExpirationDate);
         }
 
+        $summary->setFreeBasket(false);
+
+        if ($summary->getBasketFinalPrice()->getGross() === 0.00) {
+            $summary->setFreeBasket(true);
+        }
+
         $basket->setSummary($summary);
     }
 
