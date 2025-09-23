@@ -2,7 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.1.0] - 2025-04-09
+## [2.2.3] - 2025-08-25
+
+### Fixed
+
+- Fixed deleting no longer valid InPost Pay Basket after an order has been placed in Magento Checkout from a cart bound with InPost Pay.
+- Fixed a scope error in InPost Pay Admin Panel configuration validator of Shipping Methods Mapping.
+
+## [2.2.2] - 2025-08-05
+
+### Fixed
+
+- Fixed the handling of free delivery set by Cart Rule with one of the conditions depending on the shipping country equals Poland.
+- Fixed compatibility with newer Magento 2 Open Source v2.4.8-p1 on PHP 8.3
+- Fixed compatibility with older Magento 2 Open Source v2.4.6 on PHP 8.1
+
+## [2.2.1] - 2025-06-27
+
+### Added
+
+- InPost Pay Bestseller Product objects that are synchronized with InPost Pay API will now contain also Product URL
+- InPost Pay Bestseller Products will now be synchronized when an attribute is saved in Admin Panel
+- In the case of configuration requiring Region for Poland, InPost Pay Module will now resolve Voivodeship based on post-code first two digits provided by InPost Pay due to lack of information about a region from the incoming request. 
+
+### Updated
+
+- Available Payment Methods will now work the opposite way. Instead of forcing Merchant to configure his list of available payment methods, it is allowed to configure which are not available.
+- Limit for InPost Pay Bestseller Products that can be synchronized with InPost Pay is no longer limited to 5. Limit only exists in InPost Pay API.
+
+### Fixed
+
+- Fixed sending a header with module version to InPost Pay API on each request.
+
+## [2.2.0] - 2025-06-04
+
+### Added
+
+- Unique validator for delivery mapping settings
+- Handling for order email in InPost Pay domain
+
+### Fixed
+
+- CRON Bestseller Products synchronization process should now send correct prices
+- type of accepted_consents column in inpost_pay_order DB table from varchar to text to allow longer JSONs
+
+## [2.1.1] - 2025-05-12
 
 ### Added
 
@@ -13,6 +57,7 @@ All notable changes to this project will be documented in this file.
 - Configuration of Bestseller Products in Magento has been added. Those products (if accepted by InPost) will be displayed to customers in their Mobile Apps.
 - Quote remote initiation has been added - if Customer adds configured Bestseller Product in Mobile App the cart will be initialized and bound with InPost Pay. Previously all the carts had to be initiated in browser.
 - If not configured otherwise logs will be anonymised hiding firstnames, lastnames, emails, addresses, etc.
+- Configuration that allows setting up Google Analytics purchase event sending for orders created via InPost Pay Mobile App
 
 ### Updated
 

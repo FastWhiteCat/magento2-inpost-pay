@@ -29,7 +29,7 @@ class PaymentTypeValidator implements OrderValidatorInterface
             $acceptedPaymentTypes = $this->iziApiConfigProvider->getAcceptedPaymentTypes();
         }
 
-        if (!in_array($orderPaymentType, $acceptedPaymentTypes)) {
+        if (!empty($acceptedPaymentTypes) && !in_array($orderPaymentType, $acceptedPaymentTypes)) {
             throw new LocalizedException(__('Payment type %1 is not acceptable by merchant.', $orderPaymentType));
         }
     }

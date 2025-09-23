@@ -26,6 +26,12 @@ trait AnonymizerTrait
         'merchant_secret',
     ];
 
+    private array $keysToShorten = [
+        'access_token',
+        'Authorization',
+        'qr_code',
+    ];
+
     /**
      * @param string $value
      * @return string
@@ -123,6 +129,11 @@ trait AnonymizerTrait
         return $anonymisedValue;
     }
 
+    public function shortenValue(string $value): string|array
+    {
+        return substr($value, 0, 15) . '...' . substr($value, -3);
+    }
+
     /**
      * @param array $data
      * @param int $depth
@@ -137,6 +148,8 @@ trait AnonymizerTrait
         foreach ($data as $key => $value) {
             if (in_array($key, $this->keysToAnonymize, true) && is_string($value)) {
                 $data[$key] = $this->anonymizeValueByKey($value, $key);
+            } elseif (in_array($key, $this->keysToShorten, true) && is_string($value)) {
+                $data[$key] = $this->shortenValue($value);
             } elseif (is_array($value)) {
                 $data[$key] = $this->anonymizeArray($value, $depth + 1);
             }

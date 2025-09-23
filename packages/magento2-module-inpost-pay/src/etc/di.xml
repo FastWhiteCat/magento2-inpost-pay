@@ -47,6 +47,8 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Order\InvoiceDetails"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetails\AdditionalOrderParametersInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails\AdditionalOrderParameters"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
@@ -131,6 +133,8 @@
                 type="InPost\InPostPay\Model\InPostPayBestsellerProduct"/>
     <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayBestsellerProductRepository"/>
+    <preference for="InPost\InPostPay\Api\Provider\PolishRegionProviderInterface"
+                type="InPost\InPostPay\Provider\PolishRegionProvider"/>
 
     <!-- Grid data source and collections -->
     <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection"
@@ -193,6 +197,10 @@
         <plugin name="InPost_InPostPay::orderCreateIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
     </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer">
+        <plugin name="InPost_InPostPay::addAdditionalAnalyticsOrderParamsToOrderDetailsPlugin"
+                type="InPost\InPostPay\Plugin\DataTransfer\OrderToInPostOrder\AddAdditionalAnalyticsOrderParamsToOrderDetailsPlugin" />
+    </type>
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface">
         <plugin name="InPost_InPostPay::orderGetIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
@@ -223,7 +231,7 @@
         <plugin name="InPost_InPostPay::limitProductAttributeNameAndValueCharactersPlugin"
                 type="InPost\InPostPay\Plugin\Model\Data\Basket\Product\LimitProductAttributeNameAndValueCharactersPlugin" />
     </type>
-    <type name="\InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface">
+    <type name="InPost\InPostPay\Model\Request">
         <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
                 type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
     </type>
@@ -311,7 +319,7 @@
         <arguments>
             <argument name="dataTransfer" xsi:type="array">
                 <item name="core_bestseller_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\CoreProductDataTransferInPostPay</item>
-                <item name="bestseller_price" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerPriceDataTransfer</item>
+                <item name="bestseller_store_based_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerProductStoreBasedDataTransfer</item>
             </argument>
         </arguments>
     </type>
@@ -345,6 +353,20 @@
                 <item name="save_accepted_consents" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveAcceptedConsentsStep</item>
                 <item name="update_payment_title" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdatePaymentTitleStep</item>
                 <item name="update_free_order_payment" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdateFreeOrderPayment</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Data\Order\Analytics\Event\PurchaseEventDataBuilder">
+        <arguments>
+            <argument name="purchaseEvents" xsi:type="array">
+                <item name="ga4_purchase_event" xsi:type="object">InPost\InPostPay\Model\Data\Order\Analytics\Event\Purchase\Ga4PurchaseEvent</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\PurchaseEventDataSender">
+        <arguments>
+            <argument name="eventDataHandlers" xsi:type="array">
+                <item name="ga4_purchase_event" xsi:type="object">InPost\InPostPay\Service\Order\Analytics\Event\Purchase\Ga4PurchaseEventHandler</item>
             </argument>
         </arguments>
     </type>
@@ -449,6 +471,21 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\PurchaseEventDataSender">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\Purchase\Ga4PurchaseEventHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Cron\SendAnalyticsData">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -523,6 +560,8 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+
+    <type name="InPost\InPostPay\Registry\ShippingMethodMappingRegistry" shared="true" />
     <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -547,6 +586,8 @@
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
+        <plugin name="InPost_InPostPay::registerBasketIdBeforeOrderCreatePlugin"
+                type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\RegisterBasketIdBeforeOrderCreatePlugin"/>
     </type>
     <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet">
         <arguments>
@@ -688,11 +729,6 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Service\BestsellerProduct\Download">
-        <arguments>
-            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
-        </arguments>
-    </type>
     <type name="InPost\InPostPay\Service\ApiConnector\PostBestsellers">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -738,12 +774,17 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
-    <type name="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin">
+    <type name="InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

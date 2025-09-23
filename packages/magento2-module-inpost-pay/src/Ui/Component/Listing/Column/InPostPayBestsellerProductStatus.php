@@ -16,9 +16,9 @@ class InPostPayBestsellerProductStatus extends Column
     private const UNKNOWN_STATUS_LABEL = 'Unknown [Synchronization Required]';
 
     private array $inPostPayStatusMap = [
-        InPostBestsellerProductStatus::INACTIVE->value => self::INACTIVE_STATUS_LABEL,
-        InPostBestsellerProductStatus::ACTIVE->value => self::ACTIVE_STATUS_LABEL,
-        InPostBestsellerProductStatus::UNKNOWN->value => self::UNKNOWN_STATUS_LABEL,
+        InPostBestsellerProductStatus::INACTIVE_VALUE => self::INACTIVE_STATUS_LABEL,
+        InPostBestsellerProductStatus::ACTIVE_VALUE => self::ACTIVE_STATUS_LABEL,
+        InPostBestsellerProductStatus::UNKNOWN_VALUE => self::UNKNOWN_STATUS_LABEL,
     ];
 
     /**

@@ -38,10 +38,6 @@ class CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin
         $result,
         array $reservations
     ): void {
-        if (!$this->bestsellerChecker->isSynchronizationEnabled()) {
-            return;
-        }
-
         foreach ($reservations as $reservation) {
             $sku = $reservation->getSku();
 

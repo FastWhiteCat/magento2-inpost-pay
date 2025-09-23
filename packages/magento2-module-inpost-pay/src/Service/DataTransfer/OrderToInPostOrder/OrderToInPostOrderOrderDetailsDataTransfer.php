@@ -106,6 +106,5 @@ class OrderToInPostOrderOrderDetailsDataTransfer implements OrderToInPostOrderDa
         $orderFinalPrice->setGross($grandTotalGross);
         $orderFinalPrice->setVat($grandTotalTax);
         $orderDetails->setOrderFinalPrice($orderFinalPrice);
-        $orderDetails->setBasketPrice($orderDetails->getOrderFinalPrice());
     }
 }

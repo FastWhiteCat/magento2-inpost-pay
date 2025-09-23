@@ -216,9 +216,34 @@ define([
             var self = this;
 
             return new Promise((resolve, reject) => {
+                var formData = {
+                    form_key: $.mage.cookies.get('form_key')
+                };
+
+                if (self.configuration.enabledAnalyticsParams) {
+                    var gaClientId = window.localStorage.getItem('client_id');
+                    var fbclid = window.localStorage.getItem('fbclid');
+                    var gclid = window.localStorage.getItem('gclid');
+
+                    if (gaClientId !== null) {
+                        formData.ga_client_id = gaClientId;
+                    }
+
+                    if (fbclid !== null) {
+                        formData.fbclid = fbclid;
+                    }
+
+                    if (gclid !== null) {
+                        formData.gclid = gclid;
+                    }
+                }
+
+                var url = urlBuilder.build('inpostizi/BasketBindingApiKey/Get');
+
                 $.ajax({
-                    url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
-                    method: 'GET',
+                    url: url,
+                    method: 'POST',
+                    data: formData,
                 })
                     .done(function (data) {
                         if (data && data.success && data.basket_binding_api_key) {
@@ -294,6 +319,30 @@ define([
 
             function ajaxSubmit($form) {
                 return new Promise(function (resolve, reject) {
+                    var formData = {
+                        form_key: $.mage.cookies.get('form_key')
+                    };
+
+                    if (self.configuration.enabledAnalyticsParams) {
+                        var gaClientId = window.localStorage.getItem('client_id');
+                        var fbclid = window.localStorage.getItem('fbclid');
+                        var gclid = window.localStorage.getItem('gclid');
+
+                        if (gaClientId !== null) {
+                            formData.ga_client_id = gaClientId;
+                        }
+
+                        if (fbclid !== null) {
+                            formData.fbclid = fbclid;
+                        }
+
+                        if (gclid !== null) {
+                            formData.gclid = gclid;
+                        }
+                    }
+
+                    var url = urlBuilder.build('inpostizi/BasketBindingApiKey/Get');
+
                     $.ajax({
                         url: $form.attr('action'),
                         data: new FormData($form[0]),
@@ -304,8 +353,9 @@ define([
                         processData: false,
                         success: function () {
                             $.ajax({
-                                url: urlBuilder.build('inpostizi/BasketBindingApiKey/Get' + '/form_key/' + $.mage.cookies.get('form_key')),
-                                method: 'GET',
+                                url: url,
+                                method: 'POST',
+                                data: formData
                             })
                                 .done(function (data) {
                                     if (data && data.success && data.basket_binding_api_key) {

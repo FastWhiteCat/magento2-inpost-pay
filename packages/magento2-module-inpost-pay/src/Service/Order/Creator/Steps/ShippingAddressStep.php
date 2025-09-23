@@ -5,25 +5,36 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Service\Order\Creator\Steps;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface;
-use InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface;
 use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface;
 use InPost\InPostPay\Api\OrderProcessingStepInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
+use InPost\InPostPay\Api\Provider\PolishRegionProviderInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
+use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ShippingAddressManagement;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ShippingAddressStep extends OrderProcessingStep implements OrderProcessingStepInterface
 {
+    /**
+     * Polish country code
+     */
+    private const POLAND_COUNTRY_CODE = 'PL';
+
     public function __construct(
         private readonly AddressInterfaceFactory $addressFactory,
         private readonly ShippingAddressManagement $shippingAddressManagement,
+        private readonly PolishRegionProviderInterface $polishRegionProvider,
+        private readonly DirectoryHelper $directoryHelper,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -45,12 +56,22 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
             $shippingAddress->setCity($clientAddress->getCity());
             $shippingAddress->setPostcode($clientAddress->getPostalCode());
             $shippingAddress->setCountryId($clientAddress->getCountryCode());
+            $this->setRegionIdIfRequired(
+                $shippingAddress,
+                $clientAddress->getPostalCode(),
+                $clientAddress->getCountryCode()
+            );
         } else {
             $deliveryAddress = $inPostOrder->getDelivery()->getDeliveryAddress();
             $shippingAddress->setStreet($this->combineDeliveryAddressArray($deliveryAddress));
             $shippingAddress->setCity($deliveryAddress->getCity());
             $shippingAddress->setPostcode($deliveryAddress->getPostalCode());
             $shippingAddress->setCountryId($deliveryAddress->getCountryCode());
+            $this->setRegionIdIfRequired(
+                $shippingAddress,
+                $deliveryAddress->getPostalCode(),
+                $deliveryAddress->getCountryCode()
+            );
         }
 
         if ($quote->getCustomerId() && $shippingAddress->getCustomerId() === null) {
@@ -63,6 +84,41 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         $this->shippingAddressManagement->assign($quoteId, $shippingAddress);
 
         $this->createLog(sprintf('Shipping address has been applied to quote ID: %s', $quoteId));
+    }
+
+    /**
+     * @param AddressInterface $address
+     * @param string $postcode
+     * @param string $countryCode
+     * @return void
+     */
+    private function setRegionIdIfRequired(AddressInterface $address, string $postcode, string $countryCode): void
+    {
+        if ($countryCode === PolishRegionProviderInterface::POLAND_COUNTRY_CODE
+            && $this->isRegionRequired($countryCode)
+        ) {
+            $regionName = $this->polishRegionProvider->getRegionNameByPostcode($postcode);
+
+            if ($regionName) {
+                $regionId = $this->polishRegionProvider->getRegionIdByName($regionName);
+
+                if ($regionId) {
+                    $address->setRegionId($regionId);
+                    $address->setRegion($regionName);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $countryCode
+     * @return bool
+     */
+    private function isRegionRequired(string $countryCode): bool
+    {
+        $countriesWithRequiredRegions = $this->directoryHelper->getCountriesWithStatesRequired();
+
+        return in_array($countryCode, is_array($countriesWithRequiredRegions) ? $countriesWithRequiredRegions : []);
     }
 
     private function combineDeliveryAddressArray(DeliveryAddressInterface $deliveryAddress): array

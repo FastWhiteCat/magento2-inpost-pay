@@ -10,6 +10,8 @@
 "General Settings","Ogólne Ustawienia",module,InPost_InPostPay
 "Enable InPost Pay","Włącz InPost Pay",module,InPost_InPostPay
 "Title","Tytuł",module,InPost_InPostPay
+"EAN product attribute is not configured!","Atrybut produktowy EAN nie został wskazany w konfiguracji!",module,InPost_InPostPay
+"Product [SKU:%1] has empty EAN attribute and cannot be used as InPost Pay Bestseller.","Produkt [SKU:%1] nie posiada wartości atrybutu EAN i nie może być wykorzystywany jako Produkt Bestsellerowy InPost Pay.",module,InPost_InPostPay
 "Network problem","Problem z siecią",module,InPost_InPostPay
 "Connection has been interrupted, please try again.","Połączenie zostało przerwane, spróbuj ponownie",module,InPost_InPostPay
 "Unhandled status","Nieoczekiwany status",module,InPost_InPostPay
@@ -21,6 +23,7 @@
 "Enable InPost Pay Sandbox","Przełącz InPost Pay w Tryb Sandbox",module,InPost_InPostPay
 "Mapping for InPost Courier delivery method","Mapowanie Kuriera InPost do metody dostawy",module,InPost_InPostPay
 "Mapping for InPost Paczkomat 24/7 delivery method","Mapowanie metody dostawy InPost Paczkomat 24/7",module,InPost_InPostPay
+"Shipping method ""%1"" is already used in ""%2"" configuration. Each method can only be used once.","Metoda dostawy ""%1"" jest już wykorzystawa w konfiguracji ""%2"". Każda metoda może być przypisana tylko raz.",module,InPost_InPostPay
 "Could not obtain public key.","Nie udało się uzyskać klucza publicznego.",module,InPost_InPostPay
 "Empty IZI API URL","Wartość IZI API URL jest pusta",module,InPost_InPostPay
 "InPost API endpoint ""%1"" responded with an error: %2","Procesowane zapytania API InPost ""%1"" zwróciło błąd: %2",module,InPost_InPostPay
@@ -91,6 +94,21 @@
 "Browser binding was not complete. Browser is not trusted.","Proces powiązania przeglądarki nie został pomyślnie ukończony. Przeglądarka nie jest zaufana.",module,InPost_InPostPay
 "Browser ID does not match value saved in merchant quote ID: %1.","ID powiązanej przeglądarki różni się od tej zapisanej w koszyku sklepu ID: %1.",module,InPost_InPostPay
 "Cannot confirm basket. Reason: %1","Nie udało się potwierdzić koszyka. Powód: %1",module,InPost_InPostPay
+"Selected shipping method is not available [%1 %2].","Wybrana metoda dostawy jest niedostępna [%1 %2].",module,InPost_InPostPay
+"Analytics param %1 is too long.","Parametr Analityczny %1 jest zbyt długi.",module,InPost_InPostPay
+"Analytics param %1 is not valid.","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API endpoint URL is invalid: %1","Parametr Analityczny %1 jest niepoprawny.",module,InPost_InPostPay
+"Google Analytics API request headers are invalid!","Nagłówki w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request params are invalid!","Parametry w żądaniu API Google Analytics są niepoprawne!",module,InPost_InPostPay
+"Google Analytics API request method are invalid: %1","Metoda: %1 w żądaniu API Google Analytics jest niepoprawna!",module,InPost_InPostPay
+"Google Analytics API endpoint ""%1"" responded with %2 code.","Żądanie API ""%1"" Google Analytics zwróciło kod: %2.",module,InPost_InPostPay
+"Analytics Settings","Ustawienia Analityki",module,InPost_InPostPay
+"Enable Analytics","Włącz Analitykę",module,InPost_InPostPay
+"Enable Analytics Data Asynchronous Sending by CRON","Włącz Asynchroniczne Wysyłanie danych Analitycznych przez CRON",module,InPost_InPostPay
+"Analytics Data Sending CRON CRON Schedule","Harmonogram CRON Wysyłki Danych Analitycznych",module,InPost_InPostPay
+"*/5 * * * * for example causes this CRON to run every 5 minutes","*/5 * * * * przykładowo oznacza wysyłkę przez CRON co 5 minut.",module,InPost_InPostPay
+"Enable Sending fbclid Param","Włącz Przekazywanie Parametru fbclid",module,InPost_InPostPay
+"Enable Sending gclid Param","Włącz Przekazywanie Parametru gclid",module,InPost_InPostPay
 "If enabled basket data will be exported using build-in database message queue system. It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update running.","Jeśli włączono dane koszyka będą eksportowane z wykorzystaniem wbudowanego systemu kolejkowania wiadomości. Wymagane jest po stronie infrastruktury serwerowej utrzymywanie uruchomionego procesu przetwarzającego kolejkę inpost_pay.basket.create_or_update",module,InPost_InPostPay
 "Enable asynchronous basket export","Włącz asynchroniczny eksport koszyka",module,InPost_InPostPay
 "Quote with ID %1 is invalid.","Koszyk o ID %1 jest niepoprawny.",module,InPost_InPostPay
@@ -179,7 +197,7 @@
 "Assign Quote to Customer by Email","Przypisz Koszyk do Klient po Adresie Email",module,InPost_InPostPay
 "If set to YES, cart initiated by guest user, bound to InPost Pay Mobile Aap on order processing will be assigned to an existing Magento account if found by InPost Pay account email address.","Jeśli wybrano opcję TAK, koszyk zainicjowany przez użytkownika niezalogowanego, powiązany z Aplikacją Mobilną InPost Pay podczas procesowania zamówienia zostanie przypisany do konta Magento jeśli takie zostanie znalezione po adresie email konta InPost Pay.",module,InPost_InPostPay
 "Delete Bestseller Product","Usuń Produkt Bestsellerowy",module,InPost_InPostPay
-"When enabled any save of selected bestseller product or inventory will trigger update of Bestseller Product. Also, any reservation append will check if configured Bestseller Product is still saleable, if not update will be performed.","Po włączeniu tej opcji każdy zapis stanu magazynowego i produktu będącego Bestsellerem InPost Pay uruchomi aktualizację danych produktowych. Ponadto każda rezerwacja, skutkująca wyłączeniem produktu ze sprzedaży również uruchomi aktualizację danych Produktu Bestsellerowego.",module,InPost_InPostPay
+"Important! This setting should only be enabled on the configuration scope where InPost Pay is enabled and has own credentials! When enabled any save of selected bestseller product or inventory will trigger update of Bestseller Product. Also, any reservation append will check if configured Bestseller Product is still saleable, if not update will be performed.","Uwaga! To ustawienie powinno być włączone wyłącznie na poziomie konfiguracji na którym InPost Pay jest uruchomione oraz posiada własne dane autoryzacyjne! Po włączeniu tej opcji każdy zapis stanu magazynowego i produktu będącego Bestsellerem InPost Pay uruchomi aktualizację danych produktowych. Ponadto każda rezerwacja, skutkująca wyłączeniem produktu ze sprzedaży również uruchomi aktualizację danych Produktu Bestsellerowego.",module,InPost_InPostPay
 "Are you sure?","Czy jesteś pewny?",module,InPost_InPostPay
 "Back","Powrót",module,InPost_InPostPay
 "New","Nowy",module,InPost_InPostPay
@@ -249,3 +267,7 @@
 "Coupon code ""%1"" expired or that promotion is not applicable to this cart.","Kod rabatowy ""%1"" wygasł lub koszyk nie spełnia warunków tej promocji",module,InPost_InPostPay
 "A maximum of 10 overriding consents will be transferred to the application","Maksymalnie do aplikacji przekazane zostanie 10 nadrzędnych zgód",module,InPost_InPostPay
 "Enable Logs Anonymisation","Włącz Anonimizację Logów",module,InPost_InPostPay
+"Define payment methods in the InPost Pay Application other than those in the contract.","Zdefiniuj metody płatności w Aplikacji InPost Pay inne niż w umowie.",module,InPost_InPostPay
+"Limit for InPost Pay Bestsellers has been reached. Try sending less products or contact InPost Pay support.","Osiągnięto limit Produktów Bestsellerowych InPost Pay. Spróbuj wysłać mniejszą ilość produktów lub skontaktuj się z Działem Wsparcia InPost Pay.",module,InPost_InPostPay
+"This option should be enabled if shipping cost is calculated using Sales Rules or customized calculations. For example, if there is a Rule conditions free delivery based on country. Cost will be calculated same way as native shipping estimation in cart at the cost of slightly lower performance.","Ta opcja powinna został włączona jeśli koszt dostaw wyliczany jest z wykorzystaniem Reguł Koszykowych bądź nienatywnych kalkulacji. Przykładowo, jeśli istnieje Reguła Koszykowa warunkująca darmową dostawę w oparciu o kraj. Koszt dostawy będzie wyliczany w sposób identyczny do natywnie przewidywanych kosztów dostawy w koszyku mając jednak negatywny wpływ na optymalizację.",module,InPost_InPostPay
+"Enable using Collect Address Totals","Włącz wykorzystanie przeliczania koszyka."
