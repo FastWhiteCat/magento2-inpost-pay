@@ -20,6 +20,9 @@ use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class DeliveryValidator implements OrderValidatorInterface
 {
     private const DEFAULT_COUNTRY_ID = 'PL';
