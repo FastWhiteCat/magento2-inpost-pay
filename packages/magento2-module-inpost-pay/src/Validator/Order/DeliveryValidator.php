@@ -10,6 +10,7 @@ use InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
+use InPost\InPostPay\Exception\InPostPayDigitalDeliveryException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Validator\DigitalQuoteValidator;
@@ -169,13 +170,16 @@ class DeliveryValidator implements OrderValidatorInterface
     private function validateDigitalDeliveryQuote(Quote $quote, OrderInterface $inPostOrder): void
     {
         if (!$this->digitalQuoteValidator->isDigitalQuoteAllowed($quote)) {
-            throw new LocalizedException(
-                __('Digital Delivery is not available for this cart.')
+            throw new InPostPayDigitalDeliveryException(
+                __(
+                    'Cart contains digital products that cannot be ordered as a not logged in user.'
+                    . ' Please create account in Merchants website in order to complete this purchase.'
+                )
             );
         }
 
         if (empty($inPostOrder->getDelivery()->getDigitalDeliveryEmail())) {
-            throw new LocalizedException(
+            throw new InPostPayDigitalDeliveryException(
                 __('Digital Delivery Email address is required to purchase digital products.')
             );
         }
