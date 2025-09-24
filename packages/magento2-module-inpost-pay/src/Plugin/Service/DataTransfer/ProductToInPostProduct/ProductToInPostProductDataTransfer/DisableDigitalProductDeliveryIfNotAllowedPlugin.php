@@ -34,6 +34,10 @@ class DisableDigitalProductDeliveryIfNotAllowedPlugin
 
         if (!$isAllowed) {
             foreach ($inPostProduct->getDeliveryProduct() as $deliveryProduct) {
+                if (!$product->isVirtual()) {
+                    continue;
+                }
+
                 $deliveryProduct->setIfDeliveryAvailable(false);
             }
         }
