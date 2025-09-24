@@ -28,7 +28,7 @@
                 <product_cart_enabled>1</product_cart_enabled>
                 <cart_enabled>1</cart_enabled>
                 <cart_url>checkout/cart</cart_url>
-                <send_session_cookie>1</send_session_cookie>
+                <send_session_cookie>0</send_session_cookie>
                 <success_page_enabled>1</success_page_enabled>
                 <success_page_url>checkout/onepage/success</success_page_url>
                 <widget_size>size-md</widget_size>

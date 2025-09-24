@@ -65,7 +65,7 @@
             <config_path>payment/inpost_pay/remove_html_and_special_chars_from_attributes</config_path>
         </field>
         <field id="send_session_cookie" translate="label" type="select" sortOrder="70"
-               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+               showInDefault="0" showInWebsite="0" showInStore="0" canRestore="1">
             <label>Send Merchant Store Session Cookie</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/inpost_pay/send_session_cookie</config_path>
