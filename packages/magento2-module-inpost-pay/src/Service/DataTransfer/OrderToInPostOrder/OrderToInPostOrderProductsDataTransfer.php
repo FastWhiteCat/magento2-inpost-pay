@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\DataTransfer\OrderToInPostOrderDataTransferInterface;
+use InPost\InPostPay\Model\Data\Merchant\Basket\Product as InPostPayProduct;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterfaceFactory;
@@ -38,8 +39,10 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
         $websiteId = (int)$order->getStore()->getWebsiteId();
         foreach ($order->getAllVisibleItems() as $orderItem) {
             if ($orderItem instanceof Item) {
+                /** @var InPostPayProduct $inPostProduct */
                 $inPostProduct = $this->productFactory->create();
                 $this->transferProductData($orderItem, $inPostProduct, $websiteId, (float)$orderItem->getQtyOrdered());
+                $inPostProduct->unsetData(ProductInterface::DELIVERY_PRODUCT);
                 $orderedProducts[] = $inPostProduct;
             }
         }
