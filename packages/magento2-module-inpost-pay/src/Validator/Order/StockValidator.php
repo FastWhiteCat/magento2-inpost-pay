@@ -18,6 +18,7 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use InPost\InPostPay\Service\Product\ProductBackorderService;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -30,7 +31,8 @@ class StockValidator implements OrderValidatorInterface
         private readonly IsSalableWithReservationsCondition $isSalableWithReservationsCondition,
         private readonly GetSalableQtyInterface $getSalableQty,
         private readonly ManageStockCondition $manageStockCondition,
-        private readonly LoggerInterface$logger
+        private readonly LoggerInterface $logger,
+        private readonly ProductBackorderService $productBackorderService
     ) {
     }
 
@@ -64,8 +66,11 @@ class StockValidator implements OrderValidatorInterface
         $name = (string)$item->getName();
         $sku = (string)$item->getSku();
         $qty = (float)$item->getQty();
+        $product = $item->getProduct();
+        $unmanagedStock = $this->manageStockCondition->execute($sku, $stockId);
+        $isBackOrdered = $this->productBackorderService->isProductBackOrdered($product, $stockId);
 
-        if ($this->manageStockCondition->execute($sku, $stockId)) {
+        if ($unmanagedStock || $isBackOrdered) {
             return;
         }
 

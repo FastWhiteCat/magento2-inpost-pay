@@ -18,6 +18,7 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\InventorySales\Model\IsProductSalableCondition\ManageStockCondition;
+use InPost\InPostPay\Service\Product\ProductBackorderService;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -29,7 +30,8 @@ class QuoteItemQtyValidator
         private readonly ProductRepositoryInterface $productRepository,
         private readonly GetStockItemConfigurationInterface $getStockItemConfiguration,
         private readonly GetProductSalableQtyInterface $getProductSalableQty,
-        private readonly ManageStockCondition $manageStockCondition
+        private readonly ManageStockCondition $manageStockCondition,
+        private readonly ProductBackorderService $productBackorderService
     ) {
     }
 
@@ -131,8 +133,11 @@ class QuoteItemQtyValidator
             $stockQuantity = $quantity;
         }
 
-        if ($stockQuantity <= 0 && $this->manageStockCondition->execute($product->getSku(), $stockId)) {
-            $stockQuantity = ProductToInPostProductDataTransfer::UNMANAGED_STOCK_QUANTITY;
+        $unmanagedStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
+        $isBackOrdered = $this->productBackorderService->isProductBackOrdered($product, $stockId);
+
+        if ($unmanagedStock || $isBackOrdered) {
+            $stockQuantity = $this->productBackorderService->getBackOrderMaxSalesQty($product, $stockId);
         }
 
         return (float)$stockQuantity;
