@@ -29,6 +29,7 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
+use InPost\InPostPay\Service\Product\ProductBackorderService;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Store\Model\App\Emulation;
@@ -74,6 +75,7 @@ class ProductToInPostProductDataTransfer
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
         private readonly LoggerInterface $logger,
+        private readonly ProductBackorderService $productBackorderService,
         Filesystem $filesystem
     ) {
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
@@ -351,9 +353,11 @@ class ProductToInPostProductDataTransfer
             $stockQuantity = $quantity;
         }
 
-        $manageStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
-        if ($stockQuantity <= 0 && $manageStock) {
-            $stockQuantity = self::UNMANAGED_STOCK_QUANTITY;
+        $unmanagedStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
+        $isBackOrdered = $this->productBackorderService->isProductBackOrdered($product, $stockId);
+
+        if ($unmanagedStock || $isBackOrdered) {
+            $stockQuantity = $this->productBackorderService->getBackOrderMaxSalesQty($product, $stockId);
         }
 
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
