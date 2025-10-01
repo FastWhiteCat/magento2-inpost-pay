@@ -1,0 +1,286 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form_data_source</item>
+		</item>
+		<item name="label" xsi:type="string" translate="true">General Information</item>
+		<item name="template" xsi:type="string">templates/form/collapsible</item>
+	</argument>
+	<settings>
+		<buttons>
+			<button name="back" class="InPost\InPostPay\Block\Adminhtml\CheckoutAgreement\Edit\BackButton"/>
+			<button name="delete" class="InPost\InPostPay\Block\Adminhtml\CheckoutAgreement\Edit\DeleteButton"/>
+			<button name="save" class="InPost\InPostPay\Block\Adminhtml\CheckoutAgreement\Edit\SaveButton"/>
+		</buttons>
+		<namespace>inpostpay_checkoutagreement_form</namespace>
+		<dataScope>data</dataScope>
+		<deps>
+			<dep>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="inpostpay_checkoutagreement_form_data_source">
+		<argument name="data" xsi:type="array">
+			<item name="js_config" xsi:type="array">
+				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+			</item>
+		</argument>
+		<settings>
+			<submitUrl path="*/*/save"/>
+		</settings>
+		<dataProvider name="inpostpay_checkoutagreement_form_data_source"
+                      class="InPost\InPostPay\Ui\Component\Form\DataSource\CheckoutAgreementDataProvider">
+			<settings>
+				<requestFieldName>agreement_id</requestFieldName>
+				<primaryFieldName>agreement_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<fieldset name="general">
+		<settings>
+			<label>General</label>
+		</settings>
+
+        <field name="title" formElement="input" sortOrder="1">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="notice" xsi:type="string" translate="true">This title will not be displayed in InPost Pay App. This is only used for easier management in Admin Panel of Magento.</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Title</label>
+                <dataScope>title</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="is_enabled" sortOrder="5">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Magento\Config\Model\Config\Source\Yesno</item>
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="label" xsi:type="string" translate="true">Is Enabled</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="store_ids" formElement="multiselect" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>int</dataType>
+                <label translate="true">Store View</label>
+                <dataScope>store_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Cms\Ui\Component\Listing\Column\Cms\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="visibility" sortOrder="15">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">InPost\InPostPay\Model\Config\Source\CheckoutAgreement\Visibility</item>
+                <item name="config" xsi:type="array">
+                    <item name="dataScope" xsi:type="string">visibility</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                     <item name="formElement" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Visible As</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="notice" xsi:type="string" translate="true">Determines if this agreement will be displayed as a separated checkbox or as a sub-agreement with link attached to other main agreement.</item>
+                </item>
+            </argument>
+            <settings>
+                <switcherConfig>
+                    <enabled>true</enabled>
+                    <rules>
+                        <rule name="0">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.requirement</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.requirement</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.version</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="3">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.checkbox_text</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>2</value>
+                            <actions>
+                                <action name="0">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.requirement</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="1">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.children_ids</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.version</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="3">
+                                    <target>inpostpay_checkoutagreement_form.inpostpay_checkoutagreement_form.general.checkbox_text</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                </switcherConfig>
+            </settings>
+        </field>
+
+        <field name="requirement" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">InPost\InPostPay\Model\Config\Source\CheckoutAgreement\Requirement</item>
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="label" xsi:type="string" translate="true">Requirement</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="imports" xsi:type="array">
+                        <item name="value" xsi:type="string">${$.provider}:data.inpost_pay_checkout_agreement.visibility:value</item>
+                    </item>
+                    <item name="notice" xsi:type="string" translate="true">Determines if this agreement requires to be checked every time order is placed, once until changed or it is optional.</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="children_ids" formElement="multiselect" sortOrder="25">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="notice" xsi:type="string" translate="true">You can optionally add sub-agreements to this main agreement. In order to display them modify Checkbox Text field.</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Sub-Agreements</label>
+                <dataScope>children_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="InPost\InPostPay\Model\Config\Source\CheckoutAgreement\SubAgreements"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="checkbox_text" formElement="input" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="notice" xsi:type="string" translate="true">You can use {URL} variable to determine where in checkbox text content link to agreement will be displayed with value from URL Label field. Check the tooltip for advanced configuration including Sub-Agreements.</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Checkbox Text</label>
+                <dataScope>checkbox_text</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">500</rule>
+                </validation>
+                <tooltip>
+                    <description translate="true"><![CDATA[<p>This text will be displayed next to agreement checkbox in InPost Pay Mobile App before order placement.</p>
+<p>In order to add more links to sub-agreements for a single checkbox:</p>
+<p>Create new InPost Pay Agreement with Visible As: Sub-Agreement</p>
+<p>All saved and enabled Sub-Agreements will be listed above.</p>
+<p>Select all sub-agreements needed.</p>
+<p>On the Main Agreement enter Checkbox Text content with short description.</p>
+<p>Variables {ID|Label} can be used to display Sub-Agreements as Links to their URLs</p>
+<p>For example:</p>
+<p>Sub-Agreements created and selected: {1|Regulations} and {2|Privacy Policy}</p>
+<p>Checkbox Text: I confirm that I have read the {1|Regulations} and agree to the {2|Privacy Policy}</p>
+<p>In InPost Pay Mobile App agreement from this example will be displayed as text with links to Sub-Agreements under words in brackets</p>
+<p>I confirm that I have read the Regulations and agree to the Privacy Policy</p>]]>
+                    </description>
+                </tooltip>
+            </settings>
+        </field>
+
+        <field name="agreement_url" formElement="input" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Agreement URL</label>
+                <dataScope>agreement_url</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-url" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="url_label" formElement="input" sortOrder="41">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">URL Label</label>
+                <dataScope>url_label</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">100</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="version" formElement="input" sortOrder="100">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">inpost_pay_checkout_agreement</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Version</label>
+                <dataScope>version</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

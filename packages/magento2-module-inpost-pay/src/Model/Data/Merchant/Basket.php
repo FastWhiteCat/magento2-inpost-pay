@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Model\Data\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterfaceFactory;
@@ -162,6 +163,25 @@ class Basket extends DataObject implements BasketInterface, ExtensibleDataInterf
     public function setConsents(array $consents): void
     {
         $this->setData(self::CONSENTS, $consents);
+    }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface|null
+     */
+    public function getMerchantStore(): ?MerchantStoreInterface
+    {
+        $merchantStore = $this->getData(self::MERCHANT_STORE);
+
+        return $merchantStore instanceof MerchantStoreInterface ? $merchantStore : null;
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface $merchantStore
+     * @return void
+     */
+    public function setMerchantStore(?MerchantStoreInterface $merchantStore = null): void
+    {
+        $this->setData(self::MERCHANT_STORE, $merchantStore);
     }
 
     public function getStatus(): ?string

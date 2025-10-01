@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Service\ApiConnector\Merchant;
 
 use InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface;
 use InPost\InPostPay\Exception\BasketNotFoundException;
+use InPost\InPostPay\Exception\InPostPayDigitalDeliveryException;
 use InPost\InPostPay\Exception\OrderNotCreateException;
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
 use InPost\InPostPay\Service\CreateBasketNotice;
@@ -129,7 +130,7 @@ class OrderCreate implements OrderCreateInterface
 
             $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());
             throw new BasketNotFoundException();
-        } catch (QuoteItemOutOfStockException $e) {
+        } catch (QuoteItemOutOfStockException | InPostPayDigitalDeliveryException $e) {
             $this->logger->error($e->getMessage());
 
             $this->addBasketNoticeError($orderDetails->getBasketId(), $e->getMessage());

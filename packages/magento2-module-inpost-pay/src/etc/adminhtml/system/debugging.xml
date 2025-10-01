@@ -17,5 +17,6 @@
             <config_path>payment/inpost_pay/anonymise_objects_enabled</config_path>
             <comment>When enabled objects and data logged in files will have every personal information anonymised.</comment>
         </field>
+        <include path="InPost_InPostPay::system/debugging/logs.xml"/>
     </group>
 </include>

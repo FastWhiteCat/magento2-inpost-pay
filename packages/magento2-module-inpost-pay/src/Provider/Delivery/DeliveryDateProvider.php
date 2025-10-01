@@ -51,6 +51,34 @@ class DeliveryDateProvider
         }
     }
 
+    /**
+     * This method should be modified with afterPlugin in case of customized digital delivery date calculations.
+     * If not, configuration timestamp increment will be used.
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function calculateDigitalDeliveryDate(?int $storeId = null): string
+    {
+        try {
+            $deadlineInSeconds = $this->shipmentMappingConfigProvider->getDigitalDeliveryDateDeadlineInSeconds(
+                $storeId
+            );
+            $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
+            $currentTimestamp = strtotime(
+                $currentDateTime->format(BasketInterface::INPOST_DATE_FORMAT)
+            );
+
+            return $this->formatInPostDate($currentTimestamp + ($deadlineInSeconds));
+        } catch (Exception $e) {
+            $this->logger->critical($e->getMessage());
+
+            return $this->formatInPostDate(
+                self::SECONDS_IN_DAY * ShipmentMappingConfigProvider::DEFAULT_DIGITAL_DELIVERY_DEADLINE
+            );
+        }
+    }
+
     private function formatInPostDate(int $deliveryTimestamp): string
     {
         $deliveryDateTime = new DateTime();

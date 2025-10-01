@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder;
 
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
 use \Magento\Quote\Api\Data\ShippingMethodInterfaceFactory;
 use \Magento\Quote\Api\Data\ShippingMethodInterface;
@@ -39,6 +40,13 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
     {
         $delivery = $inPostOrder->getDelivery();
         $orderShippingMethodCode = $this->getOrderShippingMethodCode($order);
+
+        if ($order->getIsVirtual()) {
+            $this->appendDigitalDeliveryData($order, $delivery);
+            $inPostOrder->setDelivery($delivery);
+
+            return;
+        }
 
         foreach ($this->shipmentMappingConfigProvider->getAllDeliveryTypes() as $deliveryType) {
             foreach ($this->getAllDeliveryOptions() as $deliveryOptionCode) {
@@ -86,7 +94,13 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
         $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
         $orderShippingAddress = $order->getShippingAddress();
-        $shippingPriceInclTax = DecimalCalculator::round((float)$order->getShippingInclTax());
+        $shippingPriceInclTax = DecimalCalculator::round(
+            DecimalCalculator::sub(
+                (float)$order->getShippingInclTax(),
+                (float)$order->getShippingDiscountAmount()
+            )
+        );
+
         $shippingPriceTax = DecimalCalculator::round((float)$order->getShippingTaxAmount());
         $shippingPriceExclTax = DecimalCalculator::sub($shippingPriceInclTax, $shippingPriceTax);
         $delivery->setDeliveryType($deliveryType);
@@ -102,6 +116,10 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
 
         $delivery->setMail($order->getCustomerEmail());
         $delivery->setPhoneNumber($inPostPayOrder->getPhoneNumber());
+
+        if ($inPostPayOrder->getDigitalDeliveryEmail()) {
+            $delivery->setDigitalDeliveryEmail($inPostPayOrder->getDigitalDeliveryEmail());
+        }
 
         if ($inPostPayOrder->getCourierNote()) {
             $delivery->setCourierNote($inPostPayOrder->getCourierNote());
@@ -120,14 +138,38 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         }
     }
 
-    private function appendDeliveryAddressData(Address $orderShippingAddress, DeliveryInterface $delivery): void
+    private function appendDigitalDeliveryData(Order $order, DeliveryInterface $delivery): void
+    {
+        $orderId = (is_scalar($order->getId())) ? (int)$order->getId() : 0;
+        $inPostPayOrder = $this->inPostPayOrderRepository->getByOrderId($orderId);
+        $delivery->setDeliveryType(InPostDeliveryType::DIGITAL->value);
+        $orderBillingAddress = $order->getBillingAddress();
+
+        $deliveryPrice = $delivery->getDeliveryPrice();
+        if ($deliveryPrice instanceof PriceInterface) {
+            $deliveryPrice->setNet(0);
+            $deliveryPrice->setGross(0);
+            $deliveryPrice->setVat(0);
+            $delivery->setDeliveryPrice($deliveryPrice);
+        }
+
+        $delivery->setMail($order->getCustomerEmail());
+        $delivery->setDigitalDeliveryEmail($inPostPayOrder->getDigitalDeliveryEmail());
+        $delivery->setPhoneNumber($inPostPayOrder->getPhoneNumber());
+
+        if ($orderBillingAddress instanceof Address) {
+            $this->appendDeliveryAddressData($orderBillingAddress, $delivery);
+        }
+    }
+
+    private function appendDeliveryAddressData(Address $orderAddress, DeliveryInterface $delivery): void
     {
         $deliveryAddress = $delivery->getDeliveryAddress();
         $deliveryAddress->setName(
-            sprintf('%s %s', $orderShippingAddress->getFirstname(), $orderShippingAddress->getLastname())
+            sprintf('%s %s', $orderAddress->getFirstname(), $orderAddress->getLastname())
         );
 
-        $streetData = $orderShippingAddress->getStreet();
+        $streetData = $orderAddress->getStreet();
         $street = (isset($streetData[0])) ? (string)$streetData[0] : '';
         $building = (isset($streetData[1])) ? (string)$streetData[1] : '';
         $flat = (isset($streetData[2])) ? (string)$streetData[2] : '';
@@ -142,9 +184,9 @@ class OrderToInPostOrderDeliveryDataTransfer implements OrderToInPostOrderDataTr
         }
 
         $deliveryAddress->setAddress($addressLine);
-        $deliveryAddress->setCity($orderShippingAddress->getCity());
-        $deliveryAddress->setPostalCode($orderShippingAddress->getPostcode());
-        $deliveryAddress->setCountryCode($orderShippingAddress->getCountryId());
+        $deliveryAddress->setCity($orderAddress->getCity());
+        $deliveryAddress->setPostalCode($orderAddress->getPostcode());
+        $deliveryAddress->setCountryCode($orderAddress->getCountryId());
 
         $addressDetails = $deliveryAddress->getAddressDetails();
         $addressDetails->setStreet($street);

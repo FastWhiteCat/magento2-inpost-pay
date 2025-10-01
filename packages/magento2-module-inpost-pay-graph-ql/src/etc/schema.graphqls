@@ -49,6 +49,9 @@ type StoreConfig {
     inpost_pay_widget_enabled : Boolean
     @doc(description: "Indicates whether widget should be displayed or not.")
 
+    inpost_pay_test_mode_active : Boolean
+    @doc(description: "Indicates whether a production test mode of widget is active or not. If active widget should be hidden unless ?showInPostPay=true params exists in URL.")
+
     inpost_pay_show_on_product_cart : Boolean
     @doc(description: "Indicates whether widget should be displayed on product page or not.")
 

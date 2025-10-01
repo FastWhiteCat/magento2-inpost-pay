@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] - 2025-10-01
+
+### Added
+
+- Added support for downloadable and virtual products
+- Added new configuration for InPost Pay Terms and Conditions (legacy configuration is still default)
+- Added Magento Coupon condition that only works if an order is placed via InPost Pay Mobile App
+- Added support for free orders, for example, a voucher that covers all order costs (requires InPost Mobile App upgrade)
+
+### Fixed
+- Fixed handling of backorders and disabled stock management
+- Fixed error from logs for Merchants with no Smartmage_InPost logistic module installed
+- Fixed: delivery_product object is no longer sent to InPost Pay API as an order response, it was unnecessary
+- Fixed: after an order from a bound basket is placed via browser, the basket is deleted from InPost Pay API
+
 ## [2.2.3] - 2025-08-25
 
 ### Fixed

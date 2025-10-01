@@ -143,6 +143,25 @@ class Product extends DataObject implements ProductInterface, ExtensibleDataInte
     }
 
     /**
+     * @return string|null
+     */
+    public function getProductType(): ?string
+    {
+        $productType = $this->hasData(self::PRODUCT_TYPE) ? $this->getData(self::PRODUCT_TYPE) : null;
+
+        return is_scalar($productType) ? (string)$productType : null;
+    }
+
+    /**
+     * @param string|null $productType
+     * @return void
+     */
+    public function setProductType(?string $productType): void
+    {
+        $this->setData(self::PRODUCT_TYPE, $productType);
+    }
+
+    /**
      * @return string
      */
     public function getProductImage(): string
@@ -289,6 +308,25 @@ class Product extends DataObject implements ProductInterface, ExtensibleDataInte
     public function setDeliveryProduct(array $deliveryProduct): void
     {
         $this->setData(self::DELIVERY_PRODUCT, $deliveryProduct);
+    }
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[]|null
+     */
+    public function getDeliveryRelatedProducts(): ?array
+    {
+        $deliveryRelatedProducts = $this->getData(self::DELIVERY_RELATED_PRODUCTS);
+
+        return is_array($deliveryRelatedProducts) ? $deliveryRelatedProducts : null;
+    }
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[] $deliveryRelatedProducts
+     * @return void
+     */
+    public function setDeliveryRelatedProducts(array $deliveryRelatedProducts): void
+    {
+        $this->setData(self::DELIVERY_RELATED_PRODUCTS, $deliveryRelatedProducts);
     }
 
     /**

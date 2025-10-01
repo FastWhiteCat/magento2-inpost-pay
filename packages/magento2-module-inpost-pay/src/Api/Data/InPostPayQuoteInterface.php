@@ -25,6 +25,7 @@ interface InPostPayQuoteInterface
     public const GA_CLIENT_ID = 'ga_client_id';
     public const FBCLID = 'fbclid';
     public const GCLID = 'gclid';
+    public const SESSION_COOKIE = 'session_cookie';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -69,6 +70,8 @@ interface InPostPayQuoteInterface
 
     public function getCartVersion(): string;
     public function setCartVersion(string $cartVersion): InPostPayQuoteInterface;
+    public function getSessionCookie(): ?string;
+    public function setSessionCookie(?string $sessionCookie): InPostPayQuoteInterface;
 
     public function getGaClientId(): ?string;
     public function setGaClientId(?string $gaClientId): InPostPayQuoteInterface;

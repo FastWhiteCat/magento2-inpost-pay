@@ -16,6 +16,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -35,6 +36,8 @@ class Get extends WidgetController implements HttpGetActionInterface
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param SuccessPageUrlConfigProvider $successPageUrlConfigProvider
      * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
+     * @param EventManager $eventManager
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Context $context,
@@ -45,7 +48,8 @@ class Get extends WidgetController implements HttpGetActionInterface
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly SuccessPageUrlConfigProvider $successPageUrlConfigProvider,
-        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
+        private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
+        private readonly EventManager $eventManager
     ) {
         parent::__construct($context, $checkoutSession, $formKeyValidator, $jsonFactory, $logger);
     }
@@ -66,6 +70,11 @@ class Get extends WidgetController implements HttpGetActionInterface
                 $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
                 $this->checkoutSession->setLastOrderStatus($order->getStatus());
                 $this->basketBindingApiKeyCookieService->deleteBasketBindingKeyCookie();
+
+                $this->eventManager->dispatch(
+                    'inpost_pay_order_success_action',
+                    ['order' => $order]
+                );
 
                 $result = [
                     self::SUCCESS_RESULT_KEY => true,

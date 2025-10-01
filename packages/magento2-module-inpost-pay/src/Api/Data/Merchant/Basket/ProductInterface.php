@@ -14,6 +14,7 @@ interface ProductInterface
     public const PRODUCT_NAME = 'product_name';
     public const PRODUCT_DESCRIPTION = 'product_description';
     public const PRODUCT_LINK = 'product_link';
+    public const PRODUCT_TYPE = 'product_type';
     public const PRODUCT_IMAGE = 'product_image';
     public const BASE_PRICE = 'base_price';
     public const PROMO_PRICE = 'promo_price';
@@ -21,6 +22,7 @@ interface ProductInterface
     public const QUANTITY = 'quantity';
     public const PRODUCT_ATTRIBUTES = 'product_attributes';
     public const DELIVERY_PRODUCT = 'delivery_product';
+    public const DELIVERY_RELATED_PRODUCTS = 'delivery_related_products';
     public const ADDITIONAL_PRODUCT_IMAGES = 'additional_product_images';
 
     /**
@@ -88,6 +90,17 @@ interface ProductInterface
      * @return void
      */
     public function setProductLink(string $productLink): void;
+
+    /**
+     * @return string|null
+     */
+    public function getProductType(): ?string;
+
+    /**
+     * @param string|null $productType
+     * @return void
+     */
+    public function setProductType(?string $productType): void;
 
     /**
      * @return string
@@ -165,6 +178,17 @@ interface ProductInterface
      * @return void
      */
     public function setDeliveryProduct(array $deliveryProduct): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[]|null
+     */
+    public function getDeliveryRelatedProducts(): ?array;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface[] $deliveryRelatedProducts
+     * @return void
+     */
+    public function setDeliveryRelatedProducts(array $deliveryRelatedProducts): void;
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface[]

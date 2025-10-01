@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] - 2025-10-01
+
+### Added
+
+- Additional config for InPost Pay production test mode (for testing a hidden widget in production environment)
+
 ## [2.2.0] - 2025-06-04
 
 ### Added

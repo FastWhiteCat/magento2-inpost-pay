@@ -23,22 +23,28 @@ class OrderRestrictionsValidator
     ) {
         $this->deliveryTypes = [
             InPostDeliveryType::COURIER->name => RestrictionsRuleInterface::APPLIES_TO_COURIER,
-            InPostDeliveryType::APM->name => RestrictionsRuleInterface::APPLIES_TO_APM
+            InPostDeliveryType::APM->name => RestrictionsRuleInterface::APPLIES_TO_APM,
+            InPostDeliveryType::DIGITAL->name => RestrictionsRuleInterface::APPLIES_TO_DIGITAL
         ];
     }
 
     /**
      * @throws InPostPayRestrictedProductException
      */
-    public function validate(Quote $quote, OrderInterface $inPostOrder, bool $everyOccurenceMode = false): void
+    public function validate(Quote $quote, OrderInterface $inPostOrder, bool $everyOccurrenceMode = false): void
     {
         $websiteId = (int)$quote->getStore()->getWebsiteId();
         $restrictedProduct = null;
         foreach ($quote->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
             $appliesTo =  $this->deliveryTypes[$inPostOrder->getDelivery()->getDeliveryType()];
+
+            if ($appliesTo === InPostDeliveryType::DIGITAL->name) {
+                $appliesTo = RestrictionsRuleInterface::APPLIES_TO_BOTH;
+            }
+
             if ($this->isProductRestricted($item, $websiteId, $appliesTo)) {
-                if ($everyOccurenceMode) {
+                if ($everyOccurrenceMode) {
                     $this->createExceptionForRestrictedProduct((string)$product->getName());
                 } else {
                     $restrictedProduct = $product;
