@@ -12,10 +12,12 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterfaceFa
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\InPostPayRestrictedProductException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Provider\Delivery\DeliveryDateProvider;
+use InPost\InPostPay\Registry\Quote\DigitalQuoteAllowRegistry;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator;
 use InPost\InPostPay\Service\CreateBasketNotice;
@@ -30,6 +32,17 @@ use Psr\Log\LoggerInterface;
 class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInterface
 {
 
+    /**
+     * @param DeliveryInterfaceFactory $deliveryFactory
+     * @param DeliveryOptionInterfaceFactory $deliveryOptionFactory
+     * @param DeliveryDateProvider $deliveryDateProvider
+     * @param ShipmentMappingConfigProvider $shipmentMappingConfigProvider
+     * @param CreateBasketNotice $createBasketNotice
+     * @param QuoteRestrictionsValidator $quoteRestrictionsValidator
+     * @param ShippingMethodEstimator $shippingMethodEstimator
+     * @param DigitalQuoteAllowRegistry $digitalQuoteAllowRegistry
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         private readonly DeliveryInterfaceFactory $deliveryFactory,
         private readonly DeliveryOptionInterfaceFactory $deliveryOptionFactory,
@@ -38,6 +51,7 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         private readonly CreateBasketNotice $createBasketNotice,
         private readonly QuoteRestrictionsValidator $quoteRestrictionsValidator,
         private readonly ShippingMethodEstimator $shippingMethodEstimator,
+        private readonly DigitalQuoteAllowRegistry $digitalQuoteAllowRegistry,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -46,10 +60,9 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
     {
         $storeId = $quote->getStoreId();
 
-        if ($quote->isVirtual()) {
-            $this->logger->error('Quote is virtual. Setting empty delivery.');
+        if (!$this->digitalQuoteAllowRegistry->isCurrentlyProcessedDigitalQuoteAllowed()) {
             $basket->setDelivery([]);
-            $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
+
             return;
         }
 
@@ -69,15 +82,16 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             return;
         }
 
-        foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getIsVirtual()) {
-                $this->setBasketNoticeVirtualProducts((string)$basket->getBasketId());
-                break;
-            }
-        }
+        if (!$quote->isVirtual()) {
+            $shippingMethods = $this->shippingMethodEstimator->estimate($quote);
+            $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
 
-        $shippingMethods = $this->shippingMethodEstimator->estimate($quote);
-        $deliveries = $this->prepareMappedShippingMethodsData($shippingMethods, $storeId);
+            if ($quote->hasVirtualItems()) {
+                $deliveries = array_merge($deliveries, $this->prepareDigitalDeliveryData($storeId));
+            }
+        } else {
+            $deliveries = $this->prepareDigitalDeliveryData($storeId);
+        }
 
         if (empty($deliveries)) {
             $this->createBasketNotice->execute(
@@ -144,6 +158,28 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
             $delivery->setDeliveryOptions($optionsData);
             $deliveryData[] = $delivery;
         }
+
+        return $deliveryData;
+    }
+
+    /**
+     * @param int $storeId
+     * @return array
+     */
+    private function prepareDigitalDeliveryData(int $storeId): array
+    {
+        $deliveryData = [];
+        /** @var DeliveryInterface $delivery */
+        $delivery = $this->deliveryFactory->create();
+        $delivery->setDeliveryType(InPostDeliveryType::DIGITAL->value);
+        $delivery->setDeliveryDate($this->deliveryDateProvider->calculateDigitalDeliveryDate($storeId));
+        $deliverPrice = $delivery->getDeliveryPrice();
+        $deliverPrice->setNet(0);
+        $deliverPrice->setGross(0);
+        $deliverPrice->setVat(0);
+        $delivery->setDeliveryPrice($deliverPrice);
+        $delivery->setDeliveryOptions([]);
+        $deliveryData[] = $delivery;
 
         return $deliveryData;
     }
@@ -216,14 +252,5 @@ class QuoteToBasketDeliveryDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         return $limit;
-    }
-
-    private function setBasketNoticeVirtualProducts(string $basketId): void
-    {
-        $this->createBasketNotice->execute(
-            $basketId,
-            InPostPayBasketNoticeInterface::ATTENTION,
-            __('Order contains products that cannot be shipped.')->render()
-        );
     }
 }

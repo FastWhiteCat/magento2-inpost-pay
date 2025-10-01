@@ -85,5 +85,12 @@
             <config_path>payment/inpost_pay/assign_quote_to_customer_by_email</config_path>
             <comment>If set to YES, cart initiated by guest user, bound to InPost Pay Mobile Aap on order processing will be assigned to an existing Magento account if found by InPost Pay account email address.</comment>
         </field>
+        <field id="can_refund_partial_per_invoice" translate="label" type="select" sortOrder="110"
+               showInDefault="1" canRestore="1">
+            <label>Allow Invoice Partial Refund</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/can_refund_partial_per_invoice</config_path>
+            <comment>If set to YES, invoice refund forms will have inputs allowing to select item quantities.</comment>
+        </field>
     </group>
 </include>

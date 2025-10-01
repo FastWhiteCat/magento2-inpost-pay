@@ -20,6 +20,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
 {
@@ -333,6 +334,32 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
     public function setInPostPayAccountEmail(?string $inPostPayAccountEmail): InPostPayOrderInterface
     {
         return $this->setData(self::INPOST_PAY_ACCOUNT_EMAIL, $inPostPayAccountEmail);
+    }
+
+    public function getDeliveryEmail(): ?string
+    {
+        $deliveryEmail = $this->hasData(self::DELIVERY_EMAIL);
+        $deliveryEmail = $deliveryEmail ? $this->getData(self::DELIVERY_EMAIL) : null;
+
+        return ($deliveryEmail && is_scalar($deliveryEmail)) ? (string)$deliveryEmail : null;
+    }
+
+    public function setDeliveryEmail(?string $deliveryEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::DELIVERY_EMAIL, $deliveryEmail);
+    }
+
+    public function getDigitalDeliveryEmail(): ?string
+    {
+        $hasDigitalDeliveryEmail = $this->hasData(self::DIGITAL_DELIVERY_EMAIL);
+        $digitalDeliveryEmail = $hasDigitalDeliveryEmail ? $this->getData(self::DIGITAL_DELIVERY_EMAIL) : null;
+
+        return ($digitalDeliveryEmail && is_scalar($digitalDeliveryEmail)) ? (string)$digitalDeliveryEmail : null;
+    }
+
+    public function setDigitalDeliveryEmail(?string $digitalDeliveryEmail): InPostPayOrderInterface
+    {
+        return $this->setData(self::DIGITAL_DELIVERY_EMAIL, $digitalDeliveryEmail);
     }
 
     public function getCountryPrefix(): ?string

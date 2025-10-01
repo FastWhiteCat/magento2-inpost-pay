@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Api\Data\Merchant;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface;
+use InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface;
 
 use InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface;
 
@@ -18,6 +19,7 @@ interface BasketInterface
     public const RELATED_PRODUCTS = 'related_products';
     public const CONSENTS = 'consents';
     public const PROMOTIONS_AVAILABLE = 'promotions_available';
+    public const MERCHANT_STORE = 'merchant_store';
     public const INPOST_DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
     public const STATUS = 'status';
 
@@ -97,6 +99,17 @@ interface BasketInterface
      * @return void
      */
     public function setConsents(array $consents): void;
+
+    /**
+     * @return \InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface|null
+     */
+    public function getMerchantStore(): ?MerchantStoreInterface;
+
+    /**
+     * @param \InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface|null $merchantStore
+     * @return void
+     */
+    public function setMerchantStore(?MerchantStoreInterface $merchantStore = null): void;
 
     /**
      * @return string|null

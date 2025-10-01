@@ -16,6 +16,7 @@ use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\Restrictions\Api\Data\RestrictionsRuleInterface;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Model\Product\Type;
+use InPost\InPostPay\Enum\InPostProductType;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\InputException;
@@ -28,6 +29,7 @@ use Magento\InventorySalesApi\Model\StockByWebsiteIdResolverInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Pricing\Price\RegularPrice;
+use InPost\InPostPay\Service\Product\ProductBackorderService;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Store\Model\App\Emulation;
@@ -49,7 +51,8 @@ class ProductToInPostProductDataTransfer
 
     public const ALL_DELIVERY_TYPES = [
         RestrictionsRuleInterface::APPLIES_TO_COURIER => InPostDeliveryType::COURIER,
-        RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM
+        RestrictionsRuleInterface::APPLIES_TO_APM => InPostDeliveryType::APM,
+        RestrictionsRuleInterface::APPLIES_TO_DIGITAL => InPostDeliveryType::DIGITAL
     ];
 
     private WriteInterface $mediaDirectory;
@@ -72,6 +75,7 @@ class ProductToInPostProductDataTransfer
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly Emulation $emulation,
         private readonly LoggerInterface $logger,
+        private readonly ProductBackorderService $productBackorderService,
         Filesystem $filesystem
     ) {
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
@@ -83,12 +87,11 @@ class ProductToInPostProductDataTransfer
         int $websiteId,
         ?float $quantity = null,
         array $selectedOptions = [],
-        array $quoteItemsQuantity = []
+        array $quoteItemsQuantity = [],
+        bool $isRelatedProduct = false
     ): void {
         if ($product->getTypeId() === Type::TYPE_BUNDLE) {
-            if ($quantity === null) {
-                $quantity = 1.0;
-            }
+            $quantity = $quantity ?? 1.0;
             $bundleQuantity = $this->getBundleQuantity($product, $quantity, $websiteId, $quoteItemsQuantity);
             $canCastQtyToInt = $this->canCastToInteger($quantity);
             $maxQuantity = $bundleQuantity['maxQuantity'];
@@ -96,13 +99,11 @@ class ProductToInPostProductDataTransfer
         } else {
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
-            if ($quantity === null) {
-                $quantity = $stockItemConfiguration->getMinSaleQty();
-            }
+            $quantity = $quantity ?? $stockItemConfiguration->getMinSaleQty();
             $canCastQtyToInt = $this->canCastToInteger($quantity);
-
             $stockQuantity = $this->getSimpleProductStockQuantity($stockId, $product, $quantity, $canCastQtyToInt);
             $maxQuantity = min([$stockItemConfiguration->getMaxSaleQty(), $stockQuantity]);
+
             if ($quoteItemsQuantity) {
                 $maxQuantity -= ($quoteItemsQuantity[$product->getId()] - $quantity);
                 $stockQuantity -= ($quoteItemsQuantity[$product->getId()] - $quantity);
@@ -125,21 +126,39 @@ class ProductToInPostProductDataTransfer
         $inPostProduct->setProductDescription($this->prepareProductDescription($product));
         $inPostProduct->setProductLink($this->prepareProductUrl($product));
         $inPostProduct->setProductImage($this->prepareProductImageUrl($product));
+        $inPostProduct->setProductType(InPostProductType::PRODUCT->value);
+
+        if ($product->isVirtual()) {
+            $inPostProduct->setProductType(InPostProductType::DIGITAL->value);
+        }
+
         $basePrice = $inPostProduct->getBasePrice();
         $basePrice->setNet($regularPriceExclTax);
         $basePrice->setGross($regularPriceInclTax);
         $basePrice->setVat(DecimalCalculator::sub($regularPriceInclTax, $regularPriceExclTax));
         $inPostProduct->setBasePrice($basePrice);
         $quantityObj = $inPostProduct->getQuantity();
-        $quantityObj->setQuantity($canCastQtyToInt ? (int)$quantity : $quantity);
-        $quantityObj->setQuantityType($canCastQtyToInt ? self::INT_QTY : self::FLOAT_QTY);
+        if ($canCastQtyToInt) {
+            $quantityObj->setQuantity((int)$quantity);
+            $quantityObj->setQuantityType(self::INT_QTY);
+        } else {
+            $quantityObj->setQuantity($quantity);
+            $quantityObj->setQuantityType(self::FLOAT_QTY);
+        }
         $unit = Quantity::DEFAULT_UNIT;
         $quantityObj->setQuantityUnit(__($unit)->render());
         $quantityObj->setAvailableQuantity($stockQuantity);
         $quantityObj->setMaxQuantity($maxQuantity);
         $inPostProduct->setQuantity($quantityObj);
         $inPostProduct->setProductAttributes($this->getProductAttributes($product, $selectedOptions));
-        $inPostProduct->setDeliveryProduct($this->getDeliveryProduct($product, $websiteId));
+        $deliveryProductArray = $this->getDeliveryProduct($product, $websiteId);
+
+        if ($isRelatedProduct) {
+            $inPostProduct->setDeliveryRelatedProducts($deliveryProductArray);
+        } else {
+            $inPostProduct->setDeliveryProduct($deliveryProductArray);
+        }
+
         $this->additionalProductImagesDataTransfer->transfer($product, $inPostProduct);
     }
 
@@ -334,9 +353,11 @@ class ProductToInPostProductDataTransfer
             $stockQuantity = $quantity;
         }
 
-        $manageStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
-        if ($stockQuantity <= 0 && $manageStock) {
-            $stockQuantity = self::UNMANAGED_STOCK_QUANTITY;
+        $unmanagedStock = $this->manageStockCondition->execute($product->getSku(), $stockId);
+        $isBackOrdered = $this->productBackorderService->isProductBackOrdered($product, $stockId);
+
+        if ($unmanagedStock || $isBackOrdered) {
+            $stockQuantity = $this->productBackorderService->getBackOrderMaxSalesQty($product, $stockId);
         }
 
         return $canCastQtyToInt ? (int)$stockQuantity : (float)$stockQuantity;
@@ -347,26 +368,56 @@ class ProductToInPostProductDataTransfer
         $productId = (int)$product->getId();
         $simpleProductId = (int)$this->extractProductId($product);
 
-        $productRestricted = $this->isProductRestricted($productId, $websiteId);
-        $productRestricted = $productRestricted || $this->isProductRestricted($simpleProductId, $websiteId);
+        $isRestricted = $this->isProductRestricted($productId, $websiteId);
+        $isRestricted = $isRestricted || $this->isProductRestricted($simpleProductId, $websiteId);
 
         $deliveryProductArr = [];
         foreach (self::ALL_DELIVERY_TYPES as $key => $enum) {
+            $available = $this->isDeliveryForProductAvailable(
+                $product,
+                $websiteId,
+                $key,
+                $isRestricted,
+                $simpleProductId
+            );
             $deliveryProduct = $this->deliveryProductFactory->create();
-            if ($productRestricted) {
-                $available = false;
-            } else {
-                $available = !(
-                    $this->isProductRestricted($productId, $websiteId, $key)
-                    || $this->isProductRestricted($simpleProductId, $websiteId, $key)
-                );
-            }
             $deliveryProduct->setDeliveryType($enum->value);
             $deliveryProduct->setIfDeliveryAvailable($available);
             $deliveryProductArr[] = $deliveryProduct;
         }
 
         return $deliveryProductArr;
+    }
+
+    private function isDeliveryForProductAvailable(
+        Product $product,
+        int $websiteId,
+        int $deliveryType,
+        bool $isRestricted,
+        int $simpleProductId
+    ): bool {
+        $productId = (int)$product->getId();
+
+        if ($product->isVirtual()) {
+            if ($deliveryType !== RestrictionsRuleInterface::APPLIES_TO_DIGITAL) {
+                $available = false;
+            } else {
+                $available = !$isRestricted;
+            }
+        } else {
+            if ($isRestricted) {
+                $available = false;
+            } else {
+                $available = !(
+                    $this->isProductRestricted($productId, $websiteId, $deliveryType)
+                    || $this->isProductRestricted($simpleProductId, $websiteId, $deliveryType)
+                );
+            }
+
+            $available = ($deliveryType === RestrictionsRuleInterface::APPLIES_TO_DIGITAL) ? false : $available;
+        }
+
+        return $available;
     }
 
     private function isProductRestricted(int $productId, int $websiteId, int $appliesTo = 0): bool

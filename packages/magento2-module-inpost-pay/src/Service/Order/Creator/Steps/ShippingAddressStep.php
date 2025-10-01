@@ -42,6 +42,10 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
 
     public function process(Quote $quote, OrderInterface $inPostOrder): void
     {
+        if ($inPostOrder->getDelivery()->getDeliveryType() === InPostDeliveryType::DIGITAL->value) {
+            return;
+        }
+
         $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
         /** @var AddressInterface $shippingAddress */
         $shippingAddress = $this->addressFactory->create();

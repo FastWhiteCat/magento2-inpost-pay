@@ -10,7 +10,9 @@ use InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterfaceFactory;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
+use InPost\InPostPay\Provider\Config\TermsAndConditionsConfigProvider;
 use InPost\InPostPay\Provider\ConsentsProvider;
+use InPost\InPostPay\Provider\LegacyConsentsProvider;
 use Magento\Quote\Model\Quote;
 
 class QuoteToBasketConsentsDataTransfer implements QuoteToBasketDataTransferInterface
@@ -18,7 +20,9 @@ class QuoteToBasketConsentsDataTransfer implements QuoteToBasketDataTransferInte
     public function __construct(
         private readonly ConsentInterfaceFactory $consentFactory,
         private readonly AdditionalConsentInterfaceFactory $additionalConsentFactory,
-        private readonly ConsentsProvider $consentsProvider
+        private readonly ConsentsProvider $consentsProvider,
+        private readonly LegacyConsentsProvider $legacyConsentsProvider,
+        private readonly TermsAndConditionsConfigProvider $termsAndConditionsConfigProvider
     ) {
     }
 
@@ -28,7 +32,13 @@ class QuoteToBasketConsentsDataTransfer implements QuoteToBasketDataTransferInte
     public function transfer(Quote $quote, BasketInterface $basket): void
     {
         $consents = [];
-        foreach ($this->consentsProvider->getConsents($quote->getStoreId()) as $consentData) {
+        if ($this->termsAndConditionsConfigProvider->isLegacyMappingEnabled()) {
+            $consentProvider = $this->legacyConsentsProvider;
+        } else {
+            $consentProvider = $this->consentsProvider;
+        }
+
+        foreach ($consentProvider->getConsents($quote->getStoreId()) as $consentData) {
             $additionalConsents = (array)($consentData[ConsentInterface::ADDITIONAL_CONSENT_LINKS] ?? []);
             $additionalConsentLinks = [];
 
