@@ -14,17 +14,17 @@ interface InPostPayLockerIdProviderInterface
 
     /**
      * @param int $orderId)
-     * @return string
+     * @return string|null
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */
-    public function getFromOrderById(int $orderId): string;
+    public function getFromOrderById(int $orderId): ?string;
 
     /**
      * @param string $orderIncrementId
-     * @return string
+     * @return string|null
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */
-    public function getFromOrderByIncrementId(string $orderIncrementId): string;
+    public function getFromOrderByIncrementId(string $orderIncrementId): ?string;
 }

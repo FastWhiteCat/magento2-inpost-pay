@@ -22,6 +22,7 @@ interface RestrictionsRuleInterface
     public const APPLIES_TO_COURIER = 1;
     public const APPLIES_TO_APM = 2;
     public const APPLIES_TO_BOTH = 3;
+    public const APPLIES_TO_DIGITAL = 4;
 
     public function getRuleId(): ?int;
     public function setRuleId(int $ruleId): RestrictionsRuleInterface;

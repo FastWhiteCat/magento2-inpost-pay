@@ -9,13 +9,17 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Model\Config\Source\TermsAndConditionsRequirements;
+use InPost\InPostPay\Provider\Config\TermsAndConditionsConfigProvider;
 use InPost\InPostPay\Provider\ConsentsProvider;
+use InPost\InPostPay\Provider\LegacyConsentsProvider;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 
 class ConsentsValidator implements OrderValidatorInterface
 {
     public function __construct(
+        private readonly TermsAndConditionsConfigProvider $termsAndConditionsConfigProvider,
+        private readonly LegacyConsentsProvider $legacyConsentsProvider,
         private readonly ConsentsProvider $consentsProvider
     ) {
     }
@@ -23,10 +27,18 @@ class ConsentsValidator implements OrderValidatorInterface
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         $acceptedConsents = $inPostOrder->getConsents();
-        foreach ($this->consentsProvider->getConsents($quote->getStoreId()) as $configConsent) {
+
+        if ($this->termsAndConditionsConfigProvider->isLegacyMappingEnabled()) {
+            $consentProvider = $this->legacyConsentsProvider;
+        } else {
+            $consentProvider = $this->consentsProvider;
+        }
+
+        foreach ($consentProvider->getConsents($quote->getStoreId()) as $configConsent) {
             $consentId = (string)($configConsent[AcceptedConsentInterface::CONSENT_ID] ?? '');
             $consentVersion = (string)($configConsent[AcceptedConsentInterface::CONSENT_VERSION] ?? '');
             $requirementType = $configConsent[AcceptedConsentInterface::REQUIREMENT_TYPE] ?? '';
+
             if ($requirementType === TermsAndConditionsRequirements::ALWAYS
                 || $requirementType === TermsAndConditionsRequirements::ONLY_IN_NEW_VERSION
             ) {

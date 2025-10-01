@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\Data\Merchant\OrderInterface;
 use InPost\InPostPay\Api\Validator\OrderValidatorInterface;
 use InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface;
+use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Service\Calculator\DecimalCalculator;
@@ -35,28 +36,40 @@ class BasketPriceValidator implements OrderValidatorInterface
      */
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
-        $address = $quote->getShippingAddress();
-        $shippingMethod = $this->getSelectedShippingMethod($quote, $inPostOrder);
-        $this->validateCurrency($quote, $inPostOrder);
-        $this->validateGrossPrice($address, $shippingMethod, $inPostOrder->getOrderDetails()->getBasketPrice());
+        if ($inPostOrder->getDelivery()->getDeliveryType() === InPostDeliveryType::DIGITAL->value) {
+            $billingAddress = $quote->getBillingAddress();
+            $this->validateCurrency($quote, $inPostOrder);
+            $this->validateGrossPrice($billingAddress, $inPostOrder->getOrderDetails()->getBasketPrice());
+        } else {
+            $shippingAddress = $quote->getShippingAddress();
+            $shippingMethod = $this->getSelectedShippingMethod($quote, $inPostOrder);
+            $this->validateCurrency($quote, $inPostOrder);
+            $this->validateGrossPrice(
+                $shippingAddress,
+                $inPostOrder->getOrderDetails()->getBasketPrice(),
+                $shippingMethod
+            );
+        }
     }
 
     /**
      * @param Address $address
-     * @param ShippingMethodInterface $shippingMethod
      * @param PriceInterface|null $basketPrice
+     * @param ShippingMethodInterface|null $shippingMethod
      * @return void
      * @throws LocalizedException
      */
     private function validateGrossPrice(
         Address $address,
-        ShippingMethodInterface $shippingMethod,
-        ?PriceInterface $basketPrice
+        ?PriceInterface $basketPrice,
+        ?ShippingMethodInterface $shippingMethod = null,
     ): void {
+        $shippingCost = $shippingMethod ? (float)$shippingMethod->getPriceInclTax() : 0.00;
+
         $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
         $priceInclTaxWithShipping = DecimalCalculator::add(
             (float)$address->getSubtotalInclTax(),
-            (float)$shippingMethod->getPriceInclTax()
+            $shippingCost
         );
         $finalPriceInclTax = DecimalCalculator::round(
             DecimalCalculator::add($priceInclTaxWithShipping, $discountInclTax)

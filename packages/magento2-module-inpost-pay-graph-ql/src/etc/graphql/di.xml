@@ -20,6 +20,7 @@
                 <item name="inpost_pay_is_sandbox" xsi:type="string">payment/inpost_pay/sandbox_enabled</item>
                 <item name="inpost_pay_widget_script_url" xsi:type="string">payment/inpost_pay/widget_script_url</item>
                 <item name="inpost_pay_sandbox_widget_script_url" xsi:type="string">payment/inpost_pay/sandbox_widget_script_url</item>
+                <item name="inpost_pay_test_mode_active" xsi:type="string">payment/inpost_pay/test_mode_active</item>
             </argument>
         </arguments>
     </type>

@@ -10,6 +10,7 @@
                 <model>InPostPayPaymentFacade</model>
                 <title>InPost Pay</title>
                 <order_status>pending</order_status>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <allowspecific>0</allowspecific>
                 <image_role>small_image</image_role>
                 <additional_images_enabled>0</additional_images_enabled>
@@ -19,12 +20,15 @@
                 <max_order_total>99999</max_order_total>
                 <delivery_deadline_in_days>7</delivery_deadline_in_days>
                 <estimate_with_collect_address_totals>0</estimate_with_collect_address_totals>
+                <digital_delivery_deadline_in_days>86400</digital_delivery_deadline_in_days>
                 <basket_lifetime>604800</basket_lifetime>
                 <client_id></client_id>
                 <client_secret></client_secret>
                 <auth_token_url>https://login.inpost.pl/</auth_token_url>
                 <product_cart_enabled>1</product_cart_enabled>
                 <cart_enabled>1</cart_enabled>
+                <cart_url>checkout/cart</cart_url>
+                <send_session_cookie>0</send_session_cookie>
                 <success_page_enabled>1</success_page_enabled>
                 <success_page_url>checkout/onepage/success</success_page_url>
                 <widget_size>size-md</widget_size>
@@ -40,6 +44,7 @@
                 <sandbox_auth_token_url>https://sandbox-login.inpost.pl/</sandbox_auth_token_url>
                 <sandbox_izi_api_url>https://sandbox-api.inpost.pl/</sandbox_izi_api_url>
                 <sandbox_widget_script_url>https://sandbox-inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</sandbox_widget_script_url>
+                <use_legacy_terms_and_conditions_mapping>1</use_legacy_terms_and_conditions_mapping>
                 <min_log_level>100</min_log_level>
                 <anonymise_objects_enabled>1</anonymise_objects_enabled>
                 <can_capture>1</can_capture>

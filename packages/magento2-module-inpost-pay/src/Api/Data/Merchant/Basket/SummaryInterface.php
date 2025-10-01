@@ -16,6 +16,7 @@ interface SummaryInterface
     public const BASKET_EXPIRATION_DATE = 'basket_expiration_date';
     public const PAYMENT_TYPE = 'payment_type';
     public const BASKET_NOTICE = 'basket_notice';
+    public const FREE_BASKET = 'free_basket';
 
     /**
      * @return \InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface
@@ -104,4 +105,16 @@ interface SummaryInterface
      * @return void
      */
     public function setBasketExpirationDate(?string $basketExpirationDate): void;
+
+    /**
+     * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getFreeBasket(): bool;
+
+    /**
+     * @param bool $freeBasket
+     * @return void
+     */
+    public function setFreeBasket(bool $freeBasket): void;
 }
