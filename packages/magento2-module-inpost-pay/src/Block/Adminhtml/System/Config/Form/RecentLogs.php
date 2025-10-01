@@ -11,7 +11,7 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Button;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Filesystem\DriverInterface;
+use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
@@ -28,13 +28,13 @@ class RecentLogs extends Field
 
     /**
      * @param DirectoryList $directoryList
-     * @param DriverInterface $driver
+     * @param File $driver
      * @param Context $context
      * @param array $data
      */
     public function __construct(
         private readonly DirectoryList $directoryList,
-        private readonly DriverInterface $driver,
+        private readonly File $driver,
         Context $context,
         array $data = []
     ) {
