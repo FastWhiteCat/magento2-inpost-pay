@@ -256,4 +256,16 @@ class InPostPayQuote extends AbstractModel implements InPostPayQuoteInterface
     {
         return $this->setData(self::GCLID, $gclid);
     }
+
+    public function getSessionCookie(): ?string
+    {
+        $sessionCookie = $this->getData(self::SESSION_COOKIE);
+
+        return is_scalar($sessionCookie) ? (string)$sessionCookie : null;
+    }
+
+    public function setSessionCookie(?string $sessionCookie): InPostPayQuoteInterface
+    {
+        return $this->setData(self::SESSION_COOKIE, $sessionCookie);
+    }
 }

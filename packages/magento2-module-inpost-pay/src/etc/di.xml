@@ -17,6 +17,10 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PromoCode"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\MerchantStore"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStore\CookieInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\MerchantStore\Cookie"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent\AdditionalConsent"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface"
@@ -123,6 +127,14 @@
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable\Details"/>
     <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreement"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementStoreInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementStore"/>
+    <preference for="InPost\InPostPay\Api\InPostPayCheckoutAgreementRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayCheckoutAgreementStoreRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementStoreRepository"/>
     <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface"
@@ -184,6 +196,8 @@
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface">
         <plugin name="InPost_InPostPay::basketUpdateIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+        <plugin name="InPost_InPostPay::registerMobileAppBasketEventPlugin"
+                type="InPost\InPostPay\Plugin\ApiConnector\Merchant\RegisterMobileAppBasketEventPlugin" />
     </type>
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface">
         <plugin name="InPost_InPostPay::basketDeleteIsEnablePlugin"
@@ -196,6 +210,8 @@
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
         <plugin name="InPost_InPostPay::orderCreateIsEnablePlugin"
                 type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+        <plugin name="InPost_InPostPay::registerMobileAppOrderPlugin"
+                type="InPost\InPostPay\Plugin\ApiConnector\Merchant\RegisterMobileAppOrderPlugin" />
     </type>
     <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer">
         <plugin name="InPost_InPostPay::addAdditionalAnalyticsOrderParamsToOrderDetailsPlugin"
@@ -246,6 +262,14 @@
     <type name="Magento\Sales\Model\Order\Email\Container\IdentityInterface">
         <plugin name="InPost_InPostPay::addCopyToOrderEmailsForInPostPayAccountEmailPlugin"
                 type="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <plugin name="InPost_InPostPay::registerIfDigitalQuoteIsAllowedForMagentoConfigPlugin"
+                type="InPost\InPostPay\Plugin\Service\DataTransfer\QuoteToBasketDataTransfer\RegisterIfDigitalQuoteIsAllowedForMagentoConfigPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer">
+        <plugin name="InPost_InPostPay::disableDigitalProductDeliveryIfNotAllowedPlugin"
+                type="InPost\InPostPay\Plugin\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer\DisableDigitalProductDeliveryIfNotAllowedPlugin" />
     </type>
     <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
@@ -299,6 +323,7 @@
                 <item name="related_products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer</item>
                 <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer</item>
                 <item name="promotions_available" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromotionsAvailableDataTransfer</item>
+                <item name="merchant_store" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketMerchantStoreDataTransfer</item>
             </argument>
         </arguments>
     </type>
@@ -352,6 +377,7 @@
                 <item name="save_delivery_options" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveDeliveryOptionsStep</item>
                 <item name="save_accepted_consents" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveAcceptedConsentsStep</item>
                 <item name="update_payment_title" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdatePaymentTitleStep</item>
+                <item name="update_free_order_payment" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdateFreeOrderPayment</item>
             </argument>
         </arguments>
     </type>
@@ -382,9 +408,28 @@
                 <item name="DEFERRED_PAYMENT" xsi:type="string">Deferred Payment (InPost Pay)</item>
                 <item name="GOOGLE_PAY" xsi:type="string">Google Pay (InPost Pay)</item>
                 <item name="CASH_ON_DELIVERY" xsi:type="string">Cash on delivery (InPost Pay)</item>
+                <item name="FREE_ORDER" xsi:type="string">Free Order (InPost Pay)</item>
             </argument>
         </arguments>
     </type>
+    <!-- Grid data source and collections -->
+    <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_pay_checkout_agreement</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostpay_checkoutagreement_listing_listing_data_source"
+                      xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- END Grid data source and collections -->
+
     <type name="InPost\InPostPay\Logger\Handler">
         <arguments>
             <argument name="debugConfigProvider" xsi:type="object">InPost\InPostPay\Provider\Config\DebugConfigProvider</argument>
@@ -434,6 +479,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CheckoutAgreement\DeleteInPostPayCheckoutAgreementAssignedStoresEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CheckoutAgreement\InsertInPostPayCheckoutAgreementAssignedStoresEventObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
@@ -560,6 +615,7 @@
     </type>
 
     <type name="InPost\InPostPay\Registry\ShippingMethodMappingRegistry" shared="true" />
+    <type name="InPost\InPostPay\Registry\InPostPayMobileAppOrderRegistry" shared="true" />
     <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
@@ -783,6 +839,16 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Service\DataTransfer\QuoteToBasketDataTransfer\RegisterIfDigitalQuoteIsAllowedForMagentoConfigPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Order\DeleteBindingAfterPlaceOrderObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

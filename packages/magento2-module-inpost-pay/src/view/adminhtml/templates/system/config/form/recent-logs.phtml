@@ -1,0 +1,12 @@
+<?php
+use InPost\InPostPay\Block\Adminhtml\System\Config\Form\RecentLogs;
+
+/** @var RecentLogs $block **/
+?>
+<div class="inpost_pay_debugging_logs_wrapper">
+    <?php foreach ($block->getRecentLogDates() as $logDate): ?>
+        <p class="inpostpay_debugging_log_row_<?= $block->escapeHtml($logDate); ?>">
+            <?= $block->getDownloadLogButtonHtml($logDate) ?>
+        </p>
+    <?php endforeach; ?>
+</div>

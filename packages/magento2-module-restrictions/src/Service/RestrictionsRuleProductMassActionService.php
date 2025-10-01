@@ -80,6 +80,7 @@ class RestrictionsRuleProductMassActionService
 
     public function getRuleProductsByAppliesTo(int $websiteId, int $appliesTo): array
     {
+        $appliesTo = array_unique([$appliesTo, RestrictionsRuleInterface::APPLIES_TO_BOTH]);
         $table = $this->connection->getTableName(RestrictionsRuleProductInterface::TABLE_NAME);
 
         $query = $this->connection->select()

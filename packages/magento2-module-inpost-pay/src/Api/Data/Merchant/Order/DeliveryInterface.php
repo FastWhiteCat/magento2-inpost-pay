@@ -12,6 +12,7 @@ interface DeliveryInterface
 {
     public const DELIVERY_TYPE = 'delivery_type';
     public const MAIL = 'mail';
+    public const DIGITAL_DELIVERY_EMAIL = 'digital_delivery_email';
     public const PHONE_NUMBER = 'phone_number';
     public const DELIVERY_ADDRESS = 'delivery_address';
     public const DELIVERY_CODES = 'delivery_codes';
@@ -86,6 +87,17 @@ interface DeliveryInterface
      * @return void
      */
     public function setMail(string $mail): void;
+
+    /**
+     * @return string|null
+     */
+    public function getDigitalDeliveryEmail(): ?string;
+
+    /**
+     * @param string|null $digitalDeliveryEmail
+     * @return void
+     */
+    public function setDigitalDeliveryEmail(?string $digitalDeliveryEmail): void;
 
     /**
      * @return string|null

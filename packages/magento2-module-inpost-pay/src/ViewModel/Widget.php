@@ -14,14 +14,17 @@ use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\LayoutConfigProvider;
 use InPost\InPostPay\Provider\Config\DisplayConfigProvider;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Validator\DigitalQuoteValidator;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Customer\Model\GroupManagement;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -40,6 +43,7 @@ class Widget implements ArgumentInterface
      * @param AnalyticsConfigProvider $analyticsConfigProvider
      * @param ResolverInterface $localeResolver
      * @param CheckoutSession $checkoutSession
+     * @param CustomerSession $customerSession
      * @param GeneralConfigProvider $generalConfigProvider
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param ProductRepositoryInterface $productRepository
@@ -48,6 +52,7 @@ class Widget implements ArgumentInterface
      * @param LoggerInterface $logger
      * @param AuthConfigProvider $authConfigProvider
      * @param IziApiConfigProvider $iziApiConfigProvider
+     * @param DigitalQuoteValidator $digitalQuoteValidator
      * @param TestModeProvider $testModeProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -58,6 +63,7 @@ class Widget implements ArgumentInterface
         private readonly AnalyticsConfigProvider $analyticsConfigProvider,
         private readonly ResolverInterface $localeResolver,
         private readonly CheckoutSession $checkoutSession,
+        private readonly CustomerSession $customerSession,
         private readonly GeneralConfigProvider $generalConfigProvider,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
         private readonly ProductRepositoryInterface $productRepository,
@@ -66,6 +72,7 @@ class Widget implements ArgumentInterface
         private readonly LoggerInterface $logger,
         private readonly AuthConfigProvider $authConfigProvider,
         private readonly IziApiConfigProvider $iziApiConfigProvider,
+        private readonly DigitalQuoteValidator $digitalQuoteValidator,
         private readonly TestModeProvider $testModeProvider
     ) {
     }
@@ -228,9 +235,22 @@ class Widget implements ArgumentInterface
 
     public function validateProductIsSaleableById(int $productId): bool
     {
+        $isValid = false;
         $product = $this->getProductById($productId);
 
-        return $product && $product->isSaleable();
+        if ($product && $product->isSaleable()) {
+            $isValid = true;
+            $storeId = (int)$product->getStoreId();
+
+            if ($product->isVirtual()
+                && $this->digitalQuoteValidator->isLoggedInAccountRequiredForDigitalQuotes($storeId)
+                && !$this->isCustomerLoggedIn()
+            ) {
+                $isValid = false;
+            }
+        }
+
+        return $isValid;
     }
 
     private function getProductById(int $productId): ?Product
@@ -313,5 +333,19 @@ class Widget implements ArgumentInterface
             && !empty($clientSecret)
             && !empty($authTokenUrl)
             && !empty($iziApiUrl);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isCustomerLoggedIn(): bool
+    {
+        try {
+            $customerGroupId = (int)$this->customerSession->getCustomerGroupId();
+
+            return $customerGroupId !== GroupManagement::NOT_LOGGED_IN_ID;
+        } catch (NoSuchEntityException | LocalizedException $e) {
+            return false;
+        }
     }
 }
