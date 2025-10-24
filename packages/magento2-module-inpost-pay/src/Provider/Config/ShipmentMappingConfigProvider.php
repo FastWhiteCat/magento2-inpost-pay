@@ -17,6 +17,7 @@ class ShipmentMappingConfigProvider
 
     public const OPTION_STANDARD = 'STANDARD';
     private const XML_PATH_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/inpost_%s_%s_mapping';
+    private const XML_PATH_OTHER_DELIVERY_MAPPING_PATTERN = 'payment/inpost_pay/other_inpost_%s_%s_mapping';
     private const XML_PATH_DELIVERY_DEADLINE_IN_DAYS = 'payment/inpost_pay/delivery_deadline_in_days';
     private const XML_PATH_USE_COLLECT_ADDRESS_TOTALS = 'payment/inpost_pay/estimate_with_collect_address_totals';
     private const XML_PATH_DIGITAL_DELIVERY_DEADLINE_IN_SEC = 'payment/inpost_pay/digital_delivery_deadline_in_days';
@@ -40,9 +41,15 @@ class ShipmentMappingConfigProvider
      */
     public function getCarrierMethodCodeForOptions(string $deliveryType, string $option, ?int $storeId = null): string
     {
-        $carrierConfigPattern = self::XML_PATH_DELIVERY_MAPPING_PATTERN;
-        $carrierConfigPath = sprintf($carrierConfigPattern, strtolower($deliveryType), strtolower($option));
-        $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_STORE, $storeId);
+        $otherCarrierConfigPattern = self::XML_PATH_OTHER_DELIVERY_MAPPING_PATTERN;
+        $otherCarrierConfigPath = sprintf($otherCarrierConfigPattern, strtolower($deliveryType), strtolower($option));
+        $carrier = $this->scopeConfig->getValue($otherCarrierConfigPath, ScopeInterface::SCOPE_STORE, $storeId);
+
+        if (empty($carrier) || !is_scalar($carrier)) {
+            $carrierConfigPattern = self::XML_PATH_DELIVERY_MAPPING_PATTERN;
+            $carrierConfigPath = sprintf($carrierConfigPattern, strtolower($deliveryType), strtolower($option));
+            $carrier = $this->scopeConfig->getValue($carrierConfigPath, ScopeInterface::SCOPE_STORE, $storeId);
+        }
 
         if (empty($carrier) || !is_scalar($carrier)) {
             throw new InPostPayInternalException(

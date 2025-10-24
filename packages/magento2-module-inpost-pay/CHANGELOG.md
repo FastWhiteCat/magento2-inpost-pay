@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.1] - 2025-10-22
+
+### Added
+
+- Added Owebia Advanced Shipping support by adding a configuration field for mapping custom shipping method code not present in a dropdown list. 
+
 ## [2.3.0] - 2025-10-01
 
 ### Added
