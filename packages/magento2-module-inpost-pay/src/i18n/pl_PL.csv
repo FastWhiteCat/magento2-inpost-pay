@@ -334,3 +334,20 @@
 "Cart URL","Adres URL Koszyka",module,InPost_InPostPay
 "<![CDATA[If a custom or third-party delivery method You use in Checkout is not present on the list above, enter full method code here.</br>For example, in case of Owebia it could be: owsh1_added_method_code. Leave empty if You selected Your method from a dropdown list.</br>]]>","<![CDATA[Jeśli niestandardowa lub zewnętrzna metoda dostawy używana w Checkout nie jest dostępna na powyższej liście, wprowadź tutaj pełny kod metody.</br>Na przykład, dla wtyczki Owebia może to być: owsh1_added_method_code. Pozostaw puste, jeśli wybrałeś metodę z listy rozwijanej.</br>]]>",module,InPost_InPostPay
 "If a custom or third-party delivery method You use in Checkout is not present on the list above, enter full method code here.</br>For example, in case of Owebia it could be: owsh1_added_method_code. Leave empty if You selected Your method from a dropdown list.</br>","Jeśli niestandardowa lub zewnętrzna metoda dostawy używana w Checkout nie jest dostępna na powyższej liście, wprowadź tutaj pełny kod metody.</br>Na przykład, dla wtyczki Owebia może to być: owsh1_added_method_code. Pozostaw puste, jeśli wybrałeś metodę z listy rozwijanej.</br>",module,InPost_InPostPay
+"Squared","Kwadratowa"
+"Rounded","Zaokrąglona"
+"Round","Okrągła"
+"Very Small","Bardzo mały"
+"Small","Mały"
+"Medium","Średni"
+"Large","Duży"
+"Very Large","Bardzo duży"
+"Yellow","Żółty"
+"Black","Czarny"
+"Light","Jasny"
+"Dark","Ciemny"
+"Widget background color","Kolor tła widgetu"
+"Define a widget background whether it is light or dark color of elements in the widget background.","Zdefiniuj tło widżetu, czy elementy strony pod widgetem są jasne czy ciemne."
+"Widget color variant","Wariant kolorystyczny widgetu"
+"Widget size","Rozmiar widgetu"
+"Widget frame shape","Kształt ramki widgetu"
