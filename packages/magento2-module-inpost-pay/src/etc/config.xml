@@ -32,7 +32,7 @@
                 <success_page_enabled>1</success_page_enabled>
                 <success_page_url>checkout/onepage/success</success_page_url>
                 <widget_background_color>light</widget_background_color>
-                <widget_color_variant>yellow</widget_color_variant>
+                <widget_color_variant>primary</widget_color_variant>
                 <widget_size>size-md</widget_size>
                 <widget_frame_shape>square</widget_frame_shape>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
