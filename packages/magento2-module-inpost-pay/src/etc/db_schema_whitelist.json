@@ -21,6 +21,7 @@
             "inpost_pay_account_email": true,
             "delivery_email": true,
             "digital_delivery_email": true,
+            "is_timed_out": true,
             "created_at": true,
             "updated_at": true,
             "order_with_invoice": true,
