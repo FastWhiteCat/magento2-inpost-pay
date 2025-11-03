@@ -19,19 +19,11 @@ class TimedOutOrderDescription extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $description = __(
+        return __(
             'Time out order problem might occur if Merchant processes order create request for more than %1 seconds.',
             Timeout::TIMEOUT_THRESHOLD_SECONDS
         )->render() . '<br/>' .
-        __('If that happens, the request is completed, order is placed in Merchant Store,')->render() . '<br/>' .
-        __('however in the Mobile InPost Pay App time out has already been displayed ')->render() . '<br/>' .
-        __('making that order impossible to be paid by customer.')->render();
-
-        $recommendation = __(
-            'To avoid this problem, make sure that order create request processing takes less than %1 seconds.',
-            Timeout::TIMEOUT_THRESHOLD_SECONDS
-        )->render() . '<br/>' .
-        __(',')->render() . '<br/>' .
+        __('If that happens, the request is completed, order is placed in Merchant Store, ')->render() . '<br/>' .
         __('however in the Mobile InPost Pay App time out has already been displayed ')->render() . '<br/>' .
         __('making that order impossible to be paid by customer.')->render();
     }

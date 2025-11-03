@@ -38,5 +38,13 @@
                 <field id="order_errors_handling_timeout_can_change_status">1</field>
             </depends>
         </field>
+        <field id="order_errors_handling_timed_out_cron_schedule" translate="label" type="text" sortOrder="50" showInDefault="1" canRestore="1">
+            <label>Timed Out Orders Handling CRON Schedule</label>
+            <comment>5,35 * * * * for example causes this CRON to run every at minute 5 and 35 of each hour</comment>
+            <config_path>payment/inpost_pay/order_errors_handling_timed_out_cron_schedule</config_path>
+            <depends>
+                <field id="order_errors_handling_timeout_is_enabled">1</field>
+            </depends>
+        </field>
     </group>
 </include>

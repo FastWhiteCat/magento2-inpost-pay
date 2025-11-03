@@ -853,4 +853,9 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Cron\HandleTimedOutOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
 </config>

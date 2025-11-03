@@ -16,13 +16,10 @@
         <plugin name="InPost_InPostPay::addAdditionalQuoteProductAttributesPlugin"
                 type="InPost\InPostPay\Plugin\Quote\AddAdditionalQuoteProductAttributesPlugin" />
     </type>
-
-    <!-- Plugin to measure execution time of order creation and mark timeouts -->
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
         <plugin name="InPost_InPostPay::orderCreateExecutionTimePlugin"
                 type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\OrderCreateExecutionTimePlugin"/>
     </type>
-
     <type name="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
