@@ -351,3 +351,20 @@
 "Cancel order","Anuluj zamówienie",module,InPost_InPostPay
 "Timed Out Orders Handling CRON Schedule","Harmonogram CRON obsługi zamówień z przekroczonym czasem żądania",module,InPost_InPostPay
 "5,35 * * * * for example causes this CRON to run every at minute 5 and 35 of each hour","5,35 * * * * przykładowo, sprawi że CRON będzie uruchamiał proces o każdej 5-tej i 35-tej minucie godziny",module,InPost_InPostPay
+"Squared","Kwadratowa"
+"Rounded","Zaokrąglona"
+"Round","Okrągła"
+"Very Small","Bardzo mały"
+"Small","Mały"
+"Medium","Średni"
+"Large","Duży"
+"Very Large","Bardzo duży"
+"Yellow","Żółty"
+"Black","Czarny"
+"Light","Jasny"
+"Dark","Ciemny"
+"Widget background color","Kolor tła widgetu"
+"Define a widget background whether it is light or dark color of elements in the widget background.","Zdefiniuj tło widżetu, czy elementy strony pod widgetem są jasne czy ciemne."
+"Widget color variant","Wariant kolorystyczny widgetu"
+"Widget size","Rozmiar widgetu"
+"Widget frame shape","Kształt ramki widgetu"

@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider\Config;
 
+use InPost\InPostPay\Model\Config\Source\BackgroundColor;
+use InPost\InPostPay\Model\Config\Source\ColorVariant;
+use InPost\InPostPay\Model\Config\Source\FrameStyle;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
 class LayoutConfigProvider
 {
+    private const XML_PATH_BACKGROUND_COLOR = 'payment/inpost_pay/widget_background_color';
+    private const XML_PATH_COLOR_VARIANT = 'payment/inpost_pay/widget_color_variant';
     private const XML_PATH_SIZE = 'payment/inpost_pay/widget_size';
-    private const XML_PATH_FRAME_STYLE = 'payment/inpost_pay/widget_frame_style';
+    private const XML_PATH_FRAME_SHAPE = 'payment/inpost_pay/widget_frame_shape';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -25,9 +30,14 @@ class LayoutConfigProvider
      */
     public function getWidgetStyles(?int $websiteId = null): string
     {
-        $styles = array_merge($this->getFrameStyles($websiteId), [$this->getSize($websiteId)]);
+        $styles = [
+            $this->getBackgroundColor($websiteId),
+            $this->getColorVariant($websiteId),
+            $this->getFrameShape($websiteId),
+            $this->getSize($websiteId)
+        ];
 
-        return implode(' ', $styles);
+        return (string)preg_replace('/\s+/', ' ', trim(implode(' ', $styles)));
     }
 
     /**
@@ -47,16 +57,52 @@ class LayoutConfigProvider
 
     /**
      * @param int|null $websiteId
-     * @return string[]
+     * @return string
      */
-    public function getFrameStyles(?int $websiteId = null): array
+    public function getFrameShape(?int $websiteId = null): string
     {
-        $values = $this->scopeConfig->getValue(
-            self::XML_PATH_FRAME_STYLE,
+        $frameShape = $this->scopeConfig->getValue(
+            self::XML_PATH_FRAME_SHAPE,
             ScopeInterface::SCOPE_WEBSITE,
             $websiteId
         );
 
-        return explode(',', is_scalar($values) ? (string)$values : '');
+        $frameShape = is_scalar($frameShape) ? (string)$frameShape : FrameStyle::SQUARED;
+
+        return empty($frameShape) ? FrameStyle::SQUARED : $frameShape;
+    }
+
+    /**
+     * @param int|null $websiteId
+     * @return string
+     */
+    public function getBackgroundColor(?int $websiteId = null): string
+    {
+        $backgroundColor = $this->scopeConfig->getValue(
+            self::XML_PATH_BACKGROUND_COLOR,
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
+        );
+
+        $backgroundColor = is_scalar($backgroundColor) ? (string)$backgroundColor : BackgroundColor::LIGHT;
+
+        return $backgroundColor === BackgroundColor::LIGHT ? '' : BackgroundColor::DARK;
+    }
+
+    /**
+     * @param int|null $websiteId
+     * @return string
+     */
+    public function getColorVariant(?int $websiteId = null): string
+    {
+        $colorVariant = $this->scopeConfig->getValue(
+            self::XML_PATH_COLOR_VARIANT,
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
+        );
+
+        $colorVariant = is_scalar($colorVariant) ? (string)$colorVariant : ColorVariant::PRIMARY;
+
+        return $colorVariant === ColorVariant::SECONDARY ? '' : ColorVariant::PRIMARY;
     }
 }
