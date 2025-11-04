@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] - 2025-11-04
+
+### Added
+
+- Added support for Hyva Theme and Hyva Checkout (requires installation of InPost Pay Hyva module)
+- Added new configuration for InPost Pay timed-out orders error handling
+- Changed configuration for widget styles
+
 ## [2.3.1] - 2025-10-22
 
 ### Added

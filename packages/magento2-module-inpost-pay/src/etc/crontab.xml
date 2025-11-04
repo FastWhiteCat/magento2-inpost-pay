@@ -14,5 +14,9 @@
              instance="InPost\InPostPay\Cron\SendAnalyticsData" method="execute">
             <config_path>payment/inpost_pay/analytics_async_sending_cron_schedule</config_path>
         </job>
+        <job name="inpostpay_handle_timed_out_orders"
+             instance="InPost\InPostPay\Cron\HandleTimedOutOrders" method="execute">
+            <config_path>payment/inpost_pay/order_errors_handling_timed_out_cron_schedule</config_path>
+        </job>
     </group>
 </config>

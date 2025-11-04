@@ -299,6 +299,30 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::GCLID, $gclid);
     }
 
+    public function isTimedOut(): bool
+    {
+        $isTimedOut = $this->getData(self::IS_TIMED_OUT);
+
+        return is_scalar($isTimedOut) && (bool)$isTimedOut;
+    }
+
+    public function setIsTimedOut(bool $isTimedOut): InPostPayOrderInterface
+    {
+        return $this->setData(self::IS_TIMED_OUT, $isTimedOut);
+    }
+
+    public function isTimeOutHandled(): bool
+    {
+        $isHandled = $this->getData(self::IS_TIME_OUT_HANDLED);
+
+        return is_scalar($isHandled) && (bool)$isHandled;
+    }
+
+    public function setIsTimeOutHandled(bool $isTimeOutHandled): InPostPayOrderInterface
+    {
+        return $this->setData(self::IS_TIME_OUT_HANDLED, $isTimeOutHandled);
+    }
+
     public function getSerializedAnalyticsData(): ?string
     {
         $serializedData = $this->getData(self::SERIALIZED_ANALYTICS_DATA);
