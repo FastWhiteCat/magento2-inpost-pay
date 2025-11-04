@@ -16,7 +16,16 @@
         <plugin name="InPost_InPostPay::addAdditionalQuoteProductAttributesPlugin"
                 type="InPost\InPostPay\Plugin\Quote\AddAdditionalQuoteProductAttributesPlugin" />
     </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
+        <plugin name="InPost_InPostPay::orderCreateExecutionTimePlugin"
+                type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\OrderCreateExecutionTimePlugin"/>
+    </type>
     <type name="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\OrderCreateExecutionTimePlugin">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

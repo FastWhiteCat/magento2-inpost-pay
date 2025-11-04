@@ -20,6 +20,7 @@ $language = $widgetViewModel->getCurrentLanguageCode();
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 $enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
 $productId = $block->getData('productId');
+$isCart = $block->getData('isCart');
 ?>
 
 <script>
@@ -51,13 +52,15 @@ $productId = $block->getData('productId');
             cart: false,
             basketBindingApiKey: false,
             isInitialized: false,
+            widget: false,
             configuration: {
                 merchantClientId: "<?= $merchantClientId ?>",
                 bindingPlace: "<?= $bindingPlace ?>",
                 language: "<?= $language ?>",
                 scriptUrl: "<?= $scriptUrl ?>",
                 enabledAnalyticsParams: "<?= $enabledAnalyticsParams ?>",
-                productId: "<?= $productId ?>"
+                productId: "<?= $productId ?>",
+                isCart: "<?= $isCart ?>" || "0"
             },
 
             /**
@@ -109,6 +112,10 @@ $productId = $block->getData('productId');
             },
 
             receiveCustomerData(data) {
+                if (!window.InPostPayWidget && this.configuration.bindingPlace === BASKET_POPUP_BINDING_PLACE_NAME) {
+                    return;
+                }
+
                 if (data.cart) {
                     this.cart = data.cart;
                 }
@@ -119,6 +126,20 @@ $productId = $block->getData('productId');
                     this.isInitialized = true;
                 }
 
+            },
+
+            receiveCartUpdate({isLoading}) {
+                if (isLoading) {
+                    window.InPostPayWidget = undefined;
+                    document.getElementById('inpost-api')?.remove();
+                }
+            },
+
+            receiveCartRemove() {
+                setTimeout(() => {
+                    window.InPostPayWidget = undefined;
+                    document.getElementById('inpost-api')?.remove();
+                }, 500)
             },
 
             initializeWidget() {
@@ -140,7 +161,12 @@ $productId = $block->getData('productId');
                     webView: this.configuration.webView ? this.configuration.webView : undefined
                 };
 
-                const widget = InPostPayWidget.init(widgetOptions);
+
+                this.widget = InPostPayWidget.init(widgetOptions);
+
+                if (this.configuration.isCart && Number(this.configuration.isCart)) {
+                    this.widget.rerender();
+                }
             },
 
             checkIfProductIsAdded(id, cartData, $productForm) {

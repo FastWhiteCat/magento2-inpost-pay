@@ -8,6 +8,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class FrameStyle implements OptionSourceInterface
 {
+    public const SQUARED = 'squared';
     public const ROUND = 'round';
     public const ROUNDED = 'rounded';
     public const DARK = 'dark';
@@ -17,22 +18,17 @@ class FrameStyle implements OptionSourceInterface
     {
         return [
             [
-                'value' => self::ROUND,
-                'label' => __('%1 - max border radius', self::ROUND)
+                'value' => self::SQUARED,
+                'label' => __('Squared')
             ],
             [
                 'value' => self::ROUNDED,
-                'label' => __('%1 - border radius 8px, if together with \'round\' - \'round\' is used', self::ROUNDED)
+                'label' => __('Rounded')
             ],
             [
-                'value' => self::DARK,
-                'label' => __('%1 - footer text is white', self::DARK)
-            ],
-            [
-                'value' => self::PRIMARY,
-                'label' => __('%1 - widget background is yellow', self::PRIMARY)
-            ],
-
+                'value' => self::ROUND,
+                'label' => __('Round')
+            ]
         ];
     }
 }
