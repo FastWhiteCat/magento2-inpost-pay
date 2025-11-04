@@ -38,6 +38,8 @@ interface InPostPayOrderInterface
     public const DIGITAL_DELIVERY_EMAIL = 'digital_delivery_email';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
+    public const IS_TIMED_OUT = 'is_timed_out';
+    public const IS_TIME_OUT_HANDLED = 'is_time_out_handled';
 
     public function getInPostPayOrderId(): ?int;
     public function setInPostPayOrderId(int $inPostPayOrderId): InPostPayOrderInterface;
@@ -133,4 +135,26 @@ interface InPostPayOrderInterface
      * @throws LocalizedException
      */
     public function getUpdatedAt(): string;
+
+    /**
+     * @return bool
+     */
+    public function isTimedOut(): bool;
+
+    /**
+     * @param bool $isTimedOut
+     * @return InPostPayOrderInterface
+     */
+    public function setIsTimedOut(bool $isTimedOut): InPostPayOrderInterface;
+
+    /**
+     * @return bool
+     */
+    public function isTimeOutHandled(): bool;
+
+    /**
+     * @param bool $isTimeOutHandled
+     * @return InPostPayOrderInterface
+     */
+    public function setIsTimeOutHandled(bool $isTimeOutHandled): InPostPayOrderInterface;
 }

@@ -31,8 +31,10 @@
                 <send_session_cookie>0</send_session_cookie>
                 <success_page_enabled>1</success_page_enabled>
                 <success_page_url>checkout/onepage/success</success_page_url>
+                <widget_background_color>light</widget_background_color>
+                <widget_color_variant>primary</widget_color_variant>
                 <widget_size>size-md</widget_size>
-                <widget_frame_style>primary</widget_frame_style>
+                <widget_frame_shape>square</widget_frame_shape>
                 <izi_api_url>https://api.inpost.pl/</izi_api_url>
                 <widget_script_url>https://inpostpay-widget-v2.inpost.pl/inpostpay.widget.v2.js</widget_script_url>
                 <use_defined_payment_methods>0</use_defined_payment_methods>
@@ -67,6 +69,8 @@
                 <analytics_async_sending_cron_schedule>*/5 * * * *</analytics_async_sending_cron_schedule>
                 <sending_fbclid_enabled>0</sending_fbclid_enabled>
                 <sending_gclid_enabled>0</sending_gclid_enabled>
+                <order_errors_handling_timeout_is_enabled>0</order_errors_handling_timeout_is_enabled>
+                <order_errors_handling_timed_out_cron_schedule>5,35 * * * *</order_errors_handling_timed_out_cron_schedule>
             </inpost_pay>
         </payment>
     </default>

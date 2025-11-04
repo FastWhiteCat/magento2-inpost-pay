@@ -334,3 +334,37 @@
 "Cart URL","Adres URL Koszyka",module,InPost_InPostPay
 "<![CDATA[If a custom or third-party delivery method You use in Checkout is not present on the list above, enter full method code here.</br>For example, in case of Owebia it could be: owsh1_added_method_code. Leave empty if You selected Your method from a dropdown list.</br>]]>","<![CDATA[Jeśli niestandardowa lub zewnętrzna metoda dostawy używana w Checkout nie jest dostępna na powyższej liście, wprowadź tutaj pełny kod metody.</br>Na przykład, dla wtyczki Owebia może to być: owsh1_added_method_code. Pozostaw puste, jeśli wybrałeś metodę z listy rozwijanej.</br>]]>",module,InPost_InPostPay
 "If a custom or third-party delivery method You use in Checkout is not present on the list above, enter full method code here.</br>For example, in case of Owebia it could be: owsh1_added_method_code. Leave empty if You selected Your method from a dropdown list.</br>","Jeśli niestandardowa lub zewnętrzna metoda dostawy używana w Checkout nie jest dostępna na powyższej liście, wprowadź tutaj pełny kod metody.</br>Na przykład, dla wtyczki Owebia może to być: owsh1_added_method_code. Pozostaw puste, jeśli wybrałeś metodę z listy rozwijanej.</br>",module,InPost_InPostPay
+"Order has been placed but process took %1s.","Zamówienie zostało złożone ale proces zajął %1s.",module,InPost_InPostPay
+"Limit for order placing execution time is %1s.","Limit czasu procesowania tworzenia zamówienia to %1s.",module,InPost_InPostPay
+"Customer will not be able to complete and pay for that order in Mobile App.","Klient nie będzie mógł dokończyć i zapłacić za to zamówienie w Aplikacji Mobilnej.",module,InPost_InPostPay
+"InPost Pay Timed Out Order Handling: %1","InPost Pay Obsługa Przekroczonego Czasu Składania Zamówienia: %1",module,InPost_InPostPay
+"Order has been canceled because timed out orders cannot be paid by customer.","Zamówienie zostało anulowane ponieważ po przekroczeniu czasu procesowania składania zamówienia klient nie ma możliwości jego opłacenia.",module,InPost_InPostPay
+"Order status has changed because it was timed out while placing.","Status zamówienia uległ zmianie ze względu na przekroczony czas procesowania składania zamówienia.",module,InPost_InPostPay
+"Time out order problem might occur if Merchant processes order create request for more than %1 seconds.","Problem przekroczenia czasu składania zamówienia może wystąpić jeśli Sklep Merchanta procesuje żądanie utworzenia zamówienia przez dłużej niż %1 sekund.",module,InPost_InPostPay
+"If that happens, the request is completed, order is placed in Merchant Store, ","Jeśli dojdzie do takiej sytuacji, żądanie jest ukończone, zamówienie złożone w Sklepie Sprzedawcy, ",module,InPost_InPostPay
+"however in the Mobile InPost Pay App time out has already been displayed ","jednakże po stronie Aplikacji Mobilnej InPost Pay zostanie pokazany błąd przekroczenia czasu żądania ",module,InPost_InPostPay
+"making that order impossible to be paid by customer.","sprawiając, że to zamówienie będzie niemożliwe do dokończenia i opłacenia przez klienta.",module,InPost_InPostPay
+"Order Time Out Error Description","Opis Błędu Przekroczenia Czasu Żądania",module,InPost_InPostPay
+"Enable handling timed out errors","Włącz obsługę błędów przekroczenia czasu żądania",module,InPost_InPostPay
+"Timeout during order creation process","Przekroczenie czasu żądania procesu składania zamówienia",module,InPost_InPostPay
+"Order Errors Handling Settings","Ustawienia Obsługi Błędów Zamówień",module,InPost_InPostPay
+"Cancel order","Anuluj zamówienie",module,InPost_InPostPay
+"Timed Out Orders Handling CRON Schedule","Harmonogram CRON obsługi zamówień z przekroczonym czasem żądania",module,InPost_InPostPay
+"5,35 * * * * for example causes this CRON to run every at minute 5 and 35 of each hour","5,35 * * * * przykładowo, sprawi że CRON będzie uruchamiał proces o każdej 5-tej i 35-tej minucie godziny",module,InPost_InPostPay
+"Squared","Kwadratowa"
+"Rounded","Zaokrąglona"
+"Round","Okrągła"
+"Very Small","Bardzo mały"
+"Small","Mały"
+"Medium","Średni"
+"Large","Duży"
+"Very Large","Bardzo duży"
+"Yellow","Żółty"
+"Black","Czarny"
+"Light","Jasny"
+"Dark","Ciemny"
+"Widget background color","Kolor tła widgetu"
+"Define a widget background whether it is light or dark color of elements in the widget background.","Zdefiniuj tło widżetu, czy elementy strony pod widgetem są jasne czy ciemne."
+"Widget color variant","Wariant kolorystyczny widgetu"
+"Widget size","Rozmiar widgetu"
+"Widget frame shape","Kształt ramki widgetu"
