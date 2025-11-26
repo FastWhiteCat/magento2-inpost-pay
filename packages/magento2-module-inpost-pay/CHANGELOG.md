@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.1] - 2025-11-26
+
+### Fixed
+- Resolved an issue where previous order emails could be added to subsequent orders in mass processing scenarios by clearing registry state.
+
 ## [2.4.0] - 2025-11-04
 
 ### Added

@@ -30,6 +30,7 @@ class RegisterInPostPayOrderAccountEmailObserver implements ObserverInterface
 
     public function execute(Observer $observer): void
     {
+        $this->inPostPayOrderEmailSenderRegistry->unregister();
         $orderDetails = $observer->getEvent()->getData(OrderInterface::ORDER_DETAILS);
         $accountInfo = $observer->getEvent()->getData(OrderInterface::ACCOUNT_INFO);
         $delivery = $observer->getEvent()->getData(OrderInterface::DELIVERY);
