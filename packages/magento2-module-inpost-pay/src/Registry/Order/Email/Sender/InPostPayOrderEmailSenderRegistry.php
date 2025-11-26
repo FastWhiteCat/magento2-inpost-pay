@@ -19,4 +19,9 @@ class InPostPayOrderEmailSenderRegistry
     {
         return $this->inPostPayOrder;
     }
+
+    public function unregister(): void
+    {
+        $this->inPostPayOrder = null;
+    }
 }

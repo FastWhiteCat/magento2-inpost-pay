@@ -54,6 +54,7 @@ class AddCopyToOrderEmailsForInPostPayAccountEmailPlugin
         $originalResult = $result;
         $modifiedResult = is_array($result) ? $result : [];
         $inPostPayOrder = $this->inPostPayOrderEmailSenderRegistry->registry();
+        $this->inPostPayOrderEmailSenderRegistry->unregister();
 
         if ($inPostPayOrder === null) {
             return $modifiedResult;
