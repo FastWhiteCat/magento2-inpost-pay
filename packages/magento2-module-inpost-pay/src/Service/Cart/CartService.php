@@ -145,7 +145,9 @@ class CartService
      */
     public function applyPromo(Quote $quote, string $couponCode): void
     {
-        if (is_scalar($quote->getId())) {
+        $quoteId = $quote->getId();
+        if (is_scalar($quoteId)) {
+            $quoteId = (int)$quoteId;
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
             $appliedCoupon = $quote->getCouponCode();
@@ -153,7 +155,7 @@ class CartService
             $basketId = (string)$quote->getData(InPostPayQuoteInterface::INPOST_BASKET_ID);
 
             try {
-                $this->couponManagement->set((int)$quote->getId(), $couponCode);
+                $this->couponManagement->set($quoteId, $couponCode);
 
                 if ($appliedCoupon && strtolower($appliedCoupon) === strtolower($couponCode)) {
                     $this->createBasketNotice->execute(
@@ -188,7 +190,7 @@ class CartService
                 }
             }
             $this->logger->debug(
-                sprintf('Coupon code: %s has been applied to quote ID %s', $couponCode, (int)$quote->getId())
+                sprintf('Coupon code: %s has been applied to quote ID %s', $couponCode, $quoteId)
             );
         }
     }
@@ -198,12 +200,14 @@ class CartService
      */
     public function removePromosFromQuote(Quote $quote): void
     {
-        if (is_scalar($quote->getId())) {
+        $quoteId = $quote->getId();
+        if (is_scalar($quoteId)) {
+            $quoteId = (int)$quoteId;
             $quote->setData(CartService::ALLOW_INPOST_PAY_QUOTE_REMOTE_ACCESS, true);
             $quote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
-            $this->couponManagement->remove((int)$quote->getId());
+            $this->couponManagement->remove($quoteId);
             $this->logger->debug(
-                sprintf('Coupon codes have been removed from quote ID %s', (int)$quote->getId())
+                sprintf('Coupon codes have been removed from quote ID %s', $quoteId)
             );
         }
     }
