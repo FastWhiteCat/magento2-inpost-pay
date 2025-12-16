@@ -3,9 +3,7 @@
     "description": "Module integrates InPost Pay Mobile application with Magento store.",
     "version": "2.4.2",
     "type": "magento2-module",
-    "license": [
-        "CC-BY-NC-ND-4.0"
-    ],
+    "license": ["CC-BY-NC-ND-4.0"],
     "require": {
         "php": ">=8.1",
         "laminas/laminas-http": "*",
