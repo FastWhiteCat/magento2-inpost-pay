@@ -51,7 +51,7 @@
                 <anonymise_objects_enabled>1</anonymise_objects_enabled>
                 <can_capture>1</can_capture>
                 <can_refund>1</can_refund>
-                <is_offline>1</is_offline>
+                <is_offline>0</is_offline>
                 <use_address_as_firstname_source>0</use_address_as_firstname_source>
                 <omnibus_lowest_price_product_attribute>none</omnibus_lowest_price_product_attribute>
                 <enable_custom_promo_price_for_customer_group>0</enable_custom_promo_price_for_customer_group>
