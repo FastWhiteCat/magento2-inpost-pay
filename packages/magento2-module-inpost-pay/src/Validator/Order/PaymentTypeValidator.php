@@ -22,8 +22,9 @@ class PaymentTypeValidator implements OrderValidatorInterface
     public function validate(Quote $quote, InPostPayQuoteInterface $inPostPayQuote, OrderInterface $inPostOrder): void
     {
         $orderPaymentType = $inPostOrder->getOrderDetails()->getPaymentType();
+        $basketPrice = $inPostOrder->getOrderDetails()->getBasketPrice();
 
-        if ($inPostOrder->getOrderDetails()->getBasketPrice()->getGross() === 0.00) {
+        if ($basketPrice && $basketPrice->getGross() === 0.00) {
             $acceptedPaymentTypes = [OrderDetailsInterface::FREE_ORDER];
         } else {
             $acceptedPaymentTypes = $this->iziApiConfigProvider->getAcceptedPaymentTypes();

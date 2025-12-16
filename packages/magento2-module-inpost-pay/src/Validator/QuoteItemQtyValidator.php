@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Validator;
 
 use InPost\InPostPay\Exception\QuoteItemOutOfStockException;
-use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status as ProductStatus;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -63,12 +63,8 @@ class QuoteItemQtyValidator
                 throw new NoSuchEntityException(__('Product ID: %1 not found.', $productId));
             }
 
-            $quoteItem = $quote->getItemByProduct($product);
             $name = $product->getName();
-            $itemQty = 0;
-            if ($quoteItem instanceof Item) {
-                $itemQty = $quoteItem->getQty();
-            }
+            $itemQty = $this->getQtyOfItemInCartByProduct($quote, $product);
 
             $stockId = (int)$this->stockByWebsiteIdResolver->execute($websiteId)->getStockId();
             $stockItemConfiguration = $this->getStockItemConfiguration->execute($product->getSku(), $stockId);
@@ -90,6 +86,23 @@ class QuoteItemQtyValidator
                 )
             );
         }
+    }
+
+    private function getQtyOfItemInCartByProduct(Quote $quote, Product $product): float
+    {
+        $quoteItem = $quote->getItemByProduct($product);
+        $quoteItem = $quoteItem === false ? $this->getItemByProduct($quote, $product) : $quoteItem;
+        $itemQty = 0;
+        if ($quoteItem instanceof Item) {
+            $itemQty = $quoteItem->getQty();
+
+            if ($quoteItem->getParentItemId()) {
+                $parentItem = $quote->getItemById($quoteItem->getParentItemId());
+                $itemQty = $parentItem ? $parentItem->getQty() : $quoteItem->getQty();
+            }
+        }
+
+        return (float)$itemQty;
     }
 
     private function getBundleQuantity(
@@ -141,5 +154,45 @@ class QuoteItemQtyValidator
         }
 
         return (float)$stockQuantity;
+    }
+
+    private function getItemByProduct(Quote $quote, Product $product): ?Item
+    {
+        /** @phpstan-ignore-next-line */
+        $items = $quote->getItemsCollection()->getItemsByColumnValue('product_id', $product->getId());
+
+        foreach ($items as $item) {
+            if (!$item->isDeleted()
+                && $item->getProduct()
+                && $item->getProduct()->getStatus() !== ProductStatus::STATUS_DISABLED
+                && $this->representProduct($item, $product)
+            ) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    public function representProduct(Item $item, Product $product): bool
+    {
+        $itemProduct = $item->getProduct();
+        if ($itemProduct->getId() != $product->getId()) {
+            return false;
+        }
+
+        /** @phpstan-ignore-next-line */
+        $stickWithinParent = $product->getStickWithinParent();
+        if ($stickWithinParent) {
+            if ($item->getParentItem() !== $stickWithinParent) {
+                return false;
+            }
+        }
+
+        // Original Option Check (\Magento\Quote\Model\Quote\Item::representProduct) is not being verified
+        // because InPost Pay currently does not support products with customized options.
+        // Currently, it is impossible to gather the same buyRequest from InPost Pay payload with options.
+
+        return true;
     }
 }
