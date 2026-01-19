@@ -77,6 +77,8 @@
                 type="InPost\InPostPay\Service\Order\OrderLockerService"/>
     <preference for="InPost\InPostPay\Api\Validator\SignatureValidatorInterface"
                 type="InPost\InPostPay\Validator\SignatureValidator"/>
+    <preference for="InPost\InPostPay\Api\Validator\RefundWebhookSignatureValidatorInterface"
+                type="InPost\InPostPay\Validator\RefundWebhookSignatureValidator"/>
     <preference for="InPost\InPostPay\Api\ApiConnector\ConnectorInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Connector"/>
     <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
@@ -107,12 +109,20 @@
                 type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
     <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
                 type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\RefundEventInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\RefundEvent"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\OrderUpdate"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Order\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\EventDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\EventData\AmountInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\EventData\Amount"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\EventData\PaymentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\EventData\Payment"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface"
                 type="InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessData"/>
     <preference for="InPost\InPostPay\Api\Data\Merchant\RefundInterface"
@@ -479,6 +489,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\RefundWebhookSignatureValidator">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
