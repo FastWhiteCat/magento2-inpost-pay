@@ -103,6 +103,10 @@
                 type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
     <preference for="InPost\InPostPay\Api\InPostPayBasketNoticeRepositoryInterface"
                 type="InPost\InPostPay\Model\InPostPayBasketNoticeRepository"/>
+    <preference for="InPost\InPostPay\Api\RefundTransactionRepositoryInterface"
+                type="InPost\InPostPay\Model\RefundTransactionRepository"/>
+    <preference for="InPost\InPostPay\Api\Data\RefundTransactionInterface"
+                type="InPost\InPostPay\Model\RefundTransaction"/>
     <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
                 type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
     <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
@@ -869,6 +873,11 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Cron\HandleTimedOutOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\SaveRefundTransactionMappingAfterCreditmemoCommit">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

@@ -76,6 +76,7 @@ class RefundEventSignatureValidationPolicyPlugin
 
         if ($this->isJson($requestBody)) {
             $requestParams = $this->jsonSerializer->unserialize($requestBody);
+            $requestParams = is_array($requestParams) ? $requestParams : [];
         }
 
         $requestData = [
@@ -121,7 +122,7 @@ class RefundEventSignatureValidationPolicyPlugin
         return $this->debugConfigProvider->getMinLogLevel() <= Logger::DEBUG;
     }
 
-    private function  isJson(string $string): bool
+    private function isJson(string $string): bool
     {
         $data = json_decode($string, true);
 

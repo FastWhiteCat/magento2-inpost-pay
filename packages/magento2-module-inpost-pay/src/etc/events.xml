@@ -168,4 +168,8 @@
     <event name="email_creditmemo_set_template_vars_before">
         <observer name="InPost_InPostPay::inPostPayCreditmemoEmailSenderObserver" instance="InPost\InPostPay\Observer\Order\Email\Sender\InPostPayOrderEmailSenderObserver" />
     </event>
+    <event name="sales_order_creditmemo_save_commit_after">
+        <observer name="InPost_InPostPay::saveRefundTransactionMappingAfterCreditmemoCommit"
+                  instance="InPost\InPostPay\Observer\SaveRefundTransactionMappingAfterCreditmemoCommit" />
+    </event>
 </config>

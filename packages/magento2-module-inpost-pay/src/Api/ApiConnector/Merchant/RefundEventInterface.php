@@ -10,6 +10,7 @@ interface RefundEventInterface
      * @param string $eventType
      * @param \InPost\InPostPay\Api\Data\Merchant\Refund\EventDataInterface $eventData
      * @throws \Magento\Framework\Webapi\Exception
+     * @return bool
      */
     public function execute(
         string $eventType,

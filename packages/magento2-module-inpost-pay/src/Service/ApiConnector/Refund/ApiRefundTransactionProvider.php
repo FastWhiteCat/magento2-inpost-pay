@@ -52,6 +52,7 @@ class ApiRefundTransactionProvider
 
         if ($forceSleep) {
             // Only when handling error, that process should not be triggered in loops
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
             sleep(10);
         }
 
@@ -202,7 +203,7 @@ class ApiRefundTransactionProvider
      */
     private function getConnection(): AdapterInterface
     {
-        if (is_null($this->connection)) {
+        if ($this->connection === null) {
             $this->connection = $this->resourceConnection->getConnection();
         }
 

@@ -105,5 +105,4 @@ interface EventDataInterface
      * @return void
      */
     public function setRefundReference(?string $refundReference): void;
-
 }

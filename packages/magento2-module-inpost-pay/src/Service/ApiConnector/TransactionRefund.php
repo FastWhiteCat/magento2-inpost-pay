@@ -27,6 +27,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TransactionRefund
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         private readonly AdditionalBusinessDataInterfaceFactory $additionalBusinessDataFactory,
         private readonly ConnectorInterface $connector,
@@ -102,12 +105,15 @@ class TransactionRefund
         return $transactionRefundResponse;
     }
 
-    private function handleErrorRefund(RefundInterface $refund, string $errorMsg, int $errorCode): TransactionRefundResponse
-    {
+    private function handleErrorRefund(
+        RefundInterface $refund,
+        string $errorMsg,
+        int $errorCode
+    ): TransactionRefundResponse {
         $externalRefundId = $refund->getExternalRefundId() ?? '';
         try {
             $refundTransactionData = $this->apiRefundTransactionProvider->getRefundTransactionDataByTransactionId(
-                $refund->getTransactionId(),
+                (string)$refund->getTransactionId(),
                 $externalRefundId,
                 true
             );
