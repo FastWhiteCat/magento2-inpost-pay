@@ -368,3 +368,5 @@
 "Widget color variant","Wariant kolorystyczny widgetu"
 "Widget size","Rozmiar widgetu"
 "Widget frame shape","Kształt ramki widgetu"
+"InPost Pay has confirmed the refund amount:%1 %2 for creditmemo ID:%3. External TXN: %4","InPost Pay potwierdziło dokonanie zwrotu w kwocie %1 %2 dla korekty faktury o ID: %3. Zewnętrzny numer transakcji: %4",module,InPost_InPostPay
+"InPost Pay has declined the refund amount:%1 %2 for creditmemo ID:%3. External TXN: %4","InPost Pay odrzuciło zwrot w kwocie %1 %2 dla korekty faktury o ID: %3. Zewnętrzny numer transakcji: %4",module,InPost_InPostPay

@@ -3,6 +3,8 @@
     <type name="Magento\Framework\Authorization\PolicyInterface">
         <plugin name="InPost_InPostPay::signatureValidationPolicyPlugin"
                 type="InPost\InPostPay\Plugin\Authorization\SignatureValidationPolicyPlugin"/>
+        <plugin name="InPost_InPostPay::refundWebhookSignatureValidationPolicyPlugin"
+                type="InPost\InPostPay\Plugin\Authorization\RefundEventSignatureValidationPolicyPlugin"/>
     </type>
     <type name="Magento\Webapi\Controller\Rest\SynchronousRequestProcessor">
         <plugin name="InPost_InPostPay::allowLowerCasePrefixForWebapiRestEndpointsPlugin"
@@ -26,6 +28,21 @@
         </arguments>
     </type>
     <type name="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\OrderCreateExecutionTimePlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Authorization\RefundEventSignatureValidationPolicyPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\RefundEvent">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\Refund\RefundEventValidator">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>

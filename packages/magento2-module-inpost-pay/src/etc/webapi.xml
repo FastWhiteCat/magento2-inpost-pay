@@ -55,6 +55,12 @@
             <resource ref="inpost_pay_signature_validated_resource" />
         </resources>
     </route>
+    <route url="/v1/izi/refund/events" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\RefundEventInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_refunds_event_signature_validated_resource" />
+        </resources>
+    </route>
     <route url="/V1/izi/inpostpaylogs/:logDate" method="GET">
         <service class="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface" method="execute"/>
         <resources>

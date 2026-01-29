@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Gateway\Response;
 use InPost\InPostPay\Enum\InPostRefundStatus;
 use InPost\InPostPay\Model\IziApi\Response\TransactionRefundResponse;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Creditmemo;
@@ -16,7 +17,8 @@ use Psr\Log\LoggerInterface;
 class RefundTransactionHandler implements HandlerInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly CreditmemoExtensionFactory $creditmemoExtensionFactory
     ) {
     }
 
@@ -68,8 +70,18 @@ class RefundTransactionHandler implements HandlerInterface
             __("Description: %1", $refundResponseDescription)->render()
         ];
 
-        $creditmemo?->addComment(implode(PHP_EOL, $creditmemoCommentData));
-        $creditmemo?->setState($this->getMappedCreditmemoState($refundResponseStatus));
+        if ($creditmemo) {
+            $creditmemo->addComment(implode(PHP_EOL, $creditmemoCommentData));
+            $creditmemo->setState($this->getMappedCreditmemoState($refundResponseStatus));
+            $extensionAttributes = $creditmemo->getExtensionAttributes();
+
+            if ($extensionAttributes === null) {
+                $extensionAttributes = $this->creditmemoExtensionFactory->create();
+            }
+            // @phpstan-ignore-next-line
+            $extensionAttributes->setInpostPayRefundExternalTransactionId($externalRefundId);
+            $creditmemo->setExtensionAttributes($extensionAttributes);
+        }
     }
 
     private function getMappedCreditmemoState(?string $refundResponseStatus): int
