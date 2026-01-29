@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.0] - 2026-01-29
+
+### Added
+- Modified handling of creditmemo refunds. From now on, if InPost Pay API returns an error on refund creation, depending on the error code, order transaction will be checked after a short delay in case of that refund was successfully created while API timed out. 
+- Creditmemo refunds will be created even in case of handled error codes from the API however, the status of that creditmemo will be opened.
+- Added a webapi endpoint for handling refund confirmation webhook. If the confirmation is received, the creditmemo changes status based on external API status, either refunded or canceled.
+
 ## [2.4.2] - 2025-12-16
 
 ### Fixed
