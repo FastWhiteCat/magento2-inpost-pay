@@ -188,4 +188,19 @@
                     referenceColumn="store_id"
                     onDelete="CASCADE"/>
     </table>
+    <table name="inpost_pay_refund_transaction" resource="default" engine="innodb" comment="InPost Pay refund transaction mapping">
+        <column xsi:type="int" name="mapping_id" unsigned="true" nullable="false" identity="true" comment="Mapping ID"/>
+        <column xsi:type="int" name="creditmemo_id" unsigned="true" nullable="false" identity="false" comment="Creditmemo ID"/>
+        <column xsi:type="varchar" name="refund_external_transaction_id" length="255" nullable="false" comment="InPost Pay External Refund Transaction ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="mapping_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_INPOSTPAY_REFUND_TXN_CM_ID_SALES_CREDITMEMO_ENTITY_ID"
+                    table="inpost_pay_refund_transaction" column="creditmemo_id"
+                    referenceTable="sales_creditmemo" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNIQUE_INPOSTPAY_REFUND_TXN_EXTERNAL_ID">
+            <column name="refund_external_transaction_id"/>
+        </constraint>
+    </table>
 </schema>
