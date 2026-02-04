@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="inpostpay">
+        <job name="inpostpay_synchronize_payment_methods"
+             instance="InPost\InPostPay\Cron\SynchronizePaymentMethods" method="execute">
+            <schedule>0 3 * * *</schedule>
+        </job>
+        <job name="inpostpay_synchronize_bestsellers"
+             instance="InPost\InPostPay\Cron\Bestsellers\SynchronizeBestsellers" method="execute">
+            <config_path>payment/inpost_pay/bestsellers_synchronize_cron_schedule</config_path>
+        </job>
+        <job name="inpostpay_send_analytics_data"
+             instance="InPost\InPostPay\Cron\SendAnalyticsData" method="execute">
+            <config_path>payment/inpost_pay/analytics_async_sending_cron_schedule</config_path>
+        </job>
+        <job name="inpostpay_handle_timed_out_orders"
+             instance="InPost\InPostPay\Cron\HandleTimedOutOrders" method="execute">
+            <config_path>payment/inpost_pay/order_errors_handling_timed_out_cron_schedule</config_path>
+        </job>
+    </group>
+</config>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_authorization" translate="label" type="text" sortOrder="20"
+           showInDefault="1" showInWebsite="1">
+        <label>Authorization Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="client_id" translate="label" type="text" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Client ID</label>
+            <config_path>payment/inpost_pay/client_id</config_path>
+        </field>
+        <field id="client_secret" translate="label" type="text" sortOrder="21"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Client Secret</label>
+            <config_path>payment/inpost_pay/client_secret</config_path>
+        </field>
+        <field id="auth_token_url" translate="label" type="text" sortOrder="25"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Auth Token URL</label>
+            <config_path>payment/inpost_pay/auth_token_url</config_path>
+        </field>
+        <field id="merchant_secret" translate="label" type="text" sortOrder="26"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Merchant Secret</label>
+            <config_path>payment/inpost_pay/merchant_secret</config_path>
+            <comment>The key needed to generate returns</comment>
+        </field>
+        <field id="pos_id" translate="label" type="text" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>POS ID</label>
+            <config_path>payment/inpost_pay/pos_id</config_path>
+        </field>
+        <field id="client_merchant_id" translate="label" type="text" sortOrder="35"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Client Merchant ID</label>
+            <config_path>payment/inpost_pay/client_merchant_id</config_path>
+        </field>
+    </group>
+</include>

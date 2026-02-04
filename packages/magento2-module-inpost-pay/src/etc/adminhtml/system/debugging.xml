@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_debugging" translate="label" type="text" sortOrder="200" showInDefault="1">
+        <label>Debugging Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="min_log_level" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+            <label>Log Level</label>
+            <comment>Only logs of this level and higher will be stored in var/log/inpost-pay/Y-m-d.log files.</comment>
+            <source_model>InPost\InPostPay\Model\Config\Source\LogLevel</source_model>
+            <config_path>payment/inpost_pay/min_log_level</config_path>
+        </field>
+        <field id="anonymise_objects_enabled" translate="label" type="select" sortOrder="20" showInDefault="1"
+               canRestore="1">
+            <label>Enable Logs Anonymisation</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/anonymise_objects_enabled</config_path>
+            <comment>When enabled objects and data logged in files will have every personal information anonymised.</comment>
+        </field>
+        <include path="InPost_InPostPay::system/debugging/logs.xml"/>
+    </group>
+</include>

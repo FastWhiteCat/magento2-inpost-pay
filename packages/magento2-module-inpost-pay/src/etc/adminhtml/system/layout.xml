@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_layout" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1">
+        <label>Button Layout Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="widget_background_color" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Widget background color</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\BackgroundColor</source_model>
+            <config_path>payment/inpost_pay/widget_background_color</config_path>
+            <comment>Define a widget background whether it is light or dark color of elements in the widget background.</comment>
+        </field>
+        <field id="widget_color_variant" translate="label" type="select" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Widget color variant</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ColorVariant</source_model>
+            <config_path>payment/inpost_pay/widget_color_variant</config_path>
+        </field>
+        <field id="widget_size" translate="label" type="select" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Widget size</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\Sizes</source_model>
+            <config_path>payment/inpost_pay/widget_size</config_path>
+        </field>
+        <field id="widget_frame_shape" translate="label" type="select" sortOrder="40"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Widget frame shape</label>
+            <can_be_empty>1</can_be_empty>
+            <source_model>InPost\InPostPay\Model\Config\Source\FrameStyle</source_model>
+            <config_path>payment/inpost_pay/widget_frame_shape</config_path>
+        </field>
+    </group>
+</include>

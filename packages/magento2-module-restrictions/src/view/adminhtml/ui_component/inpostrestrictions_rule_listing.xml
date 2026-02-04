@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">inpostrestrictions_rule_listing.inpostrestrictions_rule_listing_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>inpostrestrictions_rule_columns</spinner>
+		<deps>
+			<dep>inpostrestrictions_rule_listing.inpostrestrictions_rule_listing_listing_data_source</dep>
+		</deps>
+		<buttons>
+            <button name="refresh">
+                <url path="*/*/refresh"/>
+                <class>primary</class>
+                <label translate="true">Refresh All Rules</label>
+            </button>
+			<button name="add">
+				<url path="*/*/new"/>
+				<class>primary</class>
+				<label translate="true">Add New Rule</label>
+			</button>
+		</buttons>
+	</settings>
+	<dataSource name="inpostrestrictions_rule_listing_listing_data_source" component="Magento_Ui/js/grid/provider">
+		<settings>
+			<storageConfig>
+				<param name="indexField" xsi:type="string">rule_id</param>
+			</storageConfig>
+			<updateUrl path="mui/index/render"/>
+		</settings>
+		<dataProvider name="inpostrestrictions_rule_listing_listing_data_source"
+                      class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+			<settings>
+				<requestFieldName>id</requestFieldName>
+				<primaryFieldName>rule_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+	</listingToolbar>
+	<columns name="inpostrestrictions_rule_columns">
+		<settings>
+			<childDefaults>
+				<param name="fieldAction" xsi:type="array">
+					<item name="provider" xsi:type="string">inpostrestrictions_rule_listing.inpostrestrictions_rule_listing.inpostrestrictions_rule_columns</item>
+					<item name="target" xsi:type="string">startEdit</item>
+					<item name="params" xsi:type="array">
+						<item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+						<item name="1" xsi:type="boolean">true</item>
+					</item>
+				</param>
+			</childDefaults>
+		</settings>
+		<selectionsColumn name="ids">
+			<settings>
+				<indexField>rule_id</indexField>
+			</settings>
+		</selectionsColumn>
+		<column name="rule_id">
+			<settings>
+				<filter>text</filter>
+				<sorting>asc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
+        <column name="is_enabled" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Is Enabled</label>
+            </settings>
+        </column>
+        <column name="website_id" class="InPost\Restrictions\Ui\Component\Listing\Column\WebsiteOptions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Website</item>
+                </item>
+                <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\Store\Website</item>
+            </argument>
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Website</label>
+            </settings>
+        </column>
+        <column name="applies_to" class="InPost\Restrictions\Ui\Component\Listing\Column\AppliesToOptions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Applies To</item>
+                </item>
+                <item name="options" xsi:type="object">InPost\Restrictions\Model\Source\RestrictionsRule\AppliesTo</item>
+            </argument>
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Applies To</label>
+            </settings>
+        </column>
+		<column name="name">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Name</label>
+			</settings>
+		</column>
+        <actionsColumn name="actions" class="InPost\Restrictions\Ui\Component\Listing\Column\RestrictionsRuleActions">
+            <settings>
+                <indexField>rule_id</indexField>
+            </settings>
+        </actionsColumn>
+	</columns>
+</listing>

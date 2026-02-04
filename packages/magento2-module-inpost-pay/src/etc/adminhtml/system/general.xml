@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1">
+        <label>General Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="module_version" translate="label" type="label" sortOrder="1" showInDefault="1">
+            <label>Module Version</label>
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\Form\ModuleVersion</frontend_model>
+        </field>
+        <field id="active" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable InPost Pay</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/active</config_path>
+        </field>
+        <field id="test_mode_active" translate="label" type="select" sortOrder="15"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable Test Mode</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/test_mode_active</config_path>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Title</label>
+            <config_path>payment/inpost_pay/title</config_path>
+        </field>
+        <field id="order_status" translate="label" type="select" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>New Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+            <config_path>payment/inpost_pay/order_status</config_path>
+        </field>
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="50"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Payment from Applicable Countries</label>
+            <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/inpost_pay/allowspecific</config_path>
+        </field>
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="51"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Payment from Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <can_be_empty>1</can_be_empty>
+            <config_path>payment/inpost_pay/specificcountry</config_path>
+        </field>
+        <field id="min_order_total" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1">
+            <label>Minimum Order Total</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/min_order_total</config_path>
+        </field>
+        <field id="max_order_total" translate="label" type="text" sortOrder="61" showInDefault="1" showInWebsite="1">
+            <label>Maximum Order Total</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/max_order_total</config_path>
+        </field>
+        <field id="use_address_as_firstname_source" translate="label" type="select" sortOrder="80"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Use order address firstname and lastname instead of customer firstname and lastname</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/use_address_as_firstname_source</config_path>
+        </field>
+        <field id="image_role" translate="label" type="select" sortOrder="90"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Image role sended to InPost Pay</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ImageType</source_model>
+            <config_path>payment/inpost_pay/image_role</config_path>
+        </field>
+        <field id="additional_images_enabled" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Send additional images to InPost Pay</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/additional_images_enabled</config_path>
+        </field>
+        <field id="prepare_resized_additional_images" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Prepare resized additional images</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/prepare_resized_additional_images</config_path>
+        </field>
+        <field id="assign_quote_to_customer_by_email" translate="label" type="select" sortOrder="100"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Assign Quote to Customer by Email</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/assign_quote_to_customer_by_email</config_path>
+            <comment>If set to YES, cart initiated by guest user, bound to InPost Pay Mobile Aap on order processing will be assigned to an existing Magento account if found by InPost Pay account email address.</comment>
+        </field>
+        <field id="can_refund_partial_per_invoice" translate="label" type="select" sortOrder="110"
+               showInDefault="1" canRestore="1">
+            <label>Allow Invoice Partial Refund</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/can_refund_partial_per_invoice</config_path>
+            <comment>If set to YES, invoice refund forms will have inputs allowing to select item quantities.</comment>
+        </field>
+    </group>
+</include>

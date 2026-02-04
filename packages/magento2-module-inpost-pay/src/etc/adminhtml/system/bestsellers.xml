@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="bestsellers" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1">
+        <label>InPost Pay Bestsellers Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="synchronize_bestsellers_enabled" translate="label" type="select" sortOrder="1"
+               showInDefault="0" showInWebsite="1" canRestore="1">
+            <label>Enabled Bestsellers Synchronization</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/synchronize_bestsellers_enabled</config_path>
+            <comment>Important! This setting should only be enabled on the configuration scope where InPost Pay is enabled and has own credentials! When enabled any save of selected bestseller product or inventory will trigger update of Bestseller Product. Also, any reservation append will check if configured Bestseller Product is still saleable, if not update will be performed.</comment>
+        </field>
+        <field id="ean_product_attribute" translate="label" type="select" sortOrder="5" showInDefault="1">
+            <label>EAN Product Attribute</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\ProductAttributes</source_model>
+            <config_path>payment/inpost_pay/ean_product_attribute</config_path>
+        </field>
+        <field id="bestsellers_synchronize_cron_enabled" translate="label" type="select" sortOrder="10"
+               showInDefault="1" canRestore="1">
+            <label>Enabled Bestsellers Synchronize CRON</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/bestsellers_synchronize_cron_enabled</config_path>
+            <comment>When enabled scheduled CRON Job will synchronize Magento Bestsellers into InPost Pay API.</comment>
+        </field>
+        <field id="bestsellers_synchronize_cron_schedule" translate="label" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+            <label>Synchronize Bestsellers Cron Schedule</label>
+            <comment>30 6 * * * for example causes this CRON to run every day, at 6:30 AM</comment>
+            <config_path>payment/inpost_pay/bestsellers_synchronize_cron_schedule</config_path>
+            <depends>
+                <field id="bestsellers_synchronize_cron_enabled">1</field>
+            </depends>
+        </field>
+    </group>
+</include>

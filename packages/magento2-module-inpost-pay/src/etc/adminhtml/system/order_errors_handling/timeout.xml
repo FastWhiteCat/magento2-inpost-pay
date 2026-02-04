@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_order_errors_handling_timeout" translate="label" type="text" sortOrder="100" showInDefault="1">
+        <label>Timeout during order creation process</label>
+        <field id="order_timeout_description" translate="label" type="label" sortOrder="1" showInDefault="1">
+            <label>Order Time Out Error Description</label>
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\Form\TimedOutOrderDescription</frontend_model>
+        </field>
+        <field id="order_errors_handling_timeout_is_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+            <label>Enable handling timed out errors</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/order_errors_handling_timeout_is_enabled</config_path>
+        </field>
+        <field id="order_errors_handling_timeout_can_cancel" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+            <label>Cancel order</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/order_errors_handling_timeout_can_cancel</config_path>
+            <depends>
+                <field id="order_errors_handling_timeout_is_enabled">1</field>
+            </depends>
+        </field>
+        <field id="order_errors_handling_timeout_can_change_status" translate="label" type="select" sortOrder="30" showInDefault="1" canRestore="1">
+            <label>Change order status</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/order_errors_handling_timeout_can_change_status</config_path>
+            <depends>
+                <field id="order_errors_handling_timeout_is_enabled">1</field>
+                <field id="order_errors_handling_timeout_can_cancel">0</field>
+            </depends>
+        </field>
+        <field id="order_errors_handling_timed_out_order_status" translate="label" type="select" sortOrder="40" showInDefault="1" canRestore="1">
+            <label>Change timed out order status to</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+            <config_path>payment/inpost_pay/order_errors_handling_timed_out_order_status</config_path>
+            <depends>
+                <field id="order_errors_handling_timeout_is_enabled">1</field>
+                <field id="order_errors_handling_timeout_can_cancel">0</field>
+                <field id="order_errors_handling_timeout_can_change_status">1</field>
+            </depends>
+        </field>
+        <field id="order_errors_handling_timed_out_cron_schedule" translate="label" type="text" sortOrder="50" showInDefault="1" canRestore="1">
+            <label>Timed Out Orders Handling CRON Schedule</label>
+            <comment>5,35 * * * * for example causes this CRON to run every at minute 5 and 35 of each hour</comment>
+            <config_path>payment/inpost_pay/order_errors_handling_timed_out_cron_schedule</config_path>
+            <depends>
+                <field id="order_errors_handling_timeout_is_enabled">1</field>
+            </depends>
+        </field>
+    </group>
+</include>

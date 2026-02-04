@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_sandbox" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1">
+        <label>Sandbox</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="enabled" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable InPost Pay Sandbox</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/sandbox_enabled</config_path>
+        </field>
+        <field id="sandbox_client_id" translate="label" type="text" sortOrder="20"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Client ID</label>
+            <config_path>payment/inpost_pay/sandbox_client_id</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_client_secret" translate="label" type="text" sortOrder="21"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Client Secret</label>
+            <config_path>payment/inpost_pay/sandbox_client_secret</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_auth_token_url" translate="label" type="text" sortOrder="25"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Auth Token URL</label>
+            <config_path>payment/inpost_pay/sandbox_auth_token_url</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_merchant_secret" translate="label" type="text" sortOrder="26"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Merchant Secret</label>
+            <config_path>payment/inpost_pay/sandbox_merchant_secret</config_path>
+            <comment>The key needed to generate returns</comment>
+        </field>
+        <field id="sandbox_pos_id" translate="label" type="text" sortOrder="27"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox POS ID</label>
+            <config_path>payment/inpost_pay/sandbox_pos_id</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_izi_api_url" translate="label" type="text" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox IZI API URL</label>
+            <config_path>payment/inpost_pay/sandbox_izi_api_url</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_widget_script_url" translate="label" type="text" sortOrder="31"
+               showInDefault="1" canRestore="1">
+            <label>Sandbox Widget Script URL</label>
+            <config_path>payment/inpost_pay/sandbox_widget_script_url</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="sandbox_client_merchant_id" translate="label" type="text" sortOrder="35"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Sandbox Client Merchant ID</label>
+            <config_path>payment/inpost_pay/sandbox_client_merchant_id</config_path>
+        </field>
+    </group>
+</include>

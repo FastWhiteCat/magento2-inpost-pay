@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ */
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnLoginPage()) {
+    return;
+}
+
+$merchantClientId = $widgetViewModel->getClientMerchantId();
+$bindingPlace = $block->getBindingPlace();
+$language = $widgetViewModel->getCurrentLanguageCode();
+$layoutConfig = $widgetViewModel->getLayoutConfig();
+$widgetWrapperClass = "inpay-widget-wrapper";
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
+?>
+
+<div class="inpay-login-wrapper">
+    <div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+        <inpost-izi-button
+            binding_place="<?= /* @noEscape */ $bindingPlace ?>"
+            variation="<?= /* @noEscape */ $layoutConfig ?>"
+        ></inpost-izi-button>
+
+        <script type="text/x-magento-init">
+            {
+                "*" : {
+                    "InpostPayMerchantWidget" : {
+                        "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
+                        "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
+                        "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
+                        "language": "<?= /* @noEscape */ $language ?>",
+                        "enabledAnalyticsParams": "<?= /* @noEscape */ $enabledAnalyticsParams ?>"
+                    }
+                }
+            }
+        </script>
+    </div>
+</div>

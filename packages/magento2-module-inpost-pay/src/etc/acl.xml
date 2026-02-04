@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Magento_Backend::stores">
+					<resource id="Magento_Backend::stores_settings">
+						<resource id="Magento_Config::config">
+                            <resource id="InPost_InPostPay::inpostpay" title="Inpost Pay config">
+                                <resource id="InPost_InPostPay::logs" title="InPost Pay Logs"/>
+                                <resource id="InPost_InPostPay::checkoutagreement" title="InPost Pay Checkout Agreements"/>
+                            </resource>
+						</resource>
+					</resource>
+				</resource>
+                <resource id="Magento_Catalog::catalog">
+                    <resource id="InPost_InPostPay::bestseller_products" title="Inpost Pay Bestseller Products"/>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

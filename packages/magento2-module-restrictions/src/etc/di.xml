@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Interface preferences -->
+    <preference for="InPost\Restrictions\Api\RestrictionsRuleRepositoryInterface"
+                type="InPost\Restrictions\Model\RestrictionsRuleRepository"/>
+    <preference for="InPost\Restrictions\Api\Data\RestrictionsRuleInterface"
+                type="InPost\Restrictions\Model\RestrictionsRule"/>
+    <preference for="InPost\Restrictions\Api\RestrictionsRuleProductRepositoryInterface"
+                type="InPost\Restrictions\Model\RestrictionsRuleProductRepository"/>
+    <preference for="InPost\Restrictions\Api\Data\RestrictionsRuleProductInterface"
+                type="InPost\Restrictions\Model\RestrictionsRuleProduct"/>
+
+    <!-- Grid data source and collections -->
+    <virtualType name="InPost\Restrictions\Model\ResourceModel\RestrictionsRule\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_restrictions_rule</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\Restrictions\Model\ResourceModel\RestrictionsRule\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostrestrictions_rule_listing_listing_data_source"
+                      xsi:type="string">InPost\Restrictions\Model\ResourceModel\RestrictionsRule\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="InPost\Restrictions\Model\ResourceModel\RestrictionsRuleProduct\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_restrictions_rule_product</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\Restrictions\Model\ResourceModel\RestrictionsRuleProduct\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostrestrictions_rule_product_listing_listing_data_source"
+                      xsi:type="string">InPost\Restrictions\Model\ResourceModel\RestrictionsRuleProduct\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

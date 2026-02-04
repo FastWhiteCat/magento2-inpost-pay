@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_terms_and_conditions" translate="label" type="text" sortOrder="40"
+           showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Terms and Conditions Mapping Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="use_legacy_terms_and_conditions_mapping" translate="label" type="select" sortOrder="5"
+               showInDefault="1" canRestore="1">
+            <label>Use Legacy Terms And Conditions Mapping</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/use_legacy_terms_and_conditions_mapping</config_path>
+            <comment>If this option is enabled old mapping from below configuration will be used otherwise new: Store->InPost Pay Terms And Conditions.</comment>
+        </field>
+        <field id="terms_and_conditions_new_mapping" translate="label" sortOrder="10"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Legacy Terms and Conditions Mapping</label>
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\Form\Field\TermsAndConditionsField</frontend_model>
+            <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+            <config_path>payment/inpost_pay/terms_and_conditions_new_mapping</config_path>
+            <comment>A maximum of 10 overriding consents will be transferred to the application</comment>
+        </field>
+    </group>
+</include>

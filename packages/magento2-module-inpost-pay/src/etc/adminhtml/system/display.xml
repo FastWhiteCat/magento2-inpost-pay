@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_display" translate="label" type="text" sortOrder="20"
+           showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Display Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="widget_enabled" translate="label" type="select" sortOrder="5"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Enable Widget InPost Pay</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/widget_enabled</config_path>
+        </field>
+        <field id="product_cart_enabled" translate="label" type="select" sortOrder="10"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show on product cart</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_on_product_cart</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+        <field id="cart_enabled" translate="label" type="select" sortOrder="20"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show on cart</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_on_cart</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+        <field id="minicart_enabled" translate="label" type="select" sortOrder="30"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show in minicart</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_in_minicart</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+        <field id="checkout_enabled" translate="label" type="select" sortOrder="40"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show on checkout</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_on_checkout</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+        <field id="success_page_enabled" translate="label" type="select" sortOrder="50"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show on thank you page</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_on_success_page</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+        <field id="success_page_url" translate="label" type="text" sortOrder="51"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Success Page URL</label>
+            <config_path>payment/inpost_pay/success_page_url</config_path>
+            <comment>After completing order in InPost Pay App, browser page will be redirected to this URL. Allowed variables: {order_id}, {increment_id}</comment>
+            <depends>
+                <field id="success_page_enabled">1</field>
+            </depends>
+        </field>
+        <field id="register_page_enabled" translate="label" type="select" sortOrder="60"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show on register page</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_on_register_page</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+        <field id="login_page_enabled" translate="label" type="select" sortOrder="70"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Show on login page</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/show_on_login_page</config_path>
+            <depends>
+                <field id="widget_enabled">1</field>
+            </depends>
+        </field>
+    </group>
+</include>
