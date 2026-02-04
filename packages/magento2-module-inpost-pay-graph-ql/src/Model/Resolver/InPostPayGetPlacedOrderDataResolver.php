@@ -44,8 +44,13 @@ class InPostPayGetPlacedOrderDataResolver implements ResolverInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): array
-    {
+    public function resolve(
+        Field $field,
+        $context,
+        ResolveInfo $info,
+        ?array $value = null,
+        ?array $args = null
+    ): array {
         $basketBindingApiKey = $this->extractBasketBindingApiKey($args ?? []);
 
         try {
