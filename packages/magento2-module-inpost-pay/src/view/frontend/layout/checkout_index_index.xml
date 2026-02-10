@@ -20,7 +20,7 @@
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <item name="inpost-pay" xsi:type="array">
-                                            <item name="component" xsi:type="string">InPost_InPostPay/js/inpostPayMerchantWidget</item>
+                                            <item name="component" xsi:type="string">InPost_InPostPay/js/inpostPayMerchantWidgetCheckout</item>
                                             <item name="sortOrder" xsi:type="string">0</item>
                                             <item name="displayArea" xsi:type="string">inpost-pay</item>
                                             <item name="config" xsi:type="array">
