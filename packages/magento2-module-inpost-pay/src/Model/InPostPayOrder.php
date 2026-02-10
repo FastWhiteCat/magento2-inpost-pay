@@ -35,8 +35,8 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         private readonly PhoneNumberInterfaceFactory $phoneNumberInterfaceFactory,
         private readonly AcceptedConsentInterfaceFactory $acceptedConsentFactory,
         private readonly SerializerInterface $serializer,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
