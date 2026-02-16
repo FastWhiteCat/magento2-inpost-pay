@@ -2,11 +2,12 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/model/step-navigator',
     'mage/url',
     'underscore',
     'ko',
     'mage/validation',
-], function (Component, $, customerData, urlBuilder, _, ko) {
+], function (Component, $, customerData, stepNavigator, urlBuilder, _, ko) {
     'use strict';
 
     /**
@@ -59,6 +60,14 @@ define([
                 customerData.reload(['cart'])
             }
 
+            if (this.configuration) {
+                stepNavigator.steps.subscribe(function (steps) {
+                    var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
+                    var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
+                    self.isVisible(self.configuration.enabledOnCheckoutPage && shippingStepVisibility);
+                })
+            }
+
             if (!config || (config && !config.merchantClientId)) return;
 
             if (this.configuration.scriptUrl && this.configuration.bindingPlace !== CHECKOUT_BINDING_PLACE) {
@@ -107,6 +116,10 @@ define([
             var widget = InPostPayWidget.init(widgetOptions);
 
             this.bindEvents();
+        },
+
+        getConfiguration: function() {
+            return this.checkoutConfiguration;
         },
 
         bindEvents: function() {
@@ -180,6 +193,22 @@ define([
                     })) addedSimpleProducts++
                 })
                 return addedSimpleProducts === simpleProductsInGrouped.length;
+            }
+        },
+
+        initAfterRender: function() {
+            var config = window.checkoutConfig ? window.checkoutConfig.inPostConfig : {}
+
+            if (config.hasOwnProperty('enabledOnCheckoutPage')
+                && !config.enabledOnCheckoutPage) {
+                $('#inpost-izi-button-wrapper').remove()
+                return;
+            }
+
+            if (config.scriptUrl) {
+                this.loadScript(config.scriptUrl, function() {
+                    this.initializeWidget(config);
+                }.bind(this));
             }
         },
 
