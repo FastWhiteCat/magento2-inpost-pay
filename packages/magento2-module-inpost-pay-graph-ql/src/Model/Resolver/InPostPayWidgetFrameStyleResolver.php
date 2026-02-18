@@ -23,13 +23,8 @@ class InPostPayWidgetFrameStyleResolver implements ResolverInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function resolve(
-        Field $field,
-        $context,
-        ResolveInfo $info,
-        ?array $value = null,
-        ?array $args = null
-    ): string {
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null): string
+    {
         $websiteId = null;
         $store = $context->getExtensionAttributes()->getStore();
         if ($store instanceof StoreInterface) {
