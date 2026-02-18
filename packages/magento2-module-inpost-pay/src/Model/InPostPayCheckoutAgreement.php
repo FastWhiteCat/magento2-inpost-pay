@@ -28,8 +28,8 @@ class InPostPayCheckoutAgreement extends AbstractModel implements InPostPayCheck
         private readonly AgreementCollectionFactory $agreementCollectionFactory,
         Context $context,
         Registry $registry,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

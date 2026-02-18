@@ -16,7 +16,7 @@ class InPostPayException extends Exception
     protected string $errorCode = '';
     protected string $errorMsg = '';
 
-    public function __construct(Phrase $phrase = null)
+    public function __construct(?Phrase $phrase = null)
     {
         if ($phrase === null) {
             $phrase = new Phrase($this->errorMsg);
