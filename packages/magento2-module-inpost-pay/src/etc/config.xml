@@ -69,7 +69,6 @@
                 <analytics_async_sending_cron_schedule>*/5 * * * *</analytics_async_sending_cron_schedule>
                 <sending_fbclid_enabled>0</sending_fbclid_enabled>
                 <sending_gclid_enabled>0</sending_gclid_enabled>
-                <sending_ttclid_enabled>0</sending_ttclid_enabled>
                 <order_errors_handling_timeout_is_enabled>0</order_errors_handling_timeout_is_enabled>
                 <order_errors_handling_timed_out_cron_schedule>5,35 * * * *</order_errors_handling_timed_out_cron_schedule>
             </inpost_pay>

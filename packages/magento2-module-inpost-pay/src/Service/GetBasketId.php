@@ -27,8 +27,7 @@ class GetBasketId
         bool $generateIfEmpty = false,
         ?string $gaClientId = null,
         ?string $fbclid = null,
-        ?string $gclid = null,
-        ?string $ttclid = null
+        ?string $gclid = null
     ): ?string {
         if (!$this->config->isEnabled()) {
             return null;
@@ -50,7 +49,6 @@ class GetBasketId
                 $inPostPayQuote->setGaClientId($gaClientId);
                 $inPostPayQuote->setFbclid($fbclid);
                 $inPostPayQuote->setGclid($gclid);
-                $inPostPayQuote->setTtclid($ttclid);
                 $this->inPostPayQuoteRepository->save($inPostPayQuote);
             }
 

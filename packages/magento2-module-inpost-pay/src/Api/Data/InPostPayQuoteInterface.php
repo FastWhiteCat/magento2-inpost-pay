@@ -25,7 +25,6 @@ interface InPostPayQuoteInterface
     public const GA_CLIENT_ID = 'ga_client_id';
     public const FBCLID = 'fbclid';
     public const GCLID = 'gclid';
-    public const TTCLID = 'ttclid';
     public const SESSION_COOKIE = 'session_cookie';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
@@ -82,9 +81,6 @@ interface InPostPayQuoteInterface
 
     public function getGclid(): ?string;
     public function setGclid(?string $gclid): InPostPayQuoteInterface;
-
-    public function getTtclid(): ?string;
-    public function setTtclid(?string $ttclid): InPostPayQuoteInterface;
 
     public function getCreatedAt(): string;
     public function getUpdatedAt(): string;

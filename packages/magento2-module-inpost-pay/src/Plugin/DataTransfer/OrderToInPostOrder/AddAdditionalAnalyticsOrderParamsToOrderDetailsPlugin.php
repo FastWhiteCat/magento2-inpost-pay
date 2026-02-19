@@ -73,7 +73,6 @@ class AddAdditionalAnalyticsOrderParamsToOrderDetailsPlugin
         $clientId = $inPostPayOrder->getGaClientId();
         $fbclid = $inPostPayOrder->getFbclid();
         $gclid = $inPostPayOrder->getGclid();
-        $ttclid = $inPostPayOrder->getTtclid();
 
         if ($clientId) {
             /** @var AdditionalOrderParametersInterface $clientIdAdditionalOrderParameter */
@@ -97,14 +96,6 @@ class AddAdditionalAnalyticsOrderParamsToOrderDetailsPlugin
             $gclidAdditionalOrderParameter->setKey(InPostPayOrderInterface::GCLID);
             $gclidAdditionalOrderParameter->setValue($gclid);
             $additionalOrderParameters[] = $gclidAdditionalOrderParameter;
-        }
-
-        if ($ttclid && $this->analyticsConfigProvider->isSendingTtclidEnabled($storeId)) {
-            /** @var AdditionalOrderParametersInterface $ttclidAdditionalOrderParameter */
-            $ttclidAdditionalOrderParameter = $this->additionalOrderParametersInterfaceFactory->create();
-            $ttclidAdditionalOrderParameter->setKey(InPostPayOrderInterface::TTCLID);
-            $ttclidAdditionalOrderParameter->setValue($ttclid);
-            $additionalOrderParameters[] = $ttclidAdditionalOrderParameter;
         }
 
         return $additionalOrderParameters;

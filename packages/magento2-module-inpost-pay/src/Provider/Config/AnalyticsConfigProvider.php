@@ -15,7 +15,6 @@ class AnalyticsConfigProvider
     private const XML_PATH_GA_API_URL = 'payment/inpost_pay/ga_api_url';
     private const XML_PATH_FBCLID_SENDING_ENABLED = 'payment/inpost_pay/sending_fbclid_enabled';
     private const XML_PATH_GCLID_SENDING_ENABLED = 'payment/inpost_pay/sending_gclid_enabled';
-    private const XML_PATH_TTCLID_SENDING_ENABLED = 'payment/inpost_pay/sending_ttclid_enabled';
     private const XML_PATH_ASYNC_SENDING_ENABLED = 'payment/inpost_pay/analytics_async_sending_enabled';
 
     /**
@@ -115,20 +114,5 @@ class AnalyticsConfigProvider
         );
 
         return $this->isAnalyticsEnabled($storeId) && $isSendingGclidEnabled;
-    }
-
-    /**
-     * @param int|null $storeId
-     * @return bool
-     */
-    public function isSendingTtclidEnabled(?int $storeId = null): bool
-    {
-        $isSendingTtclidEnabled = $this->scopeConfig->isSetFlag(
-            self::XML_PATH_TTCLID_SENDING_ENABLED,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-
-        return $this->isAnalyticsEnabled($storeId) && $isSendingTtclidEnabled;
     }
 }

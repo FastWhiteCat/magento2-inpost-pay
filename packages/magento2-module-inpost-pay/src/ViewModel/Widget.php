@@ -268,7 +268,7 @@ class Widget implements ArgumentInterface
         return ($product instanceof Product) ? $product : null;
     }
 
-    public function getScriptUrl(string $bindingPlace, ?array $layout = null): string
+    public function getScriptUrl(string $bindingPlace, array $layout = null): string
     {
         try {
             $scriptUrl = $this->iziApiConfigProvider->getWidgetUrl();

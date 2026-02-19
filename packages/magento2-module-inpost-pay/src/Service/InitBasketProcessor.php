@@ -30,7 +30,6 @@ class InitBasketProcessor
      * @param string|null $gaClientId
      * @param string|null $fbclid
      * @param string|null $gclid
-     * @param string|null $ttclid
      * @return InPostPayQuoteInterface
      * @throws LocalizedException
      */
@@ -38,8 +37,7 @@ class InitBasketProcessor
         int $quoteId,
         ?string $gaClientId = null,
         ?string $fbclid = null,
-        ?string $gclid = null,
-        ?string $ttclid = null
+        ?string $gclid = null
     ): InPostPayQuoteInterface {
         try {
             $basketId = $this->getBasketId->get(
@@ -47,8 +45,7 @@ class InitBasketProcessor
                 true,
                 $gaClientId,
                 $fbclid,
-                $gclid,
-                $ttclid
+                $gclid
             );
             $inPostPayQuote = $this->inPostPayQuoteRepository->getByBasketId((string)$basketId);
             $basketBindingApiKey = $inPostPayQuote->getBasketBindingApiKey();

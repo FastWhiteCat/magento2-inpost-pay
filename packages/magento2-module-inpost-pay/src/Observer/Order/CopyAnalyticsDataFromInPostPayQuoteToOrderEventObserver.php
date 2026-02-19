@@ -41,7 +41,6 @@ class CopyAnalyticsDataFromInPostPayQuoteToOrderEventObserver implements Observe
                 $inPostPayOrder->setGaClientId($inPostPayQuote->getGaClientId());
                 $inPostPayOrder->setFbclid($inPostPayQuote->getFbclid());
                 $inPostPayOrder->setGclid($inPostPayQuote->getGclid());
-                $inPostPayOrder->setTtclid($inPostPayQuote->getTtclid());
                 $this->inPostPayOrderRepository->save($inPostPayOrder);
             } catch (NoSuchEntityException $e) {
                 $this->logger->error(
