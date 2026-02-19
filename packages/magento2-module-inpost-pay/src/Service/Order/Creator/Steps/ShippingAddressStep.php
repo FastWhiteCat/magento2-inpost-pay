@@ -13,6 +13,7 @@ use InPost\InPostPay\Api\Provider\PolishRegionProviderInterface;
 use InPost\InPostPay\Enum\InPostDeliveryType;
 use InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver;
 use InPost\InPostPay\Service\Cart\CartService;
+use InPost\InPostPay\Service\Address\StreetLinesLimiter;
 use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
@@ -35,6 +36,7 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
         private readonly ShippingAddressManagement $shippingAddressManagement,
         private readonly PolishRegionProviderInterface $polishRegionProvider,
         private readonly DirectoryHelper $directoryHelper,
+        private readonly StreetLinesLimiter $streetLinesLimiter,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);
@@ -150,7 +152,7 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
             $addressArray[] = $deliveryAddress->getAddress();
         }
 
-        return $addressArray;
+        return $this->streetLinesLimiter->limitLines($addressArray);
     }
 
     private function combineClientAddressArray(ClientAddressInterface $clientAddress): array
@@ -178,7 +180,7 @@ class ShippingAddressStep extends OrderProcessingStep implements OrderProcessing
             $addressArray[] = $clientAddress->getAddress();
         }
 
-        return $addressArray;
+        return $this->streetLinesLimiter->limitLines($addressArray);
     }
 
     private function combinePhoneNumber(PhoneNumberInterface $phoneNumber): string

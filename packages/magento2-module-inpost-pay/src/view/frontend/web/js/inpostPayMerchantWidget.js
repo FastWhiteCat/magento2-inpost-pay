@@ -192,20 +192,31 @@ define([
                 };
 
                 if (self.configuration.enabledAnalyticsParams) {
-                    var gaClientId = window.localStorage.getItem('client_id');
-                    var fbclid = window.localStorage.getItem('fbclid');
-                    var gclid = window.localStorage.getItem('gclid');
+                    var gaCookie = $.mage.cookies.get('_ga');
+                    var fbc = $.mage.cookies.get('_fbc');
+                    var gclAw = $.mage.cookies.get('_gcl_aw');
+                    var ttclid = $.mage.cookies.get('ttclid');
 
-                    if (gaClientId !== null) {
-                        formData.ga_client_id = gaClientId;
+                    if (gaCookie) {
+                        try {
+                            var parts = gaCookie.split('.');
+                            if (parts.length >= 4) {
+                                formData.ga_client_id = parts[2] + '.' + parts[3];
+                            }
+                        } catch (e) {
+                        }
                     }
 
-                    if (fbclid !== null) {
-                        formData.fbclid = fbclid;
+                    if (fbc) {
+                        formData.fbclid = fbc;
                     }
 
-                    if (gclid !== null) {
-                        formData.gclid = gclid;
+                    if (gclAw) {
+                        formData.gclid = gclAw;
+                    }
+
+                    if (ttclid) {
+                        formData.ttclid = ttclid;
                     }
                 }
 
@@ -295,20 +306,34 @@ define([
                     };
 
                     if (self.configuration.enabledAnalyticsParams) {
-                        var gaClientId = window.localStorage.getItem('client_id');
-                        var fbclid = window.localStorage.getItem('fbclid');
-                        var gclid = window.localStorage.getItem('gclid');
+                        var gaCookie = $.mage.cookies.get('_ga');
+                        var fbc = $.mage.cookies.get('_fbc');
+                        var gclAw = $.mage.cookies.get('_gcl_aw');
+                        var ttclid = $.mage.cookies.get('ttclid');
 
-                        if (gaClientId !== null) {
-                            formData.ga_client_id = gaClientId;
+                        // Derive GA client_id from the _ga cookie if possible
+                        // Example: _ga=GA1.1.1234567890.1234567890 -> client_id = 1234567890.1234567890
+                        if (gaCookie) {
+                            try {
+                                var parts = gaCookie.split('.');
+                                if (parts.length >= 4) {
+                                    formData.ga_client_id = parts[2] + '.' + parts[3];
+                                }
+                            } catch (e) {
+                                // no-op
+                            }
                         }
 
-                        if (fbclid !== null) {
-                            formData.fbclid = fbclid;
+                        if (fbc) {
+                            formData.fbclid = fbc;
                         }
 
-                        if (gclid !== null) {
-                            formData.gclid = gclid;
+                        if (gclAw) {
+                            formData.gclid = gclAw;
+                        }
+
+                        if (ttclid) {
+                            formData.ttclid = ttclid;
                         }
                     }
 

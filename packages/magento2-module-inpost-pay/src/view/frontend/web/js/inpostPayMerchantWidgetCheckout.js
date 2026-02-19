@@ -62,7 +62,6 @@ define([
 
             if (this.configuration) {
                 stepNavigator.steps.subscribe(function (steps) {
-                    console.log('steps', steps)
                     var shippingStep = steps.find(function(step) { return step.code === 'shipping'});
                     var shippingStepVisibility = shippingStep ? shippingStep.isVisible() : window.location.hash.includes('shipping');
                     self.isVisible(self.configuration.enabledOnCheckoutPage && shippingStepVisibility);

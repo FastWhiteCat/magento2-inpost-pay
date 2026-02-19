@@ -68,6 +68,8 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
             ? $inPostPayOrder->getFbclid() : null;
         $gclid = $this->analyticsConfigProvider->isSendingGclidEnabled($storeId)
             ? $inPostPayOrder->getGclid() : null;
+        $ttclid = $this->analyticsConfigProvider->isSendingTtclidEnabled($storeId)
+            ? $inPostPayOrder->getTtclid() : null;
 
         $eventData = [
             'client_id' => $gaClientId,
@@ -82,6 +84,10 @@ class Ga4PurchaseEvent implements PurchaseEventInterface
 
         if ($fbclid) {
             $eventParams['fbclid'] = $fbclid;
+        }
+
+        if ($ttclid) {
+            $eventParams['ttclid'] = $ttclid;
         }
 
         $eventData['events'] = [];

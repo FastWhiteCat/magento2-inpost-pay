@@ -65,11 +65,13 @@ class Get extends WidgetController implements HttpPostActionInterface
             $gaClientId = null;
             $fbclid = null;
             $gclid = null;
+            $ttclid = null;
 
             if ($this->analyticsConfigProvider->isAnalyticsEnabled()) {
                 $gaClientId = $this->getGaClientIdFromRequestParams();
                 $fbclid = $this->getFbclidFromRequestParams();
                 $gclid = $this->getGclidFromRequestParams();
+                $ttclid = $this->getTtclidFromRequestParams();
             }
 
             $quote = $this->getQuote();
@@ -80,7 +82,8 @@ class Get extends WidgetController implements HttpPostActionInterface
                     $quoteId,
                     $gaClientId,
                     $fbclid,
-                    $gclid
+                    $gclid,
+                    $ttclid
                 );
 
                 $result = [
@@ -165,6 +168,22 @@ class Get extends WidgetController implements HttpPostActionInterface
         }
 
         return $gclid;
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     */
+    private function getTtclidFromRequestParams(): ?string
+    {
+        $ttclid = $this->request->getParam(InPostPayQuoteInterface::TTCLID);
+        $ttclid = is_scalar($ttclid) ? (string)$ttclid : null;
+
+        if ($ttclid !== null) {
+            $this->validateAnalyticsParam(InPostPayQuoteInterface::TTCLID, $ttclid);
+        }
+
+        return $ttclid;
     }
 
     /**
