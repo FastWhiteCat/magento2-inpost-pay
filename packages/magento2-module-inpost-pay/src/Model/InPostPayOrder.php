@@ -299,6 +299,18 @@ class InPostPayOrder extends AbstractModel implements InPostPayOrderInterface
         return $this->setData(self::GCLID, $gclid);
     }
 
+    public function getTtclid(): ?string
+    {
+        $ttclid = $this->getData(self::TTCLID);
+
+        return (is_scalar($ttclid) && !empty($ttclid)) ? (string)$ttclid : null;
+    }
+
+    public function setTtclid(?string $ttclid): InPostPayOrderInterface
+    {
+        return $this->setData(self::TTCLID, $ttclid);
+    }
+
     public function isTimedOut(): bool
     {
         $isTimedOut = $this->getData(self::IS_TIMED_OUT);

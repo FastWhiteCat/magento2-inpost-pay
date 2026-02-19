@@ -15,6 +15,7 @@
         <column xsi:type="varchar" name="ga_client_id" length="255" nullable="true" />
         <column xsi:type="varchar" name="fbclid" length="255" nullable="true" />
         <column xsi:type="varchar" name="gclid" length="255" nullable="true" />
+        <column xsi:type="varchar" name="ttclid" length="255" nullable="true" />
         <column xsi:type="text" name="serialized_analytics_data" nullable="true"/>
         <column xsi:type="timestamp" name="analytics_sent_at" nullable="true"/>
         <column xsi:type="varchar" length="255" name="delivery_options" nullable="true"/>
@@ -57,6 +58,7 @@
         <column xsi:type="varchar" name="ga_client_id" length="255" nullable="true" />
         <column xsi:type="varchar" name="fbclid" length="255" nullable="true" />
         <column xsi:type="varchar" name="gclid" length="255" nullable="true" />
+        <column xsi:type="varchar" name="ttclid" length="255" nullable="true" />
         <column xsi:type="varchar" name="session_cookie" length="255" nullable="true" />
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>

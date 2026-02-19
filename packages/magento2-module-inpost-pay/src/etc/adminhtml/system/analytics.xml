@@ -68,5 +68,14 @@
                 <field id="analytics_enabled">1</field>
             </depends>
         </field>
+        <field id="sending_ttclid_enabled" translate="label" type="select" sortOrder="45"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>Enable Sending ttclid Param</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/sending_ttclid_enabled</config_path>
+            <depends>
+                <field id="analytics_enabled">1</field>
+            </depends>
+        </field>
     </group>
 </include>

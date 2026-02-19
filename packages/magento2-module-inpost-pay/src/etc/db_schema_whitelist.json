@@ -14,6 +14,7 @@
             "ga_client_id": true,
             "fbclid": true,
             "gclid": true,
+            "ttclid": true,
             "serialized_analytics_data": true,
             "analytics_sent_at": true,
             "delivery_options": true,
@@ -53,6 +54,7 @@
             "ga_client_id": true,
             "fbclid": true,
             "gclid": true,
+            "ttclid": true,
             "created_at": true,
             "updated_at": true,
             "session_cookie": true
