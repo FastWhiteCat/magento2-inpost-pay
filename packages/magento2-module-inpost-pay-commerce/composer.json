@@ -2,10 +2,12 @@
     "name": "inpost/magento2-module-inpost-pay-commerce",
     "description": "Adobe Commerce Support Package for InPost_InPostPay module.",
     "type": "magento2-module",
-    "license": ["CC-BY-NC-ND-4.0"],
     "require": {
         "inpost/magento2-module-inpost-pay": ">=2.5.0"
     },
+    "license": [
+        "CC-BY-NC-ND-4.0"
+    ],
     "autoload": {
         "files": [
             "src/registration.php"
