@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] - 2026-02-19
+
+### Added
+- Support for PHP 8.4
+
 ## [2.3.0] - 2025-10-01
 
 ### Added
