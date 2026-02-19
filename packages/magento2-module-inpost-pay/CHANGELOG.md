@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] - 2026-02-19
+
+### Added
+- Support for PHP 8.4
+- Handling of new analytics parameter ttclid
+- Change in analytics parameters source from browser storage to cookies
+
+### Fixed
+- Fixed the handling of native Magento customer address configuration that limits street lines between 1 and 4 lines
+
+
 ## [2.5.0] - 2026-01-29
 
 ### Added
