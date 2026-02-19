@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="inpost_pay" translate="label" type="text" sortOrder="100"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>InPost Pay</label>
+                <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+                <include path="InPost_InPostPay::system/general.xml"/>
+                <include path="InPost_InPostPay::system/sandbox.xml"/>
+                <include path="InPost_InPostPay::system/authorization.xml"/>
+                <include path="InPost_InPostPay::system/display.xml"/>
+                <include path="InPost_InPostPay::system/layout.xml"/>
+                <include path="InPost_InPostPay::system/shipment_mapping.xml"/>
+                <include path="InPost_InPostPay::system/terms_and_conditions.xml"/>
+                <include path="InPost_InPostPay::system/izi_api.xml"/>
+                <include path="InPost_InPostPay::system/order_errors_handling.xml"/>
+                <include path="InPost_InPostPay::system/debugging.xml"/>
+                <include path="InPost_InPostPay::system/promotions.xml"/>
+                <include path="InPost_InPostPay::system/omnibus.xml"/>
+                <include path="InPost_InPostPay::system/bestsellers.xml"/>
+                <include path="InPost_InPostPay::system/analytics.xml"/>
+            </group>
+        </section>
+    </system>
+</config>

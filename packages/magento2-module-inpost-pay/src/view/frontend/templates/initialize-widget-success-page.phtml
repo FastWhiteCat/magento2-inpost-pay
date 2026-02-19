@@ -1,0 +1,38 @@
+<?php
+/**
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ * @var Magento\Framework\Escaper $escaper
+ */
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled()
+    || !$widgetViewModel->isInPostPayOrder()
+    || !$widgetViewModel->isEnabledOnSuccessPage()) {
+    return;
+}
+$merchantClientId = $widgetViewModel->getClientMerchantId();
+$language = $widgetViewModel->getCurrentLanguageCode();
+$enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
+$widgetWrapperClass = "inpay-widget-wrapper";
+$bindingPlace = $block->getBindingPlace();
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+?>
+
+<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+    <inpost-thank-you/>
+
+    <script type="text/x-magento-init">
+        {
+            "*" : {
+                "InpostPayMerchantWidget" : {
+                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
+                    "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
+                    "language": "<?= /* @noEscape */ $language ?>",
+                    "enabledAnalyticsParams": "<?= /* @noEscape */ $enabledAnalyticsParams ?>"
+                }
+            }
+        }
+    </script>
+</div>

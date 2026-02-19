@@ -1,0 +1,18 @@
+<?php
+
+use InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo;
+
+/**
+ * @var $block OrderViewDeliveryInfo
+ */
+?>
+<div class="admin__page-section-item order-shipping-method inpost-pay">
+    <?php if (isset($block) && $block->canShowLockerInfo() && $block->getLockerId()): ?>
+        <div class="admin__page-section-item-content inpost-pay-selected-locker">
+            <br/>
+            <?= $block->getEscaper()->escapeHtml(
+                __('Selected Paczkomat: %1', $block->getEscaper()->escapeHtml($block->getLockerId()))
+            ); ?>
+        </div>
+    <?php endif; ?>
+</div>

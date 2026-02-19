@@ -1,0 +1,24 @@
+{
+    "name": "inpost/magento2-module-restrictions-commerce",
+    "description": "Adobe Commerce Support Package for InPost_Restrictions module.",
+    "type": "magento2-module",
+    "license": ["CC-BY-NC-ND-4.0"],
+    "require": {
+        "inpost/magento2-module-restrictions": ">=2.5.0"
+    },
+    "autoload": {
+        "files": [
+            "src/registration.php"
+        ],
+        "psr-4": {
+            "InPost\\RestrictionsCommerce\\": "src"
+        }
+    },
+    "keywords": [
+        "magento2",
+        "inpostpay"
+    ],
+    "support": {
+        "issues": "https://github.com/inpost/magento2-inpost-pay/issues"
+    }
+}

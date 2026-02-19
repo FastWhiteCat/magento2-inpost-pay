@@ -1,0 +1,43 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      paths_released: ${{ steps.release.outputs.paths_released }}
+      restrictions--release_created: ${{ steps.release.outputs['packages/magento2-module-restrictions--release_created'] }}
+      restrictions--tag_name: ${{ steps.release.outputs['packages/magento2-module-restrictions--tag_name'] }}
+      inpost-pay--release_created: ${{ steps.release.outputs['packages/magento2-module-inpost-pay--release_created'] }}
+      inpost-pay--tag_name: ${{ steps.release.outputs['packages/magento2-module-inpost-pay--tag_name'] }}
+      inpost-pay-graph-ql--release_created: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-graph-ql--release_created'] }}
+      inpost-pay-graph-ql--tag_name: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-graph-ql--tag_name'] }}
+      inpost-pay-commerce--release_created: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-commerce--release_created'] }}
+      inpost-pay-commerce--tag_name: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-commerce--tag_name'] }}
+      restrictions-commerce--release_created: ${{ steps.release.outputs['packages/magento2-module-restrictions-commerce--release_created'] }}
+      restrictions-commerce--tag_name: ${{ steps.release.outputs['packages/magento2-module-restrictions-commerce--tag_name'] }}
+      inpost-pay-hyva-checkout--release_created: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-hyva-checkout--release_created'] }}
+      inpost-pay-hyva-checkout--tag_name: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-hyva-checkout--tag_name'] }}
+      inpost-pay-hyva-theme--release_created: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-hyva-theme--release_created'] }}
+      inpost-pay-hyva-theme--tag_name: ${{ steps.release.outputs['packages/magento2-module-inpost-pay-hyva-theme--tag_name'] }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  split:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+    uses: ./.github/workflows/monorepo-split.yml
+    secrets: inherit

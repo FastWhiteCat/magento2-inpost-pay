@@ -1,0 +1,49 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "separate-pull-requests": true,
+    "tag-separator": "-",
+    "packages": {
+        "packages/magento2-module-restrictions": {
+            "release-type": "php",
+            "component": "restrictions",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        },
+        "packages/magento2-module-inpost-pay": {
+            "release-type": "php",
+            "component": "inpost-pay",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        },
+        "packages/magento2-module-inpost-pay-graph-ql": {
+            "release-type": "php",
+            "component": "inpost-pay-graph-ql",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        },
+        "packages/magento2-module-inpost-pay-commerce": {
+            "release-type": "php",
+            "component": "inpost-pay-commerce",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        },
+        "packages/magento2-module-restrictions-commerce": {
+            "release-type": "php",
+            "component": "restrictions-commerce",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        },
+        "packages/magento2-module-inpost-pay-hyva-checkout": {
+            "release-type": "php",
+            "component": "inpost-pay-hyva-checkout",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        },
+        "packages/magento2-module-inpost-pay-hyva-theme": {
+            "release-type": "php",
+            "component": "inpost-pay-hyva-theme",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": ["composer.json"]
+        }
+    }
+}

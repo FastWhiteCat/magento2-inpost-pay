@@ -1,0 +1,13 @@
+<div id="inpost-izi-button-wrapper" data-bind="fadeVisible: isVisible"
+     afterRender="initAfterRender">
+    <div data-bind="class: 'inpay-widget-wrapper ' + getConfiguration().bindingPlace">
+        <inpost-izi-button
+            data-bind="attr: {
+            language: getConfiguration().language,
+            variation: getConfiguration().variation,
+            binding_place: getConfiguration().bindingPlace
+        }"
+        >
+        </inpost-izi-button>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="inpost.init.widget.register" remove="true" />
+
+        <referenceContainer name="form.additional.info">
+            <block name="inpost.hyva.widget.register"
+                   template="InPost_InPostPayHyvaTheme::initialize-widget-register.phtml" after="customer_form_register"
+                   ifconfig="payment/inpost_pay/show_on_register_page">
+                <arguments>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::REGISTER_PAGE_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
+                </arguments>
+                <block name="inpost.hyva.widget.register.script"
+                       template="InPost_InPostPayHyvaTheme::inpostpay-script.phtml"
+                       ifconfig="payment/inpost_pay/show_on_register_page">
+                    <arguments>
+                        <argument name="binding_place" xsi:type="const">
+                            InPost\InPostPay\Provider\Config\DisplayConfigProvider::REGISTER_PAGE_BINDING_PLACE_NAME
+                        </argument>
+                        <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

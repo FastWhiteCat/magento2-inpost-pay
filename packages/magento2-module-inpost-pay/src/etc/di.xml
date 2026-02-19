@@ -1,0 +1,885 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BasketInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\SummaryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Summary"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PriceInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Price"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Summary\NoticeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Summary\Notice"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\DeliveryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Delivery"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Delivery\DeliveryOptionInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Delivery\DeliveryOption"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromoCodeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromoCode"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStoreInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\MerchantStore"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\MerchantStore\CookieInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\MerchantStore\Cookie"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Consent\AdditionalConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Consent\AdditionalConsent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\ProductAttribute"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\Quantity"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\BrowserInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Browser"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\OrderInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AcceptedConsentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AcceptedConsent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AccountInfoInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AccountInfo"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\AddressDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\AddressDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\ClientAddressInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\ClientAddress"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\DeliveryAddressInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\DeliveryAddress"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\DeliveryInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\Delivery"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\InvoiceDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\InvoiceDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\OrderDetails\AdditionalOrderParametersInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\OrderDetails\AdditionalOrderParameters"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\QuantityUpdateInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\QuantityUpdate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\QuantityChangeInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\QuantityChange"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellersInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Bestsellers"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\ProductAvailabilityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\ProductAvailability"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\BestsellerProduct\BestsellerQuantityInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\BestsellerProduct\BestsellerQuantity"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayOrderInterface"
+                type="InPost\InPostPay\Model\InPostPayOrder"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayQuoteInterface"
+                type="InPost\InPostPay\Model\InPostPayQuote"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayBasketNoticeInterface"
+                type="InPost\InPostPay\Model\InPostPayBasketNotice"/>
+    <preference for="InPost\InPostPay\Api\InPostPayOrderRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayOrderRepository"/>
+    <preference for="InPost\InPostPay\Api\OrderLockerServiceInterface"
+                type="InPost\InPostPay\Service\Order\OrderLockerService"/>
+    <preference for="InPost\InPostPay\Api\Validator\SignatureValidatorInterface"
+                type="InPost\InPostPay\Validator\SignatureValidator"/>
+    <preference for="InPost\InPostPay\Api\Validator\RefundWebhookSignatureValidatorInterface"
+                type="InPost\InPostPay\Validator\RefundWebhookSignatureValidator"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\ConnectorInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Connector"/>
+    <preference for="InPost\InPostPay\Api\InPostPayLockerIdProviderInterface"
+                type="InPost\InPostPay\Provider\InPostPayLockerIdProvider" />
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketGet"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketDelete"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\InitBasketInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\InitBasket"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\BestsellerProductsGetInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\BestsellerProductsGet"/>
+    <preference for="InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayQuoteRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayBasketNoticeRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayBasketNoticeRepository"/>
+    <preference for="InPost\InPostPay\Api\RefundTransactionRepositoryInterface"
+                type="InPost\InPostPay\Model\RefundTransactionRepository"/>
+    <preference for="InPost\InPostPay\Api\Data\RefundTransactionInterface"
+                type="InPost\InPostPay\Model\RefundTransaction"/>
+    <preference for="InPost\InPostPay\Api\CheckoutAgreementsVersionRepositoryInterface"
+                type="InPost\InPostPay\Model\CheckoutAgreementsVersionRepository" />
+    <preference for="InPost\InPostPay\Api\OrderProcessorInterface"
+                type="InPost\InPostPay\Service\Order\Creator\OrderProcessor" />
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\Merchant\RefundEventInterface"
+                type="InPost\InPostPay\Service\ApiConnector\Merchant\RefundEvent"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\OrderUpdateInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\OrderUpdate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PhoneNumberInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PhoneNumber"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Order\EventDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Order\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\EventDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\EventData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\EventData\AmountInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\EventData\Amount"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\EventData\PaymentInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\EventData\Payment"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Refund\AdditionalBusinessDataInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund\AdditionalBusinessData"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\RefundInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Refund"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\DeliveryProductInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\DeliveryProduct"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\Product\AdditionalImageInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\Product\AdditionalImage"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailableInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Basket\PromotionAvailable\DetailsInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Basket\PromotionAvailable\Details"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayAvailablePaymentMethodInterface"
+                type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethod"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreement"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayCheckoutAgreementStoreInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementStore"/>
+    <preference for="InPost\InPostPay\Api\InPostPayCheckoutAgreementRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayCheckoutAgreementStoreRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayCheckoutAgreementStoreRepository"/>
+    <preference for="InPost\InPostPay\Api\InPostPayAvailablePaymentMethodRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayAvailablePaymentMethodRepository"/>
+    <preference for="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface"
+                type="InPost\InPostPay\Service\ApiConnector\InPostPayLogsByDate"/>
+    <preference for="InPost\InPostPay\Api\Data\Merchant\Logs\InPostPayLogInterface"
+                type="InPost\InPostPay\Model\Data\Merchant\Logs\InPostPayLog"/>
+    <preference for="InPost\InPostPay\Api\Data\InPostPayBestsellerProductInterface"
+                type="InPost\InPostPay\Model\InPostPayBestsellerProduct"/>
+    <preference for="InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface"
+                type="InPost\InPostPay\Model\InPostPayBestsellerProductRepository"/>
+    <preference for="InPost\InPostPay\Api\Provider\PolishRegionProviderInterface"
+                type="InPost\InPostPay\Provider\PolishRegionProvider"/>
+
+    <!-- Grid data source and collections -->
+    <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_pay_bestseller_product</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostpay_bestsellers_listing_listing_data_source"
+                      xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayBestsellerProduct\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface">
+        <plugin name="update_checkout_agreement_version"
+                type="InPost\InPostPay\Plugin\CheckoutAgreementsRepository\UpdateCheckoutAgreementsVersionPlugin" />
+    </type>
+    <type name="Magento\CheckoutAgreements\Api\Data\AgreementInterface">
+        <plugin name="InPost_InPostPay::updateCheckoutAgreementsVersionPlugin"
+                type="InPost\InPostPay\Plugin\UpdateCheckoutAgreementsVersionPlugin" />
+    </type>
+    <type name="Magento\Quote\Api\ChangeQuoteControlInterface">
+        <plugin name="InPost_InPostPay::allowRemoteQuoteChangeByInPostPayPlugin"
+                type="InPost\InPostPay\Plugin\Quote\AllowRemoteQuoteChangeByInPostPayPlugin" />
+    </type>
+    <type name="Magento\Webapi\Model\Rest\Swagger\Generator">
+        <plugin name="InPost_InPostPay::swaggerGetListOfServicesPlugin"
+                type="InPost\InPostPay\Plugin\Swagger\SwaggerGetListOfServicesPlugin" />
+    </type>
+    <type name="\Magento\Framework\Webapi\Authorization">
+        <plugin name="InPost_InPostPay::swaggerAllowAclResourcePlugin"
+                type="InPost\InPostPay\Plugin\Swagger\SwaggerAllowAclResourcePlugin" />
+    </type>
+    <type name="InPost\InPostPay\Controller\OrderComplete\Get">
+        <plugin name="InPost_InPostPay::orderCompleteIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface">
+        <plugin name="InPost_InPostPay::basketGetIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface">
+        <plugin name="InPost_InPostPay::basketUpdateIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+        <plugin name="InPost_InPostPay::registerMobileAppBasketEventPlugin"
+                type="InPost\InPostPay\Plugin\ApiConnector\Merchant\RegisterMobileAppBasketEventPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface">
+        <plugin name="InPost_InPostPay::basketDeleteIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface">
+        <plugin name="InPost_InPostPay::basketConfirmationIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
+        <plugin name="InPost_InPostPay::orderCreateIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+        <plugin name="InPost_InPostPay::registerMobileAppOrderPlugin"
+                type="InPost\InPostPay\Plugin\ApiConnector\Merchant\RegisterMobileAppOrderPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer">
+        <plugin name="InPost_InPostPay::addAdditionalAnalyticsOrderParamsToOrderDetailsPlugin"
+                type="InPost\InPostPay\Plugin\DataTransfer\OrderToInPostOrder\AddAdditionalAnalyticsOrderParamsToOrderDetailsPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface">
+        <plugin name="InPost_InPostPay::orderGetIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface">
+        <plugin name="InPost_InPostPay::orderEventIsEnablePlugin"
+                type="InPost\InPostPay\Plugin\IsPaymentMethodEnable" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <plugin name="InPost_InPostPay::addErrorsToBasketPlugin"
+                type="InPost\InPostPay\Plugin\AddErrorsToBasketPlugin" />
+        <plugin name="InPost_InPostPay::checkAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin"
+                type="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin" />
+    </type>
+    <type name="Magento\ConfigurableProduct\Model\Quote\Item\CartItemProcessor">
+        <plugin name="InPost_InPostPay::CartItemProcessorPlugin"
+                type="InPost\InPostPay\Plugin\ConfigurableProduct\CartItemProcessorPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer">
+        <plugin name="InPost_InPostPay::zeroQuantityWhenOutOfStockPlugin"
+                type="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ZeroQuantityWhenOutOfStockPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer">
+        <plugin name="InPost_InPostPay::applyCustomPromoPriceForCustomerGroupPlugin"
+                type="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ApplyCustomPromoPriceForCustomerGroupPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Api\Data\Merchant\Basket\Product\ProductAttributeInterface">
+        <plugin name="InPost_InPostPay::limitProductAttributeNameAndValueCharactersPlugin"
+                type="InPost\InPostPay\Plugin\Model\Data\Basket\Product\LimitProductAttributeNameAndValueCharactersPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Model\Request">
+        <plugin name="InPost_InPostPay::addMagentoModuleVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Model\Request\AddMagentoModuleVersionHeaderPlugin" />
+    </type>
+    <type name="Magento\InventoryReservationsApi\Model\AppendReservationsInterface">
+        <plugin name="InPost_InPostPay::checkProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin"
+                type="InPost\InPostPay\Plugin\InventoryReservations\CheckProductIsSaleableAndUpdateInPostPayBestsellerProductPlugin" />
+    </type>
+    <type name="Magento\Sales\Api\OrderCustomerDelegateInterface">
+        <plugin name="InPost_InPostPay::changeNewCustomerDelegateDataPlugin"
+                type="InPost\InPostPay\Plugin\ChangeNewCustomerDelegateDataPlugin" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Email\Container\IdentityInterface">
+        <plugin name="InPost_InPostPay::addCopyToOrderEmailsForInPostPayAccountEmailPlugin"
+                type="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <plugin name="InPost_InPostPay::registerIfDigitalQuoteIsAllowedForMagentoConfigPlugin"
+                type="InPost\InPostPay\Plugin\Service\DataTransfer\QuoteToBasketDataTransfer\RegisterIfDigitalQuoteIsAllowedForMagentoConfigPlugin" />
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer">
+        <plugin name="InPost_InPostPay::disableDigitalProductDeliveryIfNotAllowedPlugin"
+                type="InPost\InPostPay\Plugin\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer\DisableDigitalProductDeliveryIfNotAllowedPlugin" />
+    </type>
+    <virtualType name="InPostPayPaymentFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="string">inpost_pay</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">InPost\InPostPay\Block\Payment\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">InPostPayPaymentValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">InPostPayPaymentCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayPaymentValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">InPostPayPaymentConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayPaymentConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">InPostPayPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">inpost_pay</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayPaymentCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="capture" xsi:type="string">Magento\Payment\Gateway\Command\NullCommand</item>
+                <item name="refund" xsi:type="string">InPostPayRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="InPostPayRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">InPost\InPostPay\Gateway\Request\RefundDataBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">InPost\InPostPay\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">InPost\InPostPay\Gateway\Http\Client\TransactionRefundClient</argument>
+            <argument name="handler" xsi:type="object">InPost\InPostPay\Gateway\Response\RefundTransactionHandler</argument>
+        </arguments>
+    </virtualType>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="summary" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketSummaryDataTransfer</item>
+                <item name="delivery" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryDataTransfer</item>
+                <item name="promo_codes" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer</item>
+                <item name="products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer</item>
+                <item name="related_products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketRelatedProductsDataTransfer</item>
+                <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketConsentsDataTransfer</item>
+                <item name="promotions_available" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromotionsAvailableDataTransfer</item>
+                <item name="merchant_store" xsi:type="object">InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketMerchantStoreDataTransfer</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\OrderToInPostOrderDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="order_details" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderOrderDetailsDataTransfer</item>
+                <item name="invoice_details" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderInvoiceDetailsDataTransfer</item>
+                <item name="account_info" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderAccountInfoDataTransfer</item>
+                <item name="delivery" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDeliveryDataTransfer</item>
+                <item name="products" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderProductsDataTransfer</item>
+                <item name="consents" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderConsentsDataTransfer</item>
+                <item name="order_discount" xsi:type="object">InPost\InPostPay\Service\DataTransfer\OrderToInPostOrder\OrderToInPostOrderDiscountDataTransfer</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\BestsellerProductDataTransfer">
+        <arguments>
+            <argument name="dataTransfer" xsi:type="array">
+                <item name="core_bestseller_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\CoreProductDataTransferInPostPay</item>
+                <item name="bestseller_store_based_data" xsi:type="object">InPost\InPostPay\Service\DataTransfer\MagentoBestsellerToInPostPayBestseller\BestsellerProductStoreBasedDataTransfer</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\OrderValidator">
+        <arguments>
+            <argument name="orderValidators" xsi:type="array">
+                <item name="restrictions_validator" xsi:type="object">InPost\InPostPay\Validator\Order\RestrictionsValidator</item>
+                <item name="basket_price" xsi:type="object">InPost\InPostPay\Validator\Order\BasketPriceValidator</item>
+                <item name="payment_type" xsi:type="object">InPost\InPostPay\Validator\Order\PaymentTypeValidator</item>
+                <item name="delivery" xsi:type="object">InPost\InPostPay\Validator\Order\DeliveryValidator</item>
+                <item name="consents" xsi:type="object">InPost\InPostPay\Validator\Order\ConsentsValidator</item>
+                <item name="billing_information" xsi:type="object">InPost\InPostPay\Validator\Order\BillingInformationValidator</item>
+                <item name="stock" xsi:type="object">InPost\InPostPay\Validator\Order\StockValidator</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+        <arguments>
+            <argument name="orderProcessingSteps" xsi:type="array">
+                <item name="assign_customer" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\AssignCustomerStep</item>
+                <item name="billing_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\BillingAddressStep</item>
+                <item name="shipping_address" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ShippingAddressStep</item>
+                <item name="delivery_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\DeliveryMethodStep</item>
+                <item name="payment_method" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\PaymentMethodStep</item>
+                <item name="reload_quote" xsi:type="object">InPost\InPostPay\Service\Order\Creator\Steps\ReloadQuoteStep</item>
+            </argument>
+            <argument name="orderPostProcessingSteps" xsi:type="array">
+                <item name="init_inpost_pay_order" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\InitInPostPayOrderStep</item>
+                <item name="save_pickup_point" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SavePickupPointStep</item>
+                <item name="save_delivery_options" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveDeliveryOptionsStep</item>
+                <item name="save_accepted_consents" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\SaveAcceptedConsentsStep</item>
+                <item name="update_payment_title" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdatePaymentTitleStep</item>
+                <item name="update_free_order_payment" xsi:type="object">InPost\InPostPay\Service\Order\Updater\Steps\UpdateFreeOrderPayment</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Data\Order\Analytics\Event\PurchaseEventDataBuilder">
+        <arguments>
+            <argument name="purchaseEvents" xsi:type="array">
+                <item name="ga4_purchase_event" xsi:type="object">InPost\InPostPay\Model\Data\Order\Analytics\Event\Purchase\Ga4PurchaseEvent</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\PurchaseEventDataSender">
+        <arguments>
+            <argument name="eventDataHandlers" xsi:type="array">
+                <item name="ga4_purchase_event" xsi:type="object">InPost\InPostPay\Service\Order\Analytics\Event\Purchase\Ga4PurchaseEventHandler</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Config\Payment\TitleMapper">
+        <arguments>
+            <argument name="mappings" xsi:type="array">
+                <item name="CARD" xsi:type="string">Card (InPost Pay)</item>
+                <item name="CARD_TOKEN" xsi:type="string">Card (InPost Pay)</item>
+                <item name="APPLE_PAY" xsi:type="string">Apple Pay (InPost Pay)</item>
+                <item name="BLIK_CODE" xsi:type="string">BLIK (InPost Pay)</item>
+                <item name="BLIK_TOKEN" xsi:type="string">BLIK (InPost Pay)</item>
+                <item name="PAY_BY_LINK" xsi:type="string">Pay by Link (InPost Pay)</item>
+                <item name="SHOPPING_LIMIT" xsi:type="string">Shopping Limit (InPost Pay)</item>
+                <item name="DEFERRED_PAYMENT" xsi:type="string">Deferred Payment (InPost Pay)</item>
+                <item name="GOOGLE_PAY" xsi:type="string">Google Pay (InPost Pay)</item>
+                <item name="CASH_ON_DELIVERY" xsi:type="string">Cash on delivery (InPost Pay)</item>
+                <item name="FREE_ORDER" xsi:type="string">Free Order (InPost Pay)</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Grid data source and collections -->
+    <virtualType name="InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">inpost_pay_checkout_agreement</argument>
+            <argument name="resourceModel" xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="inpostpay_checkoutagreement_listing_listing_data_source"
+                      xsi:type="string">InPost\InPostPay\Model\ResourceModel\InPostPayCheckoutAgreement\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- END Grid data source and collections -->
+
+    <type name="InPost\InPostPay\Logger\Handler">
+        <arguments>
+            <argument name="debugConfigProvider" xsi:type="object">InPost\InPostPay\Provider\Config\DebugConfigProvider</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Refund\SignatureGenerator">
+        <arguments>
+            <argument name="hashAlgorithmName" xsi:type="const">InPost\InPostPay\Service\Refund\SignatureGenerator::DEFAULT_ALGORITHM_HASH_NAME</argument>
+            <argument name="hashAlgorithmPrefix" xsi:type="const">InPost\InPostPay\Service\Refund\SignatureGenerator::DEFAULT_ALGORITHM_HASH_PREFIX</argument>
+        </arguments>
+    </type>
+    <virtualType name="InPost\InPostPay\Logger\InPostPayLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">InPost\InPostPay\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="InPost\InPostPay\ViewModel\Widget">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\Restrictions\Service\RefreshRestrictionRulesService">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\Restrictions\Cron\RefreshRestrictionRulesCron">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Connector">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\TokenGenerator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\PublicKeyGenerator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\SignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\RefundWebhookSignatureValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CheckoutAgreement\DeleteInPostPayCheckoutAgreementAssignedStoresEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\CheckoutAgreement\InsertInPostPayCheckoutAgreementAssignedStoresEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\InPostPayLogsByDate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Provider\InPostPayLockerIdProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\CreateOrUpdateBasket">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\TransactionList">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Block\Adminhtml\Order\OrderViewDeliveryInfo">
+        <arguments>
+            <argument name="inPostPayAdapter" xsi:type="object">InPostPayPaymentFacade</argument>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Adminhtml\Order\View\RegisterCurrentOrderPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\PurchaseEventDataSender">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Analytics\Event\Purchase\Ga4PurchaseEventHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Cron\SendAnalyticsData">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\OrderLockerService">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Provider\DeliveryDateProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Quote\UpdateInPostBasketEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type><type name="InPost\InPostPay\Service\Cart\CartService">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketGet">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Authorization\SignatureValidationPolicyPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketUpdate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketDelete">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BasketConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Publisher\BasketCreateOrUpdatePublisher">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Consumer\BasketCreateOrUpdateConsumer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketPromoCodesDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\OrderProcessor">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="InPost\InPostPay\Registry\ShippingMethodMappingRegistry" shared="true" />
+    <type name="InPost\InPostPay\Registry\InPostPayMobileAppOrderRegistry" shared="true" />
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Order\Creator\Steps\OrderProcessingStep">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetGuestConfirmation">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Widget\Basket\GetMobileLink">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderCreate">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+        <plugin name="InPost_InPostPay::registerBasketIdBeforeOrderCreatePlugin"
+                type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\RegisterBasketIdBeforeOrderCreatePlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\OrderGet">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\InPostBasketToArrayConverter">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Controller\OrderComplete\Get">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Order\UpdateInPostOrderEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\MerchantEndpoint\Debug\MerchantEndpointEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\IziEndpoint\Debug\IziApiEndpointEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\Order\StockValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Webapi\Rest\ModifyExceptionResultPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Order\ForceStatusUpdateObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Validator\Order\RestrictionsValidator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketProductsDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\InitBasketProcessor">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\TransactionRefund">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Converter\InPostRefundToArrayConverter">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Refund\SignatureGenerator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Gateway\Request\RefundDataBuilder">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Gateway\Response\RefundTransactionHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\UpdateOrder">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\AdditionalProductImagesDataTransfer">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Quote\AddImageGalleryToProductsCollectionEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\DataTransfer\QuoteToBasket\ZeroQuantityWhenOutOfStockPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Provider\Product\OmnibusProductLowestPriceProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Quote\UpdateInPostBasketBeforeQuoteMergeEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Quote\UpdateInPostBasketAfterQuoteMergeEventObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\InitBasket">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\BestsellerProduct\Upload">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\PostBestsellers">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\BestsellerProduct\UploadResponseHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\DeleteBestseller">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\BestsellerProduct\Delete">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\ApiConnector\Merchant\BestsellerProductsGet">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Cron\Bestsellers\SynchronizeBestsellers">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Product\UpdateInPostPayBestsellerProductAfterSaveObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Product\DeleteInPostPayBestsellerProductAfterSaveObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Model\Config\Payment\TitleUpdater">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\CheckAndDeactivateNoLongerAvailableConfiguredPromotionsPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Model\Order\Email\Container\AddCopyToOrderEmailsForInPostPayAccountEmailPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Plugin\Service\DataTransfer\QuoteToBasketDataTransfer\RegisterIfDigitalQuoteIsAllowedForMagentoConfigPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\Order\DeleteBindingAfterPlaceOrderObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Cron\HandleTimedOutOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Observer\SaveRefundTransactionMappingAfterCreditmemoCommit">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+</config>

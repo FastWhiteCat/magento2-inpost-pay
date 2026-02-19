@@ -1,0 +1,448 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * *'  # Nightly at 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: 'Test tier to run'
+        required: true
+        default: 'tier1'
+        type: choice
+        options:
+          - tier1
+          - tier2
+
+permissions:
+  contents: read
+
+env:
+  COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+  HYVA_AUTH: ${{ secrets.HYVA_AUTH }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      packages_changed: ${{ steps.filter.outputs.changes }}
+      has_os_changes: ${{ steps.check.outputs.has_os_changes }}
+      has_commerce_changes: ${{ steps.check.outputs.has_commerce_changes }}
+      has_hyva_changes: ${{ steps.check.outputs.has_hyva_changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            restrictions:
+              - 'packages/magento2-module-restrictions/**'
+            inpost-pay:
+              - 'packages/magento2-module-inpost-pay/**'
+            inpost-pay-graph-ql:
+              - 'packages/magento2-module-inpost-pay-graph-ql/**'
+            inpost-pay-commerce:
+              - 'packages/magento2-module-inpost-pay-commerce/**'
+            restrictions-commerce:
+              - 'packages/magento2-module-restrictions-commerce/**'
+            inpost-pay-hyva-checkout:
+              - 'packages/magento2-module-inpost-pay-hyva-checkout/**'
+            inpost-pay-hyva-theme:
+              - 'packages/magento2-module-inpost-pay-hyva-theme/**'
+
+      - name: Check change categories
+        id: check
+        run: |
+          changes='${{ steps.filter.outputs.changes }}'
+          has_os=false
+          has_commerce=false
+          has_hyva=false
+
+          if echo "$changes" | grep -qE 'restrictions|inpost-pay"'; then
+            has_os=true
+          fi
+          if echo "$changes" | grep -qE 'commerce'; then
+            has_commerce=true
+          fi
+          if echo "$changes" | grep -qE 'hyva'; then
+            has_hyva=true
+          fi
+
+          # On schedule or dispatch, run everything
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            has_os=true
+            has_commerce=true
+            has_hyva=true
+          fi
+
+          echo "has_os_changes=$has_os" >> "$GITHUB_OUTPUT"
+          echo "has_commerce_changes=$has_commerce" >> "$GITHUB_OUTPUT"
+          echo "has_hyva_changes=$has_hyva" >> "$GITHUB_OUTPUT"
+
+  # Tier 1 — Every PR (representative subset)
+  tier1:
+    needs: detect-changes
+    if: >-
+      needs.detect-changes.outputs.has_os_changes == 'true' ||
+      needs.detect-changes.outputs.has_commerce_changes == 'true' ||
+      needs.detect-changes.outputs.has_hyva_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Mage OS 2.4.6 — PHP 8.2 — Luma — Clean
+          - edition: mage-os
+            magento_version: '2.4.6-p9'
+            php_version: '8.2'
+            frontend: luma
+            extensions: clean
+            composer_repo: 'https://mirror.mage-os.org'
+            packages: os
+            search: opensearch
+            db: mariadb:10.6
+
+          # Magento OS 2.4.8 — PHP 8.4 — Luma — Clean
+          - edition: magento-os
+            magento_version: '2.4.8-p1'
+            php_version: '8.4'
+            frontend: luma
+            extensions: clean
+            composer_repo: 'https://repo.magento.com'
+            packages: os
+            search: opensearch
+            db: mariadb:11.4
+
+          # Magento OS 2.4.8 — PHP 8.4 — Hyva — Clean
+          - edition: magento-os
+            magento_version: '2.4.8-p1'
+            php_version: '8.4'
+            frontend: hyva
+            extensions: clean
+            composer_repo: 'https://repo.magento.com'
+            packages: os-hyva
+            search: opensearch
+            db: mariadb:11.4
+
+          # Adobe Commerce 2.4.6 — PHP 8.2 — Luma — Clean
+          - edition: adobe-commerce
+            magento_version: '2.4.6-p9'
+            php_version: '8.2'
+            frontend: luma
+            extensions: clean
+            composer_repo: 'https://repo.magento.com'
+            packages: commerce
+            search: opensearch
+            db: mariadb:10.6
+
+    services:
+      mariadb:
+        image: ${{ matrix.db }}
+        env:
+          MARIADB_ROOT_PASSWORD: magento
+          MARIADB_DATABASE: magento
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -pmagento"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      opensearch:
+        image: opensearchproject/opensearch:2.19.0
+        env:
+          discovery.type: single-node
+          plugins.security.disabled: 'true'
+          OPENSEARCH_JAVA_OPTS: '-Xms512m -Xmx512m'
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl -sf http://localhost:9200"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_version }}
+          extensions: bcmath, ctype, curl, dom, gd, hash, iconv, intl, mbstring, openssl, pdo_mysql, simplexml, soap, sockets, sodium, xsl, zip
+          tools: composer:v2
+
+      - name: Configure Composer auth
+        if: matrix.edition != 'mage-os'
+        run: |
+          composer config --global http-basic.repo.magento.com \
+            "${{ fromJson(env.COMPOSER_AUTH)['http-basic']['repo.magento.com'].username }}" \
+            "${{ fromJson(env.COMPOSER_AUTH)['http-basic']['repo.magento.com'].password }}"
+
+      - name: Configure Hyva auth
+        if: matrix.frontend == 'hyva'
+        run: |
+          composer config --global http-basic.hyva-themes.repo.packagist.com \
+            "${{ fromJson(env.HYVA_AUTH)['http-basic']['hyva-themes.repo.packagist.com'].username }}" \
+            "${{ fromJson(env.HYVA_AUTH)['http-basic']['hyva-themes.repo.packagist.com'].password }}"
+
+      - name: Create Magento project
+        run: |
+          composer create-project \
+            --repository-url=${{ matrix.composer_repo }} \
+            magento/project-${{ matrix.edition == 'adobe-commerce' && 'enterprise' || 'community' }}-edition=${{ matrix.magento_version }} \
+            magento --no-install --no-interaction
+
+      - name: Add local packages as path repositories
+        working-directory: magento
+        run: |
+          for pkg in ../packages/magento2-module-*; do
+            name=$(basename "$pkg")
+            composer config repositories."$name" path "../packages/$name"
+          done
+
+      - name: Install OS packages
+        if: matrix.packages == 'os' || matrix.packages == 'os-hyva'
+        working-directory: magento
+        run: |
+          composer require --no-update \
+            inpost/magento2-module-restrictions:* \
+            inpost/magento2-module-inpost-pay:* \
+            inpost/magento2-module-inpost-pay-graph-ql:*
+
+      - name: Install Commerce packages
+        if: matrix.packages == 'commerce'
+        working-directory: magento
+        run: |
+          composer require --no-update \
+            inpost/magento2-module-restrictions:* \
+            inpost/magento2-module-inpost-pay:* \
+            inpost/magento2-module-inpost-pay-graph-ql:* \
+            inpost/magento2-module-inpost-pay-commerce:* \
+            inpost/magento2-module-restrictions-commerce:*
+
+      - name: Install Hyva packages
+        if: matrix.packages == 'os-hyva'
+        working-directory: magento
+        run: |
+          composer require --no-update \
+            inpost/magento2-module-inpost-pay-hyva-checkout:* \
+            inpost/magento2-module-inpost-pay-hyva-theme:*
+
+      - name: Install with extensions
+        if: matrix.extensions == 'with-extensions'
+        working-directory: magento
+        run: |
+          composer require --no-update \
+            smile/elasticsuite:* \
+            smartmage/inpost:*
+
+      - name: Composer install
+        working-directory: magento
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Install Magento
+        working-directory: magento
+        run: |
+          php bin/magento setup:install \
+            --db-host=127.0.0.1 \
+            --db-name=magento \
+            --db-user=root \
+            --db-password=magento \
+            --search-engine=opensearch \
+            --opensearch-host=127.0.0.1 \
+            --opensearch-port=9200 \
+            --session-save=redis \
+            --session-save-redis-host=127.0.0.1 \
+            --cache-backend=redis \
+            --cache-backend-redis-server=127.0.0.1 \
+            --admin-firstname=Admin \
+            --admin-lastname=Admin \
+            --admin-email=admin@example.com \
+            --admin-user=admin \
+            --admin-password=admin123 \
+            --backend-frontname=admin \
+            --no-interaction
+
+      - name: Verify modules are enabled
+        working-directory: magento
+        run: |
+          php bin/magento module:status | grep -E 'InPost_'
+
+      - name: Run setup:di:compile
+        working-directory: magento
+        run: php bin/magento setup:di:compile
+
+      - name: Run integration tests
+        working-directory: magento
+        run: |
+          # Run Magento integration test suite for InPost modules
+          if [ -d "dev/tests/integration/testsuite/InPost" ]; then
+            cd dev/tests/integration
+            php ../../../vendor/bin/phpunit testsuite/InPost/ --no-coverage
+          else
+            echo "No integration tests found — verifying compilation succeeded"
+          fi
+
+  # Tier 2 — Nightly / pre-release (full matrix)
+  tier2:
+    needs: detect-changes
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.tier == 'tier2')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        magento_version: ['2.4.6-p9', '2.4.7-p4', '2.4.8-p1']
+        php_version: ['8.2', '8.3', '8.4']
+        frontend: [luma]
+        extensions: [clean]
+        exclude:
+          # PHP 8.1 dropped — minimum 8.2
+          # 2.4.6: supports 8.1, 8.2 — we test 8.2 only
+          - magento_version: '2.4.6-p9'
+            php_version: '8.3'
+          - magento_version: '2.4.6-p9'
+            php_version: '8.4'
+          # 2.4.7: supports 8.2, 8.3
+          - magento_version: '2.4.7-p4'
+            php_version: '8.4'
+          # 2.4.8: supports 8.3, 8.4
+          - magento_version: '2.4.8-p1'
+            php_version: '8.2'
+
+    services:
+      mariadb:
+        image: ${{ matrix.magento_version == '2.4.8-p1' && 'mariadb:11.4' || 'mariadb:10.6' }}
+        env:
+          MARIADB_ROOT_PASSWORD: magento
+          MARIADB_DATABASE: magento
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -pmagento"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      opensearch:
+        image: opensearchproject/opensearch:2.19.0
+        env:
+          discovery.type: single-node
+          plugins.security.disabled: 'true'
+          OPENSEARCH_JAVA_OPTS: '-Xms512m -Xmx512m'
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl -sf http://localhost:9200"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_version }}
+          extensions: bcmath, ctype, curl, dom, gd, hash, iconv, intl, mbstring, openssl, pdo_mysql, simplexml, soap, sockets, sodium, xsl, zip
+          tools: composer:v2
+
+      - name: Configure Composer auth
+        run: |
+          composer config --global http-basic.repo.magento.com \
+            "${{ fromJson(env.COMPOSER_AUTH)['http-basic']['repo.magento.com'].username }}" \
+            "${{ fromJson(env.COMPOSER_AUTH)['http-basic']['repo.magento.com'].password }}"
+
+      - name: Create Magento project
+        run: |
+          composer create-project \
+            --repository-url=https://repo.magento.com \
+            magento/project-community-edition=${{ matrix.magento_version }} \
+            magento --no-install --no-interaction
+
+      - name: Add local packages as path repositories
+        working-directory: magento
+        run: |
+          for pkg in ../packages/magento2-module-*; do
+            name=$(basename "$pkg")
+            composer config repositories."$name" path "../packages/$name"
+          done
+
+      - name: Install InPost packages
+        working-directory: magento
+        run: |
+          composer require --no-update \
+            inpost/magento2-module-restrictions:* \
+            inpost/magento2-module-inpost-pay:* \
+            inpost/magento2-module-inpost-pay-graph-ql:*
+
+      - name: Composer install
+        working-directory: magento
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Install Magento
+        working-directory: magento
+        run: |
+          php bin/magento setup:install \
+            --db-host=127.0.0.1 \
+            --db-name=magento \
+            --db-user=root \
+            --db-password=magento \
+            --search-engine=opensearch \
+            --opensearch-host=127.0.0.1 \
+            --opensearch-port=9200 \
+            --session-save=redis \
+            --session-save-redis-host=127.0.0.1 \
+            --cache-backend=redis \
+            --cache-backend-redis-server=127.0.0.1 \
+            --admin-firstname=Admin \
+            --admin-lastname=Admin \
+            --admin-email=admin@example.com \
+            --admin-user=admin \
+            --admin-password=admin123 \
+            --backend-frontname=admin \
+            --no-interaction
+
+      - name: Verify modules are enabled
+        working-directory: magento
+        run: php bin/magento module:status | grep -E 'InPost_'
+
+      - name: Run setup:di:compile
+        working-directory: magento
+        run: php bin/magento setup:di:compile
+
+      - name: Run integration tests
+        working-directory: magento
+        run: |
+          if [ -d "dev/tests/integration/testsuite/InPost" ]; then
+            cd dev/tests/integration
+            php ../../../vendor/bin/phpunit testsuite/InPost/ --no-coverage
+          else
+            echo "No integration tests found — verifying compilation succeeded"
+          fi

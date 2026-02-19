@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/v1/izi/basket/:basketId" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/basket/:basketId/event" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/basket/:basketId/binding" method="DELETE">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/basket/product/:productId" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\InitBasketInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/basket/:basketId/confirmation" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/order" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/order/:orderId" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/order/:orderId/event" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/products" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\BestsellerProductsGetInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/v1/izi/refund/events" method="POST">
+        <service class="InPost\InPostPay\Api\ApiConnector\Merchant\RefundEventInterface" method="execute"/>
+        <resources>
+            <resource ref="inpost_pay_refunds_event_signature_validated_resource" />
+        </resources>
+    </route>
+    <route url="/V1/izi/inpostpaylogs/:logDate" method="GET">
+        <service class="InPost\InPostPay\Api\ApiConnector\InPostPayLogsByDateInterface" method="execute"/>
+        <resources>
+            <resource ref="InPost_InPostPay::logs"/>
+        </resources>
+    </route>
+</routes>

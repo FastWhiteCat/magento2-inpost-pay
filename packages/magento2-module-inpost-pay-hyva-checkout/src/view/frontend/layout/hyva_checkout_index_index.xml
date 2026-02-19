@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+>
+    <body>
+        <referenceContainer name="hyva.checkout.api-v1.after">
+            <block name="hyva.checkout.alpinejs.initialize-checkout-script"
+                   template="InPost_InPostPayHyvaCheckout::inpostpay-checkout-script.phtml"
+                   ifconfig="payment/inpost_pay/show_on_checkout"
+            >
+                <arguments>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::CHECKOUT_PAGE_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

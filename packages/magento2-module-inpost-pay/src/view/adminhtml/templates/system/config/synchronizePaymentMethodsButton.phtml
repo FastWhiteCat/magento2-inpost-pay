@@ -1,0 +1,16 @@
+<?php
+use InPost\InPostPay\Block\Adminhtml\System\Config\SynchronizePaymentMethodsButton;
+
+/** @var SynchronizePaymentMethodsButton $block **/
+?>
+<?= $block->getButtonHtml() ?>
+
+<script type="text/x-magento-init">
+    {
+        "#inpostpay_synchronize_payment_methods_button": {
+            "inpostPaySynchronizePaymentMethods": {
+                "postUrl":"<?= $block->escapeUrl($block->getAdminUrl()) ?>"
+            }
+        }
+    }
+</script>

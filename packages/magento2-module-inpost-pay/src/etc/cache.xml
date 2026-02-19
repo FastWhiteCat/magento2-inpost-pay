@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Cache/etc/cache.xsd">
+    <type name="inpost_pay_oauth_token" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\OAuthToken\Type">
+        <label>InPost Pay OAuth Token Cache</label>
+        <description>InPost Pay OAuth Token Cache used for request authentication.</description>
+    </type>
+    <type name="inpost_pay_public_key" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\PublicKey\Type">
+        <label>InPost Pay Public Key Version Cache</label>
+        <description>Public key used to generate signature for InPost Pay incoming request validations.</description>
+    </type>
+    <type name="inpost_pay_terms_and_conditions" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\TermsAndConditions\Type">
+        <label>Terms And Conditions Versions Cache</label>
+        <description>Terms and conditions needed in communication with InPost Pay API.</description>
+    </type>
+    <type name="inpost_pay_promotions" translate="label,description"
+          instance="InPost\InPostPay\Model\Cache\Promotions\Type">
+        <label>Available In-app Promotions Cache</label>
+        <description>Cache for Promotions sent to InPost Pay API.</description>
+    </type>
+</config>

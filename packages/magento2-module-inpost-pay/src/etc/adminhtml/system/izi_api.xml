@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_izi_api" translate="label" type="text" sortOrder="40" showInDefault="1">
+        <label>IZI API Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <field id="izi_api_url" translate="label" type="text" sortOrder="30"
+               showInDefault="1" showInWebsite="1" canRestore="1">
+            <label>IZI API URL</label>
+            <config_path>payment/inpost_pay/izi_api_url</config_path>
+        </field>
+        <field id="widget_script_url" translate="label" type="text" sortOrder="35" showInDefault="1" canRestore="1">
+            <label>Widget Script URL</label>
+            <config_path>payment/inpost_pay/widget_script_url</config_path>
+        </field>
+        <field id="basket_lifetime" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+            <label>Basket Lifetime</label>
+            <validate>required-entry validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/basket_lifetime</config_path>
+            <comment>InPost basket lifetime in seconds.</comment>
+        </field>
+        <field id="use_defined_payment_methods" translate="label comment" type="select" sortOrder="44"
+               showInDefault="1" canRestore="1">
+            <label>Define Payment Methods</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/use_defined_payment_methods</config_path>
+            <comment>Define payment methods in the InPost Pay Application other than those in the contract.</comment>
+        </field>
+        <field id="button" translate="label comment" type="button" sortOrder="45"
+               showInDefault="1" showInWebsite="1" showInStore="1">
+            <frontend_model>InPost\InPostPay\Block\Adminhtml\System\Config\SynchronizePaymentMethodsButton</frontend_model>
+            <depends>
+                <field id="use_defined_payment_methods">1</field>
+            </depends>
+        </field>
+        <field id="accepted_payment_types" translate="label comment" type="multiselect" sortOrder="50" showInDefault="1"
+               canRestore="1">
+            <label>Accepted Payment Types in InPost Basket</label>
+            <source_model>InPost\InPostPay\Model\Config\Source\AcceptedPaymentTypes</source_model>
+            <can_be_empty>1</can_be_empty>
+            <comment>Empty selection will allow all payment types in mobile application.</comment>
+            <config_path>payment/inpost_pay/accepted_payment_types</config_path>
+            <depends>
+                <field id="use_defined_payment_methods">1</field>
+            </depends>
+        </field>
+        <field id="async_basket_export" translate="label comment" type="select" sortOrder="60"
+               showInDefault="1" canRestore="1">
+            <label>Enable asynchronous basket export</label>
+            <comment>
+                <![CDATA[
+                    This is an advanced configuration for optimizing cart updates.</br>
+                    If enabled basket data will be exported using AMQP messaging queue system into RabbitMQ.</br>
+                    It requires server infrastructure to keep consumer inpost_pay.basket.create_or_update restarting and running all the time.</br>
+                    Example command:</br>
+                    <i>php {Magento2 root}/bin/magento queue:consumers:start inpost_pay.basket.create_or_update --max-messages=100 --area-code=frontend</i></br>
+                ]]>
+            </comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/async_basket_export</config_path>
+        </field>
+        <field id="remove_html_and_special_chars_from_attributes" translate="label comment" type="select" sortOrder="60"
+               showInDefault="1" canRestore="1">
+            <label>Enable removing special characters and HTML code from product attributes sent to InPost Pay Mobile App.</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/remove_html_and_special_chars_from_attributes</config_path>
+        </field>
+        <field id="send_session_cookie" translate="label" type="select" sortOrder="70"
+               showInDefault="0" showInWebsite="0" showInStore="0" canRestore="1">
+            <label>Send Merchant Store Session Cookie</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/send_session_cookie</config_path>
+            <comment>If enabled cart session cookie will be sent to InPost Pay API allowing customer to edit cart in mobile browser.</comment>
+        </field>
+        <field id="cart_url" translate="label" type="text" sortOrder="71"
+               showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Cart URL</label>
+            <config_path>payment/inpost_pay/cart_url</config_path>
+            <depends>
+                <field id="send_session_cookie">1</field>
+            </depends>
+        </field>
+    </group>
+</include>

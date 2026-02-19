@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+	<table name="inpost_restrictions_rule" resource="default" engine="innodb">
+		<column name="rule_id" xsi:type="int" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column name="name" nullable="false" xsi:type="varchar" length="255"/>
+        <column name="is_enabled" nullable="false" xsi:type="boolean" default="0"/>
+        <column name="website_id" nullable="false" xsi:type="smallint" unsigned="true" identity="false" default="0"/>
+        <column name="applies_to" nullable="false" xsi:type="tinyint" default="3"/>
+        <column name="conditions_serialized" nullable="true" xsi:type="text"/>
+        <column name="created_at" xsi:type="timestamp" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column name="updated_at" xsi:type="timestamp" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_RESTRICTIONS_RULE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID"
+                    table="inpost_restrictions_rule"
+                    column="website_id"
+                    referenceTable="store_website"
+                    referenceColumn="website_id"
+                    onDelete="CASCADE"/>
+	</table>
+    <table name="inpost_restrictions_rule_product" resource="default" engine="innodb">
+		<column name="index_id" xsi:type="int" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column name="rule_id" nullable="false" xsi:type="int" unsigned="true" identity="false" default="0"/>
+        <column name="website_id" nullable="false" xsi:type="smallint" unsigned="true" identity="false" default="0"/>
+        <column name="applies_to" nullable="false" xsi:type="tinyint" default="2"/>
+        <column name="product_id" nullable="false" xsi:type="int" unsigned="true" identity="false" default="0"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="index_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_RESTRICTIONS_RULE_PRODUCT_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID"
+                    table="inpost_restrictions_rule_product"
+                    column="website_id"
+                    referenceTable="store_website"
+                    referenceColumn="website_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_RESTRICTIONS_RULE_PRODUCT_RULE_ID_INPOST_RESTRICTIONS_RULE_RULE_ID"
+                    table="inpost_restrictions_rule_product"
+                    column="rule_id"
+                    referenceTable="inpost_restrictions_rule"
+                    referenceColumn="rule_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign"
+                    referenceId="INPOST_RESTRICTIONS_RULE_PRODUCT_PRODUCT_ID_CATALOG_PRODUCT_ENTITY_ENTITY_ID"
+                    table="inpost_restrictions_rule_product"
+                    column="product_id"
+                    referenceTable="catalog_product_entity"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE" />
+        <constraint xsi:type="unique" referenceId="UNQ_INPOST_RESTRICTIONS_RULE_PRODUCT_PRODUCT_ID_RULE_ID_APPLIES_TO_WEBSITE_ID">
+            <column name="product_id"/>
+            <column name="rule_id"/>
+            <column name="applies_to"/>
+            <column name="website_id"/>
+        </constraint>
+	</table>
+</schema>

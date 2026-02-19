@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @var Magento\Framework\View\Element\Template $block
+ * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ */
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnProductCart()) {
+    return;
+}
+
+$merchantClientId = $widgetViewModel->getClientMerchantId();
+$bindingPlace = $block->getBindingPlace();
+$productId = $block->getRequest()->getParam('id');
+$productId = is_scalar($productId) ? (string)$productId : "";
+$isProductSaleable = $widgetViewModel->validateProductIsSaleableById((int)$productId);
+
+if (!$isProductSaleable || $widgetViewModel->isProductRestricted((int)$productId)) {
+    return;
+}
+
+$language = $widgetViewModel->getCurrentLanguageCode();
+$layoutConfig = $widgetViewModel->getLayoutConfig();
+$widgetWrapperClass = "inpay-widget-wrapper";
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
+?>
+
+<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+    <inpost-izi-button
+        binding_place="<?= /* @noEscape */ $bindingPlace ?>"
+        data-product-id="<?= /* @noEscape */ $productId ?>"
+        variation="<?= /* @noEscape */ $layoutConfig ?>"
+    ></inpost-izi-button>
+
+    <script type="text/x-magento-init">
+        {
+            "*" : {
+                "InpostPayMerchantWidget" : {
+                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
+                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
+                    "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
+                    "language": "<?= /* @noEscape */ $language ?>",
+                    "productId": "<?= /* @noEscape */ $productId ?>",
+                    "enabledAnalyticsParams": "<?= /* @noEscape */ $enabledAnalyticsParams ?>"
+                }
+            }
+        }
+    </script>
+</div>

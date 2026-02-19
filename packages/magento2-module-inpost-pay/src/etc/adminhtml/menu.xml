@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add id="InPost_InPostPay::management"
+             title="InPost Pay Bestsellers"
+             module="InPost_InPostPay"
+             sortOrder="1000"
+             parent="Magento_Catalog::catalog"
+             resource="InPost_InPostPay::bestseller_products"/>
+        <add id="InPost_InPostPay::bestseller_products"
+             title="InPost Pay Bestseller Products"
+             module="InPost_InPostPay"
+             sortOrder="20"
+             resource="InPost_InPostPay::bestseller_products"
+             parent="InPost_InPostPay::management"
+             action="inpostpay/bestsellers/index"/>
+        <add id="InPost_InPostPay::checkoutagreement"
+             title="InPost Pay Terms and Conditions"
+             translate="title"
+             module="InPost_InPostPay"
+             sortOrder="35"
+             parent="Magento_Backend::stores_settings"
+             action="inpostpay/checkoutagreement/"
+             resource="InPost_InPostPay::checkoutagreement"/>
+    </menu>
+</config>

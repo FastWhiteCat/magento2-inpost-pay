@@ -1,0 +1,32 @@
+{
+    "name": "inpost/magento2-inpost-pay-dev",
+    "description": "InPost Pay Magento 2 monorepo — development workspace.",
+    "type": "project",
+    "license": "proprietary",
+    "require-dev": {
+        "magento/magento-coding-standard": "^33",
+        "phpstan/phpstan": "^1.10",
+        "bitexpert/phpstan-magento": "^0.32",
+        "phpunit/phpunit": "^10.0"
+    },
+    "repositories": [
+        {"type": "path", "url": "packages/magento2-module-restrictions"},
+        {"type": "path", "url": "packages/magento2-module-inpost-pay"},
+        {"type": "path", "url": "packages/magento2-module-inpost-pay-graph-ql"},
+        {"type": "path", "url": "packages/magento2-module-inpost-pay-commerce"},
+        {"type": "path", "url": "packages/magento2-module-restrictions-commerce"},
+        {"type": "path", "url": "packages/magento2-module-inpost-pay-hyva-checkout"},
+        {"type": "path", "url": "packages/magento2-module-inpost-pay-hyva-theme"}
+    ],
+    "scripts": {
+        "phpcs": "vendor/bin/phpcs --standard=Magento2 packages/*/src",
+        "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon",
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "magento/*": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

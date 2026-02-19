@@ -1,0 +1,9 @@
+{
+    "packages/magento2-module-restrictions": "2.6.0",
+    "packages/magento2-module-inpost-pay": "2.6.0",
+    "packages/magento2-module-inpost-pay-graph-ql": "2.6.0",
+    "packages/magento2-module-inpost-pay-commerce": "2.6.0",
+    "packages/magento2-module-restrictions-commerce": "2.6.0",
+    "packages/magento2-module-inpost-pay-hyva-checkout": "2.6.0",
+    "packages/magento2-module-inpost-pay-hyva-theme": "2.6.0"
+}

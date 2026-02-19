@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="inpost_pay_shipment" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1">
+        <label>Shipment Mapping Settings</label>
+        <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+        <include path="InPost_InPostPay::system/courier/delivery_options_mapping.xml"/>
+        <include path="InPost_InPostPay::system/apm/delivery_options_mapping.xml"/>
+        <field id="delivery_deadline_in_days" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+            <label>Delivery Deadline in Days</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/delivery_deadline_in_days</config_path>
+            <comment>This value is used to calculate delivery date for InPost Pay mobile app.</comment>
+        </field>
+        <field id="estimate_with_collect_address_totals" translate="label" type="select" sortOrder="40"
+               showInDefault="1" canRestore="1">
+            <label>Enable using Collect Address Totals</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/inpost_pay/estimate_with_collect_address_totals</config_path>
+            <comment>This option should be enabled if shipping cost is calculated using Sales Rules or customized calculations. For example, if there is a Rule conditions free delivery based on country. Cost will be calculated same way as native shipping estimation in cart at the cost of slightly lower performance.</comment>
+        </field>
+        <field id="digital_delivery_deadline_in_days" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+            <label>Digital Delivery Deadline in Seconds</label>
+            <validate>validate-number validate-zero-or-greater</validate>
+            <config_path>payment/inpost_pay/digital_delivery_deadline_in_days</config_path>
+            <comment>This value is used to calculate digital delivery date for InPost Pay mobile app.</comment>
+        </field>
+    </group>
+</include>
