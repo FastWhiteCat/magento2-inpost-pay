@@ -2,7 +2,9 @@
     "name": "inpost/magento2-module-restrictions-commerce",
     "description": "Adobe Commerce Support Package for InPost_Restrictions module.",
     "type": "magento2-module",
-    "license": ["CC-BY-NC-ND-4.0"],
+    "license": [
+        "CC-BY-NC-ND-4.0"
+    ],
     "require": {
         "inpost/magento2-module-restrictions": ">=2.5.0"
     },
