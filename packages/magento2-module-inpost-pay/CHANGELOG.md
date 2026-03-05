@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.1] - 2026-03-05
+
+### Fixed
+- Fixed getBasket request handling by adding forced collectTotals. That fixes the issue with cart price rule not being correctly calculated when the rule is enabled or disabled and the cart has not been changed.
+
 ## [2.6.0] - 2026-02-19
 
 ### Added

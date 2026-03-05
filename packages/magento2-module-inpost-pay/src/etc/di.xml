@@ -502,6 +502,11 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPay\Service\Quote\QuoteTotalsRefreshOnRemoteAccess">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
     <type name="InPost\InPostPay\Observer\CheckoutAgreement\DeleteInPostPayCheckoutAgreementAssignedStoresEventObserver">
         <arguments>
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
