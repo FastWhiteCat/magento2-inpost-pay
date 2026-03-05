@@ -1,9 +1,13 @@
 {
     "name": "inpost/magento2-module-inpost-pay-commerce",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     "version": "2.6.0",
 >>>>>>> 35b85d51 (INPAY-122 - Upgraded InPost_InPostPay Module to newest 2.6.0 version.)
+=======
+    "version": "2.6.1",
+>>>>>>> f4301d8c (INPAY-122 - Upgraded InPost_InPostPay Module to newest 2.6.1 version.)
     "description": "Adobe Commerce Support Package for InPost_InPostPay module.",
     "type": "magento2-module",
     "require": {
