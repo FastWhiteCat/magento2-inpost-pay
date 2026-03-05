@@ -16,6 +16,7 @@ use InPost\InPostPay\Exception\InPostPayBadRequestException;
 use InPost\InPostPay\Exception\InPostPayInternalException;
 use InPost\InPostPay\Exception\BasketNotFoundException;
 use InPost\InPostPay\Service\DataTransfer\QuoteToBasketDataTransfer;
+use InPost\InPostPay\Service\Quote\QuoteTotalsRefreshOnRemoteAccess;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -32,6 +33,7 @@ class BasketGet implements BasketGetInterface
         private readonly CartRepositoryInterface $cartRepository,
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly QuoteToBasketDataTransfer $quoteToBasketDataTransfer,
+        private readonly QuoteTotalsRefreshOnRemoteAccess $quoteTotalsRefreshOnRemoteAccess,
         private readonly BasketInterfaceFactory $basketFactory,
         private readonly EventManager $eventManager,
         private readonly LoggerInterface $logger
@@ -52,6 +54,8 @@ class BasketGet implements BasketGetInterface
             $this->eventManager->dispatch('izi_basket_get_before', [InPostPayQuoteInterface::BASKET_ID => $basketId]);
 
             $inPostPayQuote = $this->getInPostPayQuoteByBasketId($basketId);
+            $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
+            $this->quoteTotalsRefreshOnRemoteAccess->execute($quote);
             $quote = $this->getQuoteById($inPostPayQuote->getQuoteId());
             $basket = $this->basketFactory->create();
             $basket->setBasketId($basketId);
