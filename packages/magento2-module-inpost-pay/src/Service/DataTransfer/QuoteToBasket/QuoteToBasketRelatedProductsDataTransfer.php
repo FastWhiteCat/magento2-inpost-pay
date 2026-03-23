@@ -24,7 +24,6 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as Produ
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
 use Magento\Catalog\Pricing\Price\FinalPrice;
-use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
 use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\Framework\Exception\LocalizedException;
