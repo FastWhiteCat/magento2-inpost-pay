@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Service\DataTransfer\QuoteToBasket;
 
+use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterface as InPostPayProduct;
 use InPost\InPostPay\Api\Data\Merchant\BasketInterface;
 use InPost\InPostPay\Api\DataTransfer\QuoteToBasketDataTransferInterface;
 use InPost\InPostPay\Provider\Product\Attribute\InPostPayProductAttributesProvider;
+use InPost\InPostPay\Service\Calculator\DecimalCalculator;
 use InPost\InPostPay\Service\DataTransfer\ProductToInPostProduct\ProductToInPostProductDataTransfer;
 use InPost\Restrictions\Provider\RestrictedProductIdsProvider;
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -21,6 +23,8 @@ use Magento\Catalog\Model\ResourceModel\Product\Link\CollectionFactory as Produc
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\Link\Product\CollectionFactory as ProductCollectionFactory;
 use InPost\InPostPay\Api\Data\Merchant\Basket\ProductInterfaceFactory;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory;
 use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\Framework\Exception\LocalizedException;
@@ -71,6 +75,8 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                     [],
                     true
                 );
+
+                $this->appendRelatedProductWithPromoPrice($crossSellProduct, $inPostCrossSellProduct);
                 $inPostCrossSellProducts[] = $inPostCrossSellProduct;
             }
         }
@@ -164,5 +170,25 @@ class QuoteToBasketRelatedProductsDataTransfer implements QuoteToBasketDataTrans
                 $this->inPostPayProductAttributesProvider->getProductAttributeCodes($storeId)
             )
         );
+    }
+
+    private function appendRelatedProductWithPromoPrice(
+        Product $crossSellProduct,
+        InPostPayProduct $inPostCrossSellProduct
+    ): void {
+        $basePrice = $inPostCrossSellProduct->getBasePrice();
+        $promoPrice = clone $basePrice;
+
+        $productPromoPrice = $crossSellProduct->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount();
+        $promoPriceExclTax = DecimalCalculator::round((float)$productPromoPrice->getBaseAmount());
+        $promoPriceInclTax = DecimalCalculator::round((float)$productPromoPrice->getValue());
+
+        $promoPrice->setNet($promoPriceExclTax);
+        $promoPrice->setGross($promoPriceInclTax);
+        $promoPrice->setVat(DecimalCalculator::sub($promoPriceInclTax, $promoPriceExclTax));
+
+        if ($basePrice->getGross() !== $promoPrice->getGross()) {
+            $inPostCrossSellProduct->setPromoPrice($promoPrice);
+        }
     }
 }
