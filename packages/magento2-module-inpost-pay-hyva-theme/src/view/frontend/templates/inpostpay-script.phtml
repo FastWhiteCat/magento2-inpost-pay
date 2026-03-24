@@ -1,0 +1,463 @@
+<?php
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use InPost\InPostPay\ViewModel\Widget;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+/** @var Widget $widgetViewModel */
+
+$widgetViewModel = $viewModels->require(Widget::class);
+
+$merchantClientId = $widgetViewModel->getClientMerchantId();
+$bindingPlace = $block->getBindingPlace();
+$language = $widgetViewModel->getCurrentLanguageCode();
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
+$productId = $block->getData('productId');
+?>
+
+<script>
+    function initializeInpostPay_<?= $bindingPlace ?>() {
+        /**
+         * @typedef {string} WidgetBasketEventHandler
+         * @enum {WidgetBasketEventHandler}
+         */
+        const WidgetBasketEventTypes = {
+            BASKET_DELETED: 'basketDeleted',
+            BASKET_PRODUCT_CHANGED: 'basketProductChanged',
+            ORDER_CREATED: 'orderCreated'
+        };
+
+        const PRODUCT_TYPES = {
+            CONFIGURABLE: 'configurable',
+            SIMPLE: 'simple',
+            GROUPED: 'grouped',
+            VIRTUAL: 'virtual',
+            DOWNLOADABLE: 'downloadable',
+            BUNDLE: 'bundle'
+        };
+
+        const REGISTER_PAGE_BINDING_PLACE = 'REGISTERFORM_PAGE';
+        const LOGIN_PAGE_BINDING_PLACE_NAME = 'LOGIN_PAGE';
+        const BASKET_POPUP_BINDING_PLACE_NAME = 'BASKET_POPUP'
+
+        return {
+            cart: false,
+            basketBindingApiKey: false,
+            isInitialized: false,
+            configuration: {
+                merchantClientId: "<?= $merchantClientId ?>",
+                bindingPlace: "<?= $bindingPlace ?>",
+                language: "<?= $language ?>",
+                scriptUrl: "<?= $scriptUrl ?>",
+                enabledAnalyticsParams: "<?= $enabledAnalyticsParams ?>",
+                productId: "<?= $productId ?>"
+            },
+
+            /**
+             * Initialize widget for minicart
+             */
+            init() {
+                if (this.configuration.bindingPlace !== BASKET_POPUP_BINDING_PLACE_NAME) {
+                    return;
+                }
+
+                this.initialize();
+            },
+
+            /**
+             * Initialize widget
+             */
+            initialize() {
+                const self = this;
+
+                if (!this.configuration?.merchantClientId
+                    || (this.configuration.bindingPlace === REGISTER_PAGE_BINDING_PLACE && !this.cart?.summary_count)
+                    || (this.configuration.bindingPlace === LOGIN_PAGE_BINDING_PLACE_NAME && !this.cart?.summary_count)
+                    || window.InPostPayWidget
+                    || document.getElementById('inpost-api')
+                ) {
+                    return;
+                }
+
+                if (this.configuration.scriptUrl) {
+                    this.loadScript(this.configuration.scriptUrl, function () {
+                        self.initializeWidget();
+                    });
+                }
+            },
+
+            loadScript(url, callback, id = 'inpost-api') {
+                if (document.getElementById(id)) {
+                    return;
+                }
+
+                const script = document.createElement("script")
+                script.type = "text/javascript";
+                script.src = url;
+                script.id = 'inpost-api';
+                script.onload = function () {
+                    callback();
+                };
+                document.head.appendChild(script);
+            },
+
+            receiveCustomerData(data) {
+                if (data.cart) {
+                    this.cart = data.cart;
+                }
+
+                if (!this.isInitialized) {
+                    this.initialize();
+                } else {
+                    this.isInitialized = true;
+                }
+
+            },
+
+            initializeWidget() {
+                /**
+                 * @type {object}
+                 * @property {string} merchantId
+                 * @property {retrieveApiKey} basketBindingApiKey
+                 * @property {string} language
+                 * @property {unboundWidgetClicked} unboundWidgetClicked
+                 * @property {handleBasketEvent} handleBasketEvent
+                 * @property {boolean} webView
+                 */
+                const widgetOptions = {
+                    merchantClientId: this.configuration.merchantClientId,
+                    basketBindingApiKey: this.retrieveBasketBindingApiKey(this.configuration.basketBindingApiKey),
+                    unboundWidgetClicked: this.unboundWidgetClicked.bind(this),
+                    handleBasketEvent: this.handleBasketEvent.bind(this),
+                    language: this.configuration.language ? this.configuration.language : undefined,
+                    webView: this.configuration.webView ? this.configuration.webView : undefined
+                };
+
+                const widget = InPostPayWidget.init(widgetOptions);
+            },
+
+            checkIfProductIsAdded(id, cartData, $productForm) {
+                if (!cartData?.items?.length) {
+                    return false;
+                }
+
+                if (cartData.items.some(({product_id, product_type}) =>
+                    product_id === id && product_type === PRODUCT_TYPES.SIMPLE)) {
+                    return true;
+                }
+
+                const formData = new FormData($productForm);
+                const superAttributesMap = new Map([...formData].filter(([k, v]) => k.includes('super_attribute')));
+                const superGroupMap = new Map([...formData].filter(([k, v]) => k.includes('super_group') && !!+v));
+
+
+                if (superAttributesMap.size) {
+                    const configurableProducts = cartData.items.filter(item => item.product_id === id);
+
+                    return configurableProducts.some(item => {
+                        const sameOptionsNumber = item.options.reduce((acc, {option_id, option_value}) =>
+                                superAttributesMap.get(`super_attribute[${option_id}]`) === option_value
+                                    ? acc + 1
+                                    : acc,
+                            0);
+
+                        return sameOptionsNumber === item.options.length;
+                    })
+                }
+
+                if (superGroupMap.size) {
+                    const sameOptionsNumber = [...superGroupMap.entries()].reduce((acc, attr) =>
+                            cartData.items.some((cartItem) =>
+                                cartItem.product_id === attr[0].match(/\[(.*?)\]/)[1]
+                                && cartItem.qty >= +attr[1])
+                                ? acc + 1
+                                : acc,
+                        0);
+
+                    return sameOptionsNumber === superGroupMap.size;
+                }
+
+                return new Error('UNDELIVERABLE_PRODUCT');
+            },
+
+            getBasketBindingApiKey() {
+                const self = this;
+
+                return new Promise((resolve, reject) => {
+                    let formData = {
+                        form_key: hyva.getFormKey(),
+                    };
+
+                    if (self.configuration.enabledAnalyticsParams) {
+                        const browserStorage = hyva.getBrowserStorage();
+                        const gaClientId = browserStorage.getItem('client_id');
+                        const fbclid = browserStorage.getItem('fbclid');
+                        const gclid = browserStorage.getItem('gclid');
+
+                        if (gaClientId !== null) {
+                            formData.ga_client_id = gaClientId;
+                        }
+
+                        if (fbclid !== null) {
+                            formData.fbclid = fbclid;
+                        }
+
+                        if (gclid !== null) {
+                            formData.gclid = gclid;
+                        }
+                    }
+
+                    const url = `${BASE_URL}inpostizi/BasketBindingApiKey/Get`;
+                    const body = new URLSearchParams({...formData});
+                    const contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+
+                    fetch(url, {
+                        method: 'post',
+                        body,
+                        headers: {
+                            'Content-Type': contentType
+                        }
+                    })
+                        .then(response => {
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data?.success && data?.basket_binding_api_key) {
+                                self.basketBindingApiKey = data.basket_binding_api_key;
+                                resolve(data.basket_binding_api_key);
+                            } else if (data.error) {
+                                reject(data.error);
+                            } else {
+                                reject(new Error('Something went wrong, refresh the page and try again'));
+                            }
+                        })
+                        .catch(() => {
+                            reject(new Error('Something went wrong, refresh the page and try again'));
+                        })
+                })
+            },
+
+            /**
+             * Handle user clicks on the unbound basket
+             *
+             * @callback unboundWidgetClicked
+             * @param {string} productId
+             * @return {promise<string>}
+             */
+            async unboundWidgetClicked(productId) {
+                const self = this;
+
+                if (!productId) {
+                    return new Promise((resolve, reject) => {
+                        self.getBasketBindingApiKey(resolve, reject)
+                            .then((data) => {
+                                resolve(data);
+                            })
+                            .catch(function (error) {
+                                reject(error);
+                            });
+                    });
+                }
+
+                const $productInput = document.querySelector('[name="product"][value="' + productId + '"]');
+                const $productForm = $productInput.closest('#product_addtocart_form');
+
+                if (!$productForm.length) {
+                    return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'));
+                }
+
+                if (!$productForm.reportValidity()) {
+                    return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'));
+                }
+
+                // Grouped product inputs validation from
+                // hyva-themes/magento2-default-theme/Magento_GroupedProduct/templates/product/view/type/grouped.phtml
+                const validateInputs = Array.from(
+                    document.querySelectorAll('input[name^=super_group]')
+                );
+
+                if (validateInputs.length) {
+                    this.isValid = validateInputs.filter(
+                        input => input.value > 0
+                    ).length || false
+
+                    validateInputs?.map(input =>
+                        input.setCustomValidity(this.isValid ?
+                            "" :
+                            "<?= $escaper->escapeJs(__('Please specify the quantity of product(s).')) ?>")
+                    )
+
+                    if (!this.isValid) {
+                        $productForm.reportValidity();
+                        return Promise.reject(new Error('UNDELIVERABLE_PRODUCT'));
+                    }
+                }
+
+                const isProductAdded = this.checkIfProductIsAdded(productId, this.cart, $productForm);
+
+                if (isProductAdded.message) {
+                    return Promise.reject(isProductAdded)
+                }
+
+                if (isProductAdded) {
+                    return new Promise((resolve, reject) => {
+                        self.getBasketBindingApiKey(resolve, reject)
+                            .then((data) => {
+                                resolve(data);
+                            })
+                            .catch(function (error) {
+                                reject(error);
+                            });
+                    });
+                }
+
+                return ajaxSubmit($productForm).then().catch(function (err) {
+                    console.error(err);
+                })
+
+                function ajaxSubmit($form) {
+                    return new Promise(async (resolve, reject) => {
+                        let formData = {
+                            form_key: hyva.getFormKey(),
+                        };
+
+                        if (self.configuration.enabledAnalyticsParams) {
+                            const browserStorage = hyva.getBrowserStorage();
+                            const gaClientId = browserStorage.getItem('client_id');
+                            const fbclid = browserStorage.getItem('fbclid');
+                            const gclid = browserStorage.getItem('gclid');
+
+                            if (gaClientId !== null) {
+                                formData.ga_client_id = gaClientId;
+                            }
+
+                            if (fbclid !== null) {
+                                formData.fbclid = fbclid;
+                            }
+
+                            if (gclid !== null) {
+                                formData.gclid = gclid;
+                            }
+                        }
+
+                        const data = new URLSearchParams(new FormData($form));
+
+                        try {
+                            fetch($form.getAttribute('action'), {
+                                method: 'POST',
+                                body: data,
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            }).then(response => {
+                                return response.json();
+                            }).then(() => {
+                                    hyva.setCookie('mage-cache-sessid', '', -1, true);
+                                    window.dispatchEvent(new Event('reload-customer-section-data'));
+                                    const url = `${BASE_URL}inpostizi/BasketBindingApiKey/Get`;
+                                    const body = new URLSearchParams({...formData});
+                                    const contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+
+                                    fetch(url, {
+                                        method: 'POST',
+                                        body,
+                                        mode: "no-cors",
+                                        headers: {contentType}
+                                    })
+                                        .then(response => {
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            if (data?.success && data?.basket_binding_api_key) {
+                                                self.basketBindingApiKey = data.basket_binding_api_key;
+                                                resolve(data.basket_binding_api_key)
+                                            } else if (data.error) {
+                                                reject(data.error);
+                                            } else {
+                                                reject(new Error('Something went wrong, refresh the page and try again'));
+                                            }
+                                        })
+                                        .catch(() => {
+                                            reject(new Error('Something went wrong, refresh the page and try again'));
+                                        })
+                                })
+                                .catch(() => {
+                                    reject();
+                                })
+                        } catch (e) {
+                            console.error(e);
+                        }
+
+                    });
+                }
+            },
+
+            /**
+             * Handle retrieving basketBindingApiKey
+             * Return true if widget should not refresh the page
+             *
+             * @callback retrieveApiKey
+             * @param {undefined|string} apiKey
+             * @return {undefined|string|promise<string>}
+             */
+            retrieveBasketBindingApiKey(apiKey = undefined) {
+                if (apiKey) {
+                    return apiKey;
+                }
+
+                const basketBindingApiKeyFromCookies = hyva.getCookie('basketBindingApiKey');
+
+                return basketBindingApiKeyFromCookies ? basketBindingApiKeyFromCookies : undefined;
+            },
+
+            /**
+             * Callback function to reflect basket updates.
+             * If not provided or returning false - widget will refresh the entire page.
+             * @return 'true' if widget should not refresh the page
+             *
+             * @callback retrieveApiKey
+             * @param {WidgetBasketEventHandler} widgetBasketEvent
+             * @return {boolean}
+             */
+            async handleBasketEvent(widgetBasketEvent) {
+                const formKey = hyva.getFormKey();
+
+                if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
+                    hyva.setCookie('mage-cache-sessid', '', -1, true);
+                    window.dispatchEvent(new Event('reload-customer-section-data'));
+                    return false;
+                }
+
+                return new Promise((resolve, reject) => {
+                    const url = `${BASE_URL}inpostizi/OrderComplete/Get/form_key/${formKey}/?basket_binding_api_key=${hyva.getCookie('basketBindingApiKey')}`;
+
+                    fetch(url)
+                        .then(response => {
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data && data.redirect) {
+                                hyva.setCookie('mage-cache-sessid', '', -1, true);
+                                window.dispatchEvent(new Event('reload-customer-section-data'));
+                                resolve(true);
+                                window.location.replace(data.redirect);
+                            } else {
+                                reject(false);
+                            }
+                        })
+                        .catch(() => {
+                            reject(false);
+                        })
+                });
+            }
+        };
+    }
+</script>

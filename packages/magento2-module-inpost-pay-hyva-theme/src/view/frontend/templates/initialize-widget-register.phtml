@@ -1,0 +1,37 @@
+<?php
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use InPost\InPostPay\ViewModel\Widget;
+use Magento\Framework\View\Element\Template;
+
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Template $block */
+/** @var Widget $widgetViewModel */
+
+$widgetViewModel = $viewModels->require(Widget::class);
+
+$widgetViewModel = $block->getData('widget_view_model');
+if (!$widgetViewModel->isEnabled() || !$widgetViewModel->isEnabledOnRegisterPage()) {
+    return;
+}
+
+$bindingPlace = $block->getBindingPlace();
+$layoutConfig = $widgetViewModel->getLayoutConfig();
+$widgetWrapperClass = "inpay-widget-wrapper";
+?>
+
+<?= $block->getChildBlock('inpost.hyva.widget.register.script')->toHtml() ?>
+
+<div x-data="initializeInpostPay_<?= $bindingPlace ?>()"
+     @private-content-loaded.window="receiveCustomerData($event.detail.data)"
+     class="<?= /* @noEscape */
+     $widgetWrapperClass . ' ' . /* @noEscape */
+     $bindingPlace ?>">
+    <inpost-izi-button
+        binding_place="<?= /* @noEscape */
+        $bindingPlace ?>"
+        variation="<?= /* @noEscape */
+        $layoutConfig ?>"
+    ></inpost-izi-button>
+</div>

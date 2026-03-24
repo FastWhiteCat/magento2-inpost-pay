@@ -1,0 +1,262 @@
+<?php
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use InPost\InPostPay\ViewModel\Widget;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\HyvaCsp;
+
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Template $block */
+/** @var Widget $widgetViewModel */
+/** @var HyvaCsp $hyvaCsp */
+
+$widgetViewModel = $viewModels->require(Widget::class);
+$hyvaCspViewModel = $viewModels->require(HyvaCsp::class);
+
+$merchantClientId = $widgetViewModel->getClientMerchantId();
+$bindingPlace = $block->getBindingPlace();
+$language = $widgetViewModel->getCurrentLanguageCode();
+$scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
+$enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
+?>
+
+<script>
+    function initializeInpostPayCheckout() {
+        /**
+         * @typedef {string} WidgetBasketEventHandler
+         * @enum {WidgetBasketEventHandler}
+         */
+        const WidgetBasketEventTypes = {
+            BASKET_DELETED: 'basketDeleted',
+            BASKET_PRODUCT_CHANGED: 'basketProductChanged',
+            ORDER_CREATED: 'orderCreated'
+        };
+
+        return {
+            cart: false,
+            basketBindingApiKey: false,
+            isInitialized: false,
+            configuration: {
+                merchantClientId: "<?= $merchantClientId ?>",
+                bindingPlace: "<?= $bindingPlace ?>",
+                language: "<?= $language ?>",
+                scriptUrl: "<?= $scriptUrl ?>",
+                enabledAnalyticsParams: "<?= $enabledAnalyticsParams ?>",
+            },
+
+            /**
+             * Initialize widget for minicart
+             */
+            initialize() {
+                const self = this;
+
+                if (!this.configuration?.merchantClientId
+                    || window.InPostPayWidget
+                    || document.getElementById('inpost-api')
+                ) {
+                    return;
+                }
+
+                if (this.configuration.scriptUrl) {
+                    this.loadScript(this.configuration.scriptUrl, function () {
+                        self.initializeWidget();
+                    });
+                }
+            },
+
+            loadScript(url, callback, id = 'inpost-api') {
+                if (document.getElementById(id)) {
+                    return;
+                }
+
+                const script = document.createElement("script")
+                script.type = "text/javascript";
+                script.src = url;
+                script.id = 'inpost-api';
+                script.onload = function () {
+                    callback();
+                };
+                document.head.appendChild(script);
+            },
+
+            receiveCustomerData() {
+                const cartData = this.$event.detail.data.cart
+
+                if (cartData) {
+                    this.cart = cartData;
+                }
+
+                if (!this.isInitialized) {
+                    this.initialize();
+                } else {
+                    this.isInitialized = true;
+                }
+            },
+
+            initializeWidget() {
+                /**
+                 * @type {object}
+                 * @property {string} merchantId
+                 * @property {retrieveApiKey} basketBindingApiKey
+                 * @property {string} language
+                 * @property {unboundWidgetClicked} unboundWidgetClicked
+                 * @property {handleBasketEvent} handleBasketEvent
+                 * @property {boolean} webView
+                 */
+                const widgetOptions = {
+                    merchantClientId: this.configuration.merchantClientId,
+                    basketBindingApiKey: this.retrieveBasketBindingApiKey(this.configuration.basketBindingApiKey),
+                    unboundWidgetClicked: this.unboundWidgetClicked.bind(this),
+                    handleBasketEvent: this.handleBasketEvent.bind(this),
+                    language: this.configuration.language ? this.configuration.language : undefined,
+                    webView: this.configuration.webView ? this.configuration.webView : undefined
+                };
+
+                const widget = InPostPayWidget.init(widgetOptions);
+            },
+
+            getBasketBindingApiKey() {
+                const self = this;
+
+                return new Promise((resolve, reject) => {
+                    let formData = {
+                        form_key: hyva.getFormKey(),
+                    };
+
+                    if (self.configuration.enabledAnalyticsParams) {
+                        const browserStorage = hyva.getBrowserStorage();
+                        const gaClientId = browserStorage.getItem('client_id');
+                        const fbclid = browserStorage.getItem('fbclid');
+                        const gclid = browserStorage.getItem('gclid');
+
+                        if (gaClientId !== null) {
+                            formData.ga_client_id = gaClientId;
+                        }
+
+                        if (fbclid !== null) {
+                            formData.fbclid = fbclid;
+                        }
+
+                        if (gclid !== null) {
+                            formData.gclid = gclid;
+                        }
+                    }
+
+                    const url = `${BASE_URL}inpostizi/BasketBindingApiKey/Get`;
+                    const body = new URLSearchParams({...formData});
+                    const contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+
+                    fetch(url, {
+                        method: 'post',
+                        body,
+                        headers: {
+                            'Content-Type': contentType
+                        }
+                    })
+                        .then(response => {
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data?.success && data?.basket_binding_api_key) {
+                                self.basketBindingApiKey = data.basket_binding_api_key;
+                                resolve(data.basket_binding_api_key);
+                            } else if (data.error) {
+                                reject(data.error);
+                            } else {
+                                reject(new Error('Something went wrong, refresh the page and try again'));
+                            }
+                        })
+                        .catch(() => {
+                            reject(new Error('Something went wrong, refresh the page and try again'));
+                        })
+                })
+            },
+
+            /**
+             * Handle user clicks on the unbound basket
+             *
+             * @callback unboundWidgetClicked
+             * @return {promise<string>}
+             */
+            async unboundWidgetClicked() {
+                const self = this;
+
+                return new Promise((resolve, reject) => {
+                    self.getBasketBindingApiKey(resolve, reject)
+                        .then((data) => {
+                            resolve(data);
+                        })
+                        .catch(function (error) {
+                            reject(error);
+                        });
+                });
+            },
+
+            /**
+             * Handle retrieving basketBindingApiKey
+             * Return true if widget should not refresh the page
+             *
+             * @callback retrieveApiKey
+             * @param {undefined|string} apiKey
+             * @return {undefined|string|promise<string>}
+             */
+            retrieveBasketBindingApiKey(apiKey = undefined) {
+                if (apiKey) {
+                    return apiKey;
+                }
+
+                const basketBindingApiKeyFromCookies = hyva.getCookie('basketBindingApiKey');
+
+                return basketBindingApiKeyFromCookies ? basketBindingApiKeyFromCookies : undefined;
+            },
+
+            /**
+             * Callback function to reflect basket updates.
+             * If not provided or returning false - widget will refresh the entire page.
+             * @return 'true' if widget should not refresh the page
+             *
+             * @callback retrieveApiKey
+             * @param {WidgetBasketEventHandler} widgetBasketEvent
+             * @return {boolean}
+             */
+            async handleBasketEvent(widgetBasketEvent) {
+                const formKey = hyva.getFormKey();
+
+                if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
+                    hyva.setCookie('mage-cache-sessid', '', -1, true);
+                    window.dispatchEvent(new Event('reload-customer-section-data'));
+                    return false;
+                }
+
+                return new Promise((resolve, reject) => {
+                    const url = `${BASE_URL}inpostizi/OrderComplete/Get/form_key/${formKey}/?basket_binding_api_key=${hyva.getCookie('basketBindingApiKey')}`;
+
+                    fetch(url)
+                        .then(response => {
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data && data.redirect) {
+                                hyva.setCookie('mage-cache-sessid', '', -1, true);
+                                window.dispatchEvent(new Event('reload-customer-section-data'));
+                                resolve(true);
+                                window.location.replace(data.redirect);
+                            } else {
+                                reject(false);
+                            }
+                        })
+                        .catch(() => {
+                            reject(false);
+                        })
+                });
+            }
+        };
+    }
+
+    window.addEventListener('alpine:init', () => {
+        Alpine.data('initializeInpostPayCheckout', initializeInpostPayCheckout)
+    }, { once: true })
+</script>
+
+<?php $hyvaCspViewModel->registerInlineScript() ?>

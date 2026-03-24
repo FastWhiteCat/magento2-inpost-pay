@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="inpost.init.widget.minicart" remove="true"/>
+
+        <referenceContainer name="extra_actions">
+            <block name="inpost.hyva.widget.minicart"
+                   template="InPost_InPostPayHyvaTheme::initialize-widget-minicart.phtml" after="-"
+                   ifconfig="payment/inpost_pay/show_in_minicart">
+                <arguments>
+                    <argument name="binding_place" xsi:type="const">
+                        InPost\InPostPay\Provider\Config\DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME
+                    </argument>
+                    <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget</argument>
+                </arguments>
+                <block name="inpost.hyva.widget.minicart.script"
+                       template="InPost_InPostPayHyvaTheme::inpostpay-script.phtml"
+                       ifconfig="payment/inpost_pay/show_in_minicart">
+                    <arguments>
+                        <argument name="binding_place" xsi:type="const">
+                            InPost\InPostPay\Provider\Config\DisplayConfigProvider::BASKET_POPUP_BINDING_PLACE_NAME
+                        </argument>
+                        <argument name="widget_view_model" xsi:type="object">InPost\InPostPay\ViewModel\Widget
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
