@@ -34,6 +34,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Load secrets from 1Password
+        uses: 1password/load-secrets-action@v3
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          SPLIT_APP_ID: op://project-inpostpay/inpostpay--github-app/App ID
+          SPLIT_APP_PRIVATE_KEY: op://project-inpostpay/inpostpay--github-app/private-key.pem
+
+      - name: Generate GitHub App token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ env.SPLIT_APP_ID }}
+          private-key: ${{ env.SPLIT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - name: Install splitsh-lite
         run: |
           curl -sL https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz | tar -xz
@@ -41,7 +58,7 @@ jobs:
 
       - name: Split ${{ matrix.package.split_repo }}
         env:
-          GITHUB_TOKEN: ${{ secrets.SPLIT_REPO_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           SHA=$(splitsh-lite --prefix=${{ matrix.package.local_path }})
           git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
