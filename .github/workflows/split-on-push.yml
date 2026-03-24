@@ -41,7 +41,7 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SPLIT_APP_ID: op://project-inpostpay/inpostpay--github-app/App ID
-          SPLIT_APP_PRIVATE_KEY: op://project-inpostpay/inpostpay--github-app/private-key.pem
+          SPLIT_APP_PRIVATE_KEY: op://project-inpostpay/inpostpay--github-app/inpost-pay-management.2026-03-24.private-key.pem
 
       - name: Generate GitHub App token
         uses: actions/create-github-app-token@v2
