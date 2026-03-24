@@ -4,6 +4,7 @@
     <module name="InPost_InPostPayHyvaTheme">
         <sequence>
             <module name="InPost_InPostPay"/>
+            <module name="Hyva_Theme"/>
         </sequence>
     </module>
 </config>

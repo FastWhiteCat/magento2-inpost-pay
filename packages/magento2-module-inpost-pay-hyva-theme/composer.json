@@ -11,7 +11,7 @@
         "monolog/monolog": "*",
         "psr/log": "*",
         "guzzlehttp/guzzle": "*",
-        "inpost/magento2-module-inpost-pay": ">=2.2.1",
+        "inpost/magento2-module-inpost-pay": ">=2.4.0",
         "inpost/magento2-module-restrictions": ">=2.1.0",
         "hyva-themes/magento2-default-theme": "*"
     },

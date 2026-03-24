@@ -20,10 +20,12 @@ $layoutConfig = $widgetViewModel->getLayoutConfig();
 $widgetWrapperClass = "inpay-widget-wrapper";
 ?>
 
-<?= $block->getChildBlock('inpost.hyva.widget.cart.script')->toHtml() ?>
+<?= $block->getChildBlock('inpost.hyva.widget.cart.script')->setData('isCart', true)->toHtml() ?>
 
 <div x-data="initializeInpostPay_<?= $bindingPlace ?>()"
      @private-content-loaded.window="receiveCustomerData($event.detail.data)"
+     @cart-is-loading.window="receiveCartUpdate($event.detail)"
+     @cart-item-removed.window="receiveCartRemove()"
      class="<?= /* @noEscape */
      $widgetWrapperClass . ' ' . /* @noEscape */
      $bindingPlace ?>">
