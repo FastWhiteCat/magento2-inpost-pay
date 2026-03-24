@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ['*']
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Detect which packages have changed files
+  # ---------------------------------------------------------------------------
+  changes:
+    name: Detect changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      any_changed: ${{ steps.filter.outputs.restrictions == 'true' || steps.filter.outputs.inpost-pay == 'true' || steps.filter.outputs.inpost-pay-graph-ql == 'true' || steps.filter.outputs.inpost-pay-commerce == 'true' || steps.filter.outputs.restrictions-commerce == 'true' || steps.filter.outputs.inpost-pay-hyva-checkout == 'true' || steps.filter.outputs.inpost-pay-hyva-theme == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            restrictions:
+              - 'packages/magento2-module-restrictions/**'
+            inpost-pay:
+              - 'packages/magento2-module-inpost-pay/**'
+            inpost-pay-graph-ql:
+              - 'packages/magento2-module-inpost-pay-graph-ql/**'
+            inpost-pay-commerce:
+              - 'packages/magento2-module-inpost-pay-commerce/**'
+            restrictions-commerce:
+              - 'packages/magento2-module-restrictions-commerce/**'
+            inpost-pay-hyva-checkout:
+              - 'packages/magento2-module-inpost-pay-hyva-checkout/**'
+            inpost-pay-hyva-theme:
+              - 'packages/magento2-module-inpost-pay-hyva-theme/**'
+
+  # ---------------------------------------------------------------------------
+  # PHPCS — Magento 2 coding standard
+  # ---------------------------------------------------------------------------
+  phpcs:
+    name: PHPCS (PHP ${{ matrix.php }})
+    needs: changes
+    if: needs.changes.outputs.any_changed == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPCS
+        run: composer phpcs
+
+  # ---------------------------------------------------------------------------
+  # PHPStan — static analysis
+  # ---------------------------------------------------------------------------
+  phpstan:
+    name: PHPStan (PHP ${{ matrix.php }})
+    needs: changes
+    if: needs.changes.outputs.any_changed == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPStan
+        run: composer phpstan
+
+  # ---------------------------------------------------------------------------
+  # PHPUnit — unit tests
+  # ---------------------------------------------------------------------------
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    needs: changes
+    if: needs.changes.outputs.any_changed == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPUnit
+        run: composer test
+
+  # ---------------------------------------------------------------------------
+  # Commitlint — enforce conventional commit format on PR title
+  # ---------------------------------------------------------------------------
+  commitlint:
+    name: Commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: wagoid/commitlint-github-action@v6

@@ -1,0 +1,48 @@
+name: Split on Push
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - local_path: packages/magento2-module-restrictions
+            split_repo: magento2-module-restrictions
+          - local_path: packages/magento2-module-inpost-pay
+            split_repo: magento2-module-inpost-pay
+          - local_path: packages/magento2-module-inpost-pay-graph-ql
+            split_repo: magento2-module-inpost-pay-graph-ql
+          - local_path: packages/magento2-module-inpost-pay-commerce
+            split_repo: magento2-module-inpost-pay-commerce
+          - local_path: packages/magento2-module-restrictions-commerce
+            split_repo: magento2-module-restrictions-commerce
+          - local_path: packages/magento2-module-inpost-pay-hyva-checkout
+            split_repo: magento2-module-inpost-pay-hyva-checkout
+          - local_path: packages/magento2-module-inpost-pay-hyva-theme
+            split_repo: magento2-module-inpost-pay-hyva-theme
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install splitsh-lite
+        run: |
+          curl -sL https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz | tar -xz
+          sudo mv splitsh-lite /usr/local/bin/
+
+      - name: Split ${{ matrix.package.split_repo }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPO_ACCESS_TOKEN }}
+        run: |
+          SHA=$(splitsh-lite --prefix=${{ matrix.package.local_path }})
+          git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/inpost/${{ matrix.package.split_repo }}.git"
+          git push split "${SHA}:refs/heads/main" --force
