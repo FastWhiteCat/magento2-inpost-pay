@@ -12,7 +12,7 @@ Assumes you have an existing Magento 2 installation (e.g., via [Warden](https://
 
 1. Clone the monorepo:
    ```bash
-   git clone git@github.com:FastWhiteCat/magento2-inpost-pay.git
+   git clone <monorepo-url>
    cd magento2-inpost-pay
    ```
 

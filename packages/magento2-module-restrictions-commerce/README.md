@@ -1,9 +1,9 @@
-# InPost Pay for Magento 2 — Hyva Theme
+# Product Restrictions for InPost Pay Commerce
 
 > **Read-only mirror** — this repository is automatically split from the [monorepo](https://github.com/inpost/magento2-inpost-pay).
 > All issues and pull requests should be submitted there.
 
-Module integrates InPost Pay Mobile application with Magento store. Implementation for Hyva Theme.
+Adobe Commerce Support Package for InPost_Restrictions module.
 
 ## Requirements
 
@@ -12,8 +12,8 @@ Compatibility and dependency requirements are defined in [`composer.json`](compo
 ## Installation
 
 ```bash
-composer require inpost/magento2-module-inpost-pay-hyva-theme
-bin/magento module:enable InPost_InPostPayHyvaTheme
+composer require inpost/magento2-module-restrictions-commerce
+bin/magento module:enable InPost_RestrictionsCommerce
 bin/magento setup:upgrade
 ```
 

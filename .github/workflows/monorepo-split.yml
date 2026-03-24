@@ -44,6 +44,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SPLIT_REPO_ACCESS_TOKEN }}
         run: |
           SHA=$(splitsh-lite --prefix=${{ matrix.package.local_path }})
-          git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/inpost/${{ matrix.package.split_repo }}.git"
+          git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
           git push split "${SHA}:refs/heads/main" --force
           git push split "${GITHUB_REF}:refs/tags/${GITHUB_REF_NAME}" --force
