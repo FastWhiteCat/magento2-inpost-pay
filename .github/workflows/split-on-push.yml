@@ -56,5 +56,5 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           SHA=$(git subtree split --prefix=${{ matrix.package.local_path }})
-          git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
-          git push split "${SHA}:refs/heads/main" --force
+          git -c http.extraheader= remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
+          git -c http.extraheader= push split "${SHA}:refs/heads/main" --force
