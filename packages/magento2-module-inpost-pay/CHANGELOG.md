@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.2] - 2026-03-24
+
+### Fixed
+- Fixed cross-sell products prices. In Mobile App cross-sell products will no longer display the regular price but the final price.
+
 ## [2.6.1] - 2026-03-05
 
 ### Fixed
