@@ -1,4 +1,4 @@
-name: Monorepo Split
+name: Monorepo Split (Tag)
 
 on:
   push:
@@ -56,7 +56,19 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git config --local --unset-all http.https://github.com/.extraheader || true
-          SHA=$(git subtree split --prefix=${{ matrix.package.local_path }})
+
+          # Check if this package exists at the tagged commit
+          if ! git ls-tree --name-only "${{ github.ref_name }}" -- "${{ matrix.package.local_path }}" | grep -q .; then
+            echo "Package ${{ matrix.package.local_path }} does not exist at tag ${{ github.ref_name }}, skipping"
+            exit 0
+          fi
+
+          SHA=$(git subtree split --prefix=${{ matrix.package.local_path }} "${{ github.ref_name }}")
           git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
+
+          # Push subtree to main
           git push split "${SHA}:refs/heads/main" --force
-          git push split "${GITHUB_REF}:refs/tags/${GITHUB_REF_NAME}" --force
+
+          # Tag the SPLIT SHA (not the monorepo SHA) and push the tag
+          git tag -f "split-${{ github.ref_name }}" "${SHA}"
+          git push split "refs/tags/split-${{ github.ref_name }}:refs/tags/${{ github.ref_name }}" --force
