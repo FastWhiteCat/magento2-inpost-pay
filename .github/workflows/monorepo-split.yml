@@ -51,17 +51,11 @@ jobs:
           private-key: ${{ env.SPLIT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - name: Install splitsh-lite
-        run: |
-          git clone --depth 1 --branch v2.0.0 https://github.com/splitsh/lite.git /tmp/splitsh
-          cd /tmp/splitsh
-          go build -o /usr/local/bin/lite .
-
-      - name: Split ${{ matrix.package.split_repo }}
+      - name: Split and push ${{ matrix.package.split_repo }}
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          SHA=$(lite --prefix=${{ matrix.package.local_path }})
+          SHA=$(git subtree split --prefix=${{ matrix.package.local_path }})
           git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
           git push split "${SHA}:refs/heads/main" --force
           git push split "${GITHUB_REF}:refs/tags/${GITHUB_REF_NAME}" --force
