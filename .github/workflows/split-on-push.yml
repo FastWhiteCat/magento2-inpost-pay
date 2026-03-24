@@ -53,7 +53,7 @@ jobs:
 
       - name: Install splitsh-lite
         run: |
-          go install github.com/splitsh/lite@v2.0.0
+          go install github.com/splitsh/lite@latest
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Split ${{ matrix.package.split_repo }}
