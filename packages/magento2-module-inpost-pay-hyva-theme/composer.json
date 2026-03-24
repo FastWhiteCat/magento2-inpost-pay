@@ -1,14 +1,8 @@
 {
     "name": "inpost/magento2-module-inpost-pay-hyva-theme",
-<<<<<<< HEAD
-    "description": "Module integrates InPost Pay Mobile application with Magento store. Implementation for Hyv\u00e4 Theme",
-=======
-    "description": "Module integrates InPost Pay Mobile application with Magento store. Implementation for Hyvä Theme",
->>>>>>> 65722889 (INPAY-600 - Remove hardcoded version from package composer.json files)
+    "description": "Module integrates InPost Pay Mobile application with Magento store. Implementation for Hyva Theme",
     "type": "magento2-module",
-    "license": [
-        "CC-BY-NC-ND-4.0"
-    ],
+    "license": ["CC-BY-NC-ND-4.0"],
     "require": {
         "php": ">=8.1",
         "laminas/laminas-http": "*",
@@ -30,6 +24,6 @@
     "keywords": [
         "magento2",
         "inpostpay",
-        "hyv\u00e4"
+        "hyva"
     ]
 }
