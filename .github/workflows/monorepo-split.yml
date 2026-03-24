@@ -53,14 +53,14 @@ jobs:
 
       - name: Install splitsh-lite
         run: |
-          curl -sL https://github.com/splitsh/lite/releases/download/v2.0.0/lite_linux_amd64.tar.gz | tar -xz
-          sudo mv splitsh-lite /usr/local/bin/
+          go install github.com/splitsh/lite@v2.0.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Split ${{ matrix.package.split_repo }}
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          SHA=$(splitsh-lite --prefix=${{ matrix.package.local_path }})
+          SHA=$(lite --prefix=${{ matrix.package.local_path }})
           git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
           git push split "${SHA}:refs/heads/main" --force
           git push split "${GITHUB_REF}:refs/tags/${GITHUB_REF_NAME}" --force
