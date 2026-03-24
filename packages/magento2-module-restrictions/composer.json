@@ -2,9 +2,7 @@
     "name": "inpost/magento2-module-restrictions",
     "description": "Module allows for configuration of restrictions for products not handled by InPost Pay.",
     "type": "magento2-module",
-    "license": [
-        "CC-BY-NC-ND-4.0"
-    ],
+    "license": ["CC-BY-NC-ND-4.0"],
     "require": {
         "php": ">=8.1",
         "magento/framework": "*",
@@ -26,3 +24,4 @@
         "inpostpay"
     ]
 }
+

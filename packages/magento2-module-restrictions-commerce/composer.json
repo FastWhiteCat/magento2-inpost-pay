@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     "version": "2.6.0",
 >>>>>>> 35b85d51 (INPAY-122 - Upgraded InPost_InPostPay Module to newest 2.6.0 version.)
@@ -16,13 +17,20 @@
 =======
 >>>>>>> 65722889 (INPAY-600 - Remove hardcoded version from package composer.json files)
     "description": "Adobe Commerce Support Package",
+=======
+    "description": "Adobe Commerce Support Package for InPost_Restrictions module.",
+>>>>>>> e9cffa96 (INPAY-600 - Fix Packagist compatibility issues)
     "type": "magento2-module",
+    "license": ["proprietary"],
     "require": {
         "inpost/magento2-module-restrictions": ">=2.5.0"
     },
+<<<<<<< HEAD
     "license": [
         "proprietary"
     ],
+=======
+>>>>>>> e9cffa96 (INPAY-600 - Fix Packagist compatibility issues)
     "autoload": {
         "files": [
             "src/registration.php"
@@ -30,5 +38,10 @@
         "psr-4": {
             "InPost\\RestrictionsCommerce\\": "src"
         }
-    }
+    },
+    "keywords": [
+        "magento2",
+        "inpostpay",
+        "adobe-commerce"
+    ]
 }

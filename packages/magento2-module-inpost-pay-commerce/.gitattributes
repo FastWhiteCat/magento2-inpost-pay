@@ -1,7 +1,4 @@
 /tests export-ignore
 /.gitattributes export-ignore
-<<<<<<< HEAD
+/.gitignore export-ignore
 CHANGELOG.md export-ignore
-=======
-CHANGELOG.md export-ignore
->>>>>>> c5584794 (INPAY-600 - Add CI/CD workflows and monorepo configuration)
