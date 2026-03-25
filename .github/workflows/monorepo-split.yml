@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to split and push (e.g. v2.4.2)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -11,6 +17,8 @@ permissions:
 jobs:
   split:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -57,18 +65,17 @@ jobs:
         run: |
           git config --local --unset-all http.https://github.com/.extraheader || true
 
+          TAG="${{ env.TAG }}"
+
           # Check if this package exists at the tagged commit
-          if ! git ls-tree --name-only "${{ github.ref_name }}" -- "${{ matrix.package.local_path }}" | grep -q .; then
-            echo "Package ${{ matrix.package.local_path }} does not exist at tag ${{ github.ref_name }}, skipping"
+          if ! git ls-tree --name-only "${TAG}" -- "${{ matrix.package.local_path }}" | grep -q .; then
+            echo "Package ${{ matrix.package.local_path }} does not exist at tag ${TAG}, skipping"
             exit 0
           fi
 
-          SHA=$(git subtree split --prefix=${{ matrix.package.local_path }} "${{ github.ref_name }}")
+          SHA=$(git subtree split --prefix=${{ matrix.package.local_path }} "${TAG}")
           git remote add split "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository_owner }}/${{ matrix.package.split_repo }}.git"
 
-          # Push subtree to main
-          git push split "${SHA}:refs/heads/main" --force
-
-          # Tag the SPLIT SHA (not the monorepo SHA) and push the tag
-          git tag -f "split-${{ github.ref_name }}" "${SHA}"
-          git push split "refs/tags/split-${{ github.ref_name }}:refs/tags/${{ github.ref_name }}" --force
+          # Push the tag (split SHA, not monorepo SHA)
+          git tag -f "split-${TAG}" "${SHA}"
+          git push split "refs/tags/split-${TAG}:refs/tags/${TAG}" --force
