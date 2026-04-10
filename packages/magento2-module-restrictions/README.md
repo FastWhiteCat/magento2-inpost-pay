@@ -1,17 +1,24 @@
-# Product Restrictions for InPost Pay Integration
-Module adds possibility to restrict products from sale in general or for certain delivery types when carts are bound with InPost Pay Mobile App.
+# Product Restrictions for InPost Pay
+
+Module allows for configuration of restrictions for products not handled by InPost Pay.
+
+## Compatibility
+
+Compatibility and dependency requirements are defined in [`composer.json`](composer.json).
+
+## Installation
+
+```bash
+composer require inpost/magento2-module-restrictions
+bin/magento module:enable InPost_Restrictions
+bin/magento setup:upgrade
+```
 
 ## License
-* This plugin is licensed under the Creative Commons BY-NC-ND 4.0 License.
-* You are free to use this plugin in its original, unmodified form for non-commercial purposes only.
-* Redistribution, modification, and commercial use are strictly prohibited.
-* License details: http://creativecommons.org/licenses/by-nc-nd/4.0/
 
-### Compatibility
-- Magento Community 2.4.6
-- Not tested in other versions
+This plugin is licensed under the Creative Commons BY-NC-ND 4.0 License.
 
-### Installation
-To enable this extension run following commands:
-- `bin/magento module:enable InPost_Restrictions`
-- `bin/magento setup:upgrade`
+You are free to use this plugin in its original, unmodified form for non-commercial purposes only.
+Redistribution, modification, and commercial use are strictly prohibited.
+
+License details: http://creativecommons.org/licenses/by-nc-nd/4.0/
