@@ -30,6 +30,10 @@ class AddImageGalleryToProductsCollectionEventObserver implements ObserverInterf
             $productCollection = $observer->getData('collection');
             $storeId = (int)$productCollection->getStoreId();
 
+            if (!$this->canSync($storeId)) {
+                return;
+            }
+
             if (!$this->generalConfigProvider->isAdditionalImagesEnabled($storeId)) {
                 return;
             }
@@ -43,5 +47,10 @@ class AddImageGalleryToProductsCollectionEventObserver implements ObserverInterf
                 )
             );
         }
+    }
+
+    private function canSync(int $storeId): bool
+    {
+        return $this->generalConfigProvider->isEnabled($storeId);
     }
 }

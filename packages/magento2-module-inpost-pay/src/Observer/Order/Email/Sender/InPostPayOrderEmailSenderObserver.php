@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Order\Email\Sender;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Registry\Order\Email\Sender\InPostPayOrderEmailSenderRegistry;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
@@ -18,10 +19,12 @@ class InPostPayOrderEmailSenderObserver implements ObserverInterface
     /**
      * @param InPostPayOrderRepositoryInterface $inPostPayOrderRepository
      * @param InPostPayOrderEmailSenderRegistry $inPostPayOrderEmailSenderRegistry
+     * @param GeneralConfigProvider $generalConfigProvider
      */
     public function __construct(
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly InPostPayOrderEmailSenderRegistry $inPostPayOrderEmailSenderRegistry
+        private readonly InPostPayOrderEmailSenderRegistry $inPostPayOrderEmailSenderRegistry,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -43,6 +46,10 @@ class InPostPayOrderEmailSenderObserver implements ObserverInterface
             return;
         }
 
+        if (!$this->canSync((int)$order->getStoreId())) {
+            return;
+        }
+
         $inPostPayOrder = $this->getInPostPayOrder($order);
 
         if ($inPostPayOrder === null) {
@@ -50,6 +57,11 @@ class InPostPayOrderEmailSenderObserver implements ObserverInterface
         }
 
         $this->inPostPayOrderEmailSenderRegistry->register($inPostPayOrder);
+    }
+
+    private function canSync(int $storeId): bool
+    {
+        return $this->generalConfigProvider->isEnabled($storeId);
     }
 
     private function getInPostPayOrder(Order $order): ?InPostPayOrderInterface

@@ -24,8 +24,9 @@ class BasketBindingDelete
 
     public function execute(
         string $basketId,
-        bool $ifBasketRealized = false
-    ):void {
+        bool $ifBasketRealized = false,
+        bool $isConfirmedBasket = false
+    ): void {
         /** @var BasketBindingDeleteRequest $request */
         $request = $this->basketBindingDeleteRequestFactory->create();
 
@@ -37,16 +38,36 @@ class BasketBindingDelete
 
         $request->setParams($params);
 
+        $silencedErrorCodes = $isConfirmedBasket ? [] : [404];
+
         try {
-            $this->connector->sendRequest($request);
+            $this->connector->sendRequest($request, $silencedErrorCodes);
         } catch (NotFoundException $e) {
-            $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
-            $this->logger->critical($errorMsg->render());
+            if ($isConfirmedBasket) {
+                $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
+                $this->logger->critical($errorMsg->render());
+            } else {
+                $this->logger->debug(
+                    sprintf(
+                        'Basket binding delete returned 404 for basket ID %s — no binding existed.',
+                        $basketId
+                    )
+                );
+            }
         } catch (Exception $e) {
             $errorMsg = __('There was a problem with delete basket binding. Details: %1', $e->getMessage());
-            $this->logger->critical($errorMsg->render());
-
-            throw new LocalizedException($errorMsg);
+            if ($isConfirmedBasket) {
+                $this->logger->critical($errorMsg->render());
+                throw new LocalizedException($errorMsg);
+            } else {
+                $this->logger->debug(
+                    sprintf(
+                        'Basket binding delete failed for unconfirmed basket ID %s — %s',
+                        $basketId,
+                        $e->getMessage()
+                    )
+                );
+            }
         }
     }
 }

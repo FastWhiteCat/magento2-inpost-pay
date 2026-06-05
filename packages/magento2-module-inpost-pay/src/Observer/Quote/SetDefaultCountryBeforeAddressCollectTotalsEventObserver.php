@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Enum\InPostBasketStatus;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Provider\Config\ShipmentMappingConfigProvider;
 use InPost\InPostPay\Service\Cart\ShippingMethod\ShippingMethodEstimator;
 use Magento\Framework\Event\Observer;
@@ -20,10 +21,12 @@ class SetDefaultCountryBeforeAddressCollectTotalsEventObserver implements Observ
     /**
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
      * @param ShipmentMappingConfigProvider $shipmentMappingConfigProvider
+     * @param GeneralConfigProvider $generalConfigProvider
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
-        private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider
+        private readonly ShipmentMappingConfigProvider $shipmentMappingConfigProvider,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -31,6 +34,7 @@ class SetDefaultCountryBeforeAddressCollectTotalsEventObserver implements Observ
      * @param Observer $observer
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function execute(Observer $observer): void
     {
@@ -39,12 +43,14 @@ class SetDefaultCountryBeforeAddressCollectTotalsEventObserver implements Observ
         }
 
         $quote = $observer->getEvent()->getData('quote');
+
+        if (!$quote instanceof Quote || !$this->canSync($quote->getStoreId())) {
+            return;
+        }
+
         $shippingAssignment = $observer->getEvent()->getData('shipping_assignment');
 
-        if ($shippingAssignment instanceof ShippingAssignmentInterface
-            && $quote instanceof Quote
-            && $this->isBoundInPostPayQuote($quote)
-        ) {
+        if ($shippingAssignment instanceof ShippingAssignmentInterface && $this->isBoundInPostPayQuote($quote)) {
             $quoteShippingAddress = $quote->getShippingAddress();
 
             if (empty($quoteShippingAddress->getCountryId())) {
@@ -73,6 +79,11 @@ class SetDefaultCountryBeforeAddressCollectTotalsEventObserver implements Observ
                 }
             }
         }
+    }
+
+    private function canSync(int $storeId): bool
+    {
+        return $this->generalConfigProvider->isEnabled($storeId);
     }
 
     /**

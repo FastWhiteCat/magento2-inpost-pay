@@ -12,7 +12,6 @@ use Magento\Quote\Model\Quote\Payment;
 
 class RemoveZeroTotalCheckFromInPostPayPaymentEventObserver implements ObserverInterface
 {
-
     public function execute(Observer $observer): void
     {
         $payment = $observer->getEvent()->getData('payment');

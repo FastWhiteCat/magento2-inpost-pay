@@ -50,8 +50,9 @@ class RefundWebhookSignatureValidator implements RefundWebhookSignatureValidator
         try {
             $merchantSecret = $this->authConfigProvider->getMerchantSecret();
             $expectedSignature = $this->prepareExpectedSignature($requestApiVersion, $requestParams, $merchantSecret);
+            $requestSignature = strtolower($requestSignature);
 
-            if (strtolower($requestSignature) !== $expectedSignature) {
+            if (!hash_equals($expectedSignature, $requestSignature)) {
                 $validationErrorMsg = __('Incorrect refund webhook signature!');
 
                 throw new AuthorizationException($validationErrorMsg, null, Response::STATUS_CODE_401);

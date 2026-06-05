@@ -7,6 +7,7 @@ namespace InPost\InPostPay\Observer\Quote;
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
 use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\UpdateInPostBasketEvent;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -22,12 +23,14 @@ class UpdateInPostBasketAfterQuoteMergeEventObserver implements ObserverInterfac
      * @param UpdateInPostBasketEvent $updateInPostBasketEvent
      * @param CartSessionCookieProvider $cartSessionCookieProvider
      * @param LoggerInterface $logger
+     * @param GeneralConfigProvider $generalConfigProvider
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly UpdateInPostBasketEvent $updateInPostBasketEvent,
         private readonly CartSessionCookieProvider $cartSessionCookieProvider,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -40,6 +43,10 @@ class UpdateInPostBasketAfterQuoteMergeEventObserver implements ObserverInterfac
         $customerQuote = $observer->getEvent()->getData('quote');
 
         if ($customerQuote instanceof Quote) {
+            if (!$this->canSync($customerQuote->getStoreId())) {
+                return;
+            }
+
             /** @phpstan-ignore-next-line */
             $customerQuoteId = (int)$customerQuote->getId();
             $customerBasket = $this->getInPostPayQuoteByQuoteId($customerQuoteId);
@@ -52,6 +59,11 @@ class UpdateInPostBasketAfterQuoteMergeEventObserver implements ObserverInterfac
                 );
             }
         }
+    }
+
+    private function canSync(int $storeId): bool
+    {
+        return $this->generalConfigProvider->isEnabled($storeId);
     }
 
     /**

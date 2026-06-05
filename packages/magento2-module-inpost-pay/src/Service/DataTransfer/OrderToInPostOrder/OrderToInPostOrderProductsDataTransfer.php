@@ -66,18 +66,7 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
                 }
             } elseif ($product->getTypeId() === Type::TYPE_BUNDLE) {
                 $product->setData(ProductToInPostProductDataTransfer::BUNDLE_CHILD_PRODUCTS, []);
-
-                $productOptions = $orderItem->getProductOptions();
-                if ($productOptions && $productOptions['bundle_options']) {
-                    foreach ($productOptions['bundle_options'] as $option) {
-                        $options[] = [
-                            'label' => $option['label'],
-                            'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title']
-                                . ' ' . DecimalCalculator::round((float)$option['value'][0]['price'])
-                                . ' ' . $orderItem->getOrder()->getOrderCurrency()->getCurrencySymbol()
-                        ];
-                    }
-                }
+                $options = $this->getBundleOptions($orderItem);
             }
 
             if ($product->getTypeId() === Configurable::TYPE_CODE) {
@@ -109,5 +98,29 @@ class OrderToInPostOrderProductsDataTransfer implements OrderToInPostOrderDataTr
             $basePrice->setVat($taxValue);
             $inPostProduct->setBasePrice($basePrice);
         }
+    }
+
+    private function getBundleOptions(Item $orderItem): array
+    {
+        $options = [];
+        $productOptions = $orderItem->getProductOptions();
+        if (!$productOptions || !$productOptions['bundle_options']) {
+            return $options;
+        }
+
+        $currencySymbol = $orderItem->getOrder()->getOrderCurrency()->getCurrencySymbol();
+
+        foreach ($productOptions['bundle_options'] as $option) {
+            foreach ($option['value'] as $valueItem) {
+                $options[] = [
+                    'label' => $option['label'],
+                    'value' => (float) $valueItem['qty'] . ' x ' . $valueItem['title']
+                        . ' ' . DecimalCalculator::round((float)$valueItem['price'])
+                        . ' ' . $currencySymbol
+                ];
+            }
+        }
+
+        return $options;
     }
 }

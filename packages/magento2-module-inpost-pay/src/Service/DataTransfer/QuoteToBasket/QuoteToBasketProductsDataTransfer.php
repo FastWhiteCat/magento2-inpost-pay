@@ -72,18 +72,7 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
             } elseif ($quoteItem->getProduct()->getTypeId() === Type::TYPE_BUNDLE) {
                 $children = $quoteItem->getChildren();
                 $product->setData(ProductToInPostProductDataTransfer::BUNDLE_CHILD_PRODUCTS, $children);
-                $selectedOptions = $quoteItem->getProduct()
-                    ->getTypeInstance()->getOrderOptions($quoteItem->getProduct());
-                if ($selectedOptions && $selectedOptions['bundle_options']) {
-                    foreach ($selectedOptions['bundle_options'] as $option) {
-                        $options[] = [
-                            'label' => $option['label'],
-                            'value' => (float) $option['value'][0]['qty'] . ' x ' . $option['value'][0]['title']
-                                . ' ' . DecimalCalculator::round((float)$option['value'][0]['price'])
-                                . ' ' . $quote->getStore()->getCurrentCurrency()->getCurrencySymbol()
-                            ];
-                    }
-                }
+                $options = $this->getBundleOptions($quoteItem, $quote);
             }
 
             $productId = (int)$product->getId();
@@ -142,6 +131,31 @@ class QuoteToBasketProductsDataTransfer implements QuoteToBasketDataTransferInte
         }
 
         $basket->setProducts($products);
+    }
+
+    private function getBundleOptions(Item $quoteItem, Quote $quote): array
+    {
+        $options = [];
+        $selectedOptions = $quoteItem->getProduct()
+            ->getTypeInstance()->getOrderOptions($quoteItem->getProduct());
+        if (!$selectedOptions || !$selectedOptions['bundle_options']) {
+            return $options;
+        }
+
+        $currencySymbol = $quote->getStore()->getCurrentCurrency()->getCurrencySymbol();
+
+        foreach ($selectedOptions['bundle_options'] as $option) {
+            foreach ($option['value'] as $valueItem) {
+                $options[] = [
+                    'label' => $option['label'],
+                    'value' => (float) $valueItem['qty'] . ' x ' . $valueItem['title']
+                        . ' ' . DecimalCalculator::round((float) $valueItem['price'])
+                        . ' ' . $currencySymbol
+                ];
+            }
+        }
+
+        return $options;
     }
 
     private function isRestricted(int $productId, int $websiteId): bool

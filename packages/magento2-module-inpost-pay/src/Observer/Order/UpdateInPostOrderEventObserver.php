@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Order;
 
 use InPost\InPostPay\Api\Data\InPostPayOrderInterface;
 use InPost\InPostPay\Api\InPostPayOrderRepositoryInterface;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\UpdateOrder;
 use InPost\InPostPay\Service\ApiConnector\Merchant\OrderEvent;
 use Magento\Framework\Event\Observer;
@@ -20,7 +21,8 @@ class UpdateInPostOrderEventObserver implements ObserverInterface
     public function __construct(
         private readonly UpdateOrder $updateOrder,
         private readonly InPostPayOrderRepositoryInterface $inPostPayOrderRepository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -52,6 +54,10 @@ class UpdateInPostOrderEventObserver implements ObserverInterface
 
     private function canSync(Order $order): bool
     {
+        if (!$this->generalConfigProvider->isEnabled((int)$order->getStoreId())) {
+            return false;
+        }
+
         if ($order->getData(OrderEvent::SKIP_INPOST_PAY_SYNC_FLAG)) {
             return false;
         }

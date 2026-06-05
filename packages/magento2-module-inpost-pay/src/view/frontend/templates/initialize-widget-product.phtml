@@ -3,6 +3,7 @@
 /**
  * @var Magento\Framework\View\Element\Template $block
  * @var InPost\InPostPay\ViewModel\Widget $widgetViewModel
+ * @var Magento\Framework\Escaper $escaper
  */
 
 $widgetViewModel = $block->getData('widget_view_model');
@@ -27,23 +28,23 @@ $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 $enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
 ?>
 
-<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+<div class="<?= $escaper->escapeHtmlAttr($widgetWrapperClass . ' ' . $bindingPlace)?>">
     <inpost-izi-button
-        binding_place="<?= /* @noEscape */ $bindingPlace ?>"
-        data-product-id="<?= /* @noEscape */ $productId ?>"
-        variation="<?= /* @noEscape */ $layoutConfig ?>"
+        binding_place="<?= $escaper->escapeHtmlAttr($bindingPlace) ?>"
+        data-product-id="<?= $escaper->escapeHtmlAttr($productId) ?>"
+        variation="<?= $escaper->escapeHtmlAttr($layoutConfig) ?>"
     ></inpost-izi-button>
 
     <script type="text/x-magento-init">
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
-                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
-                    "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
-                    "language": "<?= /* @noEscape */ $language ?>",
-                    "productId": "<?= /* @noEscape */ $productId ?>",
-                    "enabledAnalyticsParams": "<?= /* @noEscape */ $enabledAnalyticsParams ?>"
+                    "bindingPlace": "<?= $escaper->escapeJs($bindingPlace) ?>",
+                    "scriptUrl": "<?= $escaper->escapeJs($scriptUrl) ?>",
+                    "merchantClientId": "<?= $escaper->escapeJs($merchantClientId) ?>",
+                    "language": "<?= $escaper->escapeJs($language) ?>",
+                    "productId": "<?= $escaper->escapeJs($productId) ?>",
+                    "enabledAnalyticsParams": "<?= $escaper->escapeJs((string)$enabledAnalyticsParams) ?>"
                 }
             }
         }

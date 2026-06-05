@@ -6,6 +6,7 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Registry\SaveQuoteAddressActionRegistry;
 use InPost\InPostPay\Service\UpdateInPostBasketEvent;
 use Magento\Catalog\Model\Product\Type;
@@ -24,7 +25,8 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly UpdateInPostBasketEvent $updateInPostBasketEvent,
-        private readonly SaveQuoteAddressActionRegistry $saveQuoteAddressActionRegistry
+        private readonly SaveQuoteAddressActionRegistry $saveQuoteAddressActionRegistry,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -42,11 +44,21 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
 
     private function canSync(Quote $quote): bool
     {
+        if (!$this->generalConfigProvider->isEnabled($quote->getStoreId())) {
+            return false;
+        }
+
         if ($quote->getData(self::SKIP_INPOST_PAY_SYNC_FLAG)) {
             return false;
         }
 
         if ($this->saveQuoteAddressActionRegistry->isSaveQuoteAddressActionRegistered()) {
+            return false;
+        }
+
+        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
+        $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
+        if (!$inPostPayQuote) {
             return false;
         }
 
@@ -59,12 +71,6 @@ class UpdateInPostBasketEventObserver implements ObserverInterface
         }
 
         $quote->setData(self::SKIP_INPOST_PAY_SYNC_FLAG, true);
-
-        $quoteId = (int)(is_scalar($quote->getId()) ? $quote->getId() : null);
-        $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
-        if (!$inPostPayQuote) {
-            return false;
-        }
 
         return $inPostPayQuote->getBrowserTrusted();
     }

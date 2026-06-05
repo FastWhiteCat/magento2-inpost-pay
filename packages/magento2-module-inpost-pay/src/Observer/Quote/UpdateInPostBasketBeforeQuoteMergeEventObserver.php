@@ -6,10 +6,11 @@ namespace InPost\InPostPay\Observer\Quote;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
-use InPost\InPostPay\Provider\Cart\Session\CartSessionCookieProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -17,6 +18,9 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterface
 {
     /**
@@ -25,13 +29,15 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
      * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
      * @param CartSessionCookieProvider $cartSessionCookieProvider
      * @param LoggerInterface $logger
+     * @param GeneralConfigProvider $generalConfigProvider
      */
     public function __construct(
         private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         private readonly BasketBindingDelete $basketBindingDelete,
         private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
         private readonly CartSessionCookieProvider $cartSessionCookieProvider,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -45,6 +51,10 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         $guestQuote = $observer->getEvent()->getData('source');
 
         if ($customerQuote instanceof Quote && $guestQuote instanceof Quote) {
+            if (!$this->canSync($customerQuote->getStoreId())) {
+                return;
+            }
+
             try {
                 $this->resolveInPostPayQuotesMerge($customerQuote, $guestQuote);
             } catch (NoSuchEntityException | LocalizedException $e) {
@@ -81,7 +91,11 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
         }
 
         if (isset($deprecatedBasket)) {
-            $this->basketBindingDelete->execute($deprecatedBasket->getBasketId());
+            $this->basketBindingDelete->execute(
+                $deprecatedBasket->getBasketId(),
+                false,
+                $this->isBasketBound($deprecatedBasket)
+            );
             $guestQuote->setData(UpdateInPostBasketEventObserver::SKIP_INPOST_PAY_SYNC_FLAG, true);
             $this->inPostPayQuoteRepository->delete($deprecatedBasket);
         }
@@ -94,6 +108,11 @@ class UpdateInPostBasketBeforeQuoteMergeEventObserver implements ObserverInterfa
                 (string)$finalBasket->getBasketBindingApiKey()
             );
         }
+    }
+
+    private function canSync(int $storeId): bool
+    {
+        return $this->generalConfigProvider->isEnabled($storeId);
     }
 
     /**

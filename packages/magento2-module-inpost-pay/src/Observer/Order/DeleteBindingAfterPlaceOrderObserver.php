@@ -6,6 +6,8 @@ namespace InPost\InPostPay\Observer\Order;
 
 use InPost\InPostPay\Api\Data\InPostPayQuoteInterface;
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
+use InPost\InPostPay\Enum\InPostBasketStatus;
 use InPost\InPostPay\Service\ApiConnector\BasketBindingDelete;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Framework\Event\Observer;
@@ -25,7 +27,8 @@ class DeleteBindingAfterPlaceOrderObserver implements ObserverInterface
         protected readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
         protected readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
         protected readonly InPostPayOrderCreationRegistry $orderCreationRegistry,
-        protected readonly LoggerInterface $logger
+        protected readonly LoggerInterface $logger,
+        protected readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -63,6 +66,10 @@ class DeleteBindingAfterPlaceOrderObserver implements ObserverInterface
 
     protected function canSync(Order $order): bool
     {
+        if (!$this->generalConfigProvider->isEnabled((int)$order->getStoreId())) {
+            return false;
+        }
+
         $quoteId = (int)(is_scalar($order->getQuoteId()) ? $order->getQuoteId() : null);
         $inPostPayQuote = $this->getInPostPayQuoteByQuoteId($quoteId);
 
@@ -100,7 +107,8 @@ class DeleteBindingAfterPlaceOrderObserver implements ObserverInterface
             );
         } else {
             try {
-                $this->basketBindingDelete->execute($inPostPayQuote->getBasketId(), true);
+                $isConfirmed = $inPostPayQuote->getStatus() === InPostBasketStatus::SUCCESS->value;
+                $this->basketBindingDelete->execute($inPostPayQuote->getBasketId(), true, $isConfirmed);
             } catch (LocalizedException $e) {
                 $this->logger->error(
                     sprintf(

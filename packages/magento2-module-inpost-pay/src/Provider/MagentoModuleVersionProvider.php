@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace InPost\InPostPay\Provider;
 
-use Magento\Framework\Component\ComponentRegistrar;
-use Magento\Framework\Component\ComponentRegistrarInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\ValidatorException;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
@@ -13,37 +12,47 @@ use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 
 class MagentoModuleVersionProvider
 {
-    public const DEFAULT_VERSION = '0.0.0';
+    public const string DEFAULT_VERSION = '0.0.0';
+    private const string PACKAGE_NAME = 'inpost/magento2-module-inpost-pay';
 
-    protected ?string $version = null;
+    private ?string $version = null;
 
     public function __construct(
-        private readonly ComponentRegistrarInterface $componentRegistrar,
+        private readonly DirectoryList $directoryList,
         private readonly ReadFactory $readFactory,
         private readonly JsonSerializer $jsonSerializer
     ) {
     }
 
-    /**
-     * @return string
-     */
     public function getVersion(): string
     {
-        if ($this->version === null) {
-            try {
-                $modulePath = $this->componentRegistrar->getPath(ComponentRegistrar::MODULE, 'InPost_InPostPay');
-                // @phpstan-ignore-next-line
-                $directoryRead = $this->readFactory->create($modulePath);
-                if ($directoryRead->isFile('composer.json')) {
-                    $composerJsonContent = $directoryRead->readFile('composer.json');
-                    $composerData = $this->jsonSerializer->unserialize($composerJsonContent);
-                    $this->version = $composerData['version'] ?? self::DEFAULT_VERSION;
-                }
-            } catch (FileSystemException | ValidatorException $e) {
-                $this->version = self::DEFAULT_VERSION;
+        if ($this->version !== null) {
+            return $this->version;
+        }
+
+        try {
+            $directoryRead = $this->readFactory->create($this->directoryList->getRoot());
+            if (!$directoryRead->isFile('composer.lock')) {
+                return $this->version = self::DEFAULT_VERSION;
             }
+
+            $lockData = $this->jsonSerializer->unserialize($directoryRead->readFile('composer.lock'));
+            $this->version = $this->findPackageVersion($lockData['packages'] ?? []);
+        } catch (FileSystemException | ValidatorException) {
+            $this->version = self::DEFAULT_VERSION;
         }
 
         return $this->version;
+    }
+
+    private function findPackageVersion(array $packages): string
+    {
+        foreach ($packages as $package) {
+            if (($package['name'] ?? '') === self::PACKAGE_NAME) {
+                return ltrim($package['version'] ?? self::DEFAULT_VERSION, 'v');
+            }
+        }
+
+        return self::DEFAULT_VERSION;
     }
 }

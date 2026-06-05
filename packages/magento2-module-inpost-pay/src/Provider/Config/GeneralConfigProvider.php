@@ -27,13 +27,15 @@ class GeneralConfigProvider
     }
 
     /**
+     * @param int|null $storeId
      * @return bool
      */
-    public function isEnabled(): bool
+    public function isEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_INPOST_PAY_ENABLED,
-            ScopeInterface::SCOPE_WEBSITE
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 

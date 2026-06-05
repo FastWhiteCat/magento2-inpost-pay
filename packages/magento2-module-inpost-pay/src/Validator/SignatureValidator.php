@@ -69,7 +69,7 @@ class SignatureValidator implements SignatureValidatorInterface
         string $requestPublicKeyHash
     ): void {
         $publicKeyBase64Hash = hash('sha256', $this->getPublicKeyBase64ByVersion($requestPublicKeyVersion));
-        if ($publicKeyBase64Hash !== $requestPublicKeyHash) {
+        if (!hash_equals($publicKeyBase64Hash, $requestPublicKeyHash)) {
             $validationErrorMsg = __('Incorrect public key hash');
 
             throw new AuthorizationException($validationErrorMsg, null, Response::STATUS_CODE_401);
