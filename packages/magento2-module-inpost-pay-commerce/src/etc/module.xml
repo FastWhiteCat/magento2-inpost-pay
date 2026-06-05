@@ -4,6 +4,9 @@
     <module name="InPost_InPostPayCommerce">
         <sequence>
             <module name="InPost_InPostPay"/>
+            <module name="Magento_GiftCardAccount"/>
+            <module name="Magento_CustomerBalance"/>
+            <module name="Magento_Reward"/>
         </sequence>
     </module>
 </config>

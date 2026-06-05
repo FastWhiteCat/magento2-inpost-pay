@@ -24,4 +24,13 @@
             <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
         </arguments>
     </type>
+    <type name="InPost\InPostPayCommerce\Plugin\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryGiftCardRewardPointsPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryDataTransfer">
+        <plugin name="inpost_inpostpay_commerce_delivery_gift_card_reward_points"
+                type="InPost\InPostPayCommerce\Plugin\Service\DataTransfer\QuoteToBasket\QuoteToBasketDeliveryGiftCardRewardPointsPlugin"/>
+    </type>
 </config>

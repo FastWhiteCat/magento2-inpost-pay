@@ -46,20 +46,24 @@ class BasketPriceIncludingGiftWrappingValidator extends BasketPriceValidator imp
         $address = $quote->getShippingAddress();
         $shippingMethod = $this->getSelectedShippingMethod($quote, $inPostOrder);
         $this->validateCurrency($quote, $inPostOrder);
-        $this->validateGrossPrice($address, $shippingMethod, $inPostOrder->getOrderDetails()->getBasketPrice());
+        $this->validateGrossPrice(
+            $address,
+            $shippingMethod,
+            $inPostOrder->getOrderDetails()->getBasketPrice()
+        );
     }
 
     /**
      * @param Address $address
      * @param ShippingMethodInterface $shippingMethod
-     * @param PriceInterface $basketPrice
+     * @param PriceInterface|null $basketPrice
      * @return void
      * @throws LocalizedException
      */
     private function validateGrossPrice(
         Address $address,
         ShippingMethodInterface $shippingMethod,
-        PriceInterface $basketPrice
+        ?PriceInterface $basketPrice
     ): void {
         $discountInclTax = DecimalCalculator::round((float)$address->getDiscountAmount());
         $priceInclTaxWithShipping = DecimalCalculator::add(
@@ -70,17 +74,21 @@ class BasketPriceIncludingGiftWrappingValidator extends BasketPriceValidator imp
             DecimalCalculator::add($priceInclTaxWithShipping, $discountInclTax)
         );
 
-        $finalPriceInclTax = DecimalCalculator::add(
-            $finalPriceInclTax,
-            $this->getGiftWrappingTotalInclTax($address)
+        $finalPriceInclTax = DecimalCalculator::round(
+            DecimalCalculator::add(
+                $finalPriceInclTax,
+                $this->getGiftWrappingTotalInclTax($address)
+            )
         );
 
-        if ($basketPrice->getGross() !== $finalPriceInclTax) {
+        $basketPriceGross = $basketPrice ? $basketPrice->getGross() : 0.00;
+
+        if ($basketPriceGross !== $finalPriceInclTax) {
             throw new LocalizedException(
                 __(
                     'Order final Gross value is incorrect. Expected: %1 Received: %2',
                     $finalPriceInclTax,
-                    $basketPrice->getGross()
+                    $basketPriceGross
                 )
             );
         }
