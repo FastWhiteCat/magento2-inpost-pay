@@ -2,12 +2,13 @@
 
 use Hyva\Theme\Model\ViewModelRegistry;
 use InPost\InPostPay\ViewModel\Widget;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
-
 
 /** @var ViewModelRegistry $viewModels */
 /** @var Template $block */
 /** @var Widget $widgetViewModel */
+/** @var Escaper $escaper */
 
 $widgetViewModel = $viewModels->require(Widget::class);
 
@@ -31,18 +32,13 @@ $widgetWrapperClass = "inpay-widget-wrapper";
 
 <?= $block->getChildBlock('inpost.hyva.widget.product.script')->setData('productId', $productId)->toHtml() ?>
 
-<div x-data="initializeInpostPay_<?= $bindingPlace ?>()"
+<div x-data="initializeInpostPay_<?= $escaper->escapeJs($bindingPlace) ?>()"
      @private-content-loaded.window="receiveCustomerData($event.detail.data)"
-     class="<?= /* @noEscape */
-     $widgetWrapperClass . ' ' . /* @noEscape */
-     $bindingPlace ?>">
+     class="<?= $escaper->escapeHtmlAttr($widgetWrapperClass) . ' ' . $escaper->escapeHtmlAttr($bindingPlace) ?>">
     <inpost-izi-button
-        binding_place="<?= /* @noEscape */
-        $bindingPlace ?>"
-        data-product-id="<?= /* @noEscape */
-        $productId ?>"
-        variation="<?= /* @noEscape */
-        $layoutConfig ?>"
+        binding_place="<?= $escaper->escapeHtmlAttr($bindingPlace) ?>"
+        data-product-id="<?= $escaper->escapeHtmlAttr($productId) ?>"
+        variation="<?= $escaper->escapeHtmlAttr($layoutConfig) ?>"
     ></inpost-izi-button>
 </div>
 

@@ -21,7 +21,7 @@ class DeleteInPostPayBestsellerProductAfterSaveObserver extends ParentObserver i
     {
         $product = $observer->getEvent()->getData('product');
 
-        if (!$product instanceof Product) {
+        if (!$product instanceof Product || !$this->canSync($product->getStoreId())) {
             return;
         }
 

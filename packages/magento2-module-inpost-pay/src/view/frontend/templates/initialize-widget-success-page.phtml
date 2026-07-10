@@ -19,18 +19,18 @@ $bindingPlace = $block->getBindingPlace();
 $scriptUrl = $widgetViewModel->getScriptUrl($bindingPlace);
 ?>
 
-<div class="<?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+<div class="<?= $escaper->escapeHtmlAttr($widgetWrapperClass . ' ' . $bindingPlace)?>">
     <inpost-thank-you/>
 
     <script type="text/x-magento-init">
         {
             "*" : {
                 "InpostPayMerchantWidget" : {
-                    "bindingPlace": "<?= /* @noEscape */ $bindingPlace ?>",
-                    "scriptUrl": "<?= /* @noEscape */ $scriptUrl ?>",
-                    "merchantClientId": "<?= /* @noEscape */ $merchantClientId ?>",
-                    "language": "<?= /* @noEscape */ $language ?>",
-                    "enabledAnalyticsParams": "<?= /* @noEscape */ $enabledAnalyticsParams ?>"
+                    "bindingPlace": "<?= $escaper->escapeJs($bindingPlace) ?>",
+                    "scriptUrl": "<?= $escaper->escapeJs($scriptUrl) ?>",
+                    "merchantClientId": "<?= $escaper->escapeJs($merchantClientId) ?>",
+                    "language": "<?= $escaper->escapeJs($language) ?>",
+                    "enabledAnalyticsParams": "<?= $escaper->escapeJs((string)$enabledAnalyticsParams) ?>"
                 }
             }
         }

@@ -5,7 +5,6 @@ use InPost\InPostPay\ViewModel\Widget;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
-
 /** @var ViewModelRegistry $viewModels */
 /** @var Template $block */
 /** @var Escaper $escaper */
@@ -24,7 +23,7 @@ $isCart = $block->getData('isCart');
 ?>
 
 <script>
-    function initializeInpostPay_<?= $bindingPlace ?>() {
+    function initializeInpostPay_<?= $escaper->escapeJs($bindingPlace) ?>() {
         /**
          * @typedef {string} WidgetBasketEventHandler
          * @enum {WidgetBasketEventHandler}
@@ -54,13 +53,13 @@ $isCart = $block->getData('isCart');
             isInitialized: false,
             widget: false,
             configuration: {
-                merchantClientId: "<?= $merchantClientId ?>",
-                bindingPlace: "<?= $bindingPlace ?>",
-                language: "<?= $language ?>",
-                scriptUrl: "<?= $scriptUrl ?>",
-                enabledAnalyticsParams: "<?= $enabledAnalyticsParams ?>",
-                productId: "<?= $productId ?>",
-                isCart: "<?= $isCart ?>" || "0"
+                merchantClientId: "<?= $escaper->escapeJs($merchantClientId) ?>",
+                bindingPlace: "<?= $escaper->escapeJs($bindingPlace) ?>",
+                language: "<?= $escaper->escapeJs($language) ?>",
+                scriptUrl: "<?= $escaper->escapeJs($scriptUrl) ?>",
+                enabledAnalyticsParams: "<?= $escaper->escapeJs($enabledAnalyticsParams) ?>",
+                productId: "<?= $escaper->escapeJs($productId) ?>",
+                isCart: "<?= $escaper->escapeJs($isCart) ?>" || "0"
             },
 
             /**
@@ -408,7 +407,9 @@ $isCart = $block->getData('isCart');
                                             } else if (data.error) {
                                                 reject(data.error);
                                             } else {
-                                                reject(new Error('Something went wrong, refresh the page and try again'));
+                                                reject(
+                                                    new Error('Something went wrong, refresh the page and try again')
+                                                );
                                             }
                                         })
                                         .catch(() => {
@@ -463,7 +464,9 @@ $isCart = $block->getData('isCart');
                 }
 
                 return new Promise((resolve, reject) => {
-                    const url = `${BASE_URL}inpostizi/OrderComplete/Get/form_key/${formKey}/?basket_binding_api_key=${hyva.getCookie('basketBindingApiKey')}`;
+                    const basketBindingApiKey = hyva.getCookie('basketBindingApiKey');
+                    const apiKeyParam = `?basket_binding_api_key=${basketBindingApiKey}`;
+                    const url = `${BASE_URL}inpostizi/OrderComplete/Get/form_key/${formKey}/${apiKeyParam}`;
 
                     fetch(url)
                         .then(response => {
@@ -472,7 +475,6 @@ $isCart = $block->getData('isCart');
                         .then(data => {
                             if (data && data.redirect) {
                                 hyva.setCookie('mage-cache-sessid', '', -1, true);
-                                window.dispatchEvent(new Event('reload-customer-section-data'));
                                 resolve(true);
                                 window.location.replace(data.redirect);
                             } else {

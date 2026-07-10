@@ -56,6 +56,10 @@ class Get extends WidgetController implements HttpGetActionInterface
 
     public function execute(): Json
     {
+        if ($failedFormKeyValidationResult = $this->getFailedFormKeyValidationResult()) {
+            return $failedFormKeyValidationResult;
+        }
+
         try {
             $basketBindingApiKey = $this->request->getParam(InPostPayQuoteInterface::BASKET_BINDING_API_KEY);
             $basketBindingApiKey = is_scalar($basketBindingApiKey) ? (string)$basketBindingApiKey : '';

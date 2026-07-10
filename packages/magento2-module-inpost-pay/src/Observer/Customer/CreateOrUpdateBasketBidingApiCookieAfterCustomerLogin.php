@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace InPost\InPostPay\Observer\Customer;
 
 use InPost\InPostPay\Api\InPostPayQuoteRepositoryInterface;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\Cart\BasketBindingApiKeyCookieService;
 use Magento\Customer\Model\Customer;
 use Magento\Framework\Event\Observer as EventObserver;
@@ -18,11 +19,13 @@ class CreateOrUpdateBasketBidingApiCookieAfterCustomerLogin implements ObserverI
      * @param BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService
      * @param CartRepositoryInterface $cartRepository
      * @param InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
+     * @param GeneralConfigProvider $generalConfigProvider
      */
     public function __construct(
         private readonly BasketBindingApiKeyCookieService $basketBindingApiKeyCookieService,
         private readonly CartRepositoryInterface $cartRepository,
-        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository
+        private readonly InPostPayQuoteRepositoryInterface $inPostPayQuoteRepository,
+        private readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -32,6 +35,10 @@ class CreateOrUpdateBasketBidingApiCookieAfterCustomerLogin implements ObserverI
      */
     public function execute(EventObserver $observer): void
     {
+        if (!$this->canSync()) {
+            return;
+        }
+
         $customer = $observer->getData('customer');
 
         if (!$customer instanceof Customer) {
@@ -55,6 +62,11 @@ class CreateOrUpdateBasketBidingApiCookieAfterCustomerLogin implements ObserverI
         } catch (NoSuchEntityException $e) {
             return;
         }
+    }
+
+    private function canSync(): bool
+    {
+        return $this->generalConfigProvider->isEnabled();
     }
 
     /**

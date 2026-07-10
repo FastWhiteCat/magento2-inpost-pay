@@ -42,9 +42,10 @@ class OrderToInPostOrderDiscountDataTransfer implements OrderToInPostOrderDataTr
 
         foreach ($inPostOrder->getProducts() as $product) {
             $basePrice = $product->getBasePrice();
+            $qty = $product->getQuantity()->getQuantity();
             $orderSummedProductsBaseGrossAmount = DecimalCalculator::add(
                 $orderSummedProductsBaseGrossAmount,
-                $basePrice->getGross()
+                DecimalCalculator::mul($qty, $basePrice->getGross())
             );
         }
 

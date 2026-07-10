@@ -20,6 +20,9 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
 
 class Connector implements ConnectorInterface
 {
+    private const GUZZLE_CLIENT_CONFIG_CONNECTION_TIMEOUT = 5.0;
+    private const GUZZLE_CLIENT_CONFIG_TIMEOUT = 30.0;
+
     public function __construct(
         private readonly ClientFactory $clientFactory,
         private readonly EventManager $eventManager,
@@ -28,7 +31,7 @@ class Connector implements ConnectorInterface
     ) {
     }
 
-    public function sendRequest(RequestInterface $request): array
+    public function sendRequest(RequestInterface $request, array $silencedErrorCodes = []): array
     {
         $this->eventManager->dispatch('izi_api_send_request_before', [self::REQUEST => $request]);
 
@@ -57,8 +60,11 @@ class Connector implements ConnectorInterface
                 $e->getCode(),
                 $e->getMessage()
             );
-            $this->logger->critical($errorMsg);
             $errorCode = (int)$e->getCode();
+
+            if (!in_array($errorCode, $silencedErrorCodes, true)) {
+                $this->logger->critical($errorMsg);
+            }
 
             if ($errorCode === 404) {
                 throw new NotFoundException(__($errorMsg), null, $errorCode);
@@ -80,7 +86,9 @@ class Connector implements ConnectorInterface
             [
                 'config' => [
                     'cookies' => false,
-                    'headers' => $headers
+                    'headers' => $headers,
+                    'connect_timeout' => self::GUZZLE_CLIENT_CONFIG_CONNECTION_TIMEOUT,
+                    'timeout' => self::GUZZLE_CLIENT_CONFIG_TIMEOUT,
                 ]
             ]
         );

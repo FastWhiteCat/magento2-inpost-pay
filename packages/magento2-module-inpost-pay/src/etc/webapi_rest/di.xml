@@ -18,9 +18,52 @@
         <plugin name="InPost_InPostPay::addAdditionalQuoteProductAttributesPlugin"
                 type="InPost\InPostPay\Plugin\Quote\AddAdditionalQuoteProductAttributesPlugin" />
     </type>
+    <type name="InPost\InPostPay\Plugin\Webapi\Rest\Response\AbstractVersionHeaderPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">InPost\InPostPay\Logger\InPostPayLogger</argument>
+        </arguments>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketGetInterface">
+        <plugin name="InPost_InPostPay::basketGetVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\BasketGetPlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketUpdateInterface">
+        <plugin name="InPost_InPostPay::basketUpdateVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\BasketUpdatePlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketDeleteInterface">
+        <plugin name="InPost_InPostPay::basketDeleteVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\BasketDeletePlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\InitBasketInterface">
+        <plugin name="InPost_InPostPay::initBasketVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\InitBasketPlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BasketConfirmationInterface">
+        <plugin name="InPost_InPostPay::basketConfirmationVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\BasketConfirmationPlugin"/>
+    </type>
     <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderCreateInterface">
+        <plugin name="InPost_InPostPay::orderCreateVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\OrderCreatePlugin"/>
         <plugin name="InPost_InPostPay::orderCreateExecutionTimePlugin"
                 type="InPost\InPostPay\Plugin\Service\ApiConnector\Merchant\OrderCreateExecutionTimePlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderGetInterface">
+        <plugin name="InPost_InPostPay::orderGetVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\OrderGetPlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\OrderEventInterface">
+        <plugin name="InPost_InPostPay::orderEventVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\OrderEventPlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\BestsellerProductsGetInterface">
+        <plugin name="InPost_InPostPay::bestsellerProductsGetVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\BestsellerProductsGetPlugin"/>
+    </type>
+    <type name="InPost\InPostPay\Api\ApiConnector\Merchant\RefundEventInterface">
+        <plugin name="InPost_InPostPay::refundEventVersionHeaderPlugin"
+                type="InPost\InPostPay\Plugin\Webapi\Rest\Response\RefundEventPlugin"/>
     </type>
     <type name="InPost\InPostPay\Observer\Product\UpdateBestsellerProductAfterAttributeCommitObserver">
         <arguments>

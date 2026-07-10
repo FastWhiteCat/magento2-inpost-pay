@@ -14,8 +14,9 @@ interface ConnectorInterface
 
     /**
      * @param RequestInterface $request
+     * @param array $silencedErrorCodes HTTP error codes that should be logged at debug level instead of critical
      * @return array
      * @throws LocalizedException
      */
-    public function sendRequest(RequestInterface $request): array;
+    public function sendRequest(RequestInterface $request, array $silencedErrorCodes = []): array;
 }

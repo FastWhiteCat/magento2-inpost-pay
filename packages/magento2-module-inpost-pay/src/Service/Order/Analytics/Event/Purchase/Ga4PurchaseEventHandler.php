@@ -27,6 +27,8 @@ class Ga4PurchaseEventHandler implements EventDataHandlerInterface
     public const URL = 'url';
     public const PARAMS = 'params';
     public const METHOD = 'method';
+    private const GUZZLE_CLIENT_CONFIG_CONNECTION_TIMEOUT = 5.0;
+    private const GUZZLE_CLIENT_CONFIG_TIMEOUT = 30.0;
 
     public function __construct(
         private readonly AnalyticsConfigProvider $analyticsConfigProvider,
@@ -175,7 +177,9 @@ class Ga4PurchaseEventHandler implements EventDataHandlerInterface
             [
                 'config' => [
                     'cookies' => false,
-                    'headers' => $headers
+                    'headers' => $headers,
+                    'connect_timeout' => self::GUZZLE_CLIENT_CONFIG_CONNECTION_TIMEOUT,
+                    'timeout' => self::GUZZLE_CLIENT_CONFIG_TIMEOUT,
                 ]
             ]
         );

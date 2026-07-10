@@ -8,6 +8,7 @@ use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterface;
 use InPost\InPostPay\Api\InPostPayBestsellerProductRepositoryInterface;
 use InPost\InPostPay\Exception\NotFullySuccessfulBestsellerProductUploadException;
 use InPost\InPostPay\Model\Registry\SkipFurtherBestsellerUploadRegistry;
+use InPost\InPostPay\Provider\Config\GeneralConfigProvider;
 use InPost\InPostPay\Service\BestsellerProduct\BestsellerChecker;
 use InPost\InPostPay\Service\BestsellerProduct\Upload as UploadService;
 use InPost\InPostPay\Api\Data\Merchant\BestsellerProductInterfaceFactory;
@@ -29,6 +30,9 @@ use Throwable;
  */
 class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         protected readonly BestsellerChecker $bestsellerChecker,
         protected readonly InPostPayBestsellerProductRepositoryInterface $inPostPayBestsellerProductRepository,
@@ -38,7 +42,8 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
         protected readonly UploadService $uploadService,
         protected readonly StoreManagerInterface $storeManager,
         protected readonly SkipFurtherBestsellerUploadRegistry $skipFurtherBestsellerUploadRegistry,
-        protected readonly LoggerInterface $logger
+        protected readonly LoggerInterface $logger,
+        protected readonly GeneralConfigProvider $generalConfigProvider
     ) {
     }
 
@@ -47,6 +52,10 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
         $product = $observer->getEvent()->getData('product');
 
         if (!$product instanceof Product) {
+            return;
+        }
+
+        if (!$this->canSync($product->getStoreId())) {
             return;
         }
 
@@ -163,6 +172,11 @@ class UpdateInPostPayBestsellerProductAfterSaveObserver implements ObserverInter
                 );
             }
         }
+    }
+
+    protected function canSync(int $storeId): bool
+    {
+        return $this->generalConfigProvider->isEnabled($storeId);
     }
 
     /**

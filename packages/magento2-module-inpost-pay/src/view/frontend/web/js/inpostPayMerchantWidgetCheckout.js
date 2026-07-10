@@ -405,7 +405,12 @@ define([
          * @return {boolean}
          */
         handleBasketEvent: function (widgetBasketEvent) {
-            if (widgetBasketEvent !== WidgetBasketEventTypes.ORDER_CREATED) {
+            if (widgetBasketEvent === WidgetBasketEventTypes.BASKET_DELETED) {
+                customerData.invalidate(['cart', 'messages']);
+                return true;
+            }
+
+            if (widgetBasketEvent === WidgetBasketEventTypes.BASKET_PRODUCT_CHANGED) {
                 customerData.invalidate(['cart', 'messages']);
                 return false;
             }

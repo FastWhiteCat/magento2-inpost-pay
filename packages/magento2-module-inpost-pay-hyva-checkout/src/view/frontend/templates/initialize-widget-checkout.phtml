@@ -3,10 +3,12 @@
 use Hyva\Theme\Model\ViewModelRegistry;
 use InPost\InPostPay\ViewModel\Widget;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
 
 /** @var ViewModelRegistry $viewModels */
 /** @var Template $block */
 /** @var Widget $widgetViewModel */
+/** @var Escaper $escaper */
 
 $widgetViewModel = $viewModels->require(Widget::class);
 
@@ -22,14 +24,10 @@ $widgetWrapperClass = "inpay-widget-wrapper";
 
 <div x-data="initializeInpostPayCheckout"
      x-on:private-content-loaded.window="receiveCustomerData"
-     class="<?= /* @noEscape */
-     $widgetWrapperClass . ' ' . /* @noEscape */
-     $bindingPlace ?>">
+     class="<?= $escaper->escapeHtmlAttr($widgetWrapperClass) . ' ' . $escaper->escapeHtmlAttr($bindingPlace) ?>">
     <inpost-izi-button
-        binding_place="<?= /* @noEscape */
-        $bindingPlace ?>"
-        variation="<?= /* @noEscape */
-        $layoutConfig ?>"
+        binding_place="<?= $escaper->escapeHtmlAttr($bindingPlace) ?>"
+        variation="<?= $escaper->escapeHtmlAttr($layoutConfig) ?>"
     ></inpost-izi-button>
 </div>
 

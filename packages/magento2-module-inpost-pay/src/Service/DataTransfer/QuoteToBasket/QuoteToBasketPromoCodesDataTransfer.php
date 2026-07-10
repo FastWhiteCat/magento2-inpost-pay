@@ -77,13 +77,13 @@ class QuoteToBasketPromoCodesDataTransfer implements QuoteToBasketDataTransferIn
 
         $query->joinLeft(
             ['sl' => $this->getConnection()->getTableName(self::SALESRULE_LABEL_TABLE)],
-            sprintf('s.rule_id = sl.rule_id AND sl.store_id = %s', $storeId),
+            $this->getConnection()->quoteInto('s.rule_id = sl.rule_id AND sl.store_id = ?', $storeId),
             ['rule_label' => new Zend_Db_Expr('COALESCE(sl.label, s.name)')]
         );
 
         $query->joinLeft(
             ['sc' => $this->getConnection()->getTableName(self::SALESRULE_COUPON_TABLE)],
-            sprintf('s.rule_id = sc.rule_id AND sc.code = \'%s\'', $couponCode),
+            $this->getConnection()->quoteInto('s.rule_id = sc.rule_id AND sc.code = ?', $couponCode),
             ['rule_coupon' => new Zend_Db_Expr('COALESCE(sc.code, \'\')')]
         );
 

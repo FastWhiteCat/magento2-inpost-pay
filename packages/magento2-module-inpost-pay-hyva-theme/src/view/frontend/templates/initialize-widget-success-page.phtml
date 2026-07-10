@@ -5,7 +5,6 @@ use InPost\InPostPay\ViewModel\Widget;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\Escaper;
 
-
 /** @var ViewModelRegistry $viewModels */
 /** @var Escaper $escaper */
 /** @var Template $block */
@@ -20,14 +19,14 @@ if (!$widgetViewModel->isEnabled()
     return;
 }
 
-$widgetWrapperClass = "inpay-widget-wrapper";
+$wrapperClass = "inpay-widget-wrapper";
 $bindingPlace = $block->getBindingPlace();
 ?>
 
 <?= $block->getChildBlock('inpost.hyva.widget.success.page.script')->toHtml() ?>
 
-<div x-data="initializeInpostPay_<?= $bindingPlace ?>()"
+<div x-data="initializeInpostPay_<?= $escaper->escapeJs($bindingPlace) ?>()"
      @private-content-loaded.window="receiveCustomerData($event.detail.data)"
-     class="container <?= /* @noEscape */ $widgetWrapperClass . ' ' . /* @noEscape */ $bindingPlace?>">
+     class="container <?= $escaper->escapeHtmlAttr($wrapperClass) . ' ' . $escaper->escapeHtmlAttr($bindingPlace) ?>">
     <inpost-thank-you />
 </div>
