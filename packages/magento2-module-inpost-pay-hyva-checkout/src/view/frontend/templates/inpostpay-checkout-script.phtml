@@ -126,21 +126,34 @@ $enabledAnalyticsParams = $widgetViewModel->isAnalyticsEnabled();
                     };
 
                     if (self.configuration.enabledAnalyticsParams) {
-                        const browserStorage = hyva.getBrowserStorage();
-                        const gaClientId = browserStorage.getItem('client_id');
-                        const fbclid = browserStorage.getItem('fbclid');
-                        const gclid = browserStorage.getItem('gclid');
+                        const gaCookie = hyva.getCookie('_ga');
+                        const fbc = hyva.getCookie('_fbc');
+                        const gclAw = hyva.getCookie('_gcl_aw');
+                        const ttclid = hyva.getCookie('ttclid');
 
-                        if (gaClientId !== null) {
-                            formData.ga_client_id = gaClientId;
+                        // Derive GA client_id from the _ga cookie if possible
+                        // Example: _ga=GA1.1.1234567890.1234567890 -> client_id = 1234567890.1234567890
+                        if (gaCookie) {
+                            try {
+                                const parts = gaCookie.split('.');
+                                if (parts.length >= 4) {
+                                    formData.ga_client_id = parts[2] + '.' + parts[3];
+                                }
+                            } catch (e) {
+                                // no-op
+                            }
                         }
 
-                        if (fbclid !== null) {
-                            formData.fbclid = fbclid;
+                        if (fbc) {
+                            formData.fbclid = fbc;
                         }
 
-                        if (gclid !== null) {
-                            formData.gclid = gclid;
+                        if (gclAw) {
+                            formData.gclid = gclAw;
+                        }
+
+                        if (ttclid) {
+                            formData.ttclid = ttclid;
                         }
                     }
 

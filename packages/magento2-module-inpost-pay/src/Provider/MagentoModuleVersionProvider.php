@@ -12,8 +12,8 @@ use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 
 class MagentoModuleVersionProvider
 {
-    public const string DEFAULT_VERSION = '0.0.0';
-    private const string PACKAGE_NAME = 'inpost/magento2-module-inpost-pay';
+    public const DEFAULT_VERSION = '0.0.0';
+    private const PACKAGE_NAME = 'inpost/magento2-module-inpost-pay';
 
     private ?string $version = null;
 
