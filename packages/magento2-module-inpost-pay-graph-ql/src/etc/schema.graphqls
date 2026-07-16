@@ -1,6 +1,10 @@
 type Mutation {
     inPostPayInitBasket (
         cart_id: String! @doc(description: "Cart ID.")
+        ga_client_id: String @doc(description: "Optional Google Analytics client ID. Only processed when InPost Pay analytics tracking is enabled.")
+        fbclid: String @doc(description: "Optional Facebook click identifier (_fbc). Only processed when InPost Pay analytics tracking is enabled.")
+        gclid: String @doc(description: "Optional Google Ads click identifier (_gcl_aw). Only processed when InPost Pay analytics tracking is enabled.")
+        ttclid: String @doc(description: "Optional TikTok click identifier (ttclid). Only processed when InPost Pay analytics tracking is enabled.")
     ): InPostPayBasketData
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayInitBasketResolver")
     @doc(description:"Initiate InPost Pay basket.")
@@ -76,4 +80,7 @@ type StoreConfig {
     inpost_pay_widget_styles : String
     @doc(description: "InPost Pay widget frame corner style.")
     @resolver(class: "InPost\\InPostPayGraphQl\\Model\\Resolver\\InPostPayWidgetFrameStyleResolver")
+
+    inpost_pay_analytics_enabled : Boolean
+    @doc(description: "Indicates whether InPost Pay analytics tracking is enabled.")
 }

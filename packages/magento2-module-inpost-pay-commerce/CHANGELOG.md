@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.0] - 2026-05-29
+
+### Added
+
+- blocking purchasing orders with gift card and/or reward points usage on bound baskets with InPost Pay Mobile App.
+
 ## [2.2.1] - 2025-07-10
 
 ### Added

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.1] - 2026-06-16
+
+### Added
+- Added handling for analytics data passing from frontend to backend via GraphQl.
+
+
 ## [2.6.0] - 2026-02-19
 
 ### Added
@@ -21,7 +27,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Changed flag configs from string output to boolean tyoe 
+- Changed flag configs from string output to boolean tyoe
 
 ## [2.0.0] - 2025-01-17
 
@@ -35,7 +41,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Result of a query that checks if order was initiated from InPost Pay API 
+- Result of a query that checks if order was initiated from InPost Pay API
 
 ## [1.0.0]
 

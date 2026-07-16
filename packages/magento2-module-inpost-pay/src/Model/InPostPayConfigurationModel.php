@@ -26,7 +26,8 @@ class InPostPayConfigurationModel implements ConfigProviderInterface
             'bindingPlace' => DisplayConfigProvider::CHECKOUT_PAGE_BINDING_PLACE_NAME,
             'enabledOnCheckoutPage' => $this->widget->isEnabledOnCheckoutPage(),
             'scriptUrl' => $scriptUrl,
-            'merchantClientId' => $this->widget->getClientMerchantId()
+            'merchantClientId' => $this->widget->getClientMerchantId(),
+            'enabledAnalyticsParams' => $this->widget->isAnalyticsEnabled()
         ];
 
         return $config;

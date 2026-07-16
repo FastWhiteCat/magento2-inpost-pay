@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.1] - 2026-06-16
+
+### Fixed
+- Unified Widget JS scripts analytics data sources for checkout and rest of places. Before that Checkout searched for analytics data in local storage and other widget JSs searched for cookies.
+
+## [2.7.0] - 2026-05-29
+
+### Added
+- Added InPost Pay Module version header to all defined WebAPI endpoints responses. Before there was only header added to sent requests.
+
+### Fixed
+- Fixed security and performance issues related to: DB query parameter binding, PHTML escaping, timeout handling, signature comparison, form_key validation and early returns in native observers
+- Fixed displaying all options to Bundle Products in InPost Pay Order preview
+- Fixed calculating total discount on order preview
+- Fixed logs by silencing 404 critical error on failed basket binding when that is expected
+
+## [2.6.4] - 2026-04-14
+
+### Fixed
+- Fixed displaying Bundle Products options in InPost Pay Basket when Bundle has multiple checkbox options in a single section. Before only the first option was displayed.
+
 ## [2.6.2] - 2026-03-24
 
 ### Fixed
@@ -26,7 +47,7 @@ All notable changes to this project will be documented in this file.
 ## [2.5.0] - 2026-01-29
 
 ### Added
-- Modified handling of creditmemo refunds. From now on, if InPost Pay API returns an error on refund creation, depending on the error code, order transaction will be checked after a short delay in case of that refund was successfully created while API timed out. 
+- Modified handling of creditmemo refunds. From now on, if InPost Pay API returns an error on refund creation, depending on the error code, order transaction will be checked after a short delay in case of that refund was successfully created while API timed out.
 - Creditmemo refunds will be created even in case of handled error codes from the API however, the status of that creditmemo will be opened.
 - Added a webapi endpoint for handling refund confirmation webhook. If the confirmation is received, the creditmemo changes status based on external API status, either refunded or canceled.
 
@@ -54,7 +75,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Added Owebia Advanced Shipping support by adding a configuration field for mapping custom shipping method code not present in a dropdown list. 
+- Added Owebia Advanced Shipping support by adding a configuration field for mapping custom shipping method code not present in a dropdown list.
 
 ## [2.3.0] - 2025-10-01
 
@@ -92,7 +113,7 @@ All notable changes to this project will be documented in this file.
 
 - InPost Pay Bestseller Product objects that are synchronized with InPost Pay API will now contain also Product URL
 - InPost Pay Bestseller Products will now be synchronized when an attribute is saved in Admin Panel
-- In the case of configuration requiring Region for Poland, InPost Pay Module will now resolve Voivodeship based on post-code first two digits provided by InPost Pay due to lack of information about a region from the incoming request. 
+- In the case of configuration requiring Region for Poland, InPost Pay Module will now resolve Voivodeship based on post-code first two digits provided by InPost Pay due to lack of information about a region from the incoming request.
 
 ### Updated
 
@@ -160,7 +181,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- obtaining correct Bearer Token for Transaction List for Refunds using order's Store ID instead of Default Store ID to access credentials 
+- obtaining correct Bearer Token for Transaction List for Refunds using order's Store ID instead of Default Store ID to access credentials
 - removed overriding BaseUrl for Frontend Widget with configurable value
 
 ## [2.0.4] - 2025-01-31
@@ -188,7 +209,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- handling both order ID and order Increment ID in communication with InPost Pay API 
+- handling both order ID and order Increment ID in communication with InPost Pay API
 
 ## [2.0.1] - 2025-01-17
 
@@ -201,7 +222,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 - Removed backend code responsible for creating, checking and deleting bindings of browser and basket between Magento and InPost Pay API
-- Removed no longer handled by backend controllers 
+- Removed no longer handled by backend controllers
 
 ### Added
 
@@ -255,7 +276,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- InPost Pay Baskets merging in scenario when guest with connected cart logs in to an account with another Basket 
+- InPost Pay Baskets merging in scenario when guest with connected cart logs in to an account with another Basket
 
 ## [1.0.8] - 2024-09-05
 
@@ -269,7 +290,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Zero quantity on place order from mobile App will now trigger notices and warnings 
+- Zero quantity on place order from mobile App will now trigger notices and warnings
 
 ## [1.0.7] - 2024-08-08
 
